@@ -4,6 +4,9 @@
 
 # Session Data files
 .RData
+.Rdata
+.rds
+.RDS
 
 # Example code in package build process
 *-Ex.R
@@ -16,6 +19,8 @@
 
 # RStudio files
 .Rproj.user/
+.Rproj
+*.Rproj
 
 # produced vignettes
 vignettes/*.html
@@ -52,6 +57,8 @@ admin/
 *.xls
 *.docx
 *.doc
+*.pdf
+.pdf
 
 # ignore these script files which we will change regularly and don't need to deal with
 /markdown/
@@ -59,3 +66,7 @@ markdown/
 
 *presentation.R
 *.tex
+
+#figures
+*.png
+.png
