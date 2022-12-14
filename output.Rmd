@@ -1,0 +1,525 @@
+---
+output: 
+  pdf_document:
+    fig_caption: yes
+    extra_dependencies: ["float"]
+linkcolor: blue
+params:
+  bank: NA
+  banknum: NA
+header-includes:
+ - \usepackage{float}
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+
+
+
+\includegraphics[width=1\linewidth,height=0.5578\textheight]{Y:/Offshore/Assessment/2022/Presentations/Survey_summary/test_figures/Mid/survey_strata} 
+
+
+
+```
+##                        variable lastyear thisyear  LTM
+## 1          Pre-recruits (<80mm)     0.47     2.40 1.20
+## 2            Recruits (80-89mm)     0.21     0.33 0.40
+## 3 Fully-recruited ($\\geq$90mm)     17.9     11.8 12.1
+```
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- highlights[highlights$bank==params$bank & highlights$variable %in% c("IPR", "IR", "I"), c("variable", "lastyear", "thisyear", "LTM")] -->
+<!-- table$variable <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+<!-- names(table) <- c("Size class", paste0(yeartable[yeartable$bank==params$bank, "lastyear"], " survey"), paste0(yeartable[yeartable$bank==params$bank, "currentyear"], " survey"), "Long term median") -->
+<!-- rownames(table) <- NULL -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Kilograms (kg) of scallop per standardized tow by size class, for the current survey, previous survey, and long term median.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Abundance time series for ", bankname, " in ", year, ", represented by number of scallop per standardized tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/abundance_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Biomass time series for ", bankname, " in ", year, ", represented by kilograms (kg) of scallop per standardized tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/biomass_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="85%", out.width="85%", fig.align="center", fig.cap=paste0("Shell height frequencies of scallop on ", bankname, " in ", year, ". Vertical lines are the recruit size limits.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/SHF.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="70%", out.width="70%", fig.align="center", fig.cap=paste0("Meat weights and shell heights for sampled tows on ", bankname, " in ", year, " (top). Red points represent individual scallops, red lines represent the trend for each sampled tow, and the blue line is the overall trend for the current survey. Condition factor (bottom) is measured as grams of meat per decimeter cubed, which can be thought of as the meat weight of a scallop with a shell height of 100mm.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/MWSH_and_CF_ts.png")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=F} -->
+<!-- spatial.stats.abund <- spatial.sum.stats$abund[spatial.sum.stats$abund$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(spatial.stats.abund) <- NULL  -->
+<!-- names(spatial.stats.abund) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- spatial.stats.abund$`Size class` <- c("Pre-recruits", "Recruits", "Fully-recruited") -->
+<!-- spatial.stats.abund <- spatial.stats.abund[,c(5,1:4)] -->
+
+<!-- spatial.stats.detail <- spatial.sum.stats$cf[spatial.sum.stats$cf$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(spatial.stats.detail) <- NULL  -->
+<!-- names(spatial.stats.detail) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- spatial.stats.detail$` ` <- c("Condition factor") -->
+<!-- spatial.stats.detail <- spatial.stats.detail[,c(5,1:4)] -->
+
+<!-- mc <- spatial.sum.stats$mc[spatial.sum.stats$mc$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(mc) <- NULL -->
+<!-- names(mc) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- mc$` ` <- c("Meat count") -->
+<!-- mc <- mc[,c(5,1:4)] -->
+<!-- spatial.stats.detail <- rbind(spatial.stats.detail, mc) -->
+
+
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- spatial.stats.abund -->
+<!-- table$`Size class` <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Summary statistics for tow abundance by size class, for the current survey.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of pre-recruit scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/PR-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of recruit scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/Rec-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of fully-recruited scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/FR-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- spatial.stats.detail -->
+
+<!-- knitr::kable(table, format = "latex", row.names=F, booktabs=T, caption="Summary statistics for condition factor and meat count for the current survey.") %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of scallop condition on ", bankname, " in ", year, ".")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/CF-spatial.png")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of meat count on ", bankname, " in ", year, ".")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/MC-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F} -->
+<!-- table <- highlights[highlights$bank==params$bank & highlights$variable %in% c("PRpercentclap", "Rpercentclap", "Cpercentclap"), c("variable", "lastyear", "thisyear", "LTM")] -->
+<!-- table$variable <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+<!-- names(table) <- c("Size class", paste0(yeartable[yeartable$bank==params$bank, "lastyear"], " survey"), paste0(yeartable[yeartable$bank==params$bank, "currentyear"], " survey"), "Long term median") -->
+<!-- rownames(table) <- NULL -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Percentage of clappers per standardized tow by size class, for the current survey, previous survey, and long term median.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Clapper time series for ", bankname, " in ", year, ", represented by percentage of clappers per tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/Clapper_per_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="75%", out.width="75%", fig.align="center", fig.cap = paste0("The relationship between biomass and meat count for ", bankname, " in ", year, ". Shell height (5 mm bins) is on the x-axis. Meat count is on the y-axis in the top panel. The solid red line is the estimated meat count for each shell height bin. Biomass (kilograms per standardized tow, kg/tow) is on the y-axis in the bottom panel. The dashed red lines delineate the size range at which you would have a meat count of ", sizes$mc[sizes$bank==params$bank]$size, " or below. The blue vertical lines represent the recruit size range.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/breakdown-",year, ".png")) -->
+<!-- ``` -->
+
+
+
+<!--chapter:end:02-results_Mid.knit.md-->
+
+---
+output: 
+  pdf_document:
+    fig_caption: yes
+    extra_dependencies: ["float"]
+linkcolor: blue
+params:
+  bank: NA
+  banknum: NA
+header-includes:
+ - \usepackage{float}
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+
+
+
+\includegraphics[width=1\linewidth,height=0.5578\textheight]{Y:/Offshore/Assessment/2022/Presentations/Survey_summary/test_figures/Sab/survey_strata} 
+
+
+
+```
+##                        variable lastyear thisyear  LTM
+## 1          Pre-recruits (<80mm)      119      123 35.3
+## 2            Recruits (80-89mm)     9.87     7.39 9.17
+## 3 Fully-recruited ($\\geq$90mm)     15.2     11.2 34.7
+```
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- highlights[highlights$bank==params$bank & highlights$variable %in% c("IPR", "IR", "I"), c("variable", "lastyear", "thisyear", "LTM")] -->
+<!-- table$variable <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+<!-- names(table) <- c("Size class", paste0(yeartable[yeartable$bank==params$bank, "lastyear"], " survey"), paste0(yeartable[yeartable$bank==params$bank, "currentyear"], " survey"), "Long term median") -->
+<!-- rownames(table) <- NULL -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Kilograms (kg) of scallop per standardized tow by size class, for the current survey, previous survey, and long term median.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Abundance time series for ", bankname, " in ", year, ", represented by number of scallop per standardized tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/abundance_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Biomass time series for ", bankname, " in ", year, ", represented by kilograms (kg) of scallop per standardized tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/biomass_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="85%", out.width="85%", fig.align="center", fig.cap=paste0("Shell height frequencies of scallop on ", bankname, " in ", year, ". Vertical lines are the recruit size limits.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/SHF.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="70%", out.width="70%", fig.align="center", fig.cap=paste0("Meat weights and shell heights for sampled tows on ", bankname, " in ", year, " (top). Red points represent individual scallops, red lines represent the trend for each sampled tow, and the blue line is the overall trend for the current survey. Condition factor (bottom) is measured as grams of meat per decimeter cubed, which can be thought of as the meat weight of a scallop with a shell height of 100mm.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/MWSH_and_CF_ts.png")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=F} -->
+<!-- spatial.stats.abund <- spatial.sum.stats$abund[spatial.sum.stats$abund$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(spatial.stats.abund) <- NULL  -->
+<!-- names(spatial.stats.abund) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- spatial.stats.abund$`Size class` <- c("Pre-recruits", "Recruits", "Fully-recruited") -->
+<!-- spatial.stats.abund <- spatial.stats.abund[,c(5,1:4)] -->
+
+<!-- spatial.stats.detail <- spatial.sum.stats$cf[spatial.sum.stats$cf$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(spatial.stats.detail) <- NULL  -->
+<!-- names(spatial.stats.detail) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- spatial.stats.detail$` ` <- c("Condition factor") -->
+<!-- spatial.stats.detail <- spatial.stats.detail[,c(5,1:4)] -->
+
+<!-- mc <- spatial.sum.stats$mc[spatial.sum.stats$mc$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(mc) <- NULL -->
+<!-- names(mc) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- mc$` ` <- c("Meat count") -->
+<!-- mc <- mc[,c(5,1:4)] -->
+<!-- spatial.stats.detail <- rbind(spatial.stats.detail, mc) -->
+
+
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- spatial.stats.abund -->
+<!-- table$`Size class` <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Summary statistics for tow abundance by size class, for the current survey.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of pre-recruit scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/PR-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of recruit scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/Rec-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of fully-recruited scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/FR-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- spatial.stats.detail -->
+
+<!-- knitr::kable(table, format = "latex", row.names=F, booktabs=T, caption="Summary statistics for condition factor and meat count for the current survey.") %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of scallop condition on ", bankname, " in ", year, ".")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/CF-spatial.png")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of meat count on ", bankname, " in ", year, ".")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/MC-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F} -->
+<!-- table <- highlights[highlights$bank==params$bank & highlights$variable %in% c("PRpercentclap", "Rpercentclap", "Cpercentclap"), c("variable", "lastyear", "thisyear", "LTM")] -->
+<!-- table$variable <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+<!-- names(table) <- c("Size class", paste0(yeartable[yeartable$bank==params$bank, "lastyear"], " survey"), paste0(yeartable[yeartable$bank==params$bank, "currentyear"], " survey"), "Long term median") -->
+<!-- rownames(table) <- NULL -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Percentage of clappers per standardized tow by size class, for the current survey, previous survey, and long term median.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Clapper time series for ", bankname, " in ", year, ", represented by percentage of clappers per tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/Clapper_per_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="75%", out.width="75%", fig.align="center", fig.cap = paste0("The relationship between biomass and meat count for ", bankname, " in ", year, ". Shell height (5 mm bins) is on the x-axis. Meat count is on the y-axis in the top panel. The solid red line is the estimated meat count for each shell height bin. Biomass (kilograms per standardized tow, kg/tow) is on the y-axis in the bottom panel. The dashed red lines delineate the size range at which you would have a meat count of ", sizes$mc[sizes$bank==params$bank]$size, " or below. The blue vertical lines represent the recruit size range.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/breakdown-",year, ".png")) -->
+<!-- ``` -->
+
+
+
+<!--chapter:end:02-results_Sab.knit.md-->
+
+---
+output: 
+  pdf_document:
+    fig_caption: yes
+    extra_dependencies: ["float"]
+linkcolor: blue
+params:
+  bank: NA
+  banknum: NA
+header-includes:
+ - \usepackage{float}
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+
+
+
+\includegraphics[width=1\linewidth,height=0.5578\textheight]{Y:/Offshore/Assessment/2022/Presentations/Survey_summary/test_figures/Ger/survey_strata} 
+
+
+
+```
+##                         variable lastyear thisyear  LTM
+## 1           Pre-recruits (<95mm)     74.3     62.6 68.5
+## 2            Recruits (95-104mm)     0.77     2.37 3.64
+## 3 Fully-recruited ($\\geq$105mm)     21.0     13.4 47.2
+```
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- highlights[highlights$bank==params$bank & highlights$variable %in% c("IPR", "IR", "I"), c("variable", "lastyear", "thisyear", "LTM")] -->
+<!-- table$variable <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+<!-- names(table) <- c("Size class", paste0(yeartable[yeartable$bank==params$bank, "lastyear"], " survey"), paste0(yeartable[yeartable$bank==params$bank, "currentyear"], " survey"), "Long term median") -->
+<!-- rownames(table) <- NULL -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Kilograms (kg) of scallop per standardized tow by size class, for the current survey, previous survey, and long term median.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Abundance time series for ", bankname, " in ", year, ", represented by number of scallop per standardized tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/abundance_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Biomass time series for ", bankname, " in ", year, ", represented by kilograms (kg) of scallop per standardized tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/biomass_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="85%", out.width="85%", fig.align="center", fig.cap=paste0("Shell height frequencies of scallop on ", bankname, " in ", year, ". Vertical lines are the recruit size limits.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/SHF.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="70%", out.width="70%", fig.align="center", fig.cap=paste0("Meat weights and shell heights for sampled tows on ", bankname, " in ", year, " (top). Red points represent individual scallops, red lines represent the trend for each sampled tow, and the blue line is the overall trend for the current survey. Condition factor (bottom) is measured as grams of meat per decimeter cubed, which can be thought of as the meat weight of a scallop with a shell height of 100mm.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/MWSH_and_CF_ts.png")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=F} -->
+<!-- spatial.stats.abund <- spatial.sum.stats$abund[spatial.sum.stats$abund$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(spatial.stats.abund) <- NULL  -->
+<!-- names(spatial.stats.abund) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- spatial.stats.abund$`Size class` <- c("Pre-recruits", "Recruits", "Fully-recruited") -->
+<!-- spatial.stats.abund <- spatial.stats.abund[,c(5,1:4)] -->
+
+<!-- spatial.stats.detail <- spatial.sum.stats$cf[spatial.sum.stats$cf$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(spatial.stats.detail) <- NULL  -->
+<!-- names(spatial.stats.detail) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- spatial.stats.detail$` ` <- c("Condition factor") -->
+<!-- spatial.stats.detail <- spatial.stats.detail[,c(5,1:4)] -->
+
+<!-- mc <- spatial.sum.stats$mc[spatial.sum.stats$mc$bank==params$bank, c("Min.", "Median", "Mean", "Max.")] -->
+<!-- rownames(mc) <- NULL -->
+<!-- names(mc) <- c("Minimum", "Median", "Mean", "Maximum") -->
+<!-- mc$` ` <- c("Meat count") -->
+<!-- mc <- mc[,c(5,1:4)] -->
+<!-- spatial.stats.detail <- rbind(spatial.stats.detail, mc) -->
+
+
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- spatial.stats.abund -->
+<!-- table$`Size class` <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Summary statistics for tow abundance by size class, for the current survey.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of pre-recruit scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/PR-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of recruit scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/Rec-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of fully-recruited scallop on ", bankname, " in ", year, ". Each point is a survey station, and the colour shows the distribution of modelled abundance.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/FR-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=F} -->
+<!-- table <- spatial.stats.detail -->
+
+<!-- knitr::kable(table, format = "latex", row.names=F, booktabs=T, caption="Summary statistics for condition factor and meat count for the current survey.") %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of scallop condition on ", bankname, " in ", year, ".")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/CF-spatial.png")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="100%", out.width="100%", fig.align="center", fig.cap=paste0("Spatial distribution of meat count on ", bankname, " in ", year, ".")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/MC-spatial.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F} -->
+<!-- table <- highlights[highlights$bank==params$bank & highlights$variable %in% c("PRpercentclap", "Rpercentclap", "Cpercentclap"), c("variable", "lastyear", "thisyear", "LTM")] -->
+<!-- table$variable <- c(paste0("Pre-recruits (<", sizes$RS[sizes$bank==params$bank]$size, "mm)"), -->
+<!--                     paste0("Recruits (", sizes$RS[sizes$bank==params$bank]$size, "-", (sizes$CS[sizes$bank==params$bank]$size-1), "mm)"), -->
+<!--                     paste0("Fully-recruited ($\\geq$", sizes$CS[sizes$bank==params$bank]$size, "mm)")) -->
+<!-- names(table) <- c("Size class", paste0(yeartable[yeartable$bank==params$bank, "lastyear"], " survey"), paste0(yeartable[yeartable$bank==params$bank, "currentyear"], " survey"), "Long term median") -->
+<!-- rownames(table) <- NULL -->
+
+<!-- kableExtra::kbl(table, booktabs = TRUE, escape =F, format='latex',  -->
+<!--   caption = "Percentage of clappers per standardized tow by size class, for the current survey, previous survey, and long term median.") %>% -->
+<!--   kableExtra::kable_styling(full_width = F) %>%  -->
+<!--   kableExtra::kable_styling(full_width = F) %>% -->
+<!--   kableExtra::kable_styling(latex_options = "HOLD_position") -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Clapper time series for ", bankname, " in ", year, ", represented by percentage of clappers per tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/Clapper_per_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="75%", out.width="75%", fig.align="center", fig.cap = paste0("The relationship between biomass and meat count for ", bankname, " in ", year, ". Shell height (5 mm bins) is on the x-axis. Meat count is on the y-axis in the top panel. The solid red line is the estimated meat count for each shell height bin. Biomass (kilograms per standardized tow, kg/tow) is on the y-axis in the bottom panel. The dashed red lines delineate the size range at which you would have a meat count of ", sizes$mc[sizes$bank==params$bank]$size, " or below. The blue vertical lines represent the recruit size range.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/breakdown-",year, ".png")) -->
+<!-- ``` -->
+
+
+
+<!--chapter:end:02-results_Ger.knit.md-->
+

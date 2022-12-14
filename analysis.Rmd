@@ -1,0 +1,214 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r analysis, echo=F, include=F, paged.print=FALSE,cache=F}
+
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework.RData")
+load("C:/Users/keyserf/Documents/temp_data/OSAC_tidy_logs.RData")
+
+```
+
+```{r bankpertow, echo=F, include=F}
+# Abundance and Biomass TS, FR only
+
+# prep data for TS plotting
+bankpertow <- NULL
+
+# Mid, Ban
+for(bank in c("Mid", "Ban")){
+  df <- SS.summary[[bank]] %>%
+    dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv)
+  bankpertow <- rbind(bankpertow, df)
+}
+
+dim(bankpertow)
+
+# Ger
+dim(merged.survey.obj)
+bankpertow <- merged.survey.obj %>%
+  dplyr::mutate(bank="Ger") %>%
+  dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv) %>%
+  full_join(bankpertow)
+
+dim(bankpertow)
+
+dim(survey.obj$Ger$model.dat)
+bankpertow <- survey.obj$Ger$model.dat %>%
+  dplyr::mutate(bank="Ger") %>%
+  dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv) %>%
+  full_join(bankpertow)
+
+dim(bankpertow)
+
+bankpertow <- full_join(bankpertow, data.frame(bank="Ger", year=2020))
+
+# BBn, BBs
+for(b in c("BBn", "BBs")){
+  print(dim(survey.obj[[b]]$bankpertow))
+  bankpertow <- survey.obj[[b]]$bankpertow %>%
+    dplyr::mutate(bank=b) %>%
+    dplyr::select(bank, year, N, NR, NPR, N.se, NR.se, NPR.se, I, IR, IPR, I.se, IR.se, IPR.se) %>%
+    rename(N.cv=N.se, NR.cv=NR.se, NPR.cv=NPR.se, I.cv=I.se, IR.cv = IR.se, IPR.cv=IPR.se)%>%
+    full_join(bankpertow)
+
+  bankpertow <- full_join(bankpertow, data.frame(bank=b, year=2020))
+
+  print(dim(bankpertow))
+}
+
+# Sab
+source("~/GitHub/Assessment_fns/Survey_and_OSAC/survey.ts.r", echo=TRUE)
+npertow <- survey.ts(
+  survey.obj$Sab[[1]],
+  min(survey.obj$Sab[[1]]$year, na.rm = T):yr,
+  pdf = F,
+  areas = surv.info$towable_area[surv.info$startyear==2018],
+  se = T) %>%
+  mutate(bank="Sab") 
+ipertow <- survey.ts(
+  survey.obj$Sab[[1]],
+  min(survey.obj$Sab[[1]]$year, na.rm = T):yr,
+  pdf = F,
+  areas = surv.info$towable_area[surv.info$startyear==2018],
+  se = T,
+  type="B") %>%
+  mutate(bank="Sab") 
+
+bankpertow <- full_join(npertow, ipertow) %>%
+  full_join(bankpertow)
+
+
+bankpertow <- bankpertow %>%
+  pivot_longer(cols=c("N", "NR", "NPR", "I", "IPR", "IR"), values_to = "index.val", names_to="index")
+
+cv <- bankpertow %>%
+  dplyr::select(bank, year, n, N.cv, NR.cv, NPR.cv, I.cv, IPR.cv, IR.cv) %>%
+  pivot_longer(cols=c("N.cv", "NR.cv", "NPR.cv", "I.cv", "IPR.cv", "IR.cv"), values_to = "cv.val", names_to="index") %>%
+  dplyr::select(bank, year, n, index, cv.val)
+cv$index <- gsub(x=cv$index, ".cv", "")
+
+bankpertow <- bankpertow %>%
+  dplyr::select(bank, year, n, index, index.val) %>%
+  full_join(cv)
+
+bankpertow$sfa[bankpertow$bank %in% c("Ban", "Mid", "Sab")] <- 25
+bankpertow$sfa[bankpertow$bank %in% c("BBn", "BBs", "Ger")] <- 26
+
+bankpertow$size[bankpertow$index %in% c("N", "I")] <- "FR"
+bankpertow$size[bankpertow$index %in% c("NPR", "IPR")] <- "PR"
+bankpertow$size[bankpertow$index %in% c("NR", "IR")] <- "R"
+
+bankpertow$index <- gsub(x=bankpertow$index, "P", "")
+bankpertow$index <- gsub(x=bankpertow$index, "R", "")
+
+
+bankpertow$size <- factor(bankpertow$size,
+                          levels=c("PR", "R", "FR"))
+bankpertow$index <- factor(bankpertow$index,
+                          levels=c("N", "I"),
+                          labels=c(expression(frac("N", "tow")),
+                                   expression(frac("g", "tow"))))
+
+sfa <- c(25,26)
+for(sfa in sfa){
+  png(filename=paste0("timeseries_", sfa, "_FR.png"), width=8, height=6, units = "in", res=420)
+  print(ggplot() + geom_line(data=bankpertow[bankpertow$sfa==sfa & bankpertow$size=="FR",],
+                             aes(year, index.val, colour=bank)) +
+          geom_point(data=bankpertow[bankpertow$sfa==sfa & bankpertow$size=="FR",],
+                     aes(year, index.val, colour=bank)) +
+          #geom_errorbar(data=bankpertow, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
+          geom_ribbon(data=bankpertow[bankpertow$sfa==sfa & bankpertow$size=="FR",],
+                      aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank), alpha=0.3)+
+          theme_bw() +
+          # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
+          #            scales="free_y")
+          facet_wrap(~index,
+                     scales="free_y", ncol=1,
+                     labeller = label_parsed,
+                     strip.position="left") +
+          theme(strip.placement="outside", strip.background=element_blank()) +
+          scale_colour_manual(values=c("black", "darkorange", "blue"), name="Management\nunit") +
+          scale_fill_manual(values=c("black", "darkorange", "blue"), name="Management\nunit") +
+          #scale_y_log10() +
+          ylab(NULL)+
+          xlab("Year"))
+  dev.off()
+}
+
+
+# condition
+
+banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger")
+
+
+# prep data for TS plotting
+cfts <- NULL
+
+for(b in c("Mid", "Ban", "Sab", "BBn", "BBs")){
+  df <- survey.obj[[b]]$model.dat %>%
+    dplyr::select(year, CF) %>%
+    dplyr::mutate(bank=b)
+  df <- df %>%
+    full_join(expand.grid(year=seq(min(df$year), max(df$year), 1), bank=b)) %>%
+    dplyr::mutate(type="lined")
+  cfts <- rbind(cfts, df)
+}
+
+# Ger
+cfts <- cf.data$Ger$CFyrs %>%
+  dplyr::select(year, CF, CF2) %>%
+  dplyr::mutate(bank="Ger") %>%
+  full_join(expand.grid(year=seq(min(cf.data$Ger$CFyrs$year), max(cf.data$Ger$CFyrs$year), 1), bank="Ger")) %>%
+  dplyr::mutate(type=ifelse(year<2008, "unlined", "lined"))%>%
+  dplyr::mutate(CF = ifelse(is.na(CF) & !is.na(CF2), CF2, CF))%>%
+  dplyr::select(bank, year, CF, type) %>%
+  full_join(cfts)
+
+cfts$sfa[cfts$bank %in% c("Ban", "Mid", "Sab")] <- 25
+cfts$sfa[cfts$bank %in% c("BBn", "BBs", "Ger")] <- 26
+
+png(filename=paste0("cfts_26.png"), width=8, height=6, units = "in", res=420)
+print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank)) +
+        geom_line(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank, linetype=type)) +
+        xlab("Year") + 
+        ylab(expression(paste("Condition factor ",bgroup("(",frac(g,dm^3)   ,")")))) +
+        theme_bw() +
+        scale_linetype_discrete(name="") +
+        guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
+        scale_colour_manual(name="Management\nunit", values=c("black", "darkorange", "blue"))
+)
+dev.off()
+
+png(filename=paste0("cfts_25.png"), width=8, height=6, units = "in", res=420)
+print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
+        geom_line(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
+        xlab("Year") + 
+        ylab(expression(paste("Condition factor ",bgroup("(",frac(g,dm^3)   ,")")))) +
+        theme_bw() +
+        scale_colour_manual(name="Management\nunit", values=c("black", "darkorange", "blue"))
+)
+dev.off()
+
+```
+
+```{r fishery-ts, echo=F, include=F}
+fishery <- fish.dat %>% 
+  filter(!is.na(bank)) %>%
+  group_by(bank, year) %>%
+  summarize(catch = sum(pro.repwt),
+            effort=sum(hm))
+
+fishery$sfa[fishery$bank %in% c("Sab", "Ban", "Mid")] <- 25
+fishery$sfa[fishery$bank %in% c("BBn", "BBs", "Ger", "BB")] <- 26
+
+ggplot() + geom_point(data=fishery[fishery$sfa==25 & !is.na(fishery$bank),], aes(year, catch, colour=bank)) +
+  geom_line(data=fishery[fishery$sfa==25 & !is.na(fishery$bank),], aes(year, catch, colour=bank))
+
+ggplot() + geom_point(data=fishery[fishery$sfa==26 & !is.na(fishery$bank),], aes(year, catch, colour=bank)) +
+  geom_line(data=fishery[fishery$sfa==26 & !is.na(fishery$bank),], aes(year, catch, colour=bank))
+
+table(fish.dat[fish.dat$bank=="BBn" & fish.dat$year==2020,]$surv.year) 
+
+```
