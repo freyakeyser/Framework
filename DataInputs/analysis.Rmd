@@ -4,7 +4,9 @@ editor_options:
   chunk_output_type: console
 ---
 ```{r analysis, echo=F, include=F, paged.print=FALSE,cache=F}
-
+require(ggplot2)
+require(dplyr)
+require(tidyr)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework.RData")
 load("C:/Users/keyserf/Documents/temp_data/OSAC_tidy_logs.RData")
 
@@ -169,7 +171,7 @@ cfts <- cf.data$Ger$CFyrs %>%
 cfts$sfa[cfts$bank %in% c("Ban", "Mid", "Sab")] <- 25
 cfts$sfa[cfts$bank %in% c("BBn", "BBs", "Ger")] <- 26
 
-png(filename=paste0("cfts_26.png"), width=8, height=6, units = "in", res=420)
+png(filename=paste0("cfts_26.png"), width=8, height=4, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank)) +
         geom_line(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank, linetype=type)) +
         xlab("Year") + 
@@ -181,7 +183,7 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank)
 )
 dev.off()
 
-png(filename=paste0("cfts_25.png"), width=8, height=6, units = "in", res=420)
+png(filename=paste0("cfts_25.png"), width=8, height=4, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
         geom_line(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
         xlab("Year") + 
