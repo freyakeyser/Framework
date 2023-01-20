@@ -144,85 +144,8 @@ for(sfa in sfa){
 
 banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger")
 
-# compare cf approaches
-for(b in  c("Mid", "Ban", "Sab", "BBn", "BBs")){
-  original <- cf.data[[b]]$CFyrs
-  original$type <- "original"
-  original$year <- as.numeric(original$year)
-  predicted <- data.frame(year=survey.obj[[b]]$model.dat$year, CF=survey.obj[[b]]$model.dat$CF, type="predicted")
-  comb <- full_join(original, predicted) %>%
-    select(year, type, CF) %>%
-    pivot_wider(id_cols = year, values_from = CF, names_from=type)
-  
-  print(ggplot() + geom_text(data=comb, aes(original, predicted, label=year)) +
-    geom_abline(slope = 1, intercept=0)+
-      ggtitle(b))
-  
-  comb2 <- comb %>%
-    pivot_longer(!year)
-  
-  print(ggplot() + geom_point(data=comb2, aes(year, value, shape=name, colour=name)) +
-    geom_line(data=comb2, aes(year, value, colour=name))+
-      ggtitle(b))
-  
-  # what happens if you convert to biomass
-  
-  
-  
-  
-    
-}
 
 
-source("C:/Users/keyserf/Documents/Github/Assessment_fns/Survey_and_OSAC/condFac.r")
-bnk <- "BBn"
-cf2 <- condFac(na.omit(mw.dat.all[[bnk]]),bank.dat[[bnk]],model.type='gam_f',dirct=direct_fns, plt=T)
-
-
-CF.current$BBn[CF.current$BBn$tow==201,]
-cf.data$BBn$CF.data[cf.data$BBn$CF.data$year==2022 & cf.data$BBn$CF.data$tow==201,]
-
-
-mw.dat.all$BBn
-mw.dat.mod <- mw.dat.all$BBn[complete.cases(mw.dat.all$BBn),]
-mw.mod <- gam(log(wmw)~s(sh) + s(lon,lat)+s(depth)+as.factor(year),data=mw.dat.mod)
-summary(mw.mod)
-mw.dat.mod$resid.gam <- residuals(mw.mod)
-# So again we see that increase in variance as SH increases
-ggplot(mw.dat.mod, aes(x=sh,y=resid.gam)) +geom_point() + geom_smooth(method = 'gam')
-dev.off()
-qqnorm(mw.dat.mod$resid.gam)
-qqline(mw.dat.mod$resid.gam)
-pred.dat <- expand.grid(sh=50:200, depth=mean(mw.dat.mod$depth), lat=mean(mw.dat.mod$lat), lon=mean(mw.dat.mod$lon), year=unique(mw.dat.mod$year))
-pred.dat$fit <- exp(predict(object=mw.mod, newdata=pred.dat))
-ggplot() +geom_point(data=mw.dat.mod, aes(x=sh,y=wmw)) + 
-  geom_line(data=pred.dat, aes(x=sh, y=fit, group=year), colour="red")
-
-
-CF.fit<-gam(CF~s(lon,lat)+s(depth)+as.factor(year),data=cf.data$BBn$CF.data)
-summary(CF.fit)
-cf.data$BBn$CF.data$resid.gam <- residuals(CF.fit)
-# So again we see that increase in variance as SH increases
-ggplot(cf.data$BBn$CF.data, aes(x=depth,y=resid.gam)) +geom_point() + geom_smooth(method = 'gam')
-dev.off()
-qqnorm(cf.data$BBn$CF.data$resid.gam)
-qqline(cf.data$BBn$CF.data$resid.gam)
-pred.dat$fit2 <- predict(object=CF.fit, newdata=pred.dat)
-ggplot() +geom_point(data=cf.data$BBn$CF.data, aes(x=year, y=CF)) + 
-  geom_line(data=pred.dat, aes(x=year, y=fit2, group=1), colour="red") +
-  geom_line(data=pred.dat[pred.dat$sh==100,], aes(x=year, y=fit, group=1), colour="blue")
-
-ggplot() +geom_point(data=mw.dat.mod, aes(x=sh,y=wmw)) + 
-  geom_line(data=pred.dat, aes(x=sh, y=fit, group=year), colour="red") +
-  geom_line(data=pred.dat, aes(x=sh, y=fit2, group=year), colour="blue") +
-  facet_wrap(~year)
-
-
-
-without <- survey.dat(shf = surv.Rand$BBn, years=unique(surv.Rand$BBn$year), RS=85, CS=95, bk="BBn", areas=survey.info[survey.info$label=="BBn"& survey.info$startyear==2021,c("Strata_ID", "towable_area", "startyear")], mw.par="CF", user.bins = bin)
-
-without$model.dat$I
-with$model.dat$I
 # prep data for TS plotting
 cfts <- NULL
 

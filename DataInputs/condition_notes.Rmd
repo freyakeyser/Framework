@@ -1,0 +1,57 @@
+
+
+
+
+
+1)	`shwt.lme(mw.dm, random.effect = “tow”, b.par = 3)`:
+      a.	Uses current yr sampling data to predict mwsh relationship, with random effect of tow
+      b.	Creates SpatHtWt.fit obj which is used for CF.current object. For most banks:
+      `CF.current[[bnk]]<-na.omit(merge(subset(na.omit(SurvDB$pos), bank == bnk & year==yr, c('tow','lon','lat')), SpatHtWt.fit[[bnk]]$fit))`
+      c. SpatHtWt.fit is used for the MWSH plot (random effects used for tows; fixed used for overall trend)
+
+  
+2) For Mid, Ban: `cf.data[[bnk]] <- condFac(mw.dat.all[[bnk]],bank.dat[[bnk]],model.type='glm',dirct=direct_fns)`
+   For others: `cf.data[[bnk]] <- condFac(na.omit(mw.dat.all[[bnk]]),bank.dat[[bnk]],model.type='gam_f',dirct=direct_fns)`
+      a. condFac recalculates mwsh relationship using full sampling dataset (all years)
+          - creates a new SpatHtWt.fit object inside the function, where random effect is ID (not tow) `	SpatHtWt.fit<-shwt.lme(wgt.dat,random.effect='ID',b.par=b.par,verbose=F)`
+      b. depth (and coordinates for some) and the mwsh relationship are used to predict condition at all tow locations (sampled and unsampled)
+          - glm:  `CF.fit<-glm(CF~depth+as.factor(year),data=CF.data)`
+          - gam_f:  `CF.fit<-gam(CF~s(lon,lat)+s(depth)+as.factor(year),data=CF.data)`
+          
+year    tow   mw    sh    SpatHtWt.fit    depth     lat     lon  
+2021    1     20    100   pred            nnn       nn.nn   nn.nn  
+2021    2     NA    NA                    nnn       nn.nn   nn.nn
+2022    1     NA    NA                    nnn       nn.nn   nn.nn                 
+2022    2     30    150   pred            nnn       nn.nn   nn.nn
+2022    3     15    90    pred            nnn       nn.nn   nn.nn
+2022    4     NA    NA                    nnn       nn.nn   nn.nn                 
+
+CF mod <- SpatHtWt.fit pred ~ depth + lon, lat + year 
+predict annually for a particular depth and location
+
+year    pred.depth    pred.lat    pred.lon    CF*
+2019    nn            nn.nnn      nn.nnn      pred    
+2021    nn            nn.nnn      nn.nnn      pred                
+2022    nn            nn.nnn      nn.nnn      pred  
+
+*This is the condition prediction for the year
+
+#Predictions from shwt.lme outside of condfac
+`CF.current$BBn[CF.current$BBn$tow==201,]`
+  tow     lon    lat         CF year   com   com.bm meat.count
+1 201 -66.189 42.597 **15.255** 2022 3.156 0.059883     26.351
+
+#Predictions from shwt.lme inside of condfac, inputs: wmw and sh
+`cf.data$BBn$CF.data[cf.data$BBn$CF.data$year==2022 & cf.data$BBn$CF.data$tow==201,]`
+          ID     lon    lat year  depth tow         CF
+353 LE15.201 -66.189 42.597 2022 73.152 201 **15.318**
+
+#Predictions from gam or glm inside of condfac, inputs: CF, depth, lon, lat
+`cf.data$BBn$pred.dat[cf.data$BBn$pred.dat$year==2022 & cf.data$BBn$pred.dat$tow==201 & cf.data$BBn$pred.dat$state=="live",]`
+year tow cruise bank       date   slat   slon   elat    elon  depth state 
+2022 201   LE15  BBn 2022-05-29 42.593 -66.19 42.602 -66.189 73.152  live
+random    species month survey     lon    lat surv.bank
+      1 seascallop     5 spring -66.189 42.597 BBnspring
+      ID Strata_ID         CF CFse.fit
+2022.201       201 **12.256**  0.36157
+
