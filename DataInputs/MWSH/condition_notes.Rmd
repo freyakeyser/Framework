@@ -1,7 +1,4 @@
-
-
-
-
+# understanding condition calculations in Survey Summary
 
 1)	`shwt.lme(mw.dm, random.effect = “tow”, b.par = 3)`:
       a.	Uses current yr sampling data to predict mwsh relationship, with random effect of tow
