@@ -217,6 +217,22 @@ print(lvb.par)
 # source(paste0(direct2013, "fn/age.back.r"))
 # age.back(100,lvb.par)
 
+# what if we remove the "bad" tow
+#source(paste0(direct2013, "fn/lvb.nlme.r"),local=T)
+SpatLVB.fit2<-lvb.nlme(annuliAGEs[!annuliAGEs$ID=="TE11.201",],random.effect='ID')
+#source(paste0(direct2013, "fn/lvb.plt1.r"))
+lvb.plt1(SpatLVB.fit2,ylim=c(0,170),xlim=c(0,15),pch=16)
+#source(paste0(direct2013, "fn/lvb.plt.r"))
+lvb.plt(SpatLVB.fit2)
+
+lvb.par<-SpatLVB.fit2[c(1:2,5)]
+names(lvb.par)<-c("linf","k","t0")
+print(lvb.par)
+# 159.0024, 0.18758, 0.1442157
+# Hubley 2014 says: L∞ =148, K =0.19, t0=0.11
+# not sure what this is
+# source(paste0(direct2013, "fn/age.back.r"))
+# age.back(100,lvb.par)
 
 # looking at the 2013 RData
 # load(paste0(direct2013, "Age.Rdata"))
