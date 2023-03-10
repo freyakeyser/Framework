@@ -1,0 +1,513 @@
+---
+title: "Aging"
+output: word_document
+date: "2023-02-22"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=F, include=F, warning=F, message=F}
+require(tidyverse)
+require(ggplot2)
+require(lubridate)
+
+
+LVB <- function(AGE.dat,xmax,ymax,plt=T){
+	
+	# LVB model
+#browser()
+
+ 	# initial parameters
+	a <- sort(unique(AGE.dat$AGE))
+ 	mh <- tapply(AGE.dat$HEIGHT,AGE.dat$AGE,mean)
+ 	walford <- lm(mh[2:length(mh)]~mh[1:(length(mh)-1)])
+ 	hinf <- walford$coefficients[1]/(1-walford$coefficients[2])
+ 	K <- -log(walford$coefficients[2])
+ 	hmf <- lm(log(hinf-mh)~a)
+ 	t0 <- (hmf$coefficients[1]-log(hinf))/K
+	start.par <- list(hinf=hinf, K=K, t0=t0)
+	# least squares fit
+	lvb.fit <- summary(nls(HEIGHT~hinf*(1-exp(-K*(AGE-t0))), data = AGE.dat,start = start.par))
+	ht <- lvb.fit$parameters[1]*(1-exp(-lvb.fit$parameters[2]*(a-lvb.fit$parameters[3])))     # von Bertalanffy equation #
+	#ht <- parameters[1]*(1-exp(-parameters[2]*(a-parameters[3])))     # von Bertalanffy equation #
+
+	parameters<-c()
+	for(j in 1:6){parameters[j]<-lvb.fit$parameters[j]}
+	names(parameters)<-c("Hinf","K","t0","Hinf.se","K.se","t0.se")
+	
+	if(missing(xmax))xmax<-max(AGE.dat$AGE,na.rm=T)
+	if(missing(ymax))ymax<-max(AGE.dat$HEIGHT,na.rm=T)
+
+	if(plt==T){
+	plot(HEIGHT~AGE,data=AGE.dat,ylab='Shell Height (mm)',xlab='Age',xlim=c(0,xmax),ylim=c(0,ymax),col=rgb(0,0,0,0.1),pch=16)
+	lines(a,ht,lwd=2,col='red')
+	grid(col = "grey40")
+	linf <- round(parameters[1], 2)
+	k1 <- round(parameters[2], 2)
+	t0 <- round(parameters[3], 2)
+	
+	text(xmax, ymax*0.21, substitute(L[infinity] * " =  " * linf), pos = 2, cex = 1.1)
+	text(xmax, ymax*0.14, substitute(k * " = " * k1) , pos = 2, cex = 1.1)
+	text(xmax, ymax*0.07, substitute(t[0] * " = " * t0), pos = 2, cex = 1.1)
+	}
+	
+	return(parameters)
+}
+
+lvb.nlme <- function(AGE.dat,random.effect="year",ran.par='both',verbose=T, GBmodel=F, k.par='estimate'){
+
+
+	# Estimate LVB parameters using a 
+	# non-Linear mixed-effects model
+	AGE.dat <- as.data.frame(AGE.dat)
+	require(nlme)
+	AGE.dat$raneff<-AGE.dat[,random.effect]
+	ran.effects<-unique(AGE.dat$raneff)
+
+	AGE.gdat <- groupedData(HEIGHT ~ AGE | raneff, data = AGE.dat)
+	linf <- c()
+	k <- c()
+	
+	if(ran.par=='both')ran.form = linf + k ~ 1
+	if(ran.par=='linf')ran.form = linf ~ 1
+	if(ran.par=='k')ran.form = k ~ 1
+	
+	if(k.par=='estimate')AGE.nlme <- nlme(model = HEIGHT ~ linf * (1 - exp(-k * (AGE - tzero))), data = AGE.gdat, fixed = linf + k + tzero ~ 1, random = ran.form, start = c(150, 0.3, 0), na.action = na.omit, control = list(maxIter = 50), method = "ML")
+	if(k.par!='estimate'){
+		AGE.gdat$k<-k.par
+		AGE.nlme <- nlme(model = HEIGHT ~ linf * (1 - exp(-k * (AGE - tzero))), data = AGE.gdat, fixed = linf +  tzero ~ 1, random = ran.form, start = c(150, 0), na.action = na.omit, control = list(maxIter = 50), method = "ML")
+	}
+	if(is.character(AGE.dat[,random.effect]))fit <- data.frame(raneff=row.names(coef(AGE.nlme)),coef(AGE.nlme))
+	if(!is.character(AGE.dat[,random.effect]))fit <- data.frame(raneff=sort(row.names(coef(AGE.nlme))),linf=coef(AGE.nlme)[order(as.numeric(row.names(coef(AGE.nlme)))),1],k=coef(AGE.nlme)[order(as.numeric(row.names(coef(AGE.nlme)))),2])
+	for(i in 1:length(ran.effects)){
+		linf[i] <- exp(fit[i,2])
+		k[i] <- fit[i,3]
+	}
+	Linf <- AGE.nlme$coef$fixed[1]
+	K <- AGE.nlme$coef$fixed[2]
+	t0 <- AGE.nlme$coef$fixed[3]
+
+	names(fit)[1]<-random.effect
+
+	if(verbose) print(summary(AGE.nlme))
+	AGE.dat$label<-AGE.dat[,random.effect]
+	if(random.effect=="month")AGE.dat$label<-months(as.Date(paste("2009-",1:12,"-01",sep="")))[AGE.dat$raneff]
+	return(list(Linf=Linf,K=K,linf=linf,k=k,t0=t0,data=AGE.dat,fit=fit))
+	
+}
+
+lvb.plt1 <- function(lvb.fit,ht=7,wd=7,cx=1,lw=2,lab=T,alpha=0.3,...){
+
+	attach(lvb.fit)	
+
+	par(mar = c(2,2,0,0), omi = c(0.5, 0.5, 0.1, 0.1))
+	
+	plot(HEIGHT ~ AGE, data = data, col = rgb(0.1,0.1,0.1,alpha), las = 1, mgp = c(0.5, 0.5, 0), xlab ="", ylab = "", tcl = -0.3,cex.axis=cx, ...)
+	grid(col = "grey30")
+			
+	x <- with(data, seq(0, max(AGE, na.rm = T), length = 40))
+		
+	for(i in 1:nrow(fit)){
+		y= fit[i,'linf'] * (1 - exp(-fit[i,'k'] * (x - t0)))
+		lines(x, y, col = rgb(1,0,0,alpha*0.6))
+	}
+	Y= Linf * (1 - exp(-K * (x - t0)))
+	lines(x, Y, lwd = lw, col = 'blue')
+		
+	if(lab){
+		mtext("Age (years)", 1, 1, outer = T,cex=cx)
+		mtext("Shell height (mm)", 2, 1, outer = T,cex=cx)
+	}
+	
+	detach(lvb.fit)		
+}
+
+lvb.plt <- function(lvb.fit, nr=6,ht=7,wd=11,labcx=1){
+
+	x <- list(NULL)
+	y <- list(NULL)
+	y.all <- list(NULL)
+	
+	attach(lvb.fit)	
+	ran.effects<-fit[,1]
+	par(mfrow=c(nr, ceiling(length(ran.effects)/nr)), mar = c(2,2,0,0), omi = c(0.5, 0.5, 0.1, 0.1))
+	
+	
+	for(i in 1:length(ran.effects)){
+		plot(HEIGHT ~ AGE, data = data, subset = raneff == ran.effects[i],pch=16, xlim = c(0,max(data$AGE)), ylim = c(0, max(data$HEIGHT) + 5), col = rgb(0,0,0,0.05), las = 1, mgp = c(0.5, 0.5, 0), xlab ="", ylab = "", tcl = -0.3)
+		grid(col = "grey30")
+		
+		
+		x[[i]] <- with(subset(data, raneff == ran.effects[i]), seq(min(AGE, na.rm = T), max(AGE, na.rm = T), length = 40))
+		y[[i]] <- fit[i,'linf'] * (1 - exp(-fit[i,'k'] * (x[[i]] - t0)))
+		y.all[[i]] <- Linf * (1 - exp(-K * (x[[i]] - t0)))
+			
+		lines(x[[i]], y[[i]], lwd = 2, col = 'red')
+		lines(x[[i]], y.all[[i]], lwd = 2, col = 'blue')
+		text(0, max(data$HEIGHT) - 2, unique(data$label[data$raneff==ran.effects[i]]), cex = labcx,pos=4)
+		}
+		mtext("AGE", 1, 1, outer = T)
+		mtext("Shell height (mm)", 2, 1, outer = T)
+		
+	detach(lvb.fit)
+		
+}
+
+```
+
+## Hubley et al. 2014 curves
+Reading in csv's that were saved from database using import.age.data()  
+
+### 1997-2003 first.   
+```{r, echo=F}
+direct2013 <- "Y:/Offshore/Assessment/2013/r/"
+
+# 1997-2003
+age.dat <- read.csv(paste0(direct2013, "data/BBnOldIncrementAge.csv"))
+
+# new age data (FK: no, this is using the "old" data, NOT new)
+OldannuliAGEs <- subset(age.dat,annuli.HEIGHT<200)
+OldannuliAGEs$AGE <- OldannuliAGEs$annuli.AGE
+OldannuliAGEs$HEIGHT <- OldannuliAGEs$annuli.HEIGHT
+
+#source(paste0(direct2013, "fn/LVB.r"))
+lvb.par <- LVB(OldannuliAGEs)
+print(lvb.par)
+# in Hubley 2014 and 2011: : L∞ =147, K =0.22, t0=1.0
+# I'm getting 148.42, 0.22, 1
+
+#source(paste0(direct2013, "fn/lvb.nlme.r"),local=T)
+OldannuliAGEs$ID <- paste0(OldannuliAGEs$year, ".", OldannuliAGEs$tow)
+SpatLVB.fit1<-lvb.nlme(OldannuliAGEs,random.effect='ID')
+#source(paste0(direct2013, "fn/lvb.plt1.r"))
+lvb.plt1(SpatLVB.fit1,ylim=c(0,170),xlim=c(0,15),pch=16)
+#source(paste0(direct2013, "fn/lvb.plt.r"))
+lvb.plt(SpatLVB.fit1)
+lvb.par<-SpatLVB.fit1[c(1:2,5)]
+names(lvb.par)<-c("linf","k","t0")
+print(lvb.par)
+#144.5167, 0.2318, 1.035
+```
+
+### 2011/2012 data used in Hubley et al. 2014  
+```{r, echo=F}
+annuliAGEs <- read.csv(paste0(direct2013, "data/BBnIncrementAge.csv"))
+annuliAGEs$AGE <- annuliAGEs$annuli.AGE
+annuliAGEs$HEIGHT <- annuliAGEs$annuli.HEIGHT
+annuliAGEs$ID <- paste(annuliAGEs$cruise,annuliAGEs$tow,sep='.')
+
+#source(paste0(direct2013, "fn/LVB.r"))
+lvb.par<-LVB(annuliAGEs)
+print(lvb.par)
+# 130.02, 0.25, 0.28
+
+#source(paste0(direct2013, "fn/lvb.nlme.r"),local=T)
+SpatLVB.fit2<-lvb.nlme(annuliAGEs,random.effect='ID')
+#source(paste0(direct2013, "fn/lvb.plt1.r"))
+lvb.plt1(SpatLVB.fit2,ylim=c(0,170),xlim=c(0,15),pch=16)
+#source(paste0(direct2013, "fn/lvb.plt.r"))
+lvb.plt(SpatLVB.fit2)
+
+lvb.par<-SpatLVB.fit2[c(1:2,5)]
+names(lvb.par)<-c("linf","k","t0")
+print(lvb.par)
+# 151.454, 0.185, 0.06
+# Hubley 2014 says: L∞ =148, K =0.19, t0=0.11
+# not sure what this is
+# source(paste0(direct2013, "fn/age.back.r"))
+# age.back(100,lvb.par)
+
+# what if we remove the "bad" tow
+#source(paste0(direct2013, "fn/lvb.nlme.r"),local=T)
+SpatLVB.fit2<-lvb.nlme(annuliAGEs[!annuliAGEs$ID=="TE11.201",],random.effect='ID')
+#source(paste0(direct2013, "fn/lvb.plt1.r"))
+lvb.plt1(SpatLVB.fit2,ylim=c(0,170),xlim=c(0,15),pch=16)
+#source(paste0(direct2013, "fn/lvb.plt.r"))
+lvb.plt(SpatLVB.fit2)
+
+lvb.par<-SpatLVB.fit2[c(1:2,5)]
+names(lvb.par)<-c("linf","k","t0")
+print(lvb.par)
+# 159.0024, 0.18758, 0.1442157
+# Hubley 2014 says: L∞ =148, K =0.19, t0=0.11
+# not sure what this is
+# source(paste0(direct2013, "fn/age.back.r"))
+# age.back(100,lvb.par)
+
+# looking at the 2013 RData
+# load(paste0(direct2013, "Age.Rdata"))
+# LVB(OldannuliAGEs) # 148.42, 0.22, 1
+# LVB(annuliAGEs) # 130.02, 0.25, 0.28
+# lvb.par # 151.454, 0.185, 0.06
+# me.lvb.par
+# SpatLVB.fit[c(1:2,5)]
+# SpatLVB.fit1[c(1:2,5)]
+# SpatLVB.fit2[c(1:2,5)]
+# 
+# lvb.plt1(SpatLVB.fit)
+# lvb.plt1(SpatLVB.fit1,ylim=c(0,170),xlim=c(0,15),pch=16)
+# lvb.plt1(SpatLVB.fit2,ylim=c(0,170),xlim=c(0,15),pch=16)
+```
+
+# The curves look very similar to what was published, but the numbers don't match.  
+
+
+### Comparing sampling metadata to our current aging effort  
+```{r, echo=F}
+alan_summary <- annuliAGEs %>%
+  group_by(cruise, year, tow) %>%
+  summarize(shells = length(unique(Scall.no)),
+            increments=n()) %>%
+  mutate(ager="AR")
+
+
+# Fresh ages from TPD
+tpd <- readxl::read_xlsx("Y:/Offshore/Assessment/Data/Ageing/AgeingGBa_JanBBNFeb2020_tpd.xlsx")
+sort(unique(tpd[tpd$Bank=="BBn" & tpd$Year==2012,]$Station))
+table(tpd[tpd$Bank=="BBn" & tpd$Year==2012,]$Station)
+dim(tpd)
+#head(tpd)
+#tpd
+tpd_new <- readxl::read_xlsx("Y:/Offshore/Assessment/Data/Ageing/Ageing_TE13BBN2012_tpd.xlsx")
+tpd_new$Bank <- "BBn"
+dim(tpd_new)
+#head(tpd_new)
+#tpd_new
+tpd <- full_join(tpd, tpd_new)
+dim(tpd)
+#tpd
+
+tpd_long <- tpd %>%
+  filter(Bank=="BBn")%>%
+  select(-`Date Entered yyyy-mm-dd`, -Ager, -`SFA/SPA`, -`alb?`, -Comments, -Shocks, -Worms, -Total) %>%
+  pivot_longer(cols = !c(Cruise, Year, Bank, Station, `Shell #`)) %>%
+  filter(Year %in% 2011:2012)
+tpd_long$name <- gsub(x=tpd_long$name, pattern="Ring ", "")
+names(tpd_long) <- c("cruise", "year", "bank", "tow", "Scall.no", "AGE", "HEIGHT")
+tpd_long$ID <- paste0(tpd_long$cruise, ".", tpd_long$tow)
+tpd_long <- tpd_long[!is.na(tpd_long$HEIGHT),]
+tpd_long$AGE <- as.numeric(tpd_long$AGE)
+summary(tpd_long)
+#unique(tpd_long$AGE)
+#unique(tpd_long$ID)
+
+tpd_summary <- tpd_long %>%
+  group_by(cruise, year, tow) %>%
+  summarize(shells = length(unique(Scall.no)),
+            increments=n()) %>%
+  filter(year %in% 2011:2012) %>%
+  mutate(ager = "TPD")
+
+age_summary <- rbind(alan_summary, tpd_summary)
+#write.table(age_summary,"clipboard",sep="\t")
+
+age_summary <- age_summary %>%
+  group_by(ager, year) %>%
+  summarize(increments=sum(increments),
+            shells=sum(shells),
+            tows=length(unique(tow)))
+
+all_summary <- age_summary %>%
+  group_by(ager) %>%
+  summarize(increments=sum(increments),
+           shells=sum(shells),
+            tows=sum(tows))
+
+ggplot() +
+  geom_bar(data=age_summary,
+           aes(as.factor(year), increments, fill=ager),
+           colour="black",
+           stat="identity",
+           position="dodge") +
+  geom_text(data=age_summary,
+            aes(as.factor(year), increments, group=ager,
+                label=paste0("Shells = ", shells, "\nTows = ", tows)),
+            position=position_dodge(width=0.9)) +
+  scale_fill_manual(values=c("grey", "white"), labels=c("2013/14 SAR", "2023/24 Framework"), name="Process") +
+  theme_minimal() +
+  xlab("Year") +
+  ylab("Number of increments") +
+  ggtitle("BBn aging") +
+  ylim(0, 700)
+
+# compare to 2014
+annuliAGEs$ager <- "AR"
+annuliAGEs$Scall.no <- as.numeric(annuliAGEs$Scall.no)
+tpd_long$ager <- "TPD"
+all <- full_join(annuliAGEs, tpd_long)
+
+ggplot() + geom_point(data=all, aes(AGE, HEIGHT), alpha=0.25) +
+  #geom_smooth(data=all, aes(AGE, HEIGHT, group=ID), colour="red", se=F, method = "gam", formula = y ~ s(x, bs = "cs", k=2)) +
+  #geom_smooth(data=all, aes(AGE, HEIGHT), colour="blue", se=T, method = "gam", formula = y ~ s(x, bs = "cs", k=9)) +
+  theme_minimal() +
+  facet_wrap(~ager, ncol=1) +
+  #ggtitle("GAM, k=9") +
+  geom_text(data=all_summary, aes(10, 60, label=paste0("Shells = ", shells, "\nTows = ", tows, "\nIncrements = ", increments)))
+dev.off()
+```
+
+
+### VonB from new ages for 2011 and 2012 BBn
+```{r, echo=F}
+LVB(tpd_long)
+print(lvb.par)
+# 148.89 0.24 -0.01 # for 2011 and 2012
+```
+
+### And from 2012 BBn only
+```{r, echo=F}
+LVB(tpd_long[tpd_long$year==2012,])
+print(lvb.par)
+# 150.42, 0.23, -0.07 # for 2012 only
+
+
+LVB(tpd_long[!(tpd_long$tow == 261 & tpd_long$Scall.no %in% c(27, 18)),])
+print(lvb.par)
+
+
+# Estimate LVB parameters using a
+# non-Linear mixed-effects model
+
+#tpd_long$ID2 <- paste0(tpd_long$ID, ".", tpd_long$Scall.no)
+
+#SpatLVB.fit_tpd<-lvb.nlme(AGE.dat=tpd_long, random.effect="ID2")
+#lvb.plt1(SpatLVB.fit_tpd,ylim=c(0,170),xlim=c(0,15),pch=16)
+# random effects model will not converge...
+#lvb.plt(SpatLVB.fit_tpd)
+
+#lvb.par<-SpatLVB.fit_tpd[c(1:2,5)]
+#names(lvb.par)<-c("linf","k","t0")
+
+
+# AGE.gdat <- groupedData(HEIGHT ~ AGE | ID, data = tpd_long)
+# linf <- c()
+# k <- c()
+# 
+# ran.form = linf + k ~ 1
+# 
+# AGE.nlme <- nlme(model = HEIGHT ~ linf * (1 - exp(-k * (AGE - tzero))), data = AGE.gdat, fixed = linf + k + tzero ~ 1, random = ran.form, start = c(150, 0.3, 0), na.action = na.omit, control = list(maxIter = 500), method = "ML")
+```
+
+
+### compare to survey SHF information
+```{r, echo=F}
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework.RData")
+
+shf_long <- select(surv.Rand$BBn, year, tow, paste0("h", seq(5,200,5))) %>%
+  pivot_longer(cols=!c("year", "tow"))
+
+shf_long$name <- as.numeric(gsub(x = shf_long$name, "h", ""))
+shf_long$ID <- paste0(shf_long$year, ".", shf_long$tow)
+
+ggplot() + geom_bar(data=shf_long[shf_long$value>0 & shf_long$name>130,], aes(name, value, fill=ID), stat="identity", show.legend=F) +
+  theme_bw() + 
+  xlab("5mm SH bin") + 
+  ylab("Standardized count")
+
+print(shf_long[shf_long$value>0 & shf_long$name>170,])
+sum(shf_long[shf_long$value>0 & shf_long$name>170,]$value)
+
+shf_long_sum <- shf_long %>%
+  group_by(name) %>%
+  summarize(total=sum(value))
+
+alltime <- sum(shf_long_sum$total)
+
+ggplot() + geom_bar(data=shf_long_sum, aes(x=name, y = total/alltime), stat="identity", show.legend=F) +
+  theme_bw() + 
+  #xlab("5mm SH bin") + 
+  ylab("Standardized count")
+
+# Sable
+shf_long <- select(surv.Rand$Sab, year, tow, paste0("h", seq(5,200,5))) %>%
+  pivot_longer(cols=!c("year", "tow"))
+
+shf_long$name <- as.numeric(gsub(x = shf_long$name, "h", ""))
+shf_long$ID <- paste0(shf_long$year, ".", shf_long$tow)
+
+ggplot() + geom_bar(data=shf_long[shf_long$value>0 & shf_long$name>130,], aes(name, value, fill=ID), stat="identity", show.legend=F) +
+  theme_bw() + 
+  xlab("5mm SH bin") + 
+  ylab("Standardized count")
+
+shf_long_sum <- shf_long %>%
+  group_by(name) %>%
+  summarize(total=sum(value))
+
+alltime <- sum(shf_long_sum$total)
+
+ggplot() + geom_bar(data=shf_long_sum, aes(x=name, y = total/alltime), stat="identity", show.legend=F) +
+  theme_bw() + 
+  #xlab("5mm SH bin") + 
+  ylab("Standardized count")
+
+print(shf_long[shf_long$value>0 & shf_long$name>170,])
+sum(shf_long[shf_long$value>0 & shf_long$name>170,]$value)
+
+```
+
+
+```{r, echo=F}
+tpd <- readxl::read_xlsx("Y:/Offshore/Assessment/Data/Ageing/Ageing_LE03SAB2016_tpd.xlsx")
+tpd$Bank <- "Sab"
+dim(tpd)
+#tpd
+
+tpd_long <- tpd %>%
+  filter(Bank=="Sab")%>%
+  select(-`Date Entered yyyy-mm-dd`, -Ager, -`SFA/SPA`, -`alb?`, -Comments, -Shocks, -Worms, -Total) %>%
+  pivot_longer(cols = !c(Cruise, Year, Bank, Station, `Shell #`))
+tpd_long$name <- gsub(x=tpd_long$name, pattern="Ring ", "")
+names(tpd_long) <- c("cruise", "year", "tow", "Scall.no", "bank", "AGE", "HEIGHT")
+tpd_long$ID <- paste0(tpd_long$cruise, ".", tpd_long$tow)
+tpd_long <- tpd_long[!is.na(tpd_long$HEIGHT),]
+tpd_long$AGE <- as.numeric(tpd_long$AGE)
+tpd_long$Scall.no <- as.numeric(tpd_long$Scall.no)
+summary(tpd_long)
+
+tpd_summary <- tpd_long %>%
+  group_by(cruise, year, tow) %>%
+  summarize(shells = length(unique(Scall.no)),
+            increments=n()) %>%
+  mutate(ager = "TPD")
+
+age_summary <- tpd_summary %>%
+  group_by(ager, year) %>%
+  summarize(increments=sum(increments),
+            shells=sum(shells),
+            tows=length(unique(tow)))
+
+all_summary <- age_summary %>%
+  group_by(ager) %>%
+  summarize(increments=sum(increments),
+           shells=sum(shells),
+            tows=sum(tows))
+
+ggplot() +
+  geom_bar(data=age_summary,
+           aes(as.factor(year), increments, fill=ager),
+           colour="black",
+           stat="identity",
+           position="dodge") +
+  geom_text(data=age_summary,
+            aes(as.factor(year), increments, group=ager,
+                label=paste0("Shells = ", shells, "\nTows = ", tows)),
+            position=position_dodge(width=0.9)) +
+  scale_fill_manual(values=c("white"), labels=c("2023/24 Framework"), name="Process") +
+  theme_minimal() +
+  xlab("Year") +
+  ylab("Number of increments") +
+  ggtitle("Sab aging") +
+  ylim(0, 700)
+
+ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT), alpha=0.25) +
+  #geom_smooth(data=all, aes(AGE, HEIGHT, group=ID), colour="red", se=F, method = "gam", formula = y ~ s(x, bs = "cs", k=2)) +
+  #geom_smooth(data=all, aes(AGE, HEIGHT), colour="blue", se=T, method = "gam", formula = y ~ s(x, bs = "cs", k=9)) +
+  theme_minimal()
+
+
+LVB(tpd_long)
+print(lvb.par)
+
+
+```
