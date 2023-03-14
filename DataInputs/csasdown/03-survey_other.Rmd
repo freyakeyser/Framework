@@ -1,0 +1,46 @@
+
+```{r, include=F, echo=F}
+# knitr::opts_knit$set(eval.after = "fig.cap")
+# knitr::opts_chunk$set(fig.pos = 'H')
+# options(knitr.kable.NA = '')
+require(tidyverse)
+options(tinytex.verbose = TRUE)
+
+direct_fns <- "C:/Users/keyserf/Documents/Github/Assessment_fns/"
+
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 25 management units."}
+knitr::include_graphics("figure/timeseries_25_FR.png")
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units."}
+knitr::include_graphics("figure/timeseries_26_FR.png")
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 25 management units."}
+knitr::include_graphics("figure/cfts_25.png")
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 26 management units."}
+knitr::include_graphics("figure/cfts_26.png")
+```
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="85%", out.width="85%", fig.align="center", fig.cap=paste0("Shell height frequencies of scallop on ", bankname, " in ", year, ". Vertical lines are the recruit size limits.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/SHF.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="70%", out.width="70%", fig.align="center", fig.cap=paste0("Meat weights and shell heights for sampled tows on ", bankname, " in ", year, " (top). Red points represent individual scallops, red lines represent the trend for each sampled tow, and the blue line is the overall trend for the current survey. Condition factor (bottom) is measured as grams of meat per decimeter cubed, which can be thought of as the meat weight of a scallop with a shell height of 100mm.")} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/MWSH_and_CF_ts.png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Clapper time series for ", bankname, " in ", year, ", represented by percentage of clappers per tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/Clapper_per_ts.png")) -->
+<!-- ``` -->

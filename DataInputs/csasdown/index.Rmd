@@ -1,5 +1,5 @@
 ---
-title: "Data Inputs for the Assessment of Scallop Stocks in Scallop Fishing Areas 25 and 26"
+title: "STOCK ASSESSMENT FRAMEWORK FOR SCALLOP FISHING AREAS 25 AND 26 - DATA INPUTS"
 french_title: "En francais"
 author: |
   Freya Keyser,
@@ -26,8 +26,8 @@ region: "Maritimes Region"
 isbn: "978-0-660-43102-4"
 cat_no: "Fs70-5/2022-006E-PDF"
 french_region: "Région des Maritimes"
-citation_other_language: "Keyser, F., Pearo Drew, T., Glass, A., et Keith, D. Données d’entrée du cadre pour l'évaluation de petoncles dans les zones de pêche
-hauturières du pétoncle 25 et 26. DFO Secr. can. de consult. sci. du MPO. Doc. de rech 2023/nnn. iv + nn p."
+citation_other_language: "Keyser, F., Pearo Drew, T., Glass, A., et Keith, D. L'évaluation de petoncles dans les zones de pêche
+hauturières du pétoncle 25 et 26 - Données d’entrée du cadre. DFO Secr. can. de consult. sci. du MPO. Doc. de rech 2023/nnn. iv + nn p."
 
 abstract: |
   Here is the abstract text. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -41,7 +41,7 @@ french_abstract: |
   
 header: "Draft working paper --- Do not cite or circulate" # or "" to omit
 output:
- csasdown::resdoc_pdf:
+ csasdown::resdoc_word:
    french: false
    # copy_sty is a toggle to copy the style file from the csasdown package every time you compile
    # the document. If false, any changes you have made to the style file in your project
@@ -71,13 +71,14 @@ output:
    # 'DefineVerbatimEnvironment'
    # To change background color, change the RGB values in the line containing 'shadecolor'
    highlight: tango
+   toc: yes
 # ------------
 # End of options to set
 knit: (function(input, ...) {
        csasdown::render('_bookdown.yml')
       })
 link-citations: true
-bibliography: bib/refs.bib
+bibliography: MAR_SABHU.bib
 # Any extra LaTeX code for the header:
 # header-includes:
 # - \usepackage{tikz}
@@ -129,7 +130,8 @@ library(tibble)
 library(csasdown)
 
 params <- NULL
-params$bank <- c("Ban", "Mid", "Sab", "Ger", "BBs", "BBn")
+params$bank <- c("Ban", "Mid", 
+  "Sab", "Ger", "BBs", "BBn")
 params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022)
 params$bankname <- c("Banquereau", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North")
 

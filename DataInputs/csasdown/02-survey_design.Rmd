@@ -7,6 +7,7 @@ linkcolor: blue
 params:
   bank: NA
   banknum: NA
+  surv.year: NA
 header-includes:
  - \usepackage{float}
 editor_options: 
@@ -24,7 +25,7 @@ direct_fns <- "C:/Users/keyserf/Documents/Github/Assessment_fns/"
 
 year <- 2022
 
-load("summary4.Rdata")
+load("data/summary4.Rdata")
 source(paste0(direct_fns, "/Other_functions/ScallopRound.R"))
 
 ntows <- summary_data$ntows
@@ -117,46 +118,25 @@ bank$name[bank$lab=="GBb"] <- "Georges Bank 'b'"
 
 ```
 
+# Survey
+
+The Offshore Scallop Survey Database (SCALOFF) contains data collected through Collaborative Agreements (formerly Joint Project Agreements) between DFO Science and the Seafood Producers Association of Nova Scotia (SPANS). The Offshore Scallop Survey collects data on the stocks of Sea Scallop (*Placopecten magellanicus*) on the Scotian Shelf and the Canadian side of Georges Bank, as well as Iceland Scallop (*Chlamys islandica*) on Banquereau Bank. These stocks correspond to the DFO management units known as Scallop Fishing Areas (SFA) 25, 26, and 27, and the survey data are the primary source of fishery-independent information used in the Maritimes Region scallop stock assessments. Under the Collaborative Agreement, survey responsibilities are shared by DFO and SPANS. At-sea survey activities are directed by the DFO Chief Scientist aboard the survey vessel. SPANS coordinates the provision the survey vessel as well as the necessary crew complement to conduct the survey activities. DFO Science designs the survey, provides and manages scientific equipment, and validates, archives, and analyzes survey data. 
+
+## Survey history  
+
+The Offshore Scallop Survey has occurred between May and September annually since 1978 with few exceptions, but spatial coverage and survey designs have changed over time (see Survey Design).  
+
+## Sampling protocols  
+
+Regardless of survey design, the same sampling protocol is followed: At each survey station, the 8-ft scallop dredge lined with 38 mm mesh is towed for 10 minutes, and every scallop is counted and assigned to a 5 mm shell height bin (ranging from 0-200 mm). Detailed sampling occurs at a selection of the stations, where the exact shell heights and meat weights are measured for a sub-sample of the scallops caught. Bottom temperature data has also been collected on the Offshore Scallop survey since 2011.  
+
+## Survey design  
 
 
 ```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0("Example survey design for ", params$bankname, ".")}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year, "/Presentations/Survey_summary/test_figures/", params$bank, "/survey_strata.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year, "/Presentations/Survey_summary/", params$bank, "/survey_strata.png"))
 ```
 
-
-```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 25 management units."}
-knitr::include_graphics("timeseries_25_FR.png")
-```
-
-
-```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units."}
-knitr::include_graphics("timeseries_26_FR.png")
-```
-
-
-```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 25 management units."}
-knitr::include_graphics("cfts_25.png")
-```
-
-
-```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 26 management units."}
-knitr::include_graphics("cfts_26.png")
-```
-
-
-<!-- ```{r, echo=FALSE, message=F, out.height="85%", out.width="85%", fig.align="center", fig.cap=paste0("Shell height frequencies of scallop on ", bankname, " in ", year, ". Vertical lines are the recruit size limits.")} -->
-<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/SHF.png")) -->
-<!-- ``` -->
-
-
-<!-- ```{r, echo=FALSE, message=F, out.height="70%", out.width="70%", fig.align="center", fig.cap=paste0("Meat weights and shell heights for sampled tows on ", bankname, " in ", year, " (top). Red points represent individual scallops, red lines represent the trend for each sampled tow, and the blue line is the overall trend for the current survey. Condition factor (bottom) is measured as grams of meat per decimeter cubed, which can be thought of as the meat weight of a scallop with a shell height of 100mm.")} -->
-<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/MWSH_and_CF_ts.png")) -->
-<!-- ``` -->
-
-
-<!-- ```{r, echo=FALSE, message=F, out.height="90%", out.width="90%", fig.align="center", fig.cap=paste0("Clapper time series for ", bankname, " in ", year, ", represented by percentage of clappers per tow (y-axis). Pre-recruits are shown in the top panel, recruit-sized scallop in the middle panel, and fully-recruited scallop are in the bottom panel. ", ltm_ts)} -->
-<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/", year, "/Presentations/Survey_summary/test_figures/", params$bank, "/Clapper_per_ts.png")) -->
-<!-- ``` -->
 
 
 
