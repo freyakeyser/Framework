@@ -1,0 +1,100 @@
+---
+bibliography: MAR_SABHU.bib
+csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
+editor_options:
+  chunk_output_type: console
+output:
+  word_document:
+    reference_docx: RES2022-eng.docx
+---
+
+```{r, echo=F, include=F}
+direct <- "Y:/Offshore/Assessment/"
+direct_fns <- "C:/Users/keyserf/Documents/Github/Assessment_fns/"
+direct_out <- "C:/Users/keyserf/Documents/"
+bank <- "GBa"
+year <- 2023 # current year
+yr <- 2022 # fishery year
+
+require(pander)
+options(scipen=999)
+```
+
+# STOCK ASSESSMENT FRAMEWORK FOR SCALLOP FISHING AREAS 25 AND 26: DATA INPUTS
+
+## Context
+
+Advice on the status of the Georges Bank Scallop stock is requested annually by Fisheries and Oceans Canada (DFO) Resource Management to help determine an annual Total Allowable Catch (TAC, meat weight) in support of the fishery. The purpose of this report is to update the status of Georges Bank Scallop with data from the `r yr` Scallop survey and fishery (January 1 to December 31) to provide science advice for the management of the `r year` fishery. 
+
+This Stock Status Update uses the assessment framework established in 2009 [@jonsen_georges_2009] and accepted during the peer-reviewed Regional Advisory Process of 2013 [@dfo_assessment_2013; @hubley_georges_2014]. Updates have been conducted annually since, with the exception of 2021, which did not occur because the 2020 DFO Science Offshore Scallop Survey was cancelled due to challenges associated with the COVID-19 pandemic [dfo_stock_2022-1].
+
+This update for the Scallop fishery on Georges Bank pertains to zone 'a'. Georges Bank zone 'b' has separate management measures. Some elements of the fishery in zone 'b' are also presented for continuity.
+
+This Science Response reports results from the Science Response Process of April XX, `r year` on the Stock Status Update of Offshore Scallop: Browns Bank North and Georges Bank 'a'.
+
+
+```{r, echo=FALSE, message=F}
+#if("pdf_document" %in% rmarkdown::all_output_formats(knitr::current_input())[1]) {
+knitr::include_graphics(paste0(direct, year,"/Updates/", bank, "/Figures_and_tables/mixed/Offshore_banks.png"))
+# }
+# if("word_document" %in% rmarkdown::all_output_formats(knitr::current_input())[1]) {print(paste0(direct, "/",year,"/Updates/", bank, "/Figures_and_tables/Offshore_banks.png"))}
+```
+_Figure 1: Map showing the offshore Scallop Fishing Areas (SFAs) 25&ndash;27 used for management purposes in the Maritimes region._
+
+
+
+```{r, echo=F, include=F}
+# **Name** _________________ **Affiliation**
+# Freya Keyser (Lead) ______ DFO Science, Maritimes Region
+# David Keith ______________ DFO Science, Maritimes Region
+# Tricia Pearo Drew ________ DFO Science, Maritimes Region
+# Jessica Sameoto __________ DFO Science, Maritimes Region
+# _Reviewer_  ______________ DFO Science, Maritimes Region
+# _Reviewer_  ______________ DFO Science, Maritimes Region
+# Alan Reeves  _____________ DFO Resource Management, Maritimes Region
+
+authors <- c("Freya Keyser", "David Keith", "Tricia Pearo Drew", "Jessica Sameoto", "Reviewer", "Reviewer", "Alan Reeves")
+affil <- c(rep("DFO Science, Maritimes Region", 6), "DFO Resource Management, Maritimes Region")
+
+author <- data.frame(Name=authors, Affiliation=affil)
+
+row.names(author) <- NULL
+author <- pander(author, split.tables=Inf)
+```
+
+
+## Contributors
+
+```{r, echo=F}
+author
+```
+
+## Approved by
+
+Francine Desharnais  
+Regional Director of Science, DFO Maritimes Region  
+Dartmouth, Nova Scotia  
+Ph. 902-426-3490  
+_Date:_  
+
+# Notes for formatting (DELETE)
+- Change style for captions
+- TAC_and_landings height=14.34cm, width=14.34cm
+- Biomass height=19.15cm, width=14.8cm
+- Fit height=17.49cm, width=13.52cm
+- Italicize species name and space the bibliography (After +6pt)
+- Fix contributors list
+- Remove colons from reference list
+- g/dm^cubed
+- Table formatting
+- add commas to numbers >1000
+- update previous year's bm estimates (FR and rec)
+- hyperlink references
+- (Erratum: August 2012) on the Smith and Hubley 2012 reference
+-	Citation style for sources of information
+- Add section: Correct Citation for this Publication
+- Update with annual template here: http://intra.dfo-mpo.gc.ca/csas-sccs/GuidePol/Templates-Gabarits/Templates-Gabarits-eng.html
+- citations should be hanging, with no colons
+- check short title header for correct bank
+
+## Sources of Information

@@ -66,6 +66,9 @@ admin/
 .docx
 .xlsx
 .csv
+.doc
+.csl
+*.csl
 
 # ignore these script files which we will change regularly and don't need to deal with
 /markdown/
