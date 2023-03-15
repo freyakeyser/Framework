@@ -1,5 +1,5 @@
 ---
-title: "STOCK ASSESSMENT FRAMEWORK FOR SCALLOP FISHING AREAS 25 AND 26 - DATA INPUTS"
+title: ""
 french_title: "En francais"
 author: |
   Freya Keyser,
@@ -65,8 +65,6 @@ output:
    # which are:
    # the csasdown library 'themes' directory, this directory on your machine:
    highlight: tango
-   toc: yes
-   fig_caption: yes
 knit: (function(input, ...) {
        csasdown::render('_bookdown.yml')
       })

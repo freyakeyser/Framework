@@ -7,39 +7,45 @@ Scallop fishery description. Introduce SFAs and management scheme. The last full
 
 ## Framework objectives
 
-The objectives of this framework are:
+The objectives of this framework are:  
+
 - To describe the fishery, survey, and biological data informing the assessment of SFAs 25 and 26 (Part 1, this document)
 - To evaluate the analysis methodology used to summarize the above data for SFAs 25 and 26 (Part 2, separate document)
-- To propose reference points for SFAs 25 and 26 (Part 2, separate document)
+- To propose reference points for SFAs 25 and 26 (Part 2, separate document)  
 
-This Data Inputs review document will:
+This Data Inputs review document will:  
+
 - Summarize and review the sampling protocols used during the surveys of SFA 25 and 26 over time
 - Review the statistical design(s) of the surveys of SFA 25 and 26 over time
 - Review the fishery data collected for trips occurring in SFA 25 and 26 (process, volume of data, quality and validation)
 - Review the methods used to summarize survey and fishery data into Science advice
 - Present the summarized survey and fishery data for each management unit
 
-notes:
-tow-by-tow summary. station locations over time?
-clappers only for sable and north
-ts figures for all banks (fishery, abund, biomass, cond)
-survey map for all banks... example for german
+notes
+
+- tow-by-tow summary. station locations over time?
+- clappers only for sable and north
+- ts figures for all banks (fishery, abund, biomass, cond)
+- survey map for all banks... example for german
+
 
 # Fishery
 
 - Fishery independent data
 - Logbooks
 
+
 ## Fishery history
 
-- Fleet dynamics  
-- Management  
+- Fleet dynamic
+- Management
+
 
 ## Fishery data
 
-- Footprint  
-- CPUE  
-- Port sampling  
+- Footprint
+- CPUE
+- Port sampling
 
 
 # Survey
@@ -56,7 +62,7 @@ Regardless of survey design, the same sampling protocol is followed: At each sur
 
 ## Survey design  
 
-- by bank  
+- by bank
 - stratification  
 
 

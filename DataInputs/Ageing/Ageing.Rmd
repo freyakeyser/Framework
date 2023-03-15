@@ -509,7 +509,18 @@ ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT), alpha=0.25) +
 LVB(tpd_long)
 print(lvb.par)
 
+require(mgcv)
+mod <- gam(data=tpd_long, HEIGHT ~ s(AGE, bs="cs", k=5))
 
+tpd_long$preds <- predict(mod)
+
+ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT), alpha=0.25) +
+  geom_smooth(data=tpd_long, aes(AGE, HEIGHT), colour="green", se=F, method = "gam", formula = y ~ s(x, k=3)) +
+  geom_smooth(data=tpd_long, aes(AGE, HEIGHT), colour="yellow", se=F, method = "gam", formula = y ~ s(x, k=4)) +
+  geom_smooth(data=tpd_long, aes(AGE, HEIGHT), colour="red", se=F, method = "gam", formula = y ~ s(x, k=5)) +
+  geom_smooth(data=tpd_long, aes(AGE, HEIGHT), colour="blue", se=F, method = "gam", formula = y ~ s(x, k=6)) +
+  geom_smooth(data=tpd_long, aes(AGE, HEIGHT), colour="black", se=F, method = "gam", formula = y ~ s(x, k=7))
+  #geom_line(data=tpd_long, aes(AGE, preds))
 ```
 
 

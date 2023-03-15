@@ -49,6 +49,8 @@ bank$name[bank$lab=="GBb"] <- "Georges Bank 'b'"
 
 ```
 
+\clearpage
+
 # Figures {-}
 
 ```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[1], " survey design in ", params$surv.year[1], ".")}

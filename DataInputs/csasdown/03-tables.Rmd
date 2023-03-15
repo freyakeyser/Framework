@@ -1,3 +1,5 @@
+\clearpage
+
 # Tables {-}
 
 ```{r include=F, echo=F}
@@ -28,7 +30,7 @@ strata
 #   )
 # )
 
-csas_table(strata, caption ="Survey design details.")# %>% kableExtra::column_spec(4, width="2cm")
+csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0,bold=TRUE)
 #qflextable(strata)
 
 #<!---BLOCK_LANDSCAPE_START--->

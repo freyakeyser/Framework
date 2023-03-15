@@ -1,7 +1,13 @@
 ## Formatting to-do
 
 - caption styles
-- change colons in captions to periods  
-- TOC
-- add title page and frontmatter (from templates)  
-
+- change colons in captions to periods
+- bold table headers
+- delete TOC
+- move abstract up
+- add title, author, etc.
+- citation
+- DRAFT watermark
+- Bullets
+- Body text style
+- Crop old survey design figures  
