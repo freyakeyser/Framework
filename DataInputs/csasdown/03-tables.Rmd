@@ -1,0 +1,36 @@
+# Tables {-}
+
+```{r include=F, echo=F}
+require(tidyverse)
+require(csasdown)
+require(kableExtra)
+require(officedown)
+require(officer)
+require(flextable)
+strata <- readxl::read_excel("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/survey_design.xlsx")
+strata$`Area (km^2)` <- round(x=as.numeric(strata$`Area (km^2)`), digits=2)
+strata <- strata[1:17,]
+opts <- options(knitr.kable.NA = "")
+strata
+# strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
+#   kableExtra::collapse_rows(columns = 1:4, valign = "top")
+
+```
+
+
+
+```{r echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+csas_table(strata, caption ="Survey design details.")# %>% kableExtra::column_spec(4, width="2cm")
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+

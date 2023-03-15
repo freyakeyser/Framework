@@ -1,0 +1,106 @@
+---
+output: 
+  pdf_document:
+    fig_caption: yes
+    extra_dependencies: ["float"]
+linkcolor: blue
+params:
+  bank: NA
+  banknum: NA
+  surv.year: NA
+header-includes:
+ - \usepackage{float}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include=F, echo=F}
+# knitr::opts_knit$set(eval.after = "fig.cap")
+# knitr::opts_chunk$set(fig.pos = 'H')
+# options(knitr.kable.NA = '')
+require(tidyverse)
+options(tinytex.verbose = TRUE)
+
+direct_fns <- "C:/Users/keyserf/Documents/Github/Assessment_fns/"
+
+year <- 2022
+
+load("data/summary4.Rdata")
+source(paste0(direct_fns, "/Other_functions/ScallopRound.R"))
+
+ntows <- summary_data$ntows
+highlights <- summary_data$highlights
+sizes <- summary_data$sizes
+dates <- summary_data$dates
+yeartable <- summary_data$yeartable
+spatial.sum.stats <- summary_data$spatial.sum.stats
+
+bank <- data.frame(lab = c("Ban", "BanIce", "Mid", "Sab", "Ger", "BBn", "BBs", "GB", "GBa", "GBb"), name=NA)
+bank$name[bank$lab=="Ban"] <- "Banquereau (Sea scallop)"
+bank$name[bank$lab=="BanIce"] <- "Banquereau (Icelandic scallop)"
+bank$name[bank$lab=="Mid"] <- "Middle Bank"
+bank$name[bank$lab=="Sab"] <- "Sable Bank"
+bank$name[bank$lab=="Ger"] <- "German Bank"
+bank$name[bank$lab=="BBn"] <- "Browns Bank North"
+bank$name[bank$lab=="BBs"] <- "Browns Bank South"
+bank$name[bank$lab=="GB"] <- "Georges Bank (monitoring stations)"
+bank$name[bank$lab=="GBa"] <- "Georges Bank 'a'"
+bank$name[bank$lab=="GBb"] <- "Georges Bank 'b'"
+
+```
+
+# Figures {-}
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[1], " survey design in ", params$surv.year[1], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[1], "/Presentations/Survey_summary/", params$bank[1], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[2], " survey design in ", params$surv.year[2], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[2], "/Presentations/Survey_summary/", params$bank[2], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[3], " survey design in ", params$surv.year[3], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[3], "/Presentations/Survey_summary/", params$bank[3], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[4], " survey design in ", params$surv.year[4], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[4], "/Presentations/Survey_summary/", params$bank[4], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[5], " survey design in ", params$surv.year[5], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[5], "/Presentations/Survey_summary/", params$bank[5], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[6], " survey design in ", params$surv.year[6], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[6], "/Presentations/Survey_summary/", params$bank[6], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 25 management units."}
+knitr::include_graphics("figure/timeseries_25_FR.png")
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units."}
+knitr::include_graphics("figure/timeseries_26_FR.png")
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 25 management units."}
+knitr::include_graphics("figure/cfts_25.png")
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 26 management units."}
+knitr::include_graphics("figure/cfts_26.png")
+```
+

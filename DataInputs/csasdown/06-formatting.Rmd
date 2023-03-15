@@ -1,0 +1,7 @@
+## Formatting to-do
+
+- caption styles
+- change colons in captions to periods  
+- TOC
+- add title page and frontmatter (from templates)  
+
