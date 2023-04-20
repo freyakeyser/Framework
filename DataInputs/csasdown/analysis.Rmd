@@ -7,9 +7,20 @@ editor_options:
 require(ggplot2)
 require(dplyr)
 require(tidyr)
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework.RData")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework2.RData")
 load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
 
+require(rosettafish)
+funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs) 
+{
+  download.file(fun,destfile = basename(fun))
+  rosetta_terms <- read.csv(paste0(getwd(),"/",basename(fun)))
+  file.remove(paste0(getwd(),"/",basename(fun)))
+}
+
+french <- F # set to T for french
 ```
 
 ```{r bankpertow, echo=F, include=F}
@@ -131,7 +142,7 @@ for(sfa in sfa){
                      labeller = label_parsed,
                      strip.position="left") +
           theme(strip.placement="outside", strip.background=element_blank()) +
-          scale_colour_manual(values=c("black", "darkorange", "blue"), name="Management\nunit") +
+          scale_colour_manual(values=c("black", "darkorange", "blue"), name=en2fr("Management\nunit", translate=french, case="sentence")) +
           scale_fill_manual(values=c("black", "darkorange", "blue"), name="Management\nunit") +
           #scale_y_log10() +
           ylab(NULL)+
