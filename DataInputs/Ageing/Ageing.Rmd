@@ -6,12 +6,17 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r, echo=F, include=F, warning=F, message=F}
+# Set up
+```{r}
+plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/"
 require(tidyverse)
 require(ggplot2)
 require(lubridate)
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework3.Rdata")
+```
 
-
+# Old Hubley functions
+```{r, echo=F, include=F, warning=F, message=F, eval=F}
 LVB <- function(AGE.dat,xmax,ymax,plt=T){
 	
 	# LVB model
@@ -159,7 +164,7 @@ lvb.plt <- function(lvb.fit, nr=6,ht=7,wd=11,labcx=1){
 Reading in csv's that were saved from database using import.age.data()  
 
 ### 1997-2003 first.   
-```{r, echo=F}
+```{r, echo=F, eval=F}
 direct2013 <- "Y:/Offshore/Assessment/2013/r/"
 
 # 1997-2003
@@ -190,7 +195,7 @@ print(lvb.par)
 ```
 
 ### 2011/2012 data used in Hubley et al. 2014  
-```{r, echo=F}
+```{r, echo=F, eval=F}
 annuliAGEs <- read.csv(paste0(direct2013, "data/BBnIncrementAge.csv"))
 annuliAGEs$AGE <- annuliAGEs$annuli.AGE
 annuliAGEs$HEIGHT <- annuliAGEs$annuli.HEIGHT
@@ -348,14 +353,14 @@ dev.off()
 
 
 ### VonB from new ages for 2011 and 2012 BBn
-```{r, echo=F}
+```{r, echo=F, eval=F}
 LVB(tpd_long)
 print(lvb.par)
 # 148.89 0.24 -0.01 # for 2011 and 2012
 ```
 
 ### And from 2012 BBn only
-```{r, echo=F}
+```{r, echo=F, eval=F}
 LVB(tpd_long[tpd_long$year==2012,])
 print(lvb.par)
 # 150.42, 0.23, -0.07 # for 2012 only
@@ -476,11 +481,6 @@ resids$gam_k5 <- resids$HEIGHT-resids$gam_k5
 tpd_long$shell.ID <- as.factor(paste0(tpd_long$ID, ".", tpd_long$Scall.no))
 
 # with random effects
-# mod_re_3 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=3) + s(ID, bs="re") + s(ID, Scall.no, bs="re"))
-# Error: Model has more coefficients than data
-#mod_re_3 <- gamm4(HEIGHT ~ s(AGE), data=tpd_long, random = ~ (1 + AGE| shell.ID))
-# predict and plot this one # 2023-04-14
-# compare to mod_re_3.2
 
 mod_re_3 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=3) + s(ID, bs="re") + s(Scall.no, bs="re"))
 #coef(mod_re_3)
@@ -503,21 +503,39 @@ ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
 preds_exp$shell.ID <- as.factor(paste0(preds_exp$ID, ".", preds_exp$Scall.no))
 resids$shell.ID <- as.factor(paste0(resids$ID, ".", resids$Scall.no))
 
-mod_re_3.2 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=3) + s(shell.ID, bs="re"))
-#coef(mod_re_3.2)
-gratia::variance_comp(mod_re_3.2)
-summary(mod_re_3.2)
-preds_exp$gam_re_3.2 <- predict(object = mod_re_3.2, newdata = preds_exp)
-preds_exp$gam_re_3.2_se <- predict(object = mod_re_3.2, newdata = preds_exp, se.fit=T)$se.fit
-preds_exp$gam_re_3.2f <- gammit::predict_gamm(mod_re_3.2, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA)$prediction
-preds_exp$gam_re_3.2f_se <- gammit::predict_gamm(mod_re_3.2, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA, se=T)$se
-resids$gam_re_3.2<- predict(mod_re_3.2, newdata=resids)
-resids$gam_re_3.2<- resids$HEIGHT-resids$gam_re_3.2
-#mod_re_3.2
+# mod_re_3.2 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=3) + s(shell.ID, bs="re"))
+# #coef(mod_re_3.2)
+# gratia::variance_comp(mod_re_3.2)
+# summary(mod_re_3.2)
+# preds_exp$gam_re_3.2 <- predict(object = mod_re_3.2, newdata = preds_exp)
+# preds_exp$gam_re_3.2_se <- predict(object = mod_re_3.2, newdata = preds_exp, se.fit=T)$se.fit
+# preds_exp$gam_re_3.2f <- gammit::predict_gamm(mod_re_3.2, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA)$prediction
+# preds_exp$gam_re_3.2f_se <- gammit::predict_gamm(mod_re_3.2, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA, se=T)$se
+# resids$gam_re_3.2<- predict(mod_re_3.2, newdata=resids)
+# resids$gam_re_3.2<- resids$HEIGHT-resids$gam_re_3.2
+# #mod_re_3.2
+# 
+# ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
+#   geom_line(data=preds_exp, aes(AGE, gam_re_3.2, colour=ID,group=Scall.no)) +
+#   facet_wrap(~ID)
 
-ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
-  geom_line(data=preds_exp, aes(AGE, gam_re_3.2, colour=ID,group=Scall.no)) +
-  facet_wrap(~ID)
+##mod_re_3 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=3) + s(ID, bs="re") + s(ID, Scall.no, bs="re"))
+## Error: Model has more coefficients than data
+require(gamm4)
+#mod_re_3.3 <- gamm4(HEIGHT ~ s(AGE), data=tpd_long, random = ~ (1 + AGE| shell.ID))
+## predict and plot this one # 2023-04-14
+## compare to mod_re_3.2
+# # same as below. preds_exp$gam_re_3.3 <- predict(object = mod_re_3.3$gam, newdata = preds_exp)
+# #preds_exp$gam_re_3.3_se <- predict(object = mod_re_3.3$gam, newdata = preds_exp, se.fit=T)$se.fit
+# preds_exp$gam_re_3.3f <- gammit::predict_gamm(mod_re_3.3$gam, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA)$prediction
+# preds_exp$gam_re_3.3f_se <- gammit::predict_gamm(mod_re_3.3$gam, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA, se=T)$se
+# resids$gam_re_3.3<- predict(mod_re_3.3$gam, newdata=resids)
+# resids$gam_re_3.3<- resids$HEIGHT-resids$gam_re_3.3
+# 
+# ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
+#   geom_line(data=preds_exp, aes(AGE, gam_re_3.3f, colour=ID,group=Scall.no)) +
+#   facet_wrap(~ID)
+
 
 #mod_re_5 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=5) + s(ID, bs="re") + s(ID, Scall.no, bs="re"))
 # error: Model has more coefficients than data
@@ -537,21 +555,21 @@ ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
   geom_line(data=preds_exp, aes(AGE, gam_re_5, colour=ID,group=Scall.no)) +
   facet_wrap(~ID)
 
-mod_re_5.2 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=5) + s(shell.ID, bs="re"))
-#coef(mod_re_5.2)
-gratia::variance_comp(mod_re_5.2)
-summary(mod_re_5.2)
-preds_exp$gam_re_5.2 <- predict(object = mod_re_5.2, newdata = preds_exp)
-preds_exp$gam_re_5.2_se <- predict(object = mod_re_5.2, newdata = preds_exp, se.fit=T)$se.fit
-preds_exp$gam_re_5.2f <- gammit::predict_gamm(mod_re_5.2, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA)$prediction
-preds_exp$gam_re_5.2f_se <- gammit::predict_gamm(mod_re_5.2, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA, se=T)$se
-resids$gam_re_5.2<- predict(mod_re_5.2, newdata=resids)
-resids$gam_re_5.2<- resids$HEIGHT-resids$gam_re_5.2
-#mod_re_5.2
-
-ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
-  geom_line(data=preds_exp, aes(AGE, gam_re_5.2, colour=ID,group=Scall.no)) +
-  facet_wrap(~ID)
+# mod_re_5.2 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=5) + s(shell.ID, bs="re"))
+# #coef(mod_re_5.2)
+# gratia::variance_comp(mod_re_5.2)
+# summary(mod_re_5.2)
+# preds_exp$gam_re_5.2 <- predict(object = mod_re_5.2, newdata = preds_exp)
+# preds_exp$gam_re_5.2_se <- predict(object = mod_re_5.2, newdata = preds_exp, se.fit=T)$se.fit
+# preds_exp$gam_re_5.2f <- gammit::predict_gamm(mod_re_5.2, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA)$prediction
+# preds_exp$gam_re_5.2f_se <- gammit::predict_gamm(mod_re_5.2, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA, se=T)$se
+# resids$gam_re_5.2<- predict(mod_re_5.2, newdata=resids)
+# resids$gam_re_5.2<- resids$HEIGHT-resids$gam_re_5.2
+# #mod_re_5.2
+# 
+# ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
+#   geom_line(data=preds_exp, aes(AGE, gam_re_5.2, colour=ID,group=Scall.no)) +
+#   facet_wrap(~ID)
 
 # get ready for plotting
 preds_long <- pivot_longer(preds, cols=names(preds)[!names(preds) %in% "AGE"])
@@ -566,7 +584,7 @@ preds_long <- preds_long[which(grepl(x=preds_long$name, pattern="_se")==F),]
 preds_long <- left_join(preds_long, preds_se)
 preds_long <- left_join(preds_long, preds_vonB)
 
-#resids_long <- pivot_longer(resids, cols=names(resids)[!names(resids) %in% c("AGE", "HEIGHT")])
+resids_long <- pivot_longer(resids, cols=names(resids)[!names(resids) %in% c("AGE", "HEIGHT", "ID", "Scall.no", "shell.ID")])
 
 ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT), alpha=0.25) +
   geom_line(data=preds_long, aes(AGE, value, colour=name)) +
@@ -579,9 +597,9 @@ ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT), alpha=0.25) +
 
 preds_simple <- dplyr::select(preds_exp, 
                        -gam_re_3, -gam_re_3_se, 
-                       -gam_re_3.2, -gam_re_3.2_se, 
+                      # -gam_re_3.2, -gam_re_3.2_se, 
                        -gam_re_5, -gam_re_5_se, 
-                       -gam_re_5.2,-gam_re_5.2_se, 
+                      # -gam_re_5.2,-gam_re_5.2_se, 
                        -ID, -Scall.no, -shell.ID)
 preds_simple <- unique(pivot_longer(preds_simple, cols=names(preds_simple)[!names(preds_simple) %in% c("AGE")]))
 preds_se <- preds_simple[grep(x=preds_simple$name, pattern="_se"),]
@@ -605,30 +623,82 @@ names(vonB)[names(vonB)=="name"] <- "ref"
 
 #VonB confidence intervals (bootstrapped)
 
-labels <- unique(preds_long[!preds_long$name %in% c("gam_re_3", "gam_re_3.2", "gam_re_5", "gam_re_5.2"), c("AGE", "name", "value")])
-labels <- data.frame(AGE = c(rep(12, 2), 
-                             rep(11.5,3), 
-                             rep(11,2)), 
-                     name=c("gam_k5", "vonB", "gam_k3", "gam_re_3f", "gam_re_5f", "gam_re_3.2f", "gam_re_5.2f"))
+# labels <- unique(preds_long[!preds_long$name %in% c("gam_re_3", "gam_re_3.2", "gam_re_5", "gam_re_5.2"), c("AGE", "name", "value")])
+labels <- data.frame(AGE = c(rep(12, 3)), 
+                             #rep(11.5,3), 
+                             #rep(11,3)), 
+                     name=c(#"gam_k5", 
+                            "vonB", 
+                            #"gam_k3", 
+                            "gam_re_3f", 
+                            "gam_re_5f"#, 
+                            #"gam_re_3.2f", 
+                            #"gam_re_5.2f", 
+                            #"gam_re_3.3f"
+                            ))
 labels <- left_join(labels, unique(dplyr::select(preds_long, AGE, name, value)))
-
+labels$long[labels$name=="gam_re_5f"] <- "GAMM, 5 knots" 
+labels$long[labels$name=="gam_re_3f"] <- "GAMM, 3 knots"
+labels$long[labels$name=="vonB"] <- "von B"
+  
 require(ggrepel)
-ggplot() + 
-  geom_line(data=preds_long[!preds_long$name %in% c("gam_re_3", "gam_re_3.2", "gam_re_5", "gam_re_5.2"),], aes(AGE, value, colour=name), show.legend=F) + 
-  geom_text_repel(data=labels,
-                  aes(AGE, value, colour=name, label=name),
-                  show.legend=F,
-                  max.overlaps=Inf,
-                  hjust="left",
-                  direction="y",
-                  box.padding=1,
-                  nudge_x=c(1,1,1,1.5,1.5, 2, 2),
-                  arrow=arrow(length = unit(0.015, "npc"))) +
+png(paste0(plotsGo, "BBn/fit.png"),width=8, height=8, units = "in", res=420)
+all <- ggplot() + 
+  geom_point(data=tpd_long, aes(AGE, HEIGHT), size=1)+
+  geom_line(data=preds_long[!preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_k5", "gam_re_5", "gam_re_5.2"),], 
+            aes(AGE, value, group=name), show.legend=F) + 
+  geom_ribbon(data=preds_long[!preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_k5", "gam_re_5", "gam_re_5.2"),], 
+              aes(AGE, ymin=value-1.96*se, ymax=value+1.96*se, group=name), alpha=0.2, show.legend=F)+
+  geom_ribbon(data=preds_long[!preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_k5", "gam_re_5", "gam_re_5.2"),], 
+              aes(AGE, ymin=vonB_low, ymax=vonB_up, group=name), alpha=0.2, show.legend=F)+
+  geom_text(data=labels, aes(AGE, value, group=name, label=long), hjust=0)+
+  # geom_text_repel(data=labels,
+  #                 aes(AGE, value, group=name, label=name),
+  #                 show.legend=F,
+  #                 #max.overlaps=Inf,
+  #                 hjust="left",
+  #                 direction="y",
+  #                 box.padding=1,
+  #                 nudge_x=c(1,1,1),#,1.5,1.5, 2, 2),
+  #                 arrow=arrow(length = unit(0.015, "npc"))) +
   xlim(0,16) +
-  ylim(60,160) +
-  theme_bw()
+  #ylim(50,170) +
+  theme_bw() +
+  ylab("Shell height (mm)") +
+  xlab("Age")
+print(all)
+dev.off()
 
-ggplot() + geom_line(data=preds_long[preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2"),], aes(AGE, value, group=shell.ID, colour=name)) + facet_wrap(~name) +
+inset <- ggplot() + 
+  geom_point(data=tpd_long, aes(AGE, HEIGHT), size=1)+
+  geom_line(data=preds_long[!preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_k5", "gam_re_5", "gam_re_5.2"),], 
+            aes(AGE, value, group=name), show.legend=F) + 
+  geom_ribbon(data=preds_long[!preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_k5", "gam_re_5", "gam_re_5.2"),], 
+              aes(AGE, ymin=value-1.96*se, ymax=value+1.96*se, group=name), alpha=0.2, show.legend=F)+
+  geom_ribbon(data=preds_long[!preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_k5", "gam_re_5", "gam_re_5.2"),], 
+              aes(AGE, ymin=vonB_low, ymax=vonB_up, group=name), alpha=0.2, show.legend=F)+
+  geom_text(data=labels, aes(AGE, value, group=name, label=long), hjust=0)+
+  # geom_text_repel(data=labels,
+  #                 aes(AGE, value, group=name, label=name),
+  #                 show.legend=F,
+  #                 #max.overlaps=Inf,
+  #                 hjust="left",
+  #                 direction="y",
+  #                 box.padding=1,
+  #                 nudge_x=c(1,1,1),#,1.5,1.5, 2, 2),
+  #                 arrow=arrow(length = unit(0.015, "npc"))) +
+  xlim(0,16) +
+  #ylim(50,170) +
+  theme_bw() +
+  ylab(NULL) +
+  xlab(NULL) + facet_wrap(~name, ncol=1) +
+  theme(strip.text = element_blank()) 
+
+png(paste0(plotsGo, "BBn/fit_inset.png"),width=10, height=8, units = "in", res=420)
+all + inset_element(p = inset, align_to = "full", left=0.5, bottom=0.1, right = 0.975, top=0.5)
+dev.off()
+
+ggplot() + geom_line(data=preds_long[preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_re_3.3f"),], aes(AGE, value, group=shell.ID, colour=name)) + facet_wrap(~name) +
     geom_line(data=vonB, aes(AGE, value), linewidth=1)
 
 ggplot() + geom_line(data=preds_long[preds_long$name %in% c("gam_k5", "gam_re_5", "gam_re_5.2"),], aes(AGE, value, group=shell.ID, colour=name)) + facet_wrap(~name) +
@@ -638,7 +708,7 @@ ggplot() + geom_point(data=preds_long, aes(AGE, value, colour=name))
 
 # Compare differences in first 6 years
 preds_var <- preds_long %>%
-  filter(name %in% c("gam_k3", "gam_k5", "gam_re_3f", "gam_re_3.2f","gam_re_5f", "gam_re_5.2f", "vonB")) %>%
+  filter(name %in% c("gam_k3", "gam_k5", "gam_re_3f", "gam_re_3.2f","gam_re_5f", "gam_re_5.2f", "vonB", "gam_re_3.3f")) %>%
   group_by(AGE, name) %>%
   summarize(value = mean(value),
             se = mean(se),
@@ -665,40 +735,114 @@ ggplot() + geom_point(data=preds_var2, aes(AGE, diff))
 
 print(preds_var2[preds_var2$AGE %in% 1:7,])
 
-# ggplot() + geom_point(data=resids_long, aes(AGE, value, colour=name)) + facet_wrap(~name) +
-#   ggtitle("residuals (real - predicted)")
-# 
-# resids_long %>%
-#   group_by(name, AGE) %>%
-#   summarize(avg = mean(value)) %>%
-#   ggplot() + geom_line(aes(AGE, avg, colour=name)) + ggtitle("Mean residual value")
-# 
-# resids_long %>%
-#   group_by(name) %>%
-#   summarize(diff = sum(abs(value))) %>%
-#   ggplot() + geom_point(aes(name, diff)) + ggtitle("Sum of absolute residuals")
-# 
-# ggplot() + 
-#   geom_point(data=resids_long, aes(HEIGHT, HEIGHT-value, colour=name)) + 
-#   geom_smooth(data=resids_long, aes(HEIGHT, HEIGHT-value, colour=name), method="lm", se=F) + 
-#   geom_abline(data=resids_long, aes(intercept=0, slope=1)) #+ 
-#   #facet_wrap(~name)
+resids_long$name2 <- as.factor(resids_long$name)
+resids_long$name2 <- factor(resids_long$name2, labels=c("gam_k3", "gam_k5", "GAMM, 3 knots", "GAMM, 5 knots", "vonB"))
+
+png(paste0(plotsGo, "BBn/resid.png"),width=10, height=8, units = "in", res=420)
+ggplot() + 
+  geom_point(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),], aes(AGE, value)) + 
+  geom_smooth(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),], aes(AGE, value), method="lm", colour="black") + 
+  facet_wrap(~name2) +
+  ylab("Residuals (observed - predicted)") +
+  xlab("Age") +
+  scale_x_continuous(breaks=seq(2,12,2))+
+  theme_bw()
+dev.off()
+
+resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),] %>%
+  group_by(name, AGE) %>%
+  summarize(avg = mean(value)) %>%
+  ggplot() + geom_line(aes(AGE, avg, colour=name)) + ggtitle("Mean residual value")
+
+resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),] %>%
+  group_by(name) %>%
+  summarize(diff = sum(abs(value))) %>%
+  ggplot() + geom_point(aes(name, diff)) + ggtitle("Sum of absolute residuals")
+
+ggplot() +
+  geom_point(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),], aes(HEIGHT, HEIGHT-value, colour=name)) +
+  geom_smooth(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),], aes(HEIGHT, HEIGHT-value, colour=name), method="lm", se=F) +
+  geom_abline(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),], aes(intercept=0, slope=1)) #+
+  #facet_wrap(~name)
+
+```
+
+# model evaluation
+```{r]}
+df <- NULL
+l.bar <- survey.obj$BBn$model.dat$l.bar[nrow(survey.obj$BBn$model.dat)]
+for(mod in c("vonB", "mod_re_3", 
+             #"mod_re_3.2", "mod_re_3.3", 
+             "mod_re_5"#, 
+             #"mod_re_5.2"
+)){
+  print(nrow(df))
+  
+  if(!mod == "vonB"){
+    if(mod=="mod_re_3") pred <- "gam_re_3f"
+    if(mod=="mod_re_5") pred <- "gam_re_5f"
+    
+    preds_sub <- preds_simple[preds_simple$name==pred,]
+    
+    if(!any(class(get(mod))=="list")) {
+      row <- data.frame(name=deparse(formula(get(mod))), 
+                        AIC=AIC(get(mod)), 
+                        r.sq = summary(get(mod))$r.sq,
+                        scale.est=summary(get(mod))$scale,
+                        dev=summary(get(mod))$dev,
+                        H10=gammit::predict_gamm(get(mod), newdata = data.frame(AGE=10, ID=1, Scall.no=1), exclude=c("ID", "Scall.no"), re_form=NA)$prediction,
+                        H5=gammit::predict_gamm(get(mod), newdata = data.frame(AGE=5, ID=1, Scall.no=1), exclude=c("ID", "Scall.no"), re_form=NA)$prediction,
+                        H2=gammit::predict_gamm(get(mod), newdata = data.frame(AGE=2, ID=1, Scall.no=1), exclude=c("ID", "Scall.no"), re_form=NA)$prediction,
+                        AFR=preds_sub$AGE[which.min(abs(preds_sub$value-l.bar))],
+                        AR=preds_sub$AGE[which.min(abs(90-preds_sub$value))],
+                        APR=preds_sub$AGE[which.min(abs(75-preds_sub$value))])
+      
+      row$K_1yprior_to_R <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR-1)))]
+      row$K_1yprior_to_avg_FR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR-1)))]
+      row$K_2_to_5 <- row$H5 - row$H2
+      
+      
+    }
+    if(any(class(get(mod))=="list")) {
+      row <- data.frame(name=paste0(deparse(formula(get(mod)$gam)), ", ",  deparse(formula(get(mod)$mer))), 
+                        AIC=AIC(get(mod)$mer), 
+                        r.sq = summary(get(mod)$gam)$r.sq)
+    }
+  }
+  
+  if(mod=="vonB"){
+    mod <- "cheat"
+    
+    preds_sub <- preds_long[preds_long$name=="vonB",]
+    
+    row <- data.frame(name=deparse(formula(get(mod))), 
+                        AIC=AIC(get(mod)), 
+                        r.sq = NA,
+                        scale.est=NA,
+                        dev=NA,
+                        H10=predict(get(mod), newdata = data.frame(AGE=10)),
+                        H5=predict(get(mod), newdata = data.frame(AGE=5)),
+                        H2=predict(get(mod), newdata = data.frame(AGE=2)),
+                        AFR=preds_sub$AGE[which.min(abs(preds_sub$value-l.bar))],
+                        AR=preds_sub$AGE[which.min(abs(90-preds_sub$value))],
+                        APR=preds_sub$AGE[which.min(abs(75-preds_sub$value))])
+      
+      row$K_1yprior_to_R <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR-1)))]
+      row$K_1yprior_to_avg_FR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR-1)))]
+      row$K_2_to_5 <- row$H5 - row$H2
+  }
+  
+  if(is.null(df)) df <- rbind(df, row)
+  if(!is.null(df)) df <- full_join(df, row)
+}
+
+print(df)
 
 ```
 
 ### testing out ranges
 ```{r}
 preds_var_1y <- pivot_wider(select(preds_var, -se, -up, -low), id_cols="AGE")
-# preds_var_1y <- data.frame(name = row.names(preds_var_1y), preds_var_1y)
-# names(preds_var_1y) <- paste0("AGE_", preds_var_1y[1,])
-# names(preds_var_1y)[1] <- "name"
-# row.names(preds_var_1y) <- NULL
-# preds_var_1y <- preds_var_1y[-1,]
-# 
-# start <- 2:ncol(preds_var_1y)
-# end <- 10:ncol(preds_var_1y)
-# 
-# preds_var_1y[,end] - preds_var_1y[,start]
 
 preds_var_1y2 <- full_join(preds_var_1y[11:nrow(preds_var_1y),], data.frame(AGE=rep(NA, 10))) - preds_var_1y[1:nrow(preds_var_1y),]
 preds_var_1y2$end_age <- c(seq(3, 12, 0.1), rep(NA,10))
@@ -710,19 +854,61 @@ preds_var_1y2$AGE <- preds_var_1y2$end_age
 
 preds_var_1y <- full_join(preds_var, preds_var_1y2)
 
-ggplot() + geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff),], aes(end_age, diff, colour=name)) +
-  ylab("1-year growth (mm)")
+labels <- data.frame(AGE = c(5.7, 5.5, 6), 
+                             #rep(11.5,3), 
+                             #rep(11,3)),
+                     name=c(#"gam_k5", 
+                            "vonB", 
+                            #"gam_k3", 
+                            "gam_re_3f", 
+                            "gam_re_5f"#, 
+                            #"gam_re_3.2f", 
+                            #"gam_re_5.2f", 
+                            #"gam_re_3.3f"
+                            ))
+labels <- left_join(labels, unique(dplyr::select(preds_var_1y, AGE, name, diff, value)))
+labels$long[labels$name=="gam_re_5f"] <- "GAMM, 5 knots" 
+labels$long[labels$name=="gam_re_3f"] <- "GAMM, 3 knots"
+labels$long[labels$name=="vonB"] <- "von B"
 
-ggplot() + geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff),], aes(value, diff, colour=name)) +
+age <- ggplot() + 
+  geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in% c("gam_re_3f","gam_re_5f","vonB"),], aes(end_age, diff, group=name)) +
+  geom_label(data=labels, aes(AGE, diff, label=long), hjust=c(0.5, 0.25, 0.5))+
+  # geom_text_repel(data=labels, aes(AGE, diff, label=long),
+  #                 hjust="right",
+  #                 #direction="y",
+  #                # box.padding=1,
+  #                 nudge_x=2,
+  #                 arrow=arrow(length = unit(0.015, "npc"))) +
   ylab("Growth in previous year (mm)") +
-  xlab("Shell height (mm)") + 
+  xlab("Age") +
   theme_bw()
+
+sh <- ggplot() + 
+  geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in% c("gam_re_3f","gam_re_5f","vonB"),], aes(value, diff, group=name)) +
+  geom_label(data=labels, aes(value, diff, label=long), hjust=c(0.5, 0.25, 0.5))+
+  # geom_text_repel(data=labels, aes(value, diff, label=long),
+  #                 hjust="right",
+  #                 #direction="y",
+  #                 #box.padding=1,
+  #                 nudge_x=25,
+  #                 arrow=arrow(length = unit(0.015, "npc"))) +
+  ylab(NULL) +
+  xlab("Shell height (mm)") + 
+  #xlim(75,145)+
+  theme_bw() 
+
+require(patchwork)
+png(paste0(plotsGo, "BBn/growth.png"),width=10, height=8, units = "in", res=420)
+age + sh + plot_layout(guides="collect")  
+dev.off()
+# SH of 95-100 is 15mm (80-95 or 85-100mm)
 
 ```
 
 
 ### compare to survey SHF information
-```{r, echo=F}
+```{r, echo=F, eval=F}
 load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework.RData")
 
 shf_long <- dplyr::select(surv.Rand$BBn, year, tow, paste0("h", seq(5,200,5))) %>%
@@ -777,6 +963,13 @@ print(shf_long[shf_long$value>0 & shf_long$name>170,])
 sum(shf_long[shf_long$value>0 & shf_long$name>170,]$value)
 
 ```
+
+
+
+
+
+
+####### SABLE
 
 
 ```{r, echo=F}
@@ -867,7 +1060,7 @@ AGE.dat <- as.data.frame(tpd_long)
 	
 cheat <- nls(HEIGHT ~ linf * (1 - exp(-k * (AGE - tzero))), data=AGE.dat, start=c(linf=150, k=0.3, tzero=0))
 
-preds <- data.frame(AGE = seq(min(tpd_long$AGE), max(tpd_long$AGE), 0.25))
+preds <- data.frame(AGE = seq(min(tpd_long$AGE), max(tpd_long$AGE), 0.1))
 preds$vonB <- predict(cheat, newdata=preds)
 # from https://derekogle.com/fishR/2019-12-31-ggplot-vonB-fitPlot-1
 boots <- car::Boot(cheat)
@@ -968,6 +1161,24 @@ ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
   geom_line(data=preds_exp, aes(AGE, gam_re_3.2, colour=ID,group=Scall.no)) +
   facet_wrap(~ID)
 
+#mod_re_3 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=3) + s(ID, bs="re") + s(ID, Scall.no, bs="re"))
+# Error: Model has more coefficients than data
+require(gamm4)
+mod_re_3.3 <- gamm4(HEIGHT ~ s(AGE), data=tpd_long, random = ~ (1 + AGE| shell.ID))
+# predict and plot this one # 2023-04-14
+# compare to mod_re_3.2
+# same as below. preds_exp$gam_re_3.3 <- predict(object = mod_re_3.3$gam, newdata = preds_exp)
+#preds_exp$gam_re_3.3_se <- predict(object = mod_re_3.3$gam, newdata = preds_exp, se.fit=T)$se.fit
+preds_exp$gam_re_3.3f <- gammit::predict_gamm(mod_re_3.3$gam, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA)$prediction
+preds_exp$gam_re_3.3f_se <- gammit::predict_gamm(mod_re_3.3$gam, newdata=preds_exp, exclude = c("shell.ID"), re_form=NA, se=T)$se
+resids$gam_re_3.3<- predict(mod_re_3.3$gam, newdata=resids)
+resids$gam_re_3.3<- resids$HEIGHT-resids$gam_re_3.3
+
+ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
+  geom_line(data=preds_exp, aes(AGE, gam_re_3.3f, colour=ID,group=Scall.no)) +
+  facet_wrap(~ID)
+
+
 #mod_re_5 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=5) + s(ID, bs="re") + s(ID, Scall.no, bs="re"))
 # error: Model has more coefficients than data
 mod_re_5 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, k=5) + s(ID, bs="re") + s(Scall.no, bs="re"))
@@ -1015,7 +1226,7 @@ preds_long <- preds_long[which(grepl(x=preds_long$name, pattern="_se")==F),]
 preds_long <- left_join(preds_long, preds_se)
 preds_long <- left_join(preds_long, preds_vonB)
 
-#resids_long <- pivot_longer(resids, cols=names(resids)[!names(resids) %in% c("AGE", "HEIGHT")])
+resids_long <- pivot_longer(resids, cols=names(resids)[!names(resids) %in% c("AGE", "HEIGHT", "ID", "Scall.no", "shell.ID")])
 
 ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT), alpha=0.25) +
   geom_line(data=preds_long, aes(AGE, value, colour=name)) +
@@ -1054,11 +1265,11 @@ names(vonB)[names(vonB)=="name"] <- "ref"
 
 #VonB confidence intervals (bootstrapped)
 
-labels <- unique(preds_long[!preds_long$name %in% c("gam_re_3", "gam_re_3.2", "gam_re_5", "gam_re_5.2"), c("AGE", "name", "value")])
+# labels <- unique(preds_long[!preds_long$name %in% c("gam_re_3", "gam_re_3.2", "gam_re_5", "gam_re_5.2"), c("AGE", "name", "value")])
 labels <- data.frame(AGE = c(rep(11, 2), 
                              rep(11,3), 
-                             rep(11,2)), 
-                     name=c("gam_k5", "vonB", "gam_k3", "gam_re_3f", "gam_re_5f", "gam_re_3.2f", "gam_re_5.2f"))
+                             rep(11,3)), 
+                     name=c("gam_k5", "vonB", "gam_k3", "gam_re_3f", "gam_re_5f", "gam_re_3.2f", "gam_re_5.2f", "gam_re_3.3f"))
 labels <- left_join(labels, unique(dplyr::select(preds_long, AGE, name, value)))
 
 require(ggrepel)
@@ -1077,7 +1288,7 @@ ggplot() +
   ylim(60,160) +
   theme_bw()
 
-ggplot() + geom_line(data=preds_long[preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2"),], aes(AGE, value, group=shell.ID, colour=name)) + facet_wrap(~name) +
+ggplot() + geom_line(data=preds_long[preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_re_3.3f"),], aes(AGE, value, group=shell.ID, colour=name)) + facet_wrap(~name) +
     geom_line(data=vonB, aes(AGE, value), linewidth=1)
 
 ggplot() + geom_line(data=preds_long[preds_long$name %in% c("gam_k5", "gam_re_5", "gam_re_5.2"),], aes(AGE, value, group=shell.ID, colour=name)) + facet_wrap(~name) +
@@ -1085,8 +1296,7 @@ ggplot() + geom_line(data=preds_long[preds_long$name %in% c("gam_k5", "gam_re_5"
 
 # Compare differences in first 6 years
 preds_var <- preds_long %>%
-  filter(AGE %in% seq(1,12,0.5) & 
-           name %in% c("gam_k3", "gam_k5", "gam_re_3f", "gam_re_3.2f","gam_re_5f", "gam_re_5.2f", "vonB"))%>%
+  filter(name %in% c("gam_k3", "gam_k5", "gam_re_3f", "gam_re_3.2f",'gam_re_3.3f', "gam_re_5f", "gam_re_5.2f", "vonB"))%>%
   group_by(AGE, name) %>%
   summarize(value = mean(value),
             se = mean(se),
@@ -1102,19 +1312,30 @@ ggplot() + geom_point(data=preds_var[preds_var$AGE %in% c(1:6),], aes(as.factor(
 
 ggplot() + geom_boxplot(data=preds_var, aes(as.factor(AGE), value))
 
-preds_var <- preds_var %>%
+preds_var2 <- preds_var %>%
   group_by(AGE) %>%
   summarize(diff = max(value) - min(value),
             std_dev=sd(value))
 # most consistent at age 5, varies by less than 2 mm otherwise
 
-ggplot() + geom_point(data=preds_var, aes(AGE, std_dev))
-ggplot() + geom_point(data=preds_var, aes(AGE, diff))
+ggplot() + geom_point(data=preds_var2, aes(AGE, std_dev))
+ggplot() + geom_point(data=preds_var2, aes(AGE, diff))
 
-print(preds_var[preds_var$AGE %in% 1:7,])
+print(preds_var2[preds_var2$AGE %in% 1:7,])
 
-# ggplot() + geom_point(data=resids_long, aes(AGE, value, colour=name)) + facet_wrap(~name) +
-#   ggtitle("residuals (real - predicted)")
+resids_long$name2 <- as.factor(resids_long$name)
+resids_long$name2 <- factor(resids_long$name2, labels=c("gam_k3", "gam_k5", "GAMM, 3 knots", "GAMM, 5 knots", "vonB"))
+
+png(paste0(plotsGo, "Sab/resid.png"),width=10, height=8, units = "in", res=420)
+ggplot() + 
+  geom_point(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),], aes(AGE, value)) + 
+  geom_smooth(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),], aes(AGE, value), method="lm", colour="black") + 
+  facet_wrap(~name2) +
+  ylab("Residuals (observed - predicted)") +
+  xlab("Age") +
+  scale_x_continuous(breaks=seq(2,12,2))+
+  theme_bw()
+dev.off()
 # 
 # resids_long %>%
 #   group_by(name, AGE) %>%
@@ -1135,5 +1356,79 @@ print(preds_var[preds_var$AGE %in% 1:7,])
 ```
 
 
+# model evaluation
+```{r]}
+df <- NULL
+for(mod in c("mod3", "mod_re_3", "mod_re_3.2", "mod_re_3.3", "mod5", "mod_re_5", "mod_re_5.2")){
+  print(nrow(df))
+  if(!any(class(get(mod))=="list")) {
+    row <- data.frame(name=deparse(formula(get(mod))), 
+                      AIC=AIC(get(mod)), 
+                      r.sq = summary(get(mod))$r.sq)
+  }
+  if(any(class(get(mod))=="list")) {
+    row <- data.frame(name=paste0(deparse(formula(get(mod)$gam)), ", ",  deparse(formula(get(mod)$mer))), 
+                      AIC=AIC(get(mod)$mer), 
+                      r.sq = summary(get(mod)$gam)$r.sq)
+  }
+  df <- rbind(df, row)
+}
+
+print(df)
+```
+
+### testing out ranges
+```{r}
+preds_var_1y <- pivot_wider(select(preds_var, -se, -up, -low), id_cols="AGE")
+
+preds_var_1y2 <- full_join(preds_var_1y[11:nrow(preds_var_1y),], data.frame(AGE=rep(NA, 10))) - preds_var_1y[1:nrow(preds_var_1y),]
+preds_var_1y2$end_age <- c(seq(3, 11, 0.1), rep(NA,10))
+preds_var_1y2$start_age <- seq(2, 11, 0.1)
+preds_var_1y2 <- pivot_longer(preds_var_1y2, cols = names(preds_var_1y2)[!names(preds_var_1y2) %in% c("AGE", "end_age", "start_age")])
+preds_var_1y2 <- select(preds_var_1y2, -AGE)
+names(preds_var_1y2)[names(preds_var_1y2) == "value"] <- "diff"
+preds_var_1y2$AGE <- preds_var_1y2$end_age
+
+preds_var_1y <- full_join(preds_var, preds_var_1y2)
+
+age <- ggplot() + geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff),], aes(end_age, diff, group=name)) +
+  ylab("Growth in previous year (mm)") +
+  xlab("Age") +
+  theme_bw()
+
+sh <- ggplot() + geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff),], aes(value, diff, group=name)) +
+  ylab("Growth in previous year (mm)") +
+  xlab("Shell height (mm)") + 
+  theme_bw()
+
+require(patchwork)
+age + sh + plot_annotation(title="Sable")
+
+# SH of 95 is around 15mm (80-95mm)
 
 
+
+# final models only
+age <- ggplot() + 
+  geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & 
+                                !is.na(preds_var_1y$diff) & preds_var_1y$name %in% 
+                                c("gam_re_3f", "gam_re_5f", "vonB"),], 
+            aes(end_age, diff, colour=name)) +
+  ylab("Growth in previous year (mm)") +
+  xlab("Age") + 
+  scale_colour_discrete(name="Model", labels=c("GAM, 3 knots", "GAM, 5 knots", "vonB")) +
+  theme_bw()
+
+sh <- ggplot() + geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in%c("gam_re_3f", "gam_re_5f", "vonB"),], aes(value, diff, colour=name)) +
+  ylab(NULL) +
+  xlab("Shell height (mm)") + 
+  scale_colour_discrete(name="Model", labels=c("GAM, 3 knots", "GAM, 5 knots", "vonB")) +
+  theme_bw()
+
+require(patchwork)
+age + sh + 
+  plot_annotation(title="Browns Bank north") +
+  plot_layout(guides="collect")  
+# SH of 95-100 is 15mm (80-95 or 85-100mm)
+
+```

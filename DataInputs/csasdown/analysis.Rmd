@@ -8,7 +8,21 @@ require(ggplot2)
 require(dplyr)
 require(tidyr)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework2.RData")
+framework2 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data)
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework3.RData") #75-90
+framework3 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data)
+# load("C:/Users/keyserf/Documents/temp_data/testing_results_framework4.RData") # 80-95
+# framework4 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data)
+nickname <- "fw3"
+
 load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
+
+plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/"
+
+french <- T # set to T for french
+if(french == T) {
+  nickname <- paste0(nickname, "_fr")
+}
 
 require(rosettafish)
 funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
@@ -20,7 +34,28 @@ for(fun in funs)
   file.remove(paste0(getwd(),"/",basename(fun)))
 }
 
-french <- F # set to T for french
+```
+
+```{r}
+# effect of recruit size bin on abundances
+
+for (b in c("BBn", "BBs", "Sab", "Ban", "Mid")){
+  framework2$survey.obj[[b]]$model.dat$recruitsize <- "85-95"
+  framework3$survey.obj[[b]]$model.dat$recruitsize <- "75-90"
+  framework4$survey.obj[[b]]$model.dat$recruitsize <- "80-95"
+  compare <- full_join(framework2$survey.obj[[b]]$model.dat, framework3$survey.obj[[b]]$model.dat)
+  compare <- full_join(compare, framework4$survey.obj[[b]]$model.dat)
+  compare <- select(compare, year, NPR, NR, N, IPR, IR, I, CS, RS, recruitsize)
+  compare <- pivot_longer(compare, cols=names(compare)[!names(compare) %in% c("CS", "RS", "recruitsize", "year")])
+
+  compare$name <- factor(compare$name, levels=c("IPR", "IR", "I", "NPR", "NR", "N"))
+    
+  print(ggplot() + 
+          geom_line(data=compare, aes(year, value, colour=recruitsize, group=recruitsize)) + 
+          geom_point(data=compare, aes(year, value, colour=recruitsize, group=recruitsize)) + 
+          facet_wrap(~name, scales="free_y") + 
+          ggtitle(b))
+}
 ```
 
 ```{r bankpertow, echo=F, include=F}
@@ -119,34 +154,79 @@ bankpertow$index <- gsub(x=bankpertow$index, "R", "")
 
 bankpertow$size <- factor(bankpertow$size,
                           levels=c("PR", "R", "FR"))
-bankpertow$index <- factor(bankpertow$index,
-                          levels=c("N", "I"),
-                          labels=c(expression(frac("N", "tow")),
-                                   expression(frac("g", "tow"))))
+if(french==F) {
+  bankpertow$size2 <- factor(bankpertow$size,
+                             levels=c("PR", "R", "FR"),
+                             labels=c("Pre-recruit", "Recruit", "Fully recruited"))
+  
+  bankpertow$index2 <- factor(bankpertow$index,
+                              levels=c("N", "I"),
+                              labels=c(expression(frac("N", "tow")),
+                                       expression(frac("g", "tow"))))
+}
+if(french==T) {
+  bankpertow$size2 <- factor(bankpertow$size,
+                             levels=c("PR", "R", "FR"),
+                             labels=c(en2fr("Pre-recruit", custom_terms=rosetta_terms), 
+                                      en2fr("Recruit",  custom_terms=rosetta_terms), 
+                                      en2fr("Fully recruited", custom_terms=rosetta_terms)))
+  
+  bankpertow$index2 <- factor(bankpertow$index,
+                              levels=c("N", "I"),
+                              labels=c(expression(frac("N", "trait")),
+                                       expression(frac("g", "trait"))))
+}
+
+if(french==F) man.unit <- "Management\nunit"
+if(french==T) man.unit <- "Zone de\ngestion"
 
 sfa <- c(25,26)
 for(sfa in sfa){
-  png(filename=paste0("timeseries_", sfa, "_FR.png"), width=8, height=6, units = "in", res=420)
-  print(ggplot() + geom_line(data=bankpertow[bankpertow$sfa==sfa & bankpertow$size=="FR",],
-                             aes(year, index.val, colour=bank)) +
-          geom_point(data=bankpertow[bankpertow$sfa==sfa & bankpertow$size=="FR",],
-                     aes(year, index.val, colour=bank)) +
-          #geom_errorbar(data=bankpertow, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
-          geom_ribbon(data=bankpertow[bankpertow$sfa==sfa & bankpertow$size=="FR",],
-                      aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank), alpha=0.3)+
-          theme_bw() +
-          # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
-          #            scales="free_y")
-          facet_wrap(~index,
-                     scales="free_y", ncol=1,
-                     labeller = label_parsed,
-                     strip.position="left") +
-          theme(strip.placement="outside", strip.background=element_blank()) +
-          scale_colour_manual(values=c("black", "darkorange", "blue"), name=en2fr("Management\nunit", translate=french, case="sentence")) +
-          scale_fill_manual(values=c("black", "darkorange", "blue"), name="Management\nunit") +
-          #scale_y_log10() +
-          ylab(NULL)+
-          xlab("Year"))
+  
+  N <- ggplot() + geom_line(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
+                            aes(year, index.val, colour=bank)) +
+    geom_point(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
+               aes(year, index.val, colour=bank)) +
+    #geom_errorbar(data=bankpertow, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
+    geom_ribbon(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
+                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank), alpha=0.3)+
+    theme_bw() +
+    # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
+    #            scales="free_y")
+    facet_wrap(~size2, ncol=1,
+               scales="free_y",
+               strip.position="top") +
+    theme(strip.background=element_blank()) +
+    scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    scale_fill_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    #scale_y_log10() +
+    xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
+    guides(colour = "none", fill="none") +
+    ylab(parse(text=as.character(unique(bankpertow$index2[bankpertow$index=="N"]))))
+  
+  I <- ggplot() + geom_line(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
+                            aes(year, index.val, colour=bank)) +
+    geom_point(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
+               aes(year, index.val, colour=bank)) +
+    #geom_errorbar(data=bankpertow, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
+    geom_ribbon(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
+                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank), alpha=0.3)+
+    theme_bw() +
+    # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
+    #            scales="free_y")
+    facet_wrap(~size2, ncol=1,
+               scales="free_y",
+               strip.position="top") +
+    theme(strip.background=element_blank()) +
+    scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    scale_fill_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    #scale_y_log10() +
+    xlab(en2fr("Year",translate = french, custom_terms=rosetta_terms)) +
+    ylab(parse(text=as.character(unique(bankpertow$index2[bankpertow$index=="I"]))))
+  
+  require(patchwork)
+  png(filename=paste0(plotsGo, "/timeseries_", sfa, "_", nickname, ".png"), width=12, height=8, units = "in", res=420)
+  print(N+I + plot_layout(guides="collect") & theme(legend.position="right"))
   dev.off()
 }
 
@@ -183,25 +263,28 @@ cfts <- cf.data$Ger$CFyrs %>%
 cfts$sfa[cfts$bank %in% c("Ban", "Mid", "Sab")] <- 25
 cfts$sfa[cfts$bank %in% c("BBn", "BBs", "Ger")] <- 26
 
-png(filename=paste0("cfts_26.png"), width=8, height=4, units = "in", res=420)
+if(french==F) cflab <- expression(paste("Condition factor  ",bgroup("(",frac(g,dm^3)   ,")")))
+if(french==T) cflab <- expression(paste("Coefficient de condition  ",bgroup("(",frac(g,dm^3)   ,")")))
+
+png(filename=paste0(plotsGo, "/cfts_26", "_", nickname, ".png"), width=8, height=4, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank)) +
         geom_line(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank, linetype=type)) +
-        xlab("Year") + 
-        ylab(expression(paste("Condition factor ",bgroup("(",frac(g,dm^3)   ,")")))) +
+        xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) + 
+        ylab(cflab) +
         theme_bw() +
-        scale_linetype_discrete(name="") +
+        scale_linetype_discrete(name="", labels=en2fr(c("lined", "unlined"), translate = french, custom_terms=rosetta_terms)) +
         guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
-        scale_colour_manual(name="Management\nunit", values=c("black", "darkorange", "blue"))
+        scale_colour_manual(name=man.unit, values=c("black", "darkorange", "blue")) 
 )
 dev.off()
 
-png(filename=paste0("cfts_25.png"), width=8, height=4, units = "in", res=420)
+png(filename=paste0(plotsGo, "/cfts_25", "_", nickname, ".png"), width=8, height=4, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
         geom_line(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
-        xlab("Year") + 
-        ylab(expression(paste("Condition factor ",bgroup("(",frac(g,dm^3)   ,")")))) +
+        xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) + 
+        ylab(cflab) +
         theme_bw() +
-        scale_colour_manual(name="Management\nunit", values=c("black", "darkorange", "blue"))
+        scale_colour_manual(name=man.unit, values=c("black", "darkorange", "blue"))
 )
 dev.off()
 

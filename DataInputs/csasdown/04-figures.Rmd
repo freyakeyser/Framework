@@ -86,22 +86,22 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[6], "
 ```
 
 
-```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 25 management units."}
-knitr::include_graphics("figure/timeseries_25_FR.png")
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 25 management units. Recruit size is 75-90mm."}
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_25_fw3.png")
 ```
 
 
-```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units."}
-knitr::include_graphics("figure/timeseries_26_FR.png")
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (top) time series for pre-recuit, recruit, and fully-recruited scallop, represented by number of scallop per standardized tow (y-axis) and biomass (bottom) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units. Recruit size is 75-90mm for Browns Bank north and south, and 95-105mm on German Bank."}
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_26_fw3.png")
 ```
 
 
 ```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 25 management units."}
-knitr::include_graphics("figure/cfts_25.png")
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/cfts_25_fw3.png")
 ```
 
 
 ```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 26 management units."}
-knitr::include_graphics("figure/cfts_26.png")
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/cfts_26_fw3.png")
 ```
 
