@@ -838,6 +838,8 @@ for(mod in c("vonB", "mod_re_3",
 
 print(df)
 
+write.csv(x = df, paste0(plotsGo, "BBn/summary_stats.csv"))
+
 ```
 
 ### testing out ranges
