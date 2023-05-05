@@ -12,6 +12,7 @@ plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/"
 require(tidyverse)
 require(ggplot2)
 require(lubridate)
+require(patchwork)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework3.Rdata")
 ```
 
@@ -611,7 +612,7 @@ require(gamm4)
 #   geom_line(data=preds_exp, aes(AGE, gam_re_3.3f, colour=ID,group=Scall.no)) +
 #   facet_wrap(~ID)
 
-mod_re_3.4 <- gamm4(data=tster, HEIGHT ~ s(AGE, bs="cs", k=3), random = ~(1|Scall.no/ID))
+mod_re_3.4 <- gamm4(data=tpd_long, HEIGHT ~ s(AGE, bs="cs", k=3), random = ~(1|Scall.no/ID))
 preds_exp$gam_re_3.4 <- gammit::predict_gamm(model = mod_re_3.4$gam, newdata = preds_exp)$prediction
 preds_exp$gam_re_3.4_se<- gammit::predict_gamm(model = mod_re_3.4$gam, newdata = preds_exp, se=T)$se
 preds_exp$gam_re_3.4f <- gammit::predict_gamm(model = mod_re_3.4$gam, newdata = preds_exp, re_form=NA)$prediction
@@ -654,7 +655,7 @@ ggplot() + geom_point(data=tpd_long, aes(AGE, HEIGHT, colour=ID)) +
 #   facet_wrap(~ID)
 
 
-mod_re_5.4 <- gamm4(data=tster, HEIGHT ~ s(AGE, bs="cs", k=5), random = ~(1|Scall.no/ID))
+mod_re_5.4 <- gamm4(data=tpd_long, HEIGHT ~ s(AGE, bs="cs", k=5), random = ~(1|Scall.no/ID))
 preds_exp$gam_re_5.4 <- gammit::predict_gamm(model = mod_re_5.4$gam, newdata = preds_exp)$prediction
 preds_exp$gam_re_5.4_se<- gammit::predict_gamm(model = mod_re_5.4$gam, newdata = preds_exp, se=T)$se
 preds_exp$gam_re_5.4f <- gammit::predict_gamm(model = mod_re_5.4$gam, newdata = preds_exp, re_form=NA)$prediction
@@ -745,6 +746,9 @@ labels <- left_join(labels, unique(dplyr::select(preds_long, AGE, name, value)))
 labels$long[labels$name=="gam_re_5.4f"] <- "GAMM, 5 knots" 
 labels$long[labels$name=="gam_re_3.4f"] <- "GAMM, 3 knots"
 labels$long[labels$name=="vonB"] <- "von B"
+preds_long$long[preds_long$name=="gam_re_5.4f"] <- "GAMM, 5 knots" 
+preds_long$long[preds_long$name=="gam_re_3.4f"] <- "GAMM, 3 knots"
+preds_long$long[preds_long$name=="vonB"] <- "von B"
   
 require(ggrepel)
 png(paste0(plotsGo, "/", bank, "/fit.png"),width=8, height=8, units = "in", res=420)
@@ -766,9 +770,10 @@ all <- ggplot() +
   #                 box.padding=1,
   #                 nudge_x=c(1,1,1),#,1.5,1.5, 2, 2),
   #                 arrow=arrow(length = unit(0.015, "npc"))) +
-  xlim(0,16) +
+  #xlim(2,12) +
+  scale_x_continuous(breaks=seq(2,12,2), limits=c(xlim=c(2,12)))+
   #ylim(50,170) +
-  theme_bw() +
+  theme_bw() + theme(panel.grid=element_blank())+
   ylab("Shell height (mm)") +
   xlab("Age")
 print(all)
@@ -782,7 +787,7 @@ inset <- ggplot() +
               aes(AGE, ymin=value-1.96*se, ymax=value+1.96*se, group=name), alpha=0.2, show.legend=F)+
   geom_ribbon(data=preds_long[preds_long$name %in% c("gam_re_3.4f", "gam_re_5.4f", "vonB"),], 
               aes(AGE, ymin=vonB_low, ymax=vonB_up, group=name), alpha=0.2, show.legend=F)+
-  geom_text(data=labels, aes(AGE, value, group=name, label=long), hjust=0)+
+  #geom_text(data=labels, aes(AGE, value, group=name, label=long), hjust=0)+
   # geom_text_repel(data=labels,
   #                 aes(AGE, value, group=name, label=name),
   #                 show.legend=F,
@@ -792,15 +797,15 @@ inset <- ggplot() +
   #                 box.padding=1,
   #                 nudge_x=c(1,1,1),#,1.5,1.5, 2, 2),
   #                 arrow=arrow(length = unit(0.015, "npc"))) +
-  xlim(0,16) +
+  #scale_x_continuous(breaks=seq(2,12,2), limits=c(xlim=c(2,12)))+
   #ylim(50,170) +
   theme_bw() +
   ylab(NULL) +
-  xlab(NULL) + facet_wrap(~name, ncol=1) +
-  theme(strip.text = element_blank()) 
+  xlab(NULL) + facet_wrap(~long, ncol=1, strip.position="right") +
+  theme(panel.grid=element_blank()) 
 
 png(paste0(plotsGo, "/", bank, "/fit_inset.png"),width=10, height=8, units = "in", res=420)
-all + inset_element(p = inset, align_to = "full", left=0.5, bottom=0.1, right = 0.975, top=0.5)
+all + inset_element(p = inset, align_to = "full", left=0.5, bottom=0.075, right = 0.99, top=0.5)
 dev.off()
 
 ggplot() + geom_line(data=preds_long[preds_long$name %in% c("gam_k3", "gam_re_3", "gam_re_3.2", "gam_re_3.3f", "gam_re_3.4f"),], aes(AGE, value, group=shell.ID, colour=name)) + facet_wrap(~name) +
@@ -843,7 +848,7 @@ print(preds_var2[preds_var2$AGE %in% 1:7,])
 resids_long$name2 <- as.factor(resids_long$name)
 resids_long$name2 <- factor(resids_long$name2, labels=c("gam_k3", "gam_k5", "gam_re_3", "GAMM, 3 knots", "gam_re_5", "GAMM, 5 knots", "vonB"))
 
-png(paste0(plotsGo, "/", bank, "/resid.png"),width=10, height=8, units = "in", res=420)
+png(paste0(plotsGo, "/", bank, "/resid.png"),width=4200, height=2100, units = "px", res=420)
 ggplot() + 
   geom_point(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3.4f", "gam_re_5.4f"),], aes(AGE, value)) + 
   geom_smooth(data=resids_long[resids_long$name %in% c("vonB", "gam_re_3.4f", "gam_re_5.4f"),], aes(AGE, value), method="lm", colour="black") + 
@@ -851,7 +856,8 @@ ggplot() +
   ylab("Residuals (observed - predicted)") +
   xlab("Age") +
   scale_x_continuous(breaks=seq(2,10,2))+
-  theme_bw()
+  theme_bw()+
+  theme(panel.grid=element_blank())
 dev.off()
 
 resids_long[resids_long$name %in% c("vonB", "gam_re_3", "gam_re_5"),] %>%
@@ -875,7 +881,7 @@ ggplot() +
 # model evaluation 
 ```{r}
 df <- NULL
-l.bar <- survey.obj$BBn$model.dat$l.bar[nrow(survey.obj$BBn$model.dat)]
+l.bar <- survey.obj[[bank]]$model.dat$l.bar[nrow(survey.obj[[bank]]$model.dat)]
 for(mod in c("vonB", "mod_re_3.4", 
              #"mod_re_3.2", "mod_re_3.3", 
              "mod_re_5.4"#, 
@@ -890,7 +896,8 @@ for(mod in c("vonB", "mod_re_3.4",
     preds_sub <- preds_simple[preds_simple$name==pred,]
     
     if(!any(class(get(mod))=="list")) {
-      row <- data.frame(name=deparse(formula(get(mod))), 
+      row <- data.frame(Model=mod,
+                        name=deparse(formula(get(mod))), 
                         AIC=AIC(get(mod)), 
                         r.sq = summary(get(mod))$r.sq,
                         scale.est=summary(get(mod))$scale,
@@ -898,18 +905,19 @@ for(mod in c("vonB", "mod_re_3.4",
                         H10=gammit::predict_gamm(get(mod), newdata = data.frame(AGE=10, ID=1, Scall.no=1), re_form=NA)$prediction,
                         H5=gammit::predict_gamm(get(mod), newdata = data.frame(AGE=5, ID=1, Scall.no=1), re_form=NA)$prediction,
                         H2=gammit::predict_gamm(get(mod), newdata = data.frame(AGE=2, ID=1, Scall.no=1), re_form=NA)$prediction,
-                        AFR=preds_sub$AGE[which.min(abs(preds_sub$value-l.bar))],
-                        AR=preds_sub$AGE[which.min(abs(90-preds_sub$value))],
-                        APR=preds_sub$AGE[which.min(abs(75-preds_sub$value))])
+                        A_avgFR=preds_sub$AGE[which.min(abs(preds_sub$value-l.bar))],
+                        A_maxR=preds_sub$AGE[which.min(abs(90-preds_sub$value))],
+                        A_minR=preds_sub$AGE[which.min(abs(75-preds_sub$value))])
       
-      row$K_1yprior_to_R <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR-1)))]
-      row$K_1yprior_to_avg_FR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR-1)))]
+      row$K_maxR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_maxR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_maxR-1)))]
+      row$K_avgFR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_avgFR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_avgFR-1)))]
       row$K_2_to_5 <- row$H5 - row$H2
       
       
     }
     if(any(class(get(mod))=="list")) {
-      row <- data.frame(name=paste0(deparse(formula(get(mod)$gam)), ", ",  deparse(formula(get(mod)$mer))), 
+      row <- data.frame(Model=mod,
+                        name=paste0(deparse(formula(get(mod)$gam)), ", ",  deparse(formula(get(mod)$mer))), 
                         AIC=AIC(get(mod)$mer), 
                         r.sq = summary(get(mod)$gam)$r.sq,
                         scale.est = summary(get(mod)$gam)$scale,
@@ -917,12 +925,12 @@ for(mod in c("vonB", "mod_re_3.4",
                         H10=gammit::predict_gamm(get(mod)$gam, newdata = data.frame(AGE=10, ID=1, Scall.no=1), re_form=NA)$prediction,
                         H5=gammit::predict_gamm(get(mod)$gam, newdata = data.frame(AGE=5, ID=1, Scall.no=1), re_form=NA)$prediction,
                         H2=gammit::predict_gamm(get(mod)$gam, newdata = data.frame(AGE=2, ID=1, Scall.no=1), re_form=NA)$prediction,
-                        AFR=preds_sub$AGE[which.min(abs(preds_sub$value-l.bar))],
-                        AR=preds_sub$AGE[which.min(abs(90-preds_sub$value))],
-                        APR=preds_sub$AGE[which.min(abs(75-preds_sub$value))])
+                        A_avgFR=preds_sub$AGE[which.min(abs(preds_sub$value-l.bar))],
+                        A_maxR=preds_sub$AGE[which.min(abs(90-preds_sub$value))],
+                        A_minR=preds_sub$AGE[which.min(abs(75-preds_sub$value))])
       
-      row$K_1yprior_to_R <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR-1)))]
-      row$K_1yprior_to_avg_FR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR-1)))]
+      row$K_maxR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_maxR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_maxR-1)))]
+      row$K_avgFR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_avgFR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_avgFR-1)))]
       row$K_2_to_5 <- row$H5 - row$H2
     }
   }
@@ -932,7 +940,8 @@ for(mod in c("vonB", "mod_re_3.4",
     
     preds_sub <- preds_long[preds_long$name=="vonB",]
     
-    row <- data.frame(name=deparse(formula(get(mod))), 
+    row <- data.frame(Model=mod,
+                      name=deparse(formula(get(mod))), 
                         AIC=AIC(get(mod)), 
                         r.sq = NA,
                         scale.est=NA,
@@ -940,12 +949,12 @@ for(mod in c("vonB", "mod_re_3.4",
                         H10=predict(get(mod), newdata = data.frame(AGE=10)),
                         H5=predict(get(mod), newdata = data.frame(AGE=5)),
                         H2=predict(get(mod), newdata = data.frame(AGE=2)),
-                        AFR=preds_sub$AGE[which.min(abs(preds_sub$value-l.bar))],
-                        AR=preds_sub$AGE[which.min(abs(90-preds_sub$value))],
-                        APR=preds_sub$AGE[which.min(abs(75-preds_sub$value))])
+                        A_avgFR=preds_sub$AGE[which.min(abs(preds_sub$value-l.bar))],
+                        A_maxR=preds_sub$AGE[which.min(abs(90-preds_sub$value))],
+                        A_minR=preds_sub$AGE[which.min(abs(75-preds_sub$value))])
       
-      row$K_1yprior_to_R <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AR-1)))]
-      row$K_1yprior_to_avg_FR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$AFR-1)))]
+      row$K_maxR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_maxR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_maxR-1)))]
+      row$K_avgFR <- preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_avgFR)))] - preds_sub$value[which.min(abs(preds_sub$AGE-(row$A_avgFR-1)))]
       row$K_2_to_5 <- row$H5 - row$H2
   }
   
@@ -954,6 +963,12 @@ for(mod in c("vonB", "mod_re_3.4",
 }
 
 print(df)
+
+df$Model[grep(x=df$Model, pattern = "3")] <- "GAMM, 3 knots"
+df$Model[grep(x=df$Model, pattern = "5")] <- "GAMM, 5 knots"
+df$Model[grep(x=df$Model, pattern = "cheat")] <- "von B"
+
+names(df)[2] <- "Formula"
 
 write.csv(x = df, paste0(plotsGo, bank, "/summary_stats.csv"))
 
@@ -973,7 +988,7 @@ preds_var_1y2$AGE <- preds_var_1y2$end_age
 
 preds_var_1y <- full_join(preds_var, preds_var_1y2)
 
-labels <- data.frame(AGE = c(5.2, 5.5, 6), 
+if(bank=="BBn") {labels <- data.frame(AGE = c(5.7, 5.5, 6), 
                              #rep(11.5,3), 
                              #rep(11,3)),
                      name=c(#"gam_k5", 
@@ -984,7 +999,23 @@ labels <- data.frame(AGE = c(5.2, 5.5, 6),
                             #"gam_re_3.2f", 
                             #"gam_re_5.2f", 
                             #"gam_re_3.3f"
-                            ))
+                            ),
+                     hjust=c(0.7, 0, 1))
+}
+if(bank=="Sab") {labels <- data.frame(AGE = c(5.5, 5.5, 6), 
+                             #rep(11.5,3), 
+                             #rep(11,3)),
+                     name=c(#"gam_k5", 
+                            "vonB", 
+                            #"gam_k3", 
+                            "gam_re_3.4f", 
+                            "gam_re_5.4f"#, 
+                            #"gam_re_3.2f", 
+                            #"gam_re_5.2f", 
+                            #"gam_re_3.3f"
+                            ),
+                     hjust=c(0.5, 0, 1))
+}
 labels <- left_join(labels, unique(dplyr::select(preds_var_1y, AGE, name, diff, value)))
 labels$long[labels$name=="gam_re_5.4f"] <- "GAMM, 5 knots" 
 labels$long[labels$name=="gam_re_3.4f"] <- "GAMM, 3 knots"
@@ -992,7 +1023,7 @@ labels$long[labels$name=="vonB"] <- "von B"
 
 age <- ggplot() + 
   geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in% c("gam_re_3.4f","gam_re_5.4f","vonB"),], aes(end_age, diff, group=name)) +
-  geom_label(data=labels, aes(AGE, diff, label=long), hjust=c(0.9, 0, 1))+
+  geom_label(data=labels, aes(AGE, diff, label=long, hjust=hjust))+
   # geom_text_repel(data=labels, aes(AGE, diff, label=long),
   #                 hjust="right",
   #                 #direction="y",
@@ -1001,11 +1032,12 @@ age <- ggplot() +
   #                 arrow=arrow(length = unit(0.015, "npc"))) +
   ylab("Growth in previous year (mm)") +
   xlab("Age") +
-  theme_bw()
+  theme_bw() +
+  theme(panel.grid=element_blank())
 
 sh <- ggplot() + 
   geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in% c("gam_re_3.4f","gam_re_5.4f","vonB"),], aes(value, diff, group=name)) +
-  geom_label(data=labels, aes(value, diff, label=long), hjust=c(0.9, 0, 1))+
+  geom_label(data=labels, aes(value, diff, label=long, hjust=hjust))+
   # geom_text_repel(data=labels, aes(value, diff, label=long),
   #                 hjust="right",
   #                 #direction="y",
@@ -1015,10 +1047,10 @@ sh <- ggplot() +
   ylab(NULL) +
   xlab("Shell height (mm)") + 
   #xlim(75,145)+
-  theme_bw() 
+  theme_bw() +
+  theme(panel.grid=element_blank())
 
-require(patchwork)
-png(paste0(plotsGo, bank, "/growth.png"),width=10, height=8, units = "in", res=420)
+png(paste0(plotsGo, bank, "/growth.png"),width=4200, height=2100, units = "px", res=420)
 age + sh + plot_layout(guides="collect")  
 dev.off()
 # SH of 95-100 is 15mm (80-95 or 85-100mm)
@@ -1030,8 +1062,11 @@ dev.off()
 
 vonBpars <- as.data.frame(t(as.data.frame(cheat$m$getAllPars())))
 #vonB_se
+Linf <- paste0("L[infinity] == ", round(vonBpars$linf, 1))
+K <- paste0("K == ", round(vonBpars$k, 1))
+t_0 <- paste0("t[0] == ", round(vonBpars$tzero, 1))
 
-png(paste0(plotsGo, "/", bank, "/fit_vb.png"),width=8, height=8, units = "in", res=420)
+png(paste0(plotsGo, "/", bank, "/fit_vb.png"),width=2100, height=2100, units = "px", res=420)
 ggplot() + 
   geom_point(data=tpd_long, aes(AGE, HEIGHT), size=1)+
   geom_line(data=preds_long[preds_long$name == "vonB",], 
@@ -1042,15 +1077,16 @@ ggplot() +
               aes(AGE, ymin=vonB_low, ymax=vonB_up, group=name), alpha=0.2, show.legend=F)+
   #ylim(50,170) +
   theme_bw() +
+  theme(panel.grid=element_blank())+
   ylab("Shell height (mm)") +
   xlab("Age") +
-  annotate(geom="text", x=7.5, y=80, label=paste0("l_inf = ", round(vonBpars$linf, 1)), hjust=0) +
-  annotate(geom="text", x=7.5, y=70, label=paste0("k = ", round(vonBpars$k, 1)), hjust=0) + 
-  annotate(geom="text", x=7.5, y=60, label=paste0("t_0 = ", round(vonBpars$tzero, 1)), hjust=0) 
+  annotate(geom="text", x=7.5, y=80, label=Linf, parse=T, hjust=0) +
+  annotate(geom="text", x=7.5, y=70, label=K, parse=T, hjust=0) + 
+  annotate(geom="text", x=7.5, y=60, label=t_0, parse=T, hjust=0) 
 dev.off()
 
 
-png(paste0(plotsGo, "/", bank, "/resid_vb.png"),width=8, height=8, units = "in", res=420)
+png(paste0(plotsGo, "/", bank, "/resid_vb.png"),width=2100, height=2100, units = "px", res=420)
 ggplot() + 
   geom_point(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value)) + 
   geom_smooth(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value), method="lm", colour="black") + 
@@ -1058,7 +1094,8 @@ ggplot() +
   ylab("Residuals (observed - predicted)") +
   xlab("Age") +
   scale_x_continuous(breaks=seq(2,10,2))+
-  theme_bw()
+  theme_bw()+
+  theme(panel.grid=element_blank())
 dev.off()
 
 
@@ -1067,59 +1104,20 @@ age <- ggplot() +
   geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in% c("vonB"),], aes(end_age, diff, group=name)) +
   ylab("Growth in previous year (mm)") +
   xlab("Age") +
-  theme_bw()
+  theme_bw()+
+  theme(panel.grid=element_blank())
 
 sh <- ggplot() + 
   geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in% c("vonB"),], aes(value, diff, group=name)) +
   ylab(NULL) +
   xlab("Shell height (mm)") + 
   #xlim(75,145)+
-  theme_bw() 
+  theme_bw() +
+  theme(panel.grid=element_blank())
 
-require(patchwork)
-png(paste0(plotsGo, bank, "/growth_vb.png"),width=10, height=8, units = "in", res=420)
+png(paste0(plotsGo, bank, "/growth_vb.png"), width=3150, height=1575, units = "px", res=420)
 age + sh + plot_layout(guides="collect")  
 dev.off()
-
-
-
-tster <- tpd_long %>% dplyr::filter(AGE <= 10)
-tster$shell.ID <- paste0(tster$ID,"_",tster$Scall.no)
-mod.gam.re3.1 <- gamm4(HEIGHT ~ s(AGE,bs='cs',k=3), data=tster, random = ~ (1 | shell.ID))
-preds_exp$mn.gr3.1 <- predict(object = mod.gam.re3.1$gam, newdata = preds_exp)
-preds_exp$se.gr3.1 <- predict(object = mod.gam.re3.1$gam, newdata = preds_exp, se.fit=T)$se.fit
-preds_exp$UCI.gr3.1 <- preds_exp$mn.gr3.1 + 2*preds_exp$se.gr3.1
-preds_exp$LCI.gr3.1 <- preds_exp$mn.gr3.1 - 2*preds_exp$se.gr3.1
-
-mod.gam.re3 <- gam(data=tpd_long, method="REML", HEIGHT ~ s(AGE, bs='cs', k=3) + s(ID, bs="re") + s(Scall.no, bs="re"))
-preds_exp$mn.gr3 <- gammit::predict_gamm(model = mod.gam.re3, newdata = preds_exp, re_form=NA)$prediction
-preds_exp$se.gr3 <- gammit::predict_gamm(model = mod.gam.re3, newdata = preds_exp, se=T, re_form=NA)$se
-preds_exp$UCI.gr3 <- preds_exp$mn.gr3 + 2*preds_exp$se.gr3
-preds_exp$LCI.gr3 <- preds_exp$mn.gr3 - 2*preds_exp$se.gr3
-
-mod.gam.re3.2 <- gamm4(data=tster, HEIGHT ~ s(AGE, bs="cs", k=3), random = ~(1|Scall.no/ID))
-preds_exp$mn.gr3.2 <- gammit::predict_gamm(model = mod.gam.re3.2$gam, newdata = preds_exp, re_form=NA)$prediction
-preds_exp$se.gr3.2 <- gammit::predict_gamm(model = mod.gam.re3.2$gam, newdata = preds_exp, se=T, re_form=NA)$se
-preds_exp$UCI.gr3.2 <- preds_exp$mn.gr3.2 + 2*preds_exp$se.gr3.2
-preds_exp$LCI.gr3.2 <- preds_exp$mn.gr3.2 - 2*preds_exp$se.gr3.2
-
-
-ggplot() + 
-  geom_point(data=tster, aes(AGE, HEIGHT, colour=shell.ID,group=shell.ID)) +
-  geom_line(data=preds_exp, aes(AGE, mn.gr3, group=shell.ID), colour="blue") +
-  theme(legend.position = 'none') +
-  geom_ribbon(data=preds_exp, aes(ymin=LCI.gr3,ymax=UCI.gr3,x=AGE), fill=NA, colour="blue", linetype="dashed") +
-
-  geom_line(data=preds_exp, aes(AGE, mn.gr3.1, group=shell.ID)) +
-  theme(legend.position = 'none') +
-  geom_ribbon(data=preds_exp, aes(ymin=LCI.gr3.1,ymax=UCI.gr3.1,x=AGE), fill=NA, colour="black", linetype="dashed") +
-  
-  geom_line(data=preds_exp, aes(AGE, mn.gr3.2, group=shell.ID), colour="red") +
-  theme(legend.position = 'none') +
-  geom_ribbon(data=preds_exp, aes(ymin=LCI.gr3.2,ymax=UCI.gr3.2,x=AGE), fill=NA, colour="red", linetype="dashed")
-
-
-
 
 ```
 

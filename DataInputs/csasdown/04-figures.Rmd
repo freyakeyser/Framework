@@ -105,3 +105,30 @@ knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInp
 knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/cfts_26_fw3.png")
 ```
 
+```{r, echo=FALSE, message=F, out.width=400, out.height=400,fig.align="center", fig.cap="Ages and shell heights of scallops collected on Sable Bank in 2012 (points), and the von Bertallanfy growth model (line) with parameters."}
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/fit_vb.png")
+#8 in * 8 in
+```
+
+```{r, echo=FALSE, message=F,  out.width=400, out.height=400,fig.align="center", fig.cap="Residuals of the von Bertallanfy growth model for Sable Bank in 2012 (points), the corresponding linear relationship (line), and confidence interval (shading)."}
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/resid_vb.png")
+#2100*2100
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Growth (mm) in the previous year for scallops on Sable Bank in 2012 as predicted by the von Bertallanfy model, by age and by current shell height (mm)."}
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/growth_vb.png")
+#4200W * 2100H
+```
+
+```{r, echo=FALSE, message=F, out.width=400, out.height=400,fig.align="center", fig.cap="Ages and shell heights of scallops collected on Browns Bank North in 2011 and 2012 (points), and the von Bertallanfy growth model (line) with parameters."}
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/fit_vb.png")
+```
+
+```{r, echo=FALSE, message=F, out.width=400, out.height=400,fig.align="center", fig.cap="Residuals of the von Bertallanfy growth model for Browns Bank North in 2011 and 2012 (points), the corresponding linear relationship (line), and confidence interval (shading)."}
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/resid_vb.png")
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Growth (mm) in the previous year for scallops on Browns Bank North in 2011 and 2012 as predicted by the von Bertallanfy model, by age and by current shell height (mm)."}
+knitr::include_graphics("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/growth_vb.png")
+```
+
