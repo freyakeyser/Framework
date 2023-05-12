@@ -8,12 +8,28 @@ editor_options:
 
 # Set up
 ```{r}
-plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/"
 require(tidyverse)
 require(ggplot2)
 require(lubridate)
 require(patchwork)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework3.Rdata")
+
+plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/"
+
+french <- T # set to T for french
+if(french==T) {fr <- "_fr"}
+if(french==F) {fr <- ""}
+
+require(rosettafish)
+funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs) 
+{
+  download.file(fun,destfile = basename(fun))
+  rosetta_terms <- read.csv(paste0(getwd(),"/",basename(fun)), encoding = "UTF-8")
+  file.remove(paste0(getwd(),"/",basename(fun)))
+}
+
 ```
 
 # Old Hubley functions
@@ -312,7 +328,7 @@ print(lvb.par)
 
 #which bank?
 ```{r}
-bank <- "Sab"
+bank <- "BBn"
 ```
 
 # NEW data set up BBn
@@ -1066,7 +1082,7 @@ Linf <- paste0("L[infinity] == ", round(vonBpars$linf, 1))
 K <- paste0("K == ", round(vonBpars$k, 1))
 t_0 <- paste0("t[0] == ", round(vonBpars$tzero, 1))
 
-png(paste0(plotsGo, "/", bank, "/fit_vb.png"),width=2100, height=2100, units = "px", res=420)
+png(paste0(plotsGo, "/", bank, "/fit_vb", fr, ".png"),width=6.5*1.5, height=5*1.5, units = "in", res=420)
 ggplot() + 
   geom_point(data=tpd_long, aes(AGE, HEIGHT), size=1)+
   geom_line(data=preds_long[preds_long$name == "vonB",], 
@@ -1078,21 +1094,21 @@ ggplot() +
   #ylim(50,170) +
   theme_bw() +
   theme(panel.grid=element_blank())+
-  ylab("Shell height (mm)") +
-  xlab("Age") +
+  ylab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) +
+  xlab(en2fr("Age", translate=french, custom_terms=rosetta_terms)) +
   annotate(geom="text", x=7.5, y=80, label=Linf, parse=T, hjust=0) +
   annotate(geom="text", x=7.5, y=70, label=K, parse=T, hjust=0) + 
   annotate(geom="text", x=7.5, y=60, label=t_0, parse=T, hjust=0) 
 dev.off()
 
 
-png(paste0(plotsGo, "/", bank, "/resid_vb.png"),width=2100, height=2100, units = "px", res=420)
+png(paste0(plotsGo, "/", bank, "/resid_vb", fr, ".png"),width=6.5*1.5, height=5*1.5, units = "in", res=420)
 ggplot() + 
   geom_point(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value)) + 
   geom_smooth(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value), method="lm", colour="black") + 
   #facet_wrap(~name2) +
-  ylab("Residuals (observed - predicted)") +
-  xlab("Age") +
+  ylab(en2fr("Residuals", translate=french, custom_terms=rosetta_terms)) +
+  xlab(en2fr("Age", translate=french, custom_terms=rosetta_terms)) +
   scale_x_continuous(breaks=seq(2,10,2))+
   theme_bw()+
   theme(panel.grid=element_blank())
@@ -1102,20 +1118,20 @@ dev.off()
 # growth
 age <- ggplot() + 
   geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in% c("vonB"),], aes(end_age, diff, group=name)) +
-  ylab("Growth in previous year (mm)") +
-  xlab("Age") +
+  ylab(paste0(en2fr("Growth in the previous year", translate=french, custom_terms=rosetta_terms), " (mm)")) +
+  xlab(en2fr("Age", translate=french, custom_terms=rosetta_terms)) +
   theme_bw()+
   theme(panel.grid=element_blank())
 
 sh <- ggplot() + 
   geom_line(data=preds_var_1y[preds_var_1y$end_age <7 & !is.na(preds_var_1y$diff) & preds_var_1y$name %in% c("vonB"),], aes(value, diff, group=name)) +
   ylab(NULL) +
-  xlab("Shell height (mm)") + 
+  xlab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) + 
   #xlim(75,145)+
   theme_bw() +
   theme(panel.grid=element_blank())
 
-png(paste0(plotsGo, bank, "/growth_vb.png"), width=3150, height=1575, units = "px", res=420)
+png(paste0(plotsGo, bank, "/growth_vb", fr, ".png"), width=6.5*1.5, height=4*1.5, units = "in", res=420)
 age + sh + plot_layout(guides="collect")  
 dev.off()
 

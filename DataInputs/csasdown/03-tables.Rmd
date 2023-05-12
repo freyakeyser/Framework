@@ -22,11 +22,11 @@ ageing_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInpu
 ageing_bbn$`Management Unit` <- "Browns Bank North"
 ageing_sab$`Management Unit` <- "Sable Bank"
 ageing <- rbind(ageing_sab, ageing_bbn)
-ageing <- select(ageing, -X)
+ageing <- dplyr::select(ageing, -X)
 ageing <- data.frame(ageing$`Management Unit`, ageing[,1:(ncol(ageing)-1)])
 names(ageing)[1:2] <- c("Management Unit", "Model")
-ageing1 <- unique(select(ageing, Model, Formula))
-ageing2 <- select(ageing, -Formula)
+ageing1 <- unique(dplyr::select(ageing, Model, Formula))
+ageing2 <- dplyr::select(ageing, -Formula)
 ageing2$AIC <- round(ageing2$AIC, 0)
 ageing2$r.sq <- round(ageing2$r.sq, 3)
 ageing2$scale.est <- round(ageing2$scale.est, 2)
@@ -58,7 +58,8 @@ csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0
 #<!---BLOCK_LANDSCAPE_START--->
 ```
 
-```{r echo=F, message=F}
+```{r echo=F, message=F, eval=F}
+### IGNORE THIS CHUNK. FOR PRESENTATION ONLY
 #<!---BLOCK_LANDSCAPE_START--->
 # block_section(
 #   prop_section(
@@ -67,14 +68,14 @@ csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0
 #   )
 # )
 
-csas_table(ageing1, caption ="Growth model specification.") %>% kableExtra::row_spec(0,bold=TRUE)
-#qflextable(strata)
-
-csas_table(ageing2, caption ="Growth model evaluation.") %>% kableExtra::row_spec(0,bold=TRUE)
-
-csas_table(ageing3, caption ="Shell heights at age 2, 5, and 10 for aged scallops, from three models.") %>% kableExtra::row_spec(0,bold=TRUE)
-
-csas_table(ageing4, caption ="Comparative growth metrics for aged scallops, from three models. A_avgFR is the age of an average fully-recruited scallop, A_maxR is the age of a scallop at maximum recruit size, and A_minR is the age of a scallop at the minimum recruit size. K values represent growth (in mm) in the year prior to reaching average fully-recruited shell height (K_avgFR) and maximum recruit size (K_maxR), and from ages 2 to 5 (K_2-5).") %>% kableExtra::row_spec(0,bold=TRUE)
+# csas_table(ageing1, caption ="Growth model specification.") %>% kableExtra::row_spec(0,bold=TRUE)
+# #qflextable(strata)
+# 
+# csas_table(ageing2, caption ="Growth model evaluation.") %>% kableExtra::row_spec(0,bold=TRUE)
+# 
+# csas_table(ageing3, caption ="Shell heights at age 2, 5, and 10 for aged scallops, from three models.") %>% kableExtra::row_spec(0,bold=TRUE)
+# 
+# csas_table(ageing4, caption ="Comparative growth metrics for aged scallops, from three models. A_avgFR is the age of an average fully-recruited scallop, A_maxR is the age of a scallop at maximum recruit size, and A_minR is the age of a scallop at the minimum recruit size. K values represent growth (in mm) in the year prior to reaching average fully-recruited shell height (K_avgFR) and maximum recruit size (K_maxR), and from ages 2 to 5 (K_2-5).") %>% kableExtra::row_spec(0,bold=TRUE)
 
 #<!---BLOCK_LANDSCAPE_START--->
 ```

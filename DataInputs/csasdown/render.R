@@ -11,3 +11,4 @@ x <- officer::body_add_toc(x)
 # Step 4: Save
 # If error message, look for temp file in RStudio Files panel. Select box, and delete in Rstudio. Temp file may not be visible in File explorer.
 print(x, target = "_book/final_resdoc.docx")
+

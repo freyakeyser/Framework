@@ -126,4 +126,10 @@ params$bank <- c("Ban", "Mid",
 params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022)
 params$bankname <- c("Banquereau", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North")
 params$banknum <- 1:length(params$bank)
+
+fr <- ""
+#fr <- "_fr"
+if(fr=="") language <- "english"
+if(!fr=="") language <- "french"
+nickname <- "framework3"
 ```
