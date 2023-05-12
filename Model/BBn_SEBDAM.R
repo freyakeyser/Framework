@@ -1,4 +1,5 @@
 # So here we'll try and get all the data in the correct structure for the spatial model.
+#devtools::install_github("RaphMcDo/SEBDAM@dev-branch") # to install a specific branch of SEBDAM
 library(SEBDAM)
 library(tidyverse)
 library(sf)
@@ -22,18 +23,21 @@ bbn.shape <- st_read("D:/Github/GIS_layers/survey_boundaries/BBn.shp", quiet=T)
 bbn.shape <- bbn.shape %>% st_transform(crs = 32619) # BBn is right on the 19/20 border so think they are basically equivalent options here
 # Bring in the survey data
 #load("Y:/Offshore/Assessment/Data/Survey_data/2019/Survey_summary_output/Survey_all_results.Rdata")
-#load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/Survey_all_results.Rdata")
+load("D:/Framework/SFA_25_26_2024/Model/Data/testing_results_framework3.Rdata")
 #surv.dat <- surv.dat$BBn
 #saveRDS(surv.dat,'D:/Github/BBn_model/Results/BBn_surv.dat.RDS')
-surv.dat <- readRDS('D:/Github/BBn_model/Results/BBn_surv.dat.RDS')
+#surv.dat <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/BBn_surv.dat.RDS')
+surv.dat <- surv.dat$BBn
+
 # This gets our growth data, grabbing it from 2022 because we have the input data and so is way smaller
 # load("Y:/Offshore/Assessment/Data/Model/2022/BBn/Model_input_mixed.RData")
 # mod.dat <- mod.dat$BBn
 # saveRDS(mod.dat,'D:/Github/BBn_model/Results/BBn_model.dat.RDS')
-mod.dat <- readRDS('D:/Github/BBn_model/Results/BBn_model.dat.RDS')
+mod.dat <- survey.obj$BBn$model.dat
+#mod.dat <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/BBn_model.dat.RDS')
 # For now we need to get a 2022 growth term (once we run the BBn model I can update this with the latest data), just recycling the growth for 2021 for the moment
-mod.dat <- rbind(mod.dat,mod.dat[nrow(mod.dat),])
-mod.dat$year[nrow(mod.dat)] <- 2022
+#mod.dat <- rbind(mod.dat,mod.dat[nrow(mod.dat),])
+#mod.dat$year[nrow(mod.dat)] <- 2022
 # Bring in the fishery data
 # logs_and_fish(loc="offshore",year = 1991:2022,un=un.ID,pw=pwd.ID,db.con=db.con,direct="Y:/Offshore/Assessment/", get.marfis=F)
 # fish.dat<-merge(new.log.dat,old.log.dat,all=T)
@@ -57,15 +61,15 @@ mod.dat$year[nrow(mod.dat)] <- 2022
 # bbn.fish$lon[nrow(bbn.fish)]  <- -65.90183
 # # saveRDS(bbn.fish,'D:/Github/BBn_model/Results/BBn_fish.dat.RDS')
 
-bbn.fish <- readRDS('D:/Github/BBn_model/Results/Fishery_data/BBn_fish.dat.RDS')
+bbn.fish <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/BBn_fish.dat.RDS')
 bbn.fish$pro.repwt <- bbn.fish$pro.repwt/1000
 #### Finshed Data prep and clean up!
 ###############################################################################################
 
 
 # Set parameters for the run...
-repo.loc <- "D:/Github/BBn_model/"
-mod.select <- "SEAM"
+repo.loc <- "D:/Github/Framework/Model/"
+mod.select <- "TLM"
 atow<-800*2.4384/10^6 # area of standard tow in km2
 num.knots <- 10
 years <- 1994:2022
@@ -87,9 +91,60 @@ mod.input.sf$Year <- mod.input.sf$year - (min(years)-1)
 mod.input.sf$I <- mod.input.sf$I/atow
 mod.input.sf$IR <- mod.input.sf$IR/atow
 mod.input.sf <- mod.input.sf %>% dplyr::filter(year %in% years)
-# Grab the growth data
+
+# We need to recalculate the growth data using the new von B curves and size bins... breaking out the ugly code to do this...
+vonB.par <- data.frame(Linf = 164.4,K = 0.2, t0 = -0.2)
+# Back to real code
+# So first up, this condition is the weighted mean condition, this uses the GAM predicted scallop condition factor for each tow
+# and the biomass from each tow to come up with an overall bank average condition factor.
+# This is weight in this year, which becomes t-1 
+w.fr.current <- mod.dat$CF*(mod.dat$l.bar/100)^3
+w.rec.current <- mod.dat$CF*(mod.dat$l.k/100)^3
+
+# Using this years average shell height we can figure out how old the scallop are on average and then we use the 
+# von B and allow them to grow by 1 year, that's our average projected size next year.
+len.fr.next <- NA #laa.t <- NA
+len.rec.next <- NA #laa.t <- NA
+for(y in 1:nrow(mod.dat))
+{
+age= data.frame(age = seq(2,8,by=0.01),len = NA,l.fr = mod.dat$l.bar[y],l.rec = mod.dat$l.k[y])
+age$len <- vonB.par$Linf*(1-exp(-vonB.par$K*(age$age-vonB.par$t0)))
+age$fr.diff <- abs(age$len - age$l.fr)
+age$rec.diff <- abs(age$len - age$l.rec)
+age.fr.next <- age$age[which.min(age$fr.diff)] + 1
+age.rec.next <- age$age[which.min(age$rec.diff)] + 1
+len.fr.next[y] <-  vonB.par$Linf*(1-exp(-vonB.par$K*(age.fr.next-vonB.par$t0)))
+len.rec.next[y] <-  vonB.par$Linf*(1-exp(-vonB.par$K*(age.rec.next-vonB.par$t0)))
+} # end for y in 1:NY
+# The c() term in the below offsets the condition so that current year's condition slots into the previous year and repeats 
+# the condition for the final year), this effectively lines up "next year's condition" with "predictied shell height next year (laa.t)
+# This gets us the predicted weight of the current crop of scallops next year based on next years CF * length^3
+# Get the weight of scallop next year
+w.fr.next <- c(mod.dat$CF[-1],mod.dat$CF[nrow(mod.dat)])*(len.fr.next/100)^3
+w.rec.next <- c(mod.dat$CF[-1],mod.dat$CF[nrow(mod.dat)])*(len.rec.next/100)^3
+# Also calculate it based on 'known' condition, used for prediction evaluation figures only as we don't know it when we run the models, only
+# after we get survey data.
+w.fr.next.alt <- mod.dat$CF*(len.fr.next/100)^3
+w.rec.next.alt <- mod.dat$CF*(len.rec.next/100)^3
+# Now the growth, expected and realized.
+
+mod.dat$g <- w.fr.next/w.fr.current
+mod.dat$gR <- w.rec.next/w.rec.current
+# This is using the actual condition factor and g
+mod.dat$g2 <- w.fr.next.alt/w.fr.current
+mod.dat$gR2 <- w.rec.next.alt/w.rec.current
+
+
 growth <- data.frame(g = mod.dat$g, gR = mod.dat$gR,year = mod.dat$year)
+# need to fudge in 2020 data.. taking average of 2019 and 2021
+growth[nrow(growth)+1,] <- growth[nrow(growth),]
+growth$year[nrow(growth)] <- 2020
+growth$g[growth$year == 2020] <- mean(growth$g[growth$year %in% c(2019,2021)])
+growth$gR[growth$year == 2020] <- mean(growth$gR[growth$year %in% c(2019,2021)])
+# Now reorder by year...
+growth <- growth[order(growth$year),]
 growth <- growth %>% dplyr::filter(year %in% c(years,(max(years)+1)))
+
 # Now we can clip both of these to subset it to the data that I think we need for the analysis....
 
 # If we run with random == 1 then we need to fill in 2020...
@@ -103,6 +158,7 @@ mod.input.sf$tot.live.com[nrow(mod.input.sf)] <- NA
 mod.input.sf$L[nrow(mod.input.sf)] <- 0
 mod.input.sf$N[nrow(mod.input.sf)] <- 0
 
+mod.input.sf <- mod.input.sf[order(mod.input.sf$year),]
 # DK NOTE: Now this is going to get confusing for us and we may want to tweak SEBDAM for this, but that's a down the road job, not a playing around with model job
 # But based on the indexing in SEBDAM, I am going to change how we index the survey year data from what we have done with offshore traditionally.
 # Historically anything from the last half of the year goes into the following years, eg. survey.year 2002 = June 2001- May 2002.  
@@ -213,9 +269,10 @@ if(mod.select == "TLM")
 {
   set_data<-data_setup(data=as.data.frame(mod.input.sf),growths=growth[,1:2],catch=catch.tlm$catch, model="TLM",obs_mort=TRUE,prior=TRUE)
   # So this will fix the mean value of m0 to be whatever the initial value is set at in the data_setup step.  Let's see what happens!
+  set_data<-fix_param(obj=set_data, pars = list(log_q_R=-0.7))
   set_data$par$log_q_R <- -0.7 # Around 0.5, similar to some of the seam models.
   #set_data$par$log_R0 <- 4 # 5.3 = 200, 5 = 148, 4 = 55, 6 = 400
-  set_data$par$log_qR <- -1.5
+  #set_data$par$log_qR <- -1.5
   #set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA),log_qR = factor(NA))
   set_data$map <-list(log_q_R=factor(NA))
 } # end if(mod.select == "TLM")
@@ -244,8 +301,8 @@ if(mod.select != "TLM")
 if(mod.select == "TLM") 
 {
   qR.par <- sub("0.","0_",signif(exp(set_data$par$log_q_R),digits=2))
-  scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR.par)
-  saveRDS(mod.fit,paste0(repo.loc,"Results/Models/BBn/BBn_",mod.select,"_model_output_",scenario.select,".Rds"))
+  scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR.par,"_Rec_bins_",rec.bins)
+  saveRDS(mod.fit,paste0("D:/Framework/SFA_25_26_2024/Model/Results/BBn/BBn_",mod.select,"_model_output_",scenario.select,".Rds"))
 }
 
 # The model using only proper survey strata
@@ -273,22 +330,23 @@ atow<-800*2.4384/10^6 # area of standard tow in km2
 num.knots <- 20
 RO <- 150
 qR  <- "0_5" # This is just for TLM models
+rec.bins <- "75_90"
 years <- 1994:2022
 NY <- length(years)
 c_sys <- 32619
 theme_set(theme_few(base_size = 22))
-repo.loc <- "D:/Github/BBn_model/"
-mod.select <- "SEAM"
+repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
+mod.select <- "TLM"
 ################################################### End the initial model runs ###########################################
 ### Make the figures for the models
 
 
 
 if(mod.select != "TLM") scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_1_R0_",RO,"_",num.knots,"_knots")
-if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR)
+if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_Rec_bins_",rec.bins)
 # If we are going with the no extra station model this is our scenario.
 #scenario.select <- "1994_2022_vary_m_m0_1_R0_150_10_knots_No_extra_stations"
-mod.fit <- readRDS(paste0(repo.loc,"Results/Models/BBn/BBn_",mod.select,"_model_output_",scenario.select,".Rds"))
+mod.fit <- readRDS(paste0(repo.loc,"/Results/BBn/BBn_",mod.select,"_model_output_",scenario.select,".Rds"))
 if(mod.select != "TLM") catchy <- mod.fit$obj$env$data$C*mod.fit$obj$env$data$area # Get this into tonnes from catch density.
 if(mod.select == "TLM") catchy <- mod.fit$obj$env$data$C
 
@@ -668,7 +726,7 @@ ann.exploit$FM.UCI <- 1-exp(-ann.exploit$exploit.UCI)
 # Biomass time series
 bm.ts.plot <- ggplot(pred.proc$log_processes) + geom_line(aes(year,exp(log_B)),color='firebrick2',linewidth=1.5) + 
   geom_ribbon(aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.5,fill='blue',color='blue') +
-  xlab("") + ylab("Fully Recruited Biomass (tonnes)") + scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,2.35e4))
+  xlab("") + ylab("Fully Recruited Biomass (tonnes)") + scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,2.5e4))
 save_plot(paste0(repo.loc,"Results/Figures/BBn/",mod.select,"_",scenario.select,"/BBn_Biomass_time_series.png"),bm.ts.plot,base_width = 11,base_height = 8.5)
 # Recruit time series
 rec.ts.plot <- ggplot(pred.proc$log_processes) + geom_line(aes(year,exp(log_R)),color='firebrick2',linewidth=1.5) + 
@@ -678,7 +736,7 @@ save_plot(paste0(repo.loc,"Results/Figures/BBn/",mod.select,"_",scenario.select,
 # Natural mortality time series...
 mort.ts.plot <- ggplot(pred.proc$log_processes) + geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) + 
   geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
-  xlab("") + ylab("Natural mortality (Instantaneous)") + scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.65))
+  xlab("") + ylab("Natural mortality (Instantaneous)") + scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.75))
 save_plot(paste0(repo.loc,"Results/Figures/BBn/",mod.select,"_",scenario.select,"/BBn_nat_mort_time_series.png"),mort.ts.plot,base_width = 11,base_height = 8.5)
 # Explotation Rate Time Series
 exploit.plot <- ggplot(ann.exploit) + geom_line(aes(x=year,y=exploit),size=1.5) + geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.5,fill='blue',color='blue') +
@@ -723,3 +781,8 @@ exploit.plot <- ggplot(ann.exploit%>% dplyr::filter(year < c(2020))) + geom_line
                             xlab("") + ylab("Exploitation Rate (Proportional)") + ylim(c(0,0.35)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Results/Figures/BBn/",mod.select,"_",scenario.select,"/BBn_exploit_time_series_no_missing_surveys.png"),exploit.plot,base_width = 11,base_height = 8.5)
 
+
+## One Step ahead residuals from Raph....
+
+oneStepPredict(obj,observation.name="logIR",data.term.indicator="keep_IR",method="fullGaussian",subset=which(!(is.na(data$logIR))))
+oneStepPredict(obj,observation.name="logI",data.term.indicator="keep_I",method="fullGaussian",subset=which(!(is.na(data$logI))))

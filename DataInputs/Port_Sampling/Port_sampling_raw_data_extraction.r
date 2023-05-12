@@ -522,7 +522,7 @@ bbn.dat <- port.sampling[port.sampling$bank == "BBn",]
 # A plot of the time series for BBn and Sab
 
 ggplot(bbn.dat,aes(fished,meat_weight,colour=fleet)) + geom_point(size=0.2) + geom_smooth()
-ggplot(sab.dat,aes(fished,meat_weight,colour=fleet)) + geom_point(size=0.2) + geom_smooth()
+#ggplot(sab.dat,aes(fished,meat_weight,colour=fleet)) + geom_point(size=0.2) + geom_smooth()
 
 mc.by.year.fleet <- aggregate(mc~year+fleet,bbn.dat,median)
 mc.by.year.fleet
@@ -614,7 +614,8 @@ ggplot(pred.dat, aes(date,mc,colour=fleet))  + theme(text = element_text(size=16
 
 
 # First off I'll need to load in the survey results....
-load("D:/testing_folder/data/Survey_all_results.RData")
+#load("D:/testing_folder/data/Survey_all_results.RData")
+load(paste0(direct,"Data/Survey_data/2022/Survey_summary_output/Survey_all_results.RData"))
 
 # Now what we want is to fit the MW-SH model to these data for each year back to 2006 and for both May and August survey...
 # For the most recent data
@@ -665,7 +666,7 @@ names(mw.by.month) <- c("date","year","fleet","mw")
 
 
 windows(11,11)
-ggplot(mw.by.month,aes(month,mw,colour=fleet)) + geom_point() + geom_line()
+ggplot(mw.by.month,aes(x= date,mw,colour=fleet)) + geom_point() + geom_line()
 
 ps.mw.sh <- merge(mw.by.month,SH.target,by =c("year","fleet"))
 
@@ -726,11 +727,11 @@ sh.plt <- ggplot(bbn.dat,aes(date,sh,colour=fleet)) + geom_point(alpha = 0.05,si
 sh.plt
 
 
-
+# HERE IS THE MAIN ANALYSIS FOR the BBn Res doc, shows proportion below certain sizes
 n.bl.100 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 100) %>% dplyr::summarise(n100 = length(sh))
-n.all <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::summarise(tot = length(sh))
+n.all.bbn <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::summarise(tot = length(sh))
 
-prop.bl.100 <- left_join(n.bl.100,n.all,'year')
+prop.bl.100 <- left_join(n.bl.100,n.all.bbn,'year')
 prop.bl.100$prop <- prop.bl.100$n100 / prop.bl.100$tot
 
 windows(11,11)
@@ -739,15 +740,16 @@ ggplot(data = prop.bl.100,aes(x=year,y=prop)) + geom_point() + ylab("Proportion 
 
 
 n.bl.95 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 95) %>% dplyr::summarise(n95 = length(sh))
-prop.bl.95 <- left_join(n.bl.95,n.all,'year')
+prop.bl.95 <- left_join(n.bl.95,n.all.bbn,'year')
 prop.bl.95$prop <- prop.bl.95$n95 / prop.bl.95$tot
 
 windows(11,11)
 ggplot(data = prop.bl.95,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 95 mm") + 
                                                theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
+# Based on Ageing info, we think 75-90 mm is the best option, that would be ≈ 3-4 year olds.
 n.bl.90 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 90) %>% dplyr::summarise(n90 = length(sh))
-prop.bl.90 <- left_join(n.bl.90,n.all,'year')
+prop.bl.90 <- left_join(n.bl.90,n.all.bbn,'year')
 prop.bl.90$prop <- prop.bl.90$n90 / prop.bl.90$tot
 
 # This is basically under 1%, which I think will be fine.
@@ -757,7 +759,7 @@ ggplot(data = prop.bl.90,aes(x=year,y=prop)) + geom_point() + ylab("Proportion o
 
 
 n.bl.85 <- bbn.dat %>% dplyr::group_by(year,.drop=F) %>% dplyr::filter(sh < 85) %>% dplyr::summarise(n85 = length(sh))
-prop.bl.85 <- left_join(n.bl.85,n.all,'year')
+prop.bl.85 <- left_join(n.bl.85,n.all.bbn,'year')
 prop.bl.85$prop <- prop.bl.85$n85 / prop.bl.85$tot
 
 # So there is basically 0 catch coming from < 85 mm, well under 1%
@@ -765,9 +767,21 @@ windows(11,11)
 ggplot(data = prop.bl.85,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
+# Just look at spring-summer, going with April-August as in theory condition should be fairly stable during this period.
+# Based on Ageing info, we think 75-90 mm is the best option, that would be ≈ 3-4 year olds.
+sel.months <- 4:8
+n.bl.90.ss <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 90 & month %in% sel.months) %>% dplyr::summarise(n90 = length(sh))
+n.all.bbn.ss <-  bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(month %in% sel.months) %>% dplyr::summarise(tot = length(sh))
+prop.bl.90.ss <- left_join(n.bl.90.ss,n.all.bbn.ss,'year')
+prop.bl.90.ss$prop <- prop.bl.90.ss$n90 / prop.bl.90.ss$tot
+
+# This is basically under 1%, which I think will be fine.
+windows(11,11)
+ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
+  theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 
-# So I guess the next thing is to figure out what proportion the 90-95 mm size bins is of the Fully Recruited population?
+# Based on the ageing work, if we go with 90 mm as our end of recruitment bin, the recruits should be 75-90 mm in size.
 
 
 
@@ -824,7 +838,7 @@ names(mw.by.month) <- c("date","year","fleet","mw")
 
 
 windows(11,11)
-ggplot(mw.by.month,aes(month,mw,colour=fleet)) + geom_point() + geom_line()
+ggplot(mw.by.month,aes(date,mw,colour=fleet)) + geom_point() + geom_line()
 
 ps.mw.sh <- merge(mw.by.month,SH.target,by =c("year","fleet"))
 
@@ -886,11 +900,11 @@ sh.plt <- ggplot(sab.dat,aes(date,sh,colour=fleet)) + geom_point(alpha = 0.05,si
 sh.plt
 
 
-
+# Here are the money plots for SAB
 n.bl.100 <- sab.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 100) %>% dplyr::summarise(n100 = length(sh))
-n.all <- sab.dat %>% dplyr::group_by(year) %>% dplyr::summarise(tot = length(sh))
+n.all.sab <- sab.dat %>% dplyr::group_by(year) %>% dplyr::summarise(tot = length(sh))
 
-prop.bl.100 <- left_join(n.bl.100,n.all,'year')
+prop.bl.100 <- left_join(n.bl.100,n.all.sab,'year')
 prop.bl.100$prop <- prop.bl.100$n100 / prop.bl.100$tot
 
 windows(11,11)
@@ -900,7 +914,7 @@ ggplot(data = prop.bl.100,aes(x=year,y=prop)) + geom_point() + ylab("Proportion 
 
 n.bl.95 <- sab.dat %>% dplyr::group_by(year,.drop=F) %>% dplyr::filter(sh < 95) %>% dplyr::summarise(n95 = length(sh))
 
-prop.bl.95 <- left_join(n.bl.95,n.all,'year')
+prop.bl.95 <- left_join(n.bl.95,n.all.sab,'year')
 prop.bl.95$prop <- prop.bl.95$n95 / prop.bl.95$tot
 
 windows(11,11)
@@ -908,7 +922,7 @@ ggplot(data = prop.bl.95,aes(x=year,y=prop)) + geom_point() + ylab("Proportion o
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 n.bl.90 <- sab.dat %>% dplyr::group_by(year,.drop=F) %>% dplyr::filter(sh < 90) %>% dplyr::summarise(n90 = length(sh))
-prop.bl.90 <- left_join(n.bl.90,n.all,'year')
+prop.bl.90 <- left_join(n.bl.90,n.all.sab,'year')
 prop.bl.90$prop <- prop.bl.90$n90 / prop.bl.90$tot
 
 windows(11,11)
@@ -917,7 +931,7 @@ ggplot(data = prop.bl.90,aes(x=year,y=prop)) + geom_point() + ylab("Proportion o
 
 
 n.bl.85 <- sab.dat %>% dplyr::group_by(year,.drop=F) %>% dplyr::filter(sh < 85) %>% dplyr::summarise(n85 = length(sh))
-prop.bl.85 <- left_join(n.bl.85,n.all,'year')
+prop.bl.85 <- left_join(n.bl.85,n.all.sab,'year')
 prop.bl.85$prop <- prop.bl.85$n85 / prop.bl.85$tot
 
 # So there is basically 0 catch coming from < 85 mm, well under 1%
@@ -925,6 +939,17 @@ windows(11,11)
 ggplot(data = prop.bl.85,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
+# Just look at spring-summer, going with April-August as in theory condition should be fairly stable during this period.
+# Based on Ageing info, we think 75-90 mm is the best option, that would be ≈ 3-4 year olds.
+sel.months <- 4:8
+n.bl.90.ss <- sab.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 90 & month %in% sel.months) %>% dplyr::summarise(n90 = length(sh))
+n.all.sab.ss <-  sab.dat %>% dplyr::group_by(year) %>% dplyr::filter(month %in% sel.months) %>% dplyr::summarise(tot = length(sh))
+prop.bl.90.ss <- left_join(n.bl.90.ss,n.all.sab.ss,'year')
+prop.bl.90.ss$prop <- prop.bl.90.ss$n90 / prop.bl.90.ss$tot
 
+# This is basically under 1%, which I think will be fine.
+windows(11,11)
+ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
+  theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 # So I guess the next thing is to figure out what proportion the 90-95 mm size bins is of the Fully Recruited population?
