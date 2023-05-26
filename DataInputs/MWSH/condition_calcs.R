@@ -45,29 +45,53 @@ test$CFyrs
 ### should retain abundance estimates, just not biomass. Could potentially just hide CF and Biomass estimates for these years
 ### but only if it has no impact on the other years.
 
+require(ggplot2)
+require(patchwork)
 
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework.RData")
 
-before <- survey.obj$Mid
-beforecf <- cf.data$Mid
+before <- survey.obj
+beforecf <- cf.data
 
 load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_mid.RData")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework2.RData")
 
-after <- survey.obj$Mid
-aftercf <- cf.data$Mid
+after <- survey.obj
+aftercf <- cf.data
 
-ggplot() + geom_point(data=before$model.dat, aes(year, N)) +
-  geom_point(data=after$model.dat, aes(year, N), colour="red")
+for (i in names(after)[!names(after) %in% c("GB", "GBa", "GBb")]){
+  print(i)
 
-ggplot() + geom_boxplot(data=beforecf$pred.dat, aes(year, CF, group=year))# +
-  #geom_boxplot(data=aftercf$pred.dat, aes(year, CF, group=year), colour="red")
+  a<-ggplot() + geom_point(data=before[[i]]$model.dat, aes(year, N)) +
+    geom_point(data=after[[i]]$model.dat, aes(year, N), colour="red") +
+    ggtitle(i)
+
+  b<-ggplot() + geom_boxplot(data=beforecf[[i]]$pred.dat, aes(year, CF, group=year)) +
+    geom_boxplot(data=aftercf[[i]]$pred.dat, aes(year, CF, group=year), colour="red")+
+    ggtitle(i)
+
+  c<- ggplot() + geom_point(data=before[[i]]$model.dat, aes(year, I)) +
+    geom_point(data=after[[i]]$model.dat, aes(year, I), colour="red")+
+    ggtitle(i)
+
+  print(a + b + c)
+
+}
+
+for (i in names(after)[!names(after) %in% c("GB", "GBa", "GBb")]){
+  c[[i]] <- ggplot() + geom_point(data=before[[i]]$model.dat, aes(year, I)) +
+    geom_point(data=after[[i]]$model.dat, aes(year, I), colour="red")+
+    ggtitle(i)
+}
 
 
-
-
-
-
-
+banks <- names(after)[!names(after) %in% c("GB", "GBa", "GBb")]
+c[[banks[1]]] +
+  c[[banks[2]]] +
+  c[[banks[3]]] +
+  c[[banks[4]]] +
+  c[[banks[5]]] +
+  c[[banks[6]]]
 
 
 

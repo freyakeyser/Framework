@@ -42,47 +42,9 @@ Content here.
 
 Content here.
 
-#### a-2-1-2 {#app:a-2-1-2}
-
-Content here.
-
-#### a-2-1-3 {#app:a-2-1-3}
-
-Content here.
-
 ### a-2-2 {#app:a-2-2}
 
 Content here.
-
-#### a-2-2-1 {#app:a-2-2-1}
-
-Content here.
-
-#### a-2-2-2 {#app:a-2-2-2}
-
-Content here.
-
-
-## a-3 {#app:a-3}
-
-Content here.
-
-### a-3-1 {#app:a-3-1}
-
-Content here.
-
-### a-3-2 {#app:a-3-2}
-
-Content here.
-
-### a-3-3 {#app:a-3-3}
-
-Content here.
-
-### a-3-4 {#app:a-3-4}
-
-Content here.
-
 
 
 # THE SECOND APPENDIX, FOR FUN {#app:b}
@@ -99,48 +61,3 @@ Content here.
 Content here.
 
 
-
-# THE THIRD APPENDIX, FOR JOY AND PAIN {#app:c}
-
-More content.
-
-## c-1 {#app:c-1}
-
-Content here.
-
-
-## c-2 {#app:c-2}
-
-Content here.
-
-
-## c-3 {#app:c-3}
-
-Content here.
-
-
-## c-4 {#app:c-4}
-
-Content here.
-
-### c-4-1 {#app:c-4-1}
-
-Content here.
-
-### c-4-2 {#app:c-4-2}
-
-Content here.
-
-#### c-4-2-1 {#app:c-4-2-1}
-
-Content here.
-
-### c-4-3 {#app:c-4-3}
-
-Content here.
-
-
-
-# THE FOURTH APPENDIX, BECAUSE WHY NOT {#app:d}
-
-More content.
