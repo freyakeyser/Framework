@@ -12,7 +12,7 @@ require(tidyverse)
 require(ggplot2)
 require(lubridate)
 require(patchwork)
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework3.Rdata")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.Rdata")
 
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/"
 
@@ -328,7 +328,7 @@ print(lvb.par)
 
 #which bank?
 ```{r}
-bank <- "BBn"
+bank <- "Sab"
 ```
 
 # NEW data set up BBn
@@ -992,13 +992,13 @@ write.csv(x = df, paste0(plotsGo, bank, "/summary_stats.csv"))
 
 ### testing out ranges
 ```{r}
-preds_var_1y <- pivot_wider(select(preds_var, -se, -up, -low), id_cols="AGE")
+preds_var_1y <- pivot_wider(dplyr::select(preds_var, -se, -up, -low), id_cols="AGE")
 
 preds_var_1y2 <- full_join(preds_var_1y[11:nrow(preds_var_1y),], data.frame(AGE=rep(NA, 10))) - preds_var_1y[1:nrow(preds_var_1y),]
 preds_var_1y2$end_age <- c(seq(3, 10, 0.1), rep(NA,10))
 preds_var_1y2$start_age <- seq(2, 10, 0.1)
 preds_var_1y2 <- pivot_longer(preds_var_1y2, cols = names(preds_var_1y2)[!names(preds_var_1y2) %in% c("AGE", "end_age", "start_age")])
-preds_var_1y2 <- select(preds_var_1y2, -AGE)
+preds_var_1y2 <- dplyr::select(preds_var_1y2, -AGE)
 names(preds_var_1y2)[names(preds_var_1y2) == "value"] <- "diff"
 preds_var_1y2$AGE <- preds_var_1y2$end_age
 
@@ -1082,7 +1082,7 @@ Linf <- paste0("L[infinity] == ", round(vonBpars$linf, 1))
 K <- paste0("K == ", round(vonBpars$k, 1))
 t_0 <- paste0("t[0] == ", round(vonBpars$tzero, 1))
 
-png(paste0(plotsGo, "/", bank, "/fit_vb", fr, ".png"),width=6.5*1.5, height=5*1.5, units = "in", res=420)
+png(paste0(plotsGo, "/", bank, "/fit_vb", fr, ".png"),width=6.5, height=5, units = "in", res=420)
 ggplot() + 
   geom_point(data=tpd_long, aes(AGE, HEIGHT), size=1)+
   geom_line(data=preds_long[preds_long$name == "vonB",], 
@@ -1102,7 +1102,7 @@ ggplot() +
 dev.off()
 
 
-png(paste0(plotsGo, "/", bank, "/resid_vb", fr, ".png"),width=6.5*1.5, height=5*1.5, units = "in", res=420)
+png(paste0(plotsGo, "/", bank, "/resid_vb", fr, ".png"),width=6.5, height=5, units = "in", res=420)
 ggplot() + 
   geom_point(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value)) + 
   geom_smooth(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value), method="lm", colour="black") + 
@@ -1131,7 +1131,7 @@ sh <- ggplot() +
   theme_bw() +
   theme(panel.grid=element_blank())
 
-png(paste0(plotsGo, bank, "/growth_vb", fr, ".png"), width=6.5*1.5, height=4*1.5, units = "in", res=420)
+png(paste0(plotsGo, bank, "/growth_vb", fr, ".png"), width=6.5, height=4, units = "in", res=420)
 age + sh + plot_layout(guides="collect")  
 dev.off()
 

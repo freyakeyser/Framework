@@ -12,3 +12,6 @@ x <- officer::body_add_toc(x)
 # If error message, look for temp file in RStudio Files panel. Select box, and delete in Rstudio. Temp file may not be visible in File explorer.
 print(x, target = "_book/final_resdoc.docx")
 
+
+
+### need to re-run the catch plot, and figure out 6 panel figure scaling.

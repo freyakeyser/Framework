@@ -21,6 +21,8 @@ fig:unnamed-chunk-23
 fig:unnamed-chunk-24
 fig:unnamed-chunk-25
 fig:unnamed-chunk-26
+fig:unnamed-chunk-27
+fig:unnamed-chunk-28
 introduction
 species-biology
 framework-objectives

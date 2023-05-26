@@ -242,7 +242,8 @@ for(sfa in sfa){
 }
 
 # comparing different recruit sizes
-bankpertow_all$recsize[bankpertow_all$rdata=="framework2"] <- "85-95"
+bankpertow_all$recsize[bankpertow_all$rdata=="framework2" & bankpertow_all$sfa == 26] <- "85-95"
+bankpertow_all$recsize[bankpertow_all$rdata=="framework2" & bankpertow_all$sfa == 25] <- "80-90"
 bankpertow_all$recsize[bankpertow_all$rdata=="framework3"] <- "75-90"
 bankpertow_all$recsize[bankpertow_all$rdata=="framework4"] <- "80-95"
 
@@ -336,7 +337,7 @@ cfts$sfa[cfts$bank %in% c("BBn", "BBs", "Ger")] <- 26
 if(french==F) cflab <- expression(paste("Condition factor  ",bgroup("(",frac(g,dm^3)   ,")")))
 if(french==T) cflab <- expression(paste("Coefficient de condition  ",bgroup("(",frac(g,dm^3)   ,")")))
 
-png(filename=paste0(plotsGo, "/cfts_26", "_", nickname, ".png"),width=6.5*1.5, height=4*1.5, units = "in", res=420)
+png(filename=paste0(plotsGo, "/cfts_26", "_", nickname, ".png"),width=6.5, height=4, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank)) +
         geom_line(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank, linetype=type)) +
         xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) + 
@@ -348,7 +349,7 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank)
 )
 dev.off()
 
-png(filename=paste0(plotsGo, "/cfts_25", "_", nickname, ".png"),width=6.5*1.5, height=4*1.5, units = "in", res=420)
+png(filename=paste0(plotsGo, "/cfts_25", "_", nickname, ".png"),width=6.5, height=4, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
         geom_line(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
         xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) + 
@@ -544,19 +545,22 @@ for(sfa in 25:26){
     st_buffer(dist=50000) %>% 
     st_bbox()
   
+  if(french==T) nonGB$final <- nonGB$fr
+  if(french==F) nonGB$final <- nonGB$lab_short
+  
   bp <- pecjector(area=list(y = c(lims$ymin[[1]], lims$ymax[[1]]),
                             x =c(lims$xmin[[1]], lims$xmax[[1]]),
                             crs = crs),
                     repo = 'github',c_sys = 32619, add_layer = list(bathy = c(50,'c'), sfa = 'offshore', scale.bar="br"),plot=F, quiet=T)# + 
 
-  png(filename=paste0(plotsGo, "/footprint_", sfa, "_", nickname, ".png"),width=6.5*1.5, height=4*1.5, units = "in", res=420)
+  png(filename=paste0(plotsGo, "/footprint_", sfa, "_", nickname, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
   print(bp +
-          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/100000), colour="black", show.legend=T) +
+          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/1000), colour=NA, show.legend=T) +
           theme(legend.position="right") +
-          scale_fill_continuous(name="Catch (t)")+
+          scale_fill_viridis_c(name=paste0(en2fr(x = "Catch", translate=french, custom_terms=rosetta_terms), " (t)"), option="G", begin=0.95, end=0)+
           coord_sf(expand=F)+
           geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
-                       aes(label = lab_short), 
+                       aes(label = final), 
                        fun.geometry = sf::st_centroid,
                        nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
                        nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
@@ -565,7 +569,7 @@ for(sfa in 25:26){
   dev.off()
 }  
 
-tac <- read.csv("Y:/Offshore/Assessment/Data/Model/Ref_pts_and_tac.csv")
+#tac <- read.csv("Y:/Offshore/Assessment/Data/Model/Ref_pts_and_tac.csv")
 tac2 <- read.csv("C:/Users/keyserf/Downloads/RE2795A Fleet Quota Monitoring Report.csv")
 head(tac2)
 tac2$sfa <- tac2$Stk.Quota.Description
@@ -579,17 +583,31 @@ tac2$bank[tac2$sfa=="SCALLOPS -  GERMAN BANK"] <- "Ger"
 tac2$sfa[tac2$bank %in% c("BBn", "BBs", "Ger")] <- 26
 tac2$sfa[!tac2$bank %in% c("BBn", "BBs", "Ger")] <- 25
 
+if(french==T) t <- "tonnes de chair"
+if(french==F) t <- "meat, tonnes"
+
 tac2$year <- substr(x = tac2$Stk.Quota.Start.Date, start=1, stop=4)
 tac25 <- ggplot() + 
-    geom_bar(data=tac2[tac2$sfa %in% 25 & !is.na(tac2$bank),], aes(year, Alloc.Amt.Tons), stat="identity") + 
-    facet_wrap(~bank, scales="free")
-tac26 <- ggplot() + 
-    geom_bar(data=tac2[tac2$sfa %in% 26 & !is.na(tac2$bank),], aes(year, Alloc.Amt.Tons), stat="identity") + 
-    facet_wrap(~bank, scales="free")
+  geom_bar(data=tac2[tac2$sfa %in% 25 & !is.na(tac2$bank),], aes(as.numeric(year), Alloc.Amt.Tons), stat="identity") + 
+  facet_grid(sfa~bank) +
+  theme_bw() +
+  #scale_x_discrete(breaks=seq(min(tac2$year), max(tac2$year), 4)) +
+  ylab(paste0(en2fr("Total allowable catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
+  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms))
 
- ggplot() + 
-    geom_bar(data=tac2[!is.na(tac2$bank),], aes(year, Alloc.Amt.Tons), stat="identity") + 
-    facet_wrap(~sfa+bank, scales="free")
+tac26 <- ggplot() + 
+  geom_bar(data=tac2[tac2$sfa %in% 26 & !is.na(tac2$bank),], aes(as.numeric(year), Alloc.Amt.Tons), stat="identity") + 
+  facet_grid(sfa~bank) + 
+  theme_bw() +
+  #scale_x_discrete(breaks=seq(min(tac2$year), max(tac2$year), 4)) +
+  ylab(paste0(en2fr("Total allowable catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
+  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms))
+
+areas <- "#AAAAAAAAA###\nBBBBBBBBBBBB#"
+png(filename=paste0(plotsGo, "/tac_", nickname, ".png"),width=6.5*1.5, height= 5*1.5, units = "in", res=420)
+print(tac25 / tac26 + plot_layout(design = areas))
+dev.off()
 
 
 ```
+

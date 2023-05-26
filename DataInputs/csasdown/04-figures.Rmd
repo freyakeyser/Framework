@@ -57,6 +57,10 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/2023/Updates/GBa//Figures
 ```
 
 ```{r, echo=F, fig.cap="Catch, effort, and catch per unit effort for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/tac_", nickname, ".png"))
+```
+
+```{r, echo=F, fig.cap="Catch, effort, and catch per unit effort for SFA 25 management units."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/fishery_25_", nickname, ".png"))
 ```
 
@@ -77,32 +81,32 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 
 
 
-```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[1], " survey design in ", params$surv.year[1], ".")}
+```{r, echo=F, message=F, fig.cap=paste0(params$bankname[1], " survey design in ", params$surv.year[1], ".")}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[1], "/Presentations/Survey_summary/", params$bank[1], "/survey_strata.png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
-```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[2], " survey design in ", params$surv.year[2], ".")}
+```{r, echo=F, message=F, fig.cap=paste0(params$bankname[2], " survey design in ", params$surv.year[2], ".")}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[2], "/Presentations/Survey_summary/", params$bank[2], "/survey_strata.png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
-```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[3], " survey design in ", params$surv.year[3], ".")}
+```{r, echo=F, message=F, fig.cap=paste0(params$bankname[3], " survey design in ", params$surv.year[3], ".")}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[3], "/Presentations/Survey_summary/", params$bank[3], "/survey_strata.png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
-```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[4], " survey design in ", params$surv.year[4], ".")}
+```{r, echo=F, message=F, fig.cap=paste0(params$bankname[4], " survey design in ", params$surv.year[4], ".")}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[4], "/Presentations/Survey_summary/", params$bank[4], "/survey_strata.png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
-```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[5], " survey design in ", params$surv.year[5], ".")}
+```{r, echo=F, message=F, fig.cap=paste0(params$bankname[5], " survey design in ", params$surv.year[5], ".")}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[5], "/Presentations/Survey_summary/", params$bank[5], "/survey_strata.png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
-```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[6], " survey design in ", params$surv.year[6], ".")}
+```{r, echo=F, message=F, fig.cap=paste0(params$bankname[6], " survey design in ", params$surv.year[6], ".")}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[6], "/Presentations/Survey_summary/", params$bank[6], "/survey_strata.png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```

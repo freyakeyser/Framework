@@ -15,7 +15,7 @@ require(gratia)
 
 
 # hydration data
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework2.RData")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.RData")
 
 bank <- "BBn"
 dat <- mw.dat.all[[bank]]
