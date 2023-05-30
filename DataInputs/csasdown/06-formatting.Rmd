@@ -10,4 +10,4 @@
 - DRAFT watermark
 - Bullets
 - Body text style
-- Crop old survey design figures  
+- make ageing & CF-ts plots 80% size

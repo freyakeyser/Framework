@@ -167,7 +167,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 
-```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series for pre-recuit, recruit, and fully-recruited scallop, represented by number of scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units. Recruit size is 75-90mm for Browns Bank north and south, and 95-105mm on German Bank."}
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series for pre-recruit, recruit, and fully recruited scallop, represented by number of scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units. Recruit size is 75-90mm for Browns Bank north and south, and 95-105mm on German Bank."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_26_", nickname, fr, ".png"))
 ```
 
