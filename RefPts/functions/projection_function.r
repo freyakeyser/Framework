@@ -35,7 +35,7 @@ proj.mod <- function(mods = list(tlm.mod = tlm.mod,seam.mod = seam.mod), n_sim =
 {
   
 # Now get the plots and results folders sorted out...
-if(is.null(HCR.sim)) sims = paste0("Ref_points/",model)
+if(is.null(HCR.sim)) sims = paste0("RPs/",model)
 if(!is.null(HCR.sim))  sims = paste0("HCR/",model,"_TRP_",HCR.sim$TRP,"_",HCR.sim$TRP.exp,"_USR_",HCR.sim$USR,"_",HCR.sim$USR.exp,"_LRP_",HCR.sim$LRP,"_",HCR.sim$LRP.exp,"_",HCR.sim$exp.sd)
 
 # Names and locations of save objects

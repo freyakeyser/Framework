@@ -28,17 +28,20 @@ library(forecast)
 theme_set(theme_few(base_size = 14))
 
 # Here's where I'm sticking the figures
-repo_loc <- "D:/Github/"
+mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
+fun.loc <-"D:/Github/Framework/RefPts/functions/"
+rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
+
 # Functions we need to source for this to all work
-source(paste0(repo_loc,"BBn_model/Scripts/projection_function.r"))
-source(paste0(repo_loc,"BBn_model/Scripts/Density_dependence_function.R"))
-source(paste0(repo_loc,"BBn_model/Scripts/breakpoint_function.R"))
-source(paste0(repo_loc,"BBn_model/Scripts/correlation_function.R"))
+source(paste0(fun.loc,"projection_function.r"))
+source(paste0(fun.loc,"Density_dependence_function.R"))
+source(paste0(fun.loc,"breakpoint_function.R"))
+source(paste0(fun.loc,"correlation_function.R"))
 
 
 #Loading the output from TLM BBN model
 tlm.select <- "1994_2022_qR_0_5"
-tlm.mod <- readRDS(paste0(repo_loc,"BBn_model/Results/Models/BBn/BBn_TLM_model_output_",tlm.select,".Rds"))
+tlm.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_TLM_model_output_",tlm.select,".Rds"))
 pred.proc.tlm <- get_processes(tlm.mod)
 
 tlm.mod$report$totB <- tlm.mod$report$B
@@ -50,8 +53,10 @@ tlm.mod$report$mean_m <- tlm.mod$report$m
 
 
 # # If running with SEBDAM this is what ya use.
-seam.select <- "1994_2022_vary_m_m0_1_R0_150_10_knots"
-seam.mod <- readRDS(paste0(repo_loc,"BBn_model/Results/Models/BBn/BBn_SEAM_model_output_",seam.select,".Rds"))
+BBn_SEAM_model_output_1994_2023_vary_m_m0_0.15_qR_0_1_10_knots.Rds
+seam.select <- "1994_2022_vary_m_m0_0.4_R0_1_15_knots"
+seam.select <- "1994_2023_vary_m_m0_0.15_qR_0_1_10_knots"
+seam.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",seam.select,".Rds"))
 #sm2 <- readRDS(paste0(repo_loc,"BBn_model/Results/Models/BBn_SEBDAM_model_output_1994_2022_vary_m_m0_1_R0_148_10_knots.Rds"))
 #sm3 <- readRDS(paste0(repo_loc,"BBn_model/Results/Models/BBn_SEBDAM_model_output_1994_2022_vary_m_m0_1_R0_55_10_knots.Rds"))
 #sm4 <- readRDS(paste0(repo_loc,"BBn_model/Results/Models/BBn_SEBDAM_model_output_1994_2022_vary_m_m0_1_R0_148_20_knots.Rds"))
@@ -109,7 +114,7 @@ prod.dat <- data.frame(Year = years[-length(years)],
                         g = c(seam.mod$obj$env$data$g[-length(seam.mod$obj$env$data$g)]),
                         gR = c(seam.mod$obj$env$data$gR[-length(seam.mod$obj$env$data$g)]),
                         CF = cond.dat$CF[cond.dat$year %in% years[-length(years)]])
-plot.url <- paste0("D:/Github/BBn_model/Results/Figures/BBn/Ref_points/",seam.select,"/")
+plot.url <- paste0(rp.loc,"Figures/BBn/R_75_FR_90/",seam.select,"/")
 # The m from the SEAM model isn't a weighted mean, which is should be, so do this to get a correct m here. We also have a few options here, as you can get an m for Recruits and FR this way.
 
 
@@ -140,7 +145,7 @@ seam.mod$report$mean_m <- nat.mat$m.all
 nat.mat <- nat.mat[-nrow(nat.mat),] # Don't want 2023 in this...
 nat.mat.long <- pivot_longer(nat.mat,-Year,names_to = "cat",values_to = "m") # or c("m.FR","m.R","m.all")
 # Now make a plot to compare these.
-m.comp <- ggplot(nat.mat.long,aes(x= Year,y=m,group=cat,color=cat)) + geom_point(size=3) + geom_line(size=1.5) + 
+m.comp <- ggplot(nat.mat.long,aes(x= Year,y=m,group=cat,color=cat)) + geom_point(size=3) + geom_line(linewidth=1.5) + 
                                                                       xlab("") + ylab("Natural Mortality (instantaneous)") +
                                                                       scale_y_continuous(breaks = seq(0,1,by=0.05)) + 
                                                                       scale_x_continuous(breaks = seq(1980,2025,by=5)) + 
@@ -212,13 +217,13 @@ von.B <- function(L.inf,to,K,age,R.size,FR.size)
 
 # These are similar to the Sable parameters, primarily developed to eyeball Figure 35 in Hubley 2014 (Res Doc) where Figure 35 does not align with the value we currently use that are reported in the text.
 # Going with the assumption the figure with data are correct and the text is wrong.
-L.inf <- 144
+L.inf <- 164.4
 #to <- 1.337 # So this uses a 1 year offset that we no longer believe in, going to make this 0.337 to align more with what we now do...
-to <- 0.1
+to <- -0.2
 K <- 0.2
 ages <- seq(0,15,by=0.05)
-R.size = 85
-FR.size = 95
+R.size = 75
+FR.size = 90
 res <- von.B(L.inf,to,K,ages,R.size =R.size,FR.size = FR.size)
 
 
@@ -235,11 +240,11 @@ save_plot(paste0(plot.url,"von_B.png"),p.vb,base_height = 6,base_width = 10)
 
 
 
-# OK, so we see recruits are probably 5-6 years old based on that von B, so we could use either RPS5 or RPS6 for the density dependence 
+# OK, so we see recruits are probably 3-4 years old based on that von B, so we could use either RPS5 or RPS6 for the density dependence 
 # gonna go with the 5 year olds since I have to make a decision, so RPS5. expression(paste("Recruits per Spawner (",kg^{1},cdot,kg^{-1},")"))
 # First up, let's look at the RPS time series, as we haven't before...
 # This really does a bang up job of showing the dampened cycles of the recruitment patters, most interesting.
-p.rps.ts <- ggplot(prod.dat, aes(x=Year,y=RPS5))  + geom_point() + 
+p.rps.ts <- ggplot(prod.dat, aes(x=Year,y=RPS3))  + geom_point() + 
                                                     xlab("'Birth' year") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
                                                     geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 7))+
                                                     scale_y_log10() +  
@@ -247,21 +252,21 @@ p.rps.ts <- ggplot(prod.dat, aes(x=Year,y=RPS5))  + geom_point() +
 save_plot(paste0(plot.url,"RPS_ts.png"),p.rps.ts,base_height =6,base_width = 10)                                               
                        
 # Density dependence 
-p.rps.ssb <- ggplot(prod.dat,aes(y=RPS5,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3) + 
+p.rps.ssb <- ggplot(prod.dat,aes(y=RPS3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3) + 
                                                   xlab("Spawning Stock Biomass (tonnes)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
                                                   geom_smooth(method = 'lm') +
-                                                  scale_y_log10() + geom_vline(xintercept = 12000,size=0.5,color='firebrick2',linetype='dashed')  + 
-                                                  scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))# Definitely a signal here
+                                                  scale_y_log10() + geom_vline(xintercept = 11000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                                  scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))# Definitely a signal here
 save_plot(paste0(plot.url,"RPS_vs_SSB.png"),p.rps.ssb,base_height =6,base_width = 10)                                               
                        
 # We could fit a 'Ricker" model to these, but you see that below 1600 tonnes there is 0 support for this kind of relationship.
 # 1 could get behind using the linear model with uncertainty capping the RPS at the maximum of this linear 
-#ggplot(prod.dat,aes(y=RPS5,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'lm') + scale_y_log10()  + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
-#ggplot(prod.dat,aes(y=RPS5,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'lm')  + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
+#ggplot(prod.dat,aes(y=RPS3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'lm') + scale_y_log10()  + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
+#ggplot(prod.dat,aes(y=RPS3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'lm')  + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
 # One could argue for a GAM as well... this is very similar to the basic lm, but you can also see the deceleration at low Biomass with the GAM, which is pretty evident if just looking
 
-#ggplot(prod.dat,aes(y=RPS5,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'gam') + scale_y_log10() + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
-#ggplot(prod.dat,aes(y=RPS5,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'gam')  + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
+#ggplot(prod.dat,aes(y=RPS3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'gam') + scale_y_log10() + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
+#ggplot(prod.dat,aes(y=RPS3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'gam')  + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
 # Given recruits or 5 or 6 years old, how does the 6 year old RPS look, kinda wack, might hint that recruits are not 6 years old!
 #ggplot(prod.dat,aes(y=RPS6,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'gam') + scale_y_log10() + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
 #ggplot(prod.dat,aes(y=RPS6,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'gam') + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
@@ -269,14 +274,14 @@ save_plot(paste0(plot.url,"RPS_vs_SSB.png"),p.rps.ssb,base_height =6,base_width 
 # It is DK's opinion that you need to look at recruitment from a 'per capita' perspective to actually understand recruitment density dependence. But you should also look at Recruits against SSB
 # amd when you do that, the most parsimonous model will ALMOST always be a flat line, but worth noting that DOES MEAN there is density dependence in here, because you are getting just as
 # many recruits when the population abundance is low, so a smaller SSB is able to punch out as many recruits as a high SSB, but it DOES NOT MEAN that a traditional SR model will get you anywhere useful.
-p.rec.ssb <- ggplot(prod.dat,aes(y=R5,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3)  +
+p.rec.ssb <- ggplot(prod.dat,aes(y=R3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3)  +
                                                 xlab("Spawning Stock Biomass (tonnes)") + ylab("Recruits (tonnes)") +
                                                 geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +scale_y_log10() +
-                                                geom_vline(xintercept = 13500,size=0.5,color='firebrick2',linetype='dashed')  + 
-                                                scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
+                                                geom_vline(xintercept = 11000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                                scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
 save_plot(paste0(plot.url,"Rec_vs_SSB.png"),p.rec.ssb,base_height =6,base_width = 10)                                               
 
-#ggplot(prod.dat,aes(y=R5,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'gam') + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
+#ggplot(prod.dat,aes(y=R3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))  + geom_smooth(method = 'gam') + scale_x_continuous(breaks = c(seq(1000,20000,by=500)))
 # So what does this tell us? DK interpretation
 #1: The late 1990's is a magnificent aberation we may never see again, recruitment on BBn tends to be similar to Sab, except for during this period where recruit production was pushing 10 times normal
 #2 Above 13500 tonnes there is basically 0 recruitment, less than 0.01 kg per kg of SSB
@@ -294,14 +299,14 @@ save_plot(paste0(plot.url,"Rec_vs_SSB.png"),p.rec.ssb,base_height =6,base_width 
 p.g.ssb <- ggplot(prod.dat,aes(y=g,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
                                              xlab("") + ylab("Growth (Fully Recruited)") +
                                              geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
-                                             geom_vline(xintercept = 9000,size=0.5,color='firebrick2',linetype='dashed')  + 
-                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1000),labels = NA))
+                                             geom_vline(xintercept = 11000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1500),labels = NA))
 
 p.gR.ssb <- ggplot(prod.dat,aes(y=gR,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
                                              xlab("Spawning Stock Biomass (tonnes)") + ylab("Growth (Recruits)") +
                                              geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
-                                             geom_vline(xintercept = 9000,size=0.5,color='firebrick2',linetype='dashed')  + 
-                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
+                                             geom_vline(xintercept = 11000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
 
 p.gs.ssb <-  cowplot::plot_grid(p.g.ssb,p.gR.ssb,nrow=2)
 
@@ -312,8 +317,8 @@ save_plot(paste0(plot.url,"Growth(FR)_vs_SSB.png"),p.gs.ssb,base_height =12,base
 p.cf.ssb <- ggplot(prod.dat,aes(y=CF,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
                                                xlab("Spawning Stock Biomass (tonnes)") + ylab("Condition Factor (g\u22C5dm\u00B3)") +
                                                geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
-                                               geom_vline(xintercept = 9000,size=0.5,color='firebrick2',linetype='dashed')  + 
-                                               scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
+                                               geom_vline(xintercept = 11000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                               scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
 save_plot(paste0(plot.url,"Condition_vs_SSB.png"),p.cf.ssb,base_height =6,base_width = 10)                                               
 
 
@@ -324,15 +329,15 @@ save_plot(paste0(plot.url,"Condition_vs_SSB.png"),p.cf.ssb,base_height =6,base_w
 p.m.ssb <- ggplot(prod.dat,aes(y=m,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))+ 
                                              xlab("Spawning Stock Biomass (tonnes)") + ylab("Natural Mortality (instantaneous)") +
                                              geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
-                                             geom_vline(xintercept = 10000,size=0.5,color='firebrick2',linetype='dashed')  + 
-                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
+                                             geom_vline(xintercept = 11000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
 
 save_plot(paste0(plot.url,"M_vs_SSB.png"),p.m.ssb,base_height =6,base_width = 10)                
 
 
 # I wonder if high growth years are related to RPS, do we get higher Recruitment events after a good condition year?
 # No evidence for that in general, other than 96 being a great growth year.  So could be that growth potential to get the huge spawning success, so necessary but not sufficient condition things
-p.rps.g <- ggplot(prod.dat ,aes(y=RPS5,x=g)) + geom_text(aes(label = substr(Year,3,4))) + 
+p.rps.g <- ggplot(prod.dat ,aes(y=RPS3,x=g)) + geom_text(aes(label = substr(Year,3,4))) + 
                                                xlab("Growth (Fully Recruited)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
                                                geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
                                                #geom_vline(xintercept = 1.2,size=0.5,color='firebrick2',linetype='dashed') # + 
@@ -341,7 +346,7 @@ p.rps.g <- ggplot(prod.dat ,aes(y=RPS5,x=g)) + geom_text(aes(label = substr(Year
 save_plot(paste0(plot.url,"RPS_vs_Growth.png"),p.rps.g,base_height =6,base_width = 10)                
 
 # Condition actually makes more sense to look at than growth for the density dependence in RPS, and there is nothing there whatsoever
-p.rps.cf <- ggplot(prod.dat ,aes(y=RPS5,x=CF)) + geom_text(aes(label = substr(Year,3,4))) + 
+p.rps.cf <- ggplot(prod.dat ,aes(y=RPS3,x=CF)) + geom_text(aes(label = substr(Year,3,4))) + 
                                                  xlab("Condition Factor (g\u22C5dm\u00B3)") +  ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
                                                  geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
                                                  #geom_vline(xintercept = 1.2,size=0.5,color='firebrick2',linetype='dashed') # + 
@@ -368,15 +373,15 @@ summary(rec.mod)
 #acf(rec.mod$residuals)
 # So probably better to look at per capita recruitment and see if that is a better acf'er...
 # And here we do see the 1 year correlation remains.
-p.rps.acf <- ggAcf(na.omit(log(prod.dat$RPS5))) + ggtitle("") + ylab("ACF log(RPS)")
+p.rps.acf <- ggAcf(na.omit(log(prod.dat$RPS3))) + ggtitle("") + ylab("ACF log(RPS)")
 save_plot(paste0(plot.url,"ACF_RPS.png"),p.rps.acf,base_height =6,base_width = 10)                
 
 # pacf shows us that we could approximate the RPS time series as an AR2, though interesting that lag 2 is significantly negative, I think that suggest a high frequency cycling of Recruitment
 # so highly correlated with the following year, then it flips 2 years out to be negative for a couple years... interesting.
-p.rps.pacf <- ggPacf(na.omit(log(prod.dat$RPS5))) + ggtitle("") + ylab("PACF log(RPS)")
+p.rps.pacf <- ggPacf(na.omit(log(prod.dat$RPS3))) + ggtitle("") + ylab("PACF log(RPS)")
 save_plot(paste0(plot.url,"PACF_RPS.png"),p.rps.pacf,base_height =6,base_width = 10)                
 # On the log scale we see there is no trend in the data, there is a weak trend on the normal scale, but going to go with the log scale
-rps.mod <- lm(log(RPS5) ~ I(Year-1993),data=prod.dat)
+rps.mod <- lm(log(RPS3) ~ I(Year-1993),data=prod.dat)
 summary(rps.mod) # Indeed there is...
 # But we see the same pattern using the residuals, just a smidge weaker, so really doesn't matter which way we go with these
 # acf(rps.mod$residuals)
@@ -397,7 +402,7 @@ p.gs.acf <-  cowplot::plot_grid(p.g.acf,p.gR.acf,nrow=2)
 
 save_plot(paste0(plot.url,"ACF_growths.png"),p.gs.acf,base_height =12,base_width = 10)                
 
-# Natural morality correlation? Yep, autocorrelation very similar to recruitment
+# Natural morality correlation? Yep, weak autocorrelation somewhat similar to recruitment
 p.m.acf <- ggAcf(prod.dat$m) + ggtitle("") + ylab("ACF Natural Mortality") + xlab("") + scale_x_continuous(breaks = 1:14,labels=NULL) # No autocorrelation in Condition
 p.m.pacf <- ggPacf(prod.dat$m) + ggtitle("") + ylab("PACF Natural Mortality")# No autocorrelation in Condition
 p.m.acfs <-  cowplot::plot_grid(p.m.acf,p.m.pacf,nrow=2)
@@ -415,17 +420,17 @@ summary(mod.m) # There is a significant trend in m over time, largely due to low
 
 # So next up lets look for evidence of correlation between your productivity parameters, specifically RPS and m
 
-# What about other lags... Interesting that a 5 year lag shows up between mortality and RPS5.  
+# What about other lags... Interesting that a 5 year lag shows up between mortality and RPS3.  
 # I think this means when the Recruits actually show up as 'recruits' that m is high when RPS is high, and m is low when RPS is low.
-prod.dat$RPS5_offset <- c(rep(NA,5),na.omit(prod.dat$RPS5[]))
-ggplot(prod.dat,aes(x=Year,y=RPS5)) +geom_point() + geom_line(size=2) + geom_point(aes(y = m)) + geom_line(aes(y = m),color='blue') #+ geom_smooth(method = 'gam')
-ggplot(prod.dat,aes(x=m,y=RPS5)) + geom_text(aes(label = substr(Year,3,4))) + geom_smooth(method = 'gam')
+prod.dat$RPS3_offset <- c(rep(NA,3),na.omit(prod.dat$RPS3[]))
+ggplot(prod.dat,aes(x=Year,y=RPS3)) +geom_point() + geom_line(size=2) + geom_point(aes(y = m)) + geom_line(aes(y = m),color='blue') #+ geom_smooth(method = 'gam')
+ggplot(prod.dat,aes(x=m,y=RPS3)) + geom_text(aes(label = substr(Year,3,4))) + geom_smooth(method = 'gam')
 # If we offset the RPS to the year they are actually showing up, either the model is trying to kill more over everything when we have a lot of recruits, or there is a real 
 # relationship there.
-p.rpsoff.m <- ggplot(prod.dat,aes(x=Year,y=RPS5_offset)) + geom_text(aes(label = substr(Year-5,3,4)))  + 
+p.rpsoff.m <- ggplot(prod.dat,aes(x=Year,y=RPS3_offset)) + geom_text(aes(label = substr(Year-5,3,4)))  + 
                                                            xlab("") +ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9) & Natural mortality (Inst)") +
                                                            geom_line(aes(y = m),color='firebrick2',size=1,linetype='dashed')
-p.rps.m.ccf <- ggCcf(prod.dat$m,prod.dat$RPS5_offset) + ggtitle("")
+p.rps.m.ccf <- ggCcf(prod.dat$m,prod.dat$RPS3_offset) + ggtitle("")
 
 p.rps.m.ccf.combo <-  cowplot::plot_grid(p.rpsoff.m,p.rps.m.ccf,nrow=2)
 save_plot(paste0(plot.url,"CCF_ts_RPS_offset_m.png"),p.rps.m.ccf.combo,base_height =12,base_width = 10)                
@@ -435,8 +440,8 @@ save_plot(paste0(plot.url,"CCF_ts_RPS_offset_m.png"),p.rps.m.ccf.combo,base_heig
 # ccf(prod.dat$m,prod.dat$gR)
 # 
 # # OK, so that's m covered, what about growth and recruits, absolutely nothing.
-# ccf(prod.dat$RPS5,prod.dat$g,na.action= na.omit)
-# ccf(prod.dat$RPS5,prod.dat$gR,na.action= na.omit)
+# ccf(prod.dat$RPS3,prod.dat$g,na.action= na.omit)
+# ccf(prod.dat$RPS3,prod.dat$gR,na.action= na.omit)
 
 
 # For the harvest control rules we want to look at how explotation varies with biomass and also want to make the Kobe plot of Biomass vs Explotation
@@ -457,7 +462,7 @@ pred.proc.seam$log_tot_frame$totB.LCI <- exp(pred.proc.seam$log_tot_frame$log_to
 pred.proc.seam$log_tot_frame$totB.UCI <- exp(pred.proc.seam$log_tot_frame$log_totB + 1.96*pred.proc.seam$log_tot_frame$se_log_totB)
 
 # See above for explanation of how I'm doing these calculations to be consistent with the past
-ann.exploit <- data.frame(year = years[-length(years)],B = exp(pred.proc.seam$log_tot_frame$log_totB)[-length(years)], Catch = colSums(catchy),
+ann.exploit <- data.frame(year = years[-length(years)],B = exp(pred.proc.seam$log_tot_frame$log_totB)[-length(years)], Catch = colSums(catchy)[-length(years)],
                           B.LCI = pred.proc.seam$log_tot_frame$totB.LCI[-length(years)], B.UCI = pred.proc.seam$log_tot_frame$totB.UCI[-length(years)])
 ann.exploit$exploit <- c(NA,ann.exploit$Catch[-nrow(ann.exploit)])/(ann.exploit$B+c(NA,ann.exploit$Catch[-nrow(ann.exploit)]))
 ann.exploit$exploit.UCI <- c(NA,ann.exploit$Catch[-nrow(ann.exploit)])/(ann.exploit$B.LCI+c(NA,ann.exploit$Catch[-nrow(ann.exploit)]))
@@ -505,7 +510,7 @@ phase.plt <- ggplot(ann.exploit,aes(x=B,y=exploit)) + geom_text(aes(label=year))
                                     geom_path(aes(y= exploit, x= B )) +
                                     geom_hline(yintercept = 0.1,linetype='dashed') + geom_vline(xintercept = c(2400,4800),linetype='dashed') +
                                     xlab("Biomass (Tonnes)") + ylab("Exploitation Rate (Proportional)") 
-save_plot(paste0(plot.url,"Phase_plot.png"),kobe.plt,base_height =12,base_width = 10)                
+save_plot(paste0(plot.url,"Phase_plot.png"),phase.plt,base_height =12,base_width = 10)                
     
 # Now that explotation vs Biomass figure...
 windows(11,11)
@@ -561,21 +566,21 @@ hi.B.exp <- sd(ann.exploit$exploit[ann.exploit$B >= 5000],na.rm=T)
 
  # RUNME
 #g.strat <- data.frame(type = "cor",strat = 'dist', bp = 9000,mn.mx = 1, sd.mx = 0.05,ar1=0,ar2=0) # The g correlation method seems to get g a bit too  high.
-g.strat <- data.frame(type = "bp",strat = 'dist', bp = 10000,mn.mx = 1, sd.mx = 0.05)
+g.strat <- data.frame(type = "bp",strat = 'dist', bp = 11000,mn.mx = 1, sd.mx = 0.05)
 #g.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = 1, sd.mx = 0.05)
-r.strat <- data.frame(type = "cor",strat = 'dist', bp = 12000,mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
+r.strat <- data.frame(type = "cor",strat = 'dist', bp = 11000,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
                       ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=signif(p.rps.pacf$data$Freq[2],digits=2),rps.m.cor = 0.53,rps.m.lag = -5) # Note lag is -5, high RPS comes 5 years before high m due to RPS offset.
-#r.strat <- data.frame(type = "bp",strat = 'dist', bp = 13500,mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
+#r.strat <- data.frame(type = "bp",strat = 'dist', bp = 13500,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
 #                       ar1=0,ar2=0,rps.m.cor = 0,rps.m.lag = 0)
-#r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
-m.strat <- data.frame(type = "cor",strat = 'dist', bp = 10000,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1,ar1=signif(p.m.pacf$data$Freq[1],digits=2),ar2=-0) #
+#r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
+m.strat <- data.frame(type = "cor",strat = 'dist', bp = 11000,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1,ar1=signif(p.m.pacf$data$Freq[1],digits=2),ar2=-0) #
 #m.strat <- data.frame(type = "bp",strat = 'dist', bp = 10000,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 #m.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 mod = "SEAM"
-plot_url = "D:/Github/BBn_model/Results/Figures/BBn/"
-res_url = "D:/Github/BBn_model/Results/Models/BBn/"
+plot_url = "D:/Framework/SFA_25_26_2024/RefPts/Figures/BBn/R_75_FR_90/"
+res_url = "D:/Framework/SFA_25_26_2024/RefPts/Results/BBn/R_75_FR_90/"
 
-Res <- proj.mod(n_sim=500,n_y = 100,model=mod,plot_url = plot_url, run = 'model_error', res_url = res_url,save.results = T, exp.scenario=seq(0,0.3,0.02),
+Res <- proj.mod(n_sim=50,n_y = 100,model=mod,plot_url = plot_url, run = 'model_error', res_url = res_url,save.results = T, exp.scenario=seq(0,0.3,0.02),
                 g.mod =   list(type = g.strat$type,bp.strategy = g.strat$strat,bp= g.strat$bp, mn.at.max = g.strat$mn.mx,sd.at.max = g.strat$sd.mx,ar1=g.strat$ar1,ar2=g.strat$ar2),
                  rec.mod = list(type = r.strat$type,bp.strategy = r.strat$strat,bp= r.strat$bp, mn.at.max = r.strat$mn.mx,sd.at.max = r.strat$sd.mx,rec.age = r.strat$rec.age,
                                 ar1=r.strat$ar1,ar2=r.strat$ar2,rps.m.cor = r.strat$rps.m.cor,rps.m.lag = r.strat$rps.m.lag),
@@ -593,19 +598,19 @@ hcr.strat <-data.frame(TRP = 5000,TRP.exp = 0.127,
                        USR = 0, USR.exp = 0.127, 
                        LRP = 0, LRP.exp = 0.127,exp.sd = 0.25)
 #g.strat <- data.frame(type = "cor",strat = 'dist', bp = 9000,mn.mx = 1, sd.mx = 0.05,ar1=0,ar2=0) # The g correlation method seems to get g a bit too  high.
-g.strat <- data.frame(type = "bp",strat = 'dist', bp = 10000,mn.mx = 1, sd.mx = 0.05)
+g.strat <- data.frame(type = "bp",strat = 'dist', bp = 11000,mn.mx = 1, sd.mx = 0.05)
 #g.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = 1, sd.mx = 0.05)
-r.strat <- data.frame(type = "cor",strat = 'dist', bp = 12000,mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
+r.strat <- data.frame(type = "cor",strat = 'dist', bp = 11000,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
                       ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=signif(p.rps.pacf$data$Freq[2],digits=2),rps.m.cor = 0.53,rps.m.lag = -5) # Note lag is -5, high RPS comes 5 years before high m due to RPS offset.
-#r.strat <- data.frame(type = "bp",strat = 'dist', bp = 13500,mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
+#r.strat <- data.frame(type = "bp",strat = 'dist', bp = 13500,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
 #                      ar1=0,ar2=0,rps.m.cor = 0,rps.m.lag = 0)
-#r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
+#r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
 m.strat <- data.frame(type = "cor",strat = 'dist', bp = 10000,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1,ar1=signif(p.m.pacf$data$Freq[1],digits=2),ar2=-0) #
 #m.strat <- data.frame(type = "bp",strat = 'dist', bp = 10000,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 #m.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 mod = "SEAM"
-plot_url = "D:/Github/BBn_model/Results/Figures/BBn/"
-res_url = "D:/Github/BBn_model/Results/Models/BBn/"
+plot_url = "D:/Framework/SFA_25_26_2024/RefPts/Figures/BBn/R_75_FR_90/"
+res_url = "D:/Framework/SFA_25_26_2024/RefPts/Results/BBn/R_75_FR_90/"
 
 
 # An HCR model
@@ -623,7 +628,7 @@ summary(prod.dat$g)
 summary(hcr$Rec)
 summary(hcr$B)
 summary(hcr$rps)
-summary(prod.dat$RPS5)
+summary(prod.dat$RPS3)
 plot(hcr$rps[,4,1])
 ccf(hcr$mort[,2,1],hcr$rps[,2,1]) # High mort happening 5 years after the 'birth' of the high RPS'ers
 
