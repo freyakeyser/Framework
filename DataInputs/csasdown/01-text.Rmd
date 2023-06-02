@@ -2,6 +2,8 @@
 
 Scallop fishery description. Introduce SFAs and management scheme. The last full assessment for the Offshore Scallop fishery occurred in 2013, and focused on Georges Bank 'a' and Browns Bank north, which are part of SFA 27 and 26, respectively. Annual updates for these two stocks have occurred since***. However, the offshore scallop fishery consists of 9 management units in total. SFA 26 also includes Browns Bank South and German Bank, SFA 27 includes Georges Bank 'b', and SFA 25, known as the eastern scotian shelf, includes management units 25 (Sable and Middle Bank), and 25b (Banquereau Bank). An annual review of fishery and survey data summaries for all 9 stocks occurs as part of the OSAC process, however, the methodology underlying the current fishery and survey summaries has not been peer-reviewed. Furthermore, stock status information has not been published since 2001 for the Eastern Scotian Shelf stocks (Sable and Middle Banks) and 1997 for German Bank; Browns Bank South and Banquereau Bank have not been published before.
 
+\@ref(fig:map)
+
 ## Species biology
 
 
@@ -38,14 +40,14 @@ notes
 ## Fishery history
 
 - Fleet dynamic
-- Management
+- Management Figures: \@ref(fig:hist)
 
 
 ## Fishery data
 
-- Footprint
-- CPUE
-- Port sampling
+- Footprint Figures: \@ref(fig:foot-25) \@ref(fig:foot-26)
+- CPUE Figures: \@ref(fig:fts-25) \@ref(fig:fts-26)
+- Port sampling Figures: \@ref(fig:mw-annual) \@ref(fig:mw-monthly) Tables: \@ref(tab:ps-tab)
 
 
 # Survey
@@ -60,11 +62,68 @@ The Offshore Scallop Survey has occurred between May and September annually sinc
 
 Regardless of survey design, the same sampling protocol is followed: At each survey station, the 8-ft scallop dredge lined with 38 mm mesh is towed for 10 minutes, and every scallop is counted and assigned to a 5 mm shell height bin (ranging from 0-200 mm). Detailed sampling occurs at a selection of the stations, where the exact shell heights and meat weights are measured for a sub-sample of the scallops caught. Bottom temperature data has also been collected on the Offshore Scallop survey since 2011.  
 
+As part of the Offshore Scallop Survey protocol, tows are tracked to provide information on location and length (Hubley et al. 2014). Tow lengths can vary due to conditions such as vessel speed, tides, and sea state. For this reason, accurate tow lengths are required to standardize shell height frequency data across tows of various lengths to a common 800m tow length. Over the past two of decades, Ocean Vision was the navigational system used to record tow tracks, but this program has become outdated.  
+
+During the 2022 Offshore Scallop surveys of German Bank, Browns Bank North, and Georges Bank (a and b), the Olex navigational system was trialed as a replacement for Ocean Vision. A total of 449 tows were recorded using both systems. Tow tracking followed the same at-sea protocol as usual, but two systems were used simultaneously. Tow lengths were calculated based on the tracks recorded by each system and compared by tow using the sf package in R. The tows were recorded using the WGS 84 coordinate reference system, but were converted to the appropriate UTM zone for the purposes of length calculation.  
+
+Tows recorded using Olex were found to be longer in length (metres) than tows recorded using Ocean Vision (Figure \@ref(fig:nav-linear)). The median difference in length was 41.5m (or 4%). After standardizing all tows for an 800m tow length, this systematic difference would result in a small negative bias in indices derived from tows recorded using the Olex system compared to historical tows measured with Ocean Vision. To eliminate the bias in tow length (L_tow), a correction factor (φ) of 1.04 was applied to the Olex tow length (L_olex):
+
+L_tow=L_olex/φ
+
+This correction factor will be applied to all future Olex tows to ensure comparability with historical data collected under the Ocean Vision system (Figure \@ref(fig:nav-box)). Historical data collected using Ocean Vision will not be affected by the transition to Olex.
+
+
 ## Survey design  
 
 - by bank
 - stratification  
 
+Tables: 
+\@ref(tab:strata-tab)
+Figures:
+\@ref(fig:map-ban)
+\@ref(fig:map-mid)
+\@ref(fig:map-sab)
+\@ref(fig:map-ger)
+\@ref(fig:map-bbs)
+\@ref(fig:map-bbn)
+
+# Results
+
 ## Ageing
 
+Figures: 
+\@ref(fig:vb-sab)
+\@ref(fig:resid-sab)
+\@ref(fig:growth-sab)
+\@ref(fig:vb-bbn)
+\@ref(fig:resid-bbn)
+\@ref(fig:growth-bbn)
+
+
+## MWSH Model
+
+
+## Reviewing fully recruited size
+
+Figures: 
+\@ref(fig:sh-ps-sab)
+\@ref(fig:prop-ps-sab)
+\@ref(fig:propss-ps-sab)
+\@ref(fig:sh-ps-bbn)
+\@ref(fig:prop-ps-bbn)
+\@ref(fig:propss-ps-bbn)
+\@ref(fig:rec-comp-25)
+\@ref(fig:rec-comp-26)
+
+
+## Survey index
+
+Figures: 
+\@ref(fig:sts-25)
+\@ref(fig:sts-26)
+\@ref(fig:cts-25)
+\@ref(fig:cts-26)
+\@ref(fig:cfts-25)
+\@ref(fig:cfts-26)
 

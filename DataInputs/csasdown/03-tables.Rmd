@@ -43,7 +43,7 @@ opts <- options(knitr.kable.NA = "")
 
 
 
-```{r echo=F, message=F}
+```{r strata-tab, echo=F, message=F}
 #<!---BLOCK_LANDSCAPE_START--->
 # block_section(
 #   prop_section(
@@ -53,6 +53,21 @@ opts <- options(knitr.kable.NA = "")
 # )
 
 csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0,bold=TRUE)
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+```{r ps-tab, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+csas_table(data.frame(col="to come"), caption ="Port sampling data summary.") %>% kableExtra::row_spec(0,bold=TRUE)
 #qflextable(strata)
 
 #<!---BLOCK_LANDSCAPE_START--->

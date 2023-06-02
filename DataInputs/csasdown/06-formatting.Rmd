@@ -10,4 +10,4 @@
 - DRAFT watermark
 - Bullets
 - Body text style
-- make ageing & CF-ts plots 80% size
+- make olex, ageing & CF-ts plots 80% size

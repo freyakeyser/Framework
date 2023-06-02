@@ -10,17 +10,18 @@ require(dplyr)
 require(patchwork)
 
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework2.RData")
-framework2 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data)
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.RData") #75-90
-framework3 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data)
+framework2 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_80-95.RData") # 80-95
-framework4 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data)
+framework4 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand)
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.RData") #75-90
+framework3 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand)
+#### MAKE SURE CHOSEN RDATA IS READ IN LAST!
 
 nickname <- "framework3"
 
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs"
 
-french <- F # set to T for french
+french <- T # set to T for french
 if(french == T) {
   nickname <- paste0(nickname, "_fr")
 }
@@ -56,7 +57,7 @@ for (rdata in c("framework2", "framework3", "framework4")){
   
   # prep data for TS plotting
   bankpertow <- NULL
-  
+
   # Mid, Ban
   for(bank in c("Mid", "Ban")){
     df <- get(rdata)$SS.summary[[bank]] %>%
@@ -307,7 +308,6 @@ for(sfa in sfa){
 banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger")
 
 
-
 # prep data for TS plotting
 cfts <- NULL
 
@@ -358,6 +358,78 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)
         scale_colour_manual(name=man.unit, values=c("black", "darkorange", "blue"))
 )
 dev.off()
+
+
+
+# clappers
+clappertow <- NULL
+for(bank in banks){
+	# If Proportion is > 100 than make it an NA.
+	surv.Clap.Rand[[bank]]$clap.propPre[surv.Clap.Rand[[bank]]$clap.propPre>100]<-NA
+	surv.Clap.Rand[[bank]]$clap.propRec[surv.Clap.Rand[[bank]]$clap.propRec>100]<-NA
+	surv.Clap.Rand[[bank]]$clap.propCom[surv.Clap.Rand[[bank]]$clap.propCom>100]<-NA
+
+	# Subset the clapper time series and calculate the annual average
+	dat <- data.frame(years=unique(surv.Clap.Rand[[bank]]$year))
+	ts <- aggregate(clap.propPre~year,surv.Clap.Rand[[bank]],mean)
+	ts$clap.propRec <- aggregate(clap.propRec~year,surv.Clap.Rand[[bank]],mean)$clap.propRec
+	ts$clap.propCom <- aggregate(clap.propCom~year,surv.Clap.Rand[[bank]],mean)$clap.propCom
+	dat$clapsPre[dat$year %in% ts$year]  <- ts$clap.propPre
+	dat$clapsRec[dat$year %in% ts$year]  <- ts$clap.propRec
+	dat$clapsCom[dat$year %in% ts$year]  <- ts$clap.propCom
+	
+	yr.range <- data.frame(years=min(dat$years):max(dat$years))
+	dat <- full_join(yr.range, dat)
+	
+	dat$bank <- bank
+	
+	clappertow <- rbind(clappertow, dat)
+}
+
+
+clappertow$sfa[clappertow$bank %in% c("Ban", "Mid", "Sab")] <- 25
+clappertow$sfa[!clappertow$bank %in% c("Ban", "Mid", "Sab")] <- 26
+
+clappertow <- pivot_longer(clappertow, cols=c("clapsPre", "clapsRec", "clapsCom"), values_to = "index.val", names_to="index")
+
+clappertow$size2[clappertow$index=="clapsPre"] <- en2fr("Pre-recruit", translate=french, custom_terms=rosetta_terms)
+clappertow$size2[clappertow$index=="clapsRec"] <- en2fr("Recruit", translate=french, custom_terms=rosetta_terms)
+clappertow$size2[clappertow$index=="clapsCom"] <- en2fr("Fully recruited", translate=french, custom_terms=rosetta_terms)
+
+clappertow$size2 <- factor(clappertow$size2, 
+                           levels=c(en2fr("Pre-recruit", translate=french, custom_terms=rosetta_terms),
+                                    en2fr("Recruit", translate=french, custom_terms=rosetta_terms),
+                                    en2fr("Fully recruited", translate=french, custom_terms=rosetta_terms)))
+
+if(french==F) man.unit <- "Management unit"
+if(french==T) man.unit <- "Zone de gestion"
+
+if(french==T) xlabel <- expression(frac("% mort", "trait"))
+if(french==F) xlabel <- expression(frac("% dead", "tow"))
+
+sfa <- c(25,26)
+for(sfa in sfa){
+  
+  clap <- ggplot() + geom_line(data=clappertow[clappertow$sfa==sfa,],
+                            aes(years, index.val, colour=bank)) +
+    geom_point(data=clappertow[clappertow$sfa==sfa,],
+               aes(years, index.val, colour=bank)) +
+    theme_bw() +
+    facet_wrap(~size2, ncol=1,
+               scales="free_y",
+               strip.position="top") +
+    theme(strip.background=element_blank()) +
+    scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    scale_fill_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    #scale_y_log10() +
+    xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
+    ylab(parse(text=xlabel))
+
+  require(patchwork)
+  png(filename=paste0(plotsGo, "/clap_prop_", sfa, "_", nickname, ".png"),width=6.5, height=9, units = "in", res=420)
+  print(clap + plot_layout(guides="collect") & theme(legend.position="bottom"))
+  dev.off()
+}
 
 ```
 
