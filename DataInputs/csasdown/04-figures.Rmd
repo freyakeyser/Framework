@@ -1,0 +1,179 @@
+---
+output:
+  pdf_document:
+    fig_caption: yes
+    extra_dependencies: float
+linkcolor: blue
+params:
+  bank: NA
+  banknum: NA
+  surv.year: NA
+header-includes: \usepackage{float}
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include=F, echo=F}
+# knitr::opts_knit$set(eval.after = "fig.cap")
+# knitr::opts_chunk$set(fig.pos = 'H')
+# options(knitr.kable.NA = '')
+require(tidyverse)
+options(tinytex.verbose = TRUE)
+
+direct_fns <- "C:/Users/keyserf/Documents/Github/Assessment_fns/"
+
+year <- 2022
+
+load("data/summary4.Rdata")
+source(paste0(direct_fns, "/Other_functions/ScallopRound.R"))
+
+ntows <- summary_data$ntows
+highlights <- summary_data$highlights
+sizes <- summary_data$sizes
+dates <- summary_data$dates
+yeartable <- summary_data$yeartable
+spatial.sum.stats <- summary_data$spatial.sum.stats
+
+bank <- data.frame(lab = c("Ban", "BanIce", "Mid", "Sab", "Ger", "BBn", "BBs", "GB", "GBa", "GBb"), name=NA)
+bank$name[bank$lab=="Ban"] <- "Banquereau (Sea scallop)"
+bank$name[bank$lab=="BanIce"] <- "Banquereau (Icelandic scallop)"
+bank$name[bank$lab=="Mid"] <- "Middle Bank"
+bank$name[bank$lab=="Sab"] <- "Sable Bank"
+bank$name[bank$lab=="Ger"] <- "German Bank"
+bank$name[bank$lab=="BBn"] <- "Browns Bank North"
+bank$name[bank$lab=="BBs"] <- "Browns Bank South"
+bank$name[bank$lab=="GB"] <- "Georges Bank (monitoring stations)"
+bank$name[bank$lab=="GBa"] <- "Georges Bank 'a'"
+bank$name[bank$lab=="GBb"] <- "Georges Bank 'b'"
+
+```
+
+\clearpage
+
+# Figures {-}
+
+```{r, echo=F, fig.cap="Catch, effort, and catch per unit effort for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/2023/Updates/GBa//Figures_and_tables/",language, "/Offshore_banks.png"))
+```
+
+```{r, echo=F, fig.cap="Catch, effort, and catch per unit effort for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/fishery_25_", nickname, ".png"))
+```
+
+```{r, echo=F, fig.cap="Catch, effort, and catch per unit effort for SFA 26 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/fishery_26_", nickname, ".png"))
+```
+
+```{r, echo=F, fig.cap="Spatial distribution of commerical catch (tonnes) in 10km^2 cells for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/footprint_25_", nickname, ".png"))
+```
+
+```{r, echo=F, fig.cap="Spatial distribution of commercial catch (tonnes) in 10km^2 cells for SFA 26 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/footprint_26_", nickname, ".png"))
+```
+
+
+
+
+
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[1], " survey design in ", params$surv.year[1], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[1], "/Presentations/Survey_summary/", params$bank[1], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[2], " survey design in ", params$surv.year[2], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[2], "/Presentations/Survey_summary/", params$bank[2], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[3], " survey design in ", params$surv.year[3], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[3], "/Presentations/Survey_summary/", params$bank[3], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[4], " survey design in ", params$surv.year[4], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[4], "/Presentations/Survey_summary/", params$bank[4], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[5], " survey design in ", params$surv.year[5], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[5], "/Presentations/Survey_summary/", params$bank[5], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[6], " survey design in ", params$surv.year[6], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[6], "/Presentations/Survey_summary/", params$bank[6], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+
+
+
+
+```{r, echo=FALSE, message=F,fig.align="center", fig.cap="Ages and shell heights of scallops collected on Sable Bank in 2012 (points), and the von Bertallanfy growth model (line) with parameters."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/fit_vb", fr, ".png"))
+#8 in * 8 in
+# out.width=400, out.height=400,
+```
+
+```{r, echo=FALSE, message=F,  fig.align="center", fig.cap="Residuals of the von Bertallanfy growth model for Sable Bank in 2012 (points), the corresponding linear relationship (line), and confidence interval (shading)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/resid_vb", fr, ".png"))
+#2100*2100
+#out.width=400, out.height=400,
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Growth (mm) in the previous year for scallops on Sable Bank in 2012 as predicted by the von Bertallanfy model, by age and by current shell height (mm)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/growth_vb", fr, ".png"))
+#4200W * 2100H
+```
+
+```{r, echo=FALSE, message=F,fig.align="center", fig.cap="Ages and shell heights of scallops collected on Browns Bank North in 2011 and 2012 (points), and the von Bertallanfy growth model (line) with parameters."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/fit_vb", fr, ".png"))
+# out.width=400, out.height=400,
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Residuals of the von Bertallanfy growth model for Browns Bank North in 2011 and 2012 (points), the corresponding linear relationship (line), and confidence interval (shading)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/resid_vb", fr, ".png"))
+#out.width=400, out.height=400,
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Growth (mm) in the previous year for scallops on Browns Bank North in 2011 and 2012 as predicted by the von Bertallanfy model, by age and by current shell height (mm)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/growth_vb", fr, ".png"))
+```
+
+
+
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number of recruit scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of recruit scallop per standardized tow (y-axis) for SFA 25 management units using different recruit size ranges (shapes)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_25_compare", fr, ".png"))
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number of recruit scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of recruit scallop per standardized tow (y-axis) for SFA 26 management units using different recruit size ranges (shapes)"}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_26_compare", fr, ".png"))
+```
+
+
+
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number of scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of scallop per standardized tow (y-axis) for SFA 25 management units. Recruit size is 75-90mm."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_25_", nickname, fr, ".png"))
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series for pre-recuit, recruit, and fully-recruited scallop, represented by number of scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units. Recruit size is 75-90mm for Browns Bank north and south, and 95-105mm on German Bank."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_26_", nickname, fr, ".png"))
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/cfts_25_", nickname, fr, ".png"))
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 26 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/cfts_26_", nickname, fr, ".png"))
+```
+
+

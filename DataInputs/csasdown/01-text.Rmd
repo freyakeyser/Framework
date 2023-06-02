@@ -1,45 +1,60 @@
-# INTRODUCTION
+# Introduction
 
 Scallop fishery description. Introduce SFAs and management scheme. The last full assessment for the Offshore Scallop fishery occurred in 2013, and focused on Georges Bank 'a' and Browns Bank north, which are part of SFA 27 and 26, respectively. Annual updates for these two stocks have occurred since***. However, the offshore scallop fishery consists of 9 management units in total. SFA 26 also includes Browns Bank South and German Bank, SFA 27 includes Georges Bank 'b', and SFA 25, known as the eastern scotian shelf, includes management units 25 (Sable and Middle Bank), and 25b (Banquereau Bank). An annual review of fishery and survey data summaries for all 9 stocks occurs as part of the OSAC process, however, the methodology underlying the current fishery and survey summaries has not been peer-reviewed. Furthermore, stock status information has not been published since 2001 for the Eastern Scotian Shelf stocks (Sable and Middle Banks) and 1997 for German Bank; Browns Bank South and Banquereau Bank have not been published before.
 
-<!--  If you're still on the fence about using R Markdown, check out the resource for newbies available at <https://ismayc.github.io/rbasics-book/>.-->
+## Species biology
 
-## FRAMEWORK OBJECTIVES
 
-The objectives of this framework are:
+## Framework objectives
+
+The objectives of this framework are:  
+
 - To describe the fishery, survey, and biological data informing the assessment of SFAs 25 and 26 (Part 1, this document)
 - To evaluate the analysis methodology used to summarize the above data for SFAs 25 and 26 (Part 2, separate document)
-- To propose reference points for SFAs 25 and 26 (Part 2, separate document)
+- To propose reference points for SFAs 25 and 26 (Part 2, separate document)  
 
-This Data Inputs review document will:
+This Data Inputs review document will:  
+
 - Summarize and review the sampling protocols used during the surveys of SFA 25 and 26 over time
 - Review the statistical design(s) of the surveys of SFA 25 and 26 over time
 - Review the fishery data collected for trips occurring in SFA 25 and 26 (process, volume of data, quality and validation)
 - Review the methods used to summarize survey and fishery data into Science advice
 - Present the summarized survey and fishery data for each management unit
 
-notes:
-tow-by-tow summary. station locations over time?
-clappers only for sable and north
-ts figures for all banks (fishery, abund, biomass, cond)
-survey map for all banks... example for german
+notes
+
+- tow-by-tow summary. station locations over time?
+- clappers only for sable and north
+- ts figures for all banks (fishery, abund, biomass, cond)
+- survey map for all banks... example for german
 
 
+# Fishery
 
-# ```{r}
-# print(analysis)
-# ```
+- Fishery independent data
+- Logbooks
 
-# Survey overview  
 
-- history, collaborative agreement  
+## Fishery history
 
-From reproducible report: 
+- Fleet dynamic
+- Management
 
-The Offshore Scallop Survey Database (SCALOFF) contains data collected through Collaborative Agreements (formerly Joint Project Agreements) between DFO Science and the Seafood Producers Association of Nova Scotia (SPANS). The Offshore Scallop Survey collects data on the stocks of Sea Scallop (*Placopecten magellanicus*) on the Scotian Shelf and the Canadian side of Georges Bank, as well as Iceland Scallop (*Chlamys islandica*) on Banquereau Bank. These stocks correspond to the DFO management units known as Scallop Fishing Areas (SFA) 25, 26, and 27, and the survey data are the primary source of fishery-independent information used in the Maritimes Region scallop stock assessments.
 
-The Offshore Scallop Survey has occurred between May and September annually since 1978 with few exceptions, but spatial coverage and survey designs have changed over time. Under the Collaborative Agreement, survey responsibilities are shared by DFO and SPANS. At-sea survey activities are directed by the DFO Chief Scientist aboard the survey vessel. SPANS coordinates the provision the survey vessel as well as the necessary crew complement to conduct the survey activities. DFO Science designs the survey, provides and manages scientific equipment, and validates, archives, and analyzes survey data. 
+## Fishery data
 
+- Footprint
+- CPUE
+- Port sampling
+
+
+# Survey
+
+The Offshore Scallop Survey Database (SCALOFF) contains data collected through Collaborative Agreements (formerly Joint Project Agreements) between DFO Science and the Seafood Producers Association of Nova Scotia (SPANS). The Offshore Scallop Survey collects data on the stocks of Sea Scallop (*Placopecten magellanicus*) on the Scotian Shelf and the Canadian side of Georges Bank, as well as Iceland Scallop (*Chlamys islandica*) on Banquereau Bank. These stocks correspond to the DFO management units known as Scallop Fishing Areas (SFA) 25, 26, and 27, and the survey data are the primary source of fishery-independent information used in the Maritimes Region scallop stock assessments. Under the Collaborative Agreement, survey responsibilities are shared by DFO and SPANS. At-sea survey activities are directed by the DFO Chief Scientist aboard the survey vessel. SPANS coordinates the provision the survey vessel as well as the necessary crew complement to conduct the survey activities. DFO Science designs the survey, provides and manages scientific equipment, and validates, archives, and analyzes survey data. 
+
+## Survey history  
+
+The Offshore Scallop Survey has occurred between May and September annually since 1978 with few exceptions, but spatial coverage and survey designs have changed over time (see Survey Design).  
 
 ## Sampling protocols  
 
@@ -47,5 +62,10 @@ Regardless of survey design, the same sampling protocol is followed: At each sur
 
 ## Survey design  
 
-Table
+- by bank
+- stratification  
+
+## Ageing
+
+
 
