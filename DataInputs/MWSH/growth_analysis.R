@@ -194,6 +194,304 @@ mod_eval <- function(mod){
 # see yihao yin 2022 spa3 paper canjfish (can cite this for gaussian)
 # https://github.com/Mar-scal/Inshore/blob/main/SFA29/Growth/SFA29_MeatWeightShellHeight.R
 
+### using inshore approach
+
+dat$Log.HEIGHT <- log(dat$sh)
+dat$Log.HEIGHT.CTR <- dat$Log.HEIGHT - mean(dat$Log.HEIGHT)
+dat$Log.DEPTH <- log(abs(dat$depth)) #take abs to keep value positive
+dat$Log.DEPTH.CTR <- dat$Log.DEPTH - mean(dat$Log.DEPTH)
+summary(dat)
+dat$year <- as.numeric(dat$year)
+
+#plot depths by tow
+plot(depth~tow, data=dat)
+
+#run model WITH DEPTH
+mod.obj<-NULL
+liveweight <- NULL
+df_all <- NULL
+for(y in sort(unique(as.numeric(dat$year)))){
+  print(y)
+  sub <- dat[dat$year==y,]
+  sub <- sub[complete.cases(sub),]
+  mod <- glmer(wmw~Log.HEIGHT.CTR+Log.DEPTH.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                    family=Gamma(link=log), na.action = na.omit)
+
+  df=data.frame(sub, resid=residuals(mod,"pearson"),
+                fit=fitted(mod))
+
+  #Plot of tow level residuals
+  print(ggplot() + geom_point(data=df, aes(fit, resid)) + facet_wrap(~tow) + geom_hline(yintercept=0) + ggtitle(y))
+
+  #Plot of tow level fitted values
+  print(ggplot() + geom_point(data=df, aes(fit, wmw)) + facet_wrap(~tow) + ggtitle(y))
+
+  #Construct data.frame similar to SFA29livefreq for weight per tow
+  livefreqYYYY <- subset(all.surv.dat[all.surv.dat$bank==bank,], year==y)
+  liveweightYYYY <- livefreqYYYY
+
+  #create matrix of depths by tow to use in predict function
+  log.ctr.adj_depth <- log(abs(liveweightYYYY$depth)) - mean(dat$Log.DEPTH)
+  Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(dat$Log.HEIGHT) #each shell height bin to predict on
+
+  temp <- matrix(NA,dim(liveweightYYYY)[1],40)
+
+  #Use random effects for tows in detail sample and fixed effects otherwise
+  #Random effects for tows that were sampled for meat weight shell height; here ID tows that were sampled
+  random.pred <- (1:dim(liveweightYYYY)[1])[is.element(liveweightYYYY$tow,as.numeric(unique(sub$tow)))]
+
+  #fixed effects for tows that weren't sampled for meat weight shell height; here ID tows that were NOT sampled
+  fixed.pred <- (1:dim(liveweightYYYY)[1])[!is.element(liveweightYYYY$tow,as.numeric(unique(sub$tow)))]
+
+  #Predict using Random effects for tows that were sampled for meat weight shell height
+  for(i in random.pred) {
+    temp[i,] <- as.vector(predict(object = mod,
+                                  newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                     Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40),
+                                                     tow=liveweightYYYY$tow[i]),
+                                  re.form=NULL,type="response"))
+  }
+
+  #Predict using fixed effects for tows that weren't sampled for meat weight shell height
+  for(i in fixed.pred) {
+    temp[i,] <- as.vector(predict(object=mod,
+                                  newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                     Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40)),
+                                  re.form=~0,type="response"))
+  }
+  #multply temp matrix (weight) by live numbers to get weight/size bin
+  liveweightYYYY[,grep("h5", colnames(liveweightYYYY)):grep("h200", colnames(liveweightYYYY))] <- temp*livefreqYYYY[,grep("h5", colnames(livefreqYYYY)):grep("h200", colnames(livefreqYYYY))]
+
+  mod.obj[[y]] <- list(mod=mod, summary=summary(mod), df=df, liveweightYYYY=liveweightYYYY)
+  liveweight <- rbind(liveweight, liveweightYYYY)
+  df_all <- rbind(df_all, df)
+}
+
+
+mod.all<-NULL
+sub <- dat[complete.cases(dat),]
+mod <- glmer(wmw~Log.HEIGHT.CTR+Log.DEPTH.CTR+(Log.HEIGHT.CTR|ID),data=sub,
+             family=Gamma(link=log), na.action = na.omit)
+
+df=data.frame(sub, resid=residuals(mod,"pearson"),
+              fit=fitted(mod))
+
+#Plot of tow level residuals
+print(ggplot() + geom_point(data=df, aes(fit, resid)) + facet_wrap(~year) + geom_hline(yintercept=0))
+
+#Plot of tow level fitted values
+print(ggplot() + geom_point(data=df, aes(fit, wmw)) + facet_wrap(~year))
+
+#Construct data.frame similar to SFA29livefreq for weight per tow
+livefreqYYYY <- subset(all.surv.dat[all.surv.dat$bank==bank,])
+liveweightYYYY <- livefreqYYYY
+
+#create matrix of depths by tow to use in predict function
+log.ctr.adj_depth <- log(abs(liveweightYYYY$depth)) - mean(sub$Log.DEPTH)
+Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(sub$Log.HEIGHT) #each shell height bin to predict on
+
+temp <- matrix(NA,dim(liveweightYYYY)[1],40)
+
+#Use random effects for tows in detail sample and fixed effects otherwise
+#Random effects for tows that were sampled for meat weight shell height; here ID tows that were sampled
+random.pred <- (1:dim(liveweightYYYY)[1])[is.element(liveweightYYYY$ID,unique(sub$ID))]
+
+#fixed effects for tows that weren't sampled for meat weight shell height; here ID tows that were NOT sampled
+fixed.pred <- (1:dim(liveweightYYYY)[1])[!is.element(liveweightYYYY$ID,unique(sub$ID))]
+
+#Predict using Random effects for tows that were sampled for meat weight shell height
+for(i in random.pred) {
+  temp[i,] <- as.vector(predict(object = mod,
+                                newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                   Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40),
+                                                   ID=liveweightYYYY$ID[i]),
+                                re.form=NULL,type="response"))
+}
+
+#Predict using fixed effects for tows that weren't sampled for meat weight shell height
+for(i in fixed.pred) {
+  temp[i,] <- as.vector(predict(object=mod,
+                                newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                   Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40)),
+                                re.form=~0,type="response"))
+}
+#multply temp matrix (weight) by live numbers to get weight/size bin
+liveweightYYYY[,grep("h5", colnames(liveweightYYYY)):grep("h200", colnames(liveweightYYYY))] <-
+  temp*livefreqYYYY[,grep("h5", colnames(livefreqYYYY)):grep("h200", colnames(livefreqYYYY))]
+
+
+#run model WITHOUT DEPTH
+mod.obj.nodepth<-NULL
+liveweight.nodepth <- NULL
+df_all_nodepth <- NULL
+for(y in sort(unique(as.numeric(dat$year)))){
+  print(y)
+  sub <- dat[dat$year==y,]
+  sub <- sub[complete.cases(sub),]
+  mod <- glmer(wmw~Log.HEIGHT.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+               family=Gamma(link=log), na.action = na.omit)
+
+  df=data.frame(sub, resid=residuals(mod,"pearson"),
+                fit=fitted(mod))
+
+  #Plot of tow level residuals
+  print(ggplot() + geom_point(data=df, aes(fit, resid)) + facet_wrap(~tow) + geom_hline(yintercept=0) + ggtitle(y))
+
+  #Plot of tow level fitted values
+  print(ggplot() + geom_point(data=df, aes(fit, wmw)) + facet_wrap(~tow) + ggtitle(y))
+
+  #Construct data.frame similar to SFA29livefreq for weight per tow
+  livefreqYYYY <- subset(all.surv.dat[all.surv.dat$bank==bank,], year==y)
+  liveweightYYYY <- livefreqYYYY
+
+  #create matrix of depths by tow to use in predict function
+  log.ctr.adj_depth <- log(abs(liveweightYYYY$depth)) - mean(dat$Log.DEPTH)
+  Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(dat$Log.HEIGHT) #each shell height bin to predict on
+
+  temp <- matrix(NA,dim(liveweightYYYY)[1],40)
+
+  #Use random effects for tows in detail sample and fixed effects otherwise
+  #Random effects for tows that were sampled for meat weight shell height; here ID tows that were sampled
+  random.pred <- (1:dim(liveweightYYYY)[1])[is.element(liveweightYYYY$tow,as.numeric(unique(sub$tow)))]
+
+  #fixed effects for tows that weren't sampled for meat weight shell height; here ID tows that were NOT sampled
+  fixed.pred <- (1:dim(liveweightYYYY)[1])[!is.element(liveweightYYYY$tow,as.numeric(unique(sub$tow)))]
+
+  #Predict using Random effects for tows that were sampled for meat weight shell height
+  for(i in random.pred) {
+    temp[i,] <- as.vector(predict(object = mod,
+                                  newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                     Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40),
+                                                     tow=liveweightYYYY$tow[i]),
+                                  re.form=NULL,type="response"))
+  }
+
+  #Predict using fixed effects for tows that weren't sampled for meat weight shell height
+  for(i in fixed.pred) {
+    temp[i,] <- as.vector(predict(object=mod,
+                                  newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                     Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40)),
+                                  re.form=~0,type="response"))
+  }
+  #multply temp matrix (weight) by live numbers to get weight/size bin
+  liveweightYYYY[,grep("h5", colnames(liveweightYYYY)):grep("h200", colnames(liveweightYYYY))] <- temp*livefreqYYYY[,grep("h5", colnames(livefreqYYYY)):grep("h200", colnames(livefreqYYYY))]
+
+  mod.obj.nodepth[[y]] <- list(mod=mod, summary=summary(mod), df=df, liveweightYYYY=liveweightYYYY)
+  liveweight.nodepth <- rbind(liveweight.nodepth, liveweightYYYY)
+  df_all_nodepth <- rbind(df_all_nodepth, df)
+}
+
+
+mod.all.nodepth<-NULL
+sub <- dat[complete.cases(dat),]
+mod.nodepth <- glmer(wmw~Log.HEIGHT.CTR+(Log.HEIGHT.CTR|ID),data=sub,
+             family=Gamma(link=log), na.action = na.omit)
+
+df.nodepth=data.frame(sub, resid=residuals(mod.nodepth,"pearson"),
+              fit=fitted(mod.nodepth))
+
+#Plot of tow level residuals
+print(ggplot() + geom_point(data=df.nodepth, aes(fit, resid)) + facet_wrap(~year) + geom_hline(yintercept=0))
+
+#Plot of tow level fitted values
+print(ggplot() + geom_point(data=df.nodepth, aes(fit, wmw)) + facet_wrap(~year))
+
+#Construct data.frame similar to SFA29livefreq for weight per tow
+livefreqYYYY.nodepth <- subset(all.surv.dat[all.surv.dat$bank==bank,])
+liveweightYYYY.nodepth <- livefreqYYYY.nodepth
+
+#create matrix of depths by tow to use in predict function
+log.ctr.adj_depth <- log(abs(liveweightYYYY.nodepth$depth)) - mean(sub$Log.DEPTH)
+Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(sub$Log.HEIGHT) #each shell height bin to predict on
+
+temp.nodepth <- matrix(NA,dim(liveweightYYYY.nodepth)[1],40)
+
+#Use random effects for tows in detail sample and fixed effects otherwise
+#Random effects for tows that were sampled for meat weight shell height; here ID tows that were sampled
+random.pred <- (1:dim(liveweightYYYY.nodepth)[1])[is.element(liveweightYYYY.nodepth$ID,unique(sub$ID))]
+
+#fixed effects for tows that weren't sampled for meat weight shell height; here ID tows that were NOT sampled
+fixed.pred <- (1:dim(liveweightYYYY.nodepth)[1])[!is.element(liveweightYYYY.nodepth$ID,unique(sub$ID))]
+
+#Predict using Random effects for tows that were sampled for meat weight shell height
+for(i in random.pred) {
+  temp.nodepth[i,] <- as.vector(predict(object = mod.nodepth,
+                                newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                   Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40),
+                                                   ID=liveweightYYYY$ID[i]),
+                                re.form=NULL,type="response"))
+}
+
+#Predict using fixed effects for tows that weren't sampled for meat weight shell height
+for(i in fixed.pred) {
+  temp.nodepth[i,] <- as.vector(predict(object=mod.nodepth,
+                                newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                   Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40)),
+                                re.form=~0,type="response"))
+}
+#multply temp matrix (weight) by live numbers to get weight/size bin
+liveweightYYYY.nodepth[,grep("h5", colnames(liveweightYYYY.nodepth)):grep("h200", colnames(liveweightYYYY.nodepth))] <-
+  temp*livefreqYYYY.nodepth[,grep("h5", colnames(livefreqYYYY.nodepth)):grep("h200", colnames(livefreqYYYY.nodepth))]
+
+
+allyears <- df %>%
+  filter(sh==100) %>%
+  group_by(year) %>%
+  summarize(med_fit = median(fit),
+            sd_fit = sd(fit)) %>%
+  mutate(type="all_years")
+
+byyear <- df_all %>%
+  filter(sh==100) %>%
+  group_by(year) %>%
+  summarize(med_fit = median(fit),
+            sd_fit = sd(fit)) %>%
+  mutate(type="by_year")
+
+allyears_nodepth <- df.nodepth %>%
+  filter(sh==100) %>%
+  group_by(year) %>%
+  summarize(med_fit = median(fit),
+            sd_fit = sd(fit)) %>%
+  mutate(type="all_years_nodepth")
+
+byyear_nodepth <- df_all_nodepth %>%
+  filter(sh==100) %>%
+  group_by(year) %>%
+  summarize(med_fit = median(fit),
+            sd_fit = sd(fit)) %>%
+  mutate(type="by_year_nodepth")
+
+all <- rbind(allyears, byyear,allyears_nodepth, byyear_nodepth)
+
+ggplot() + geom_boxplot(data=df, aes(year, fit))
+
+ggplot() + geom_boxplot(data=df_all, aes(year, fit))
+
+ggplot() + geom_smooth(data=df, aes(sh, fit, colour=tow)) +
+  geom_smooth(data=df_all, aes(sh, fit, colour=tow), linetype="dashed") +
+  facet_wrap(~year) +
+  guides(colour="none")
+
+
+ggplot() + geom_boxplot(data=df[df$sh==100,], aes(year, fit), colour="blue", fill="blue", alpha=0.3) +
+  geom_boxplot(data=df_all[df_all$sh==100,], aes(year, fit), colour="red", fill="red", alpha=0.3) #+
+  geom_boxplot(data=df_all[df_all$sh==100,], aes(year, wmw), fill="yellow", alpha=0.3)
+
+
+ggplot() + geom_point(data=all, aes(as.numeric(year), med_fit, colour=type)) +
+  geom_line(data=all, aes(as.numeric(year), med_fit, colour=type, group=type)) +
+  geom_point(data=condfac_res$CFyrs, aes(as.numeric(year), CF)) +
+  geom_line(data=condfac_res$CFyrs, aes(as.numeric(year), CF), group=1) +
+  geom_point(data=CFyrs, aes(as.numeric(year), fit), colour="grey") +
+  geom_line(data=CFyrs, aes(as.numeric(year), fit), colour="grey", group=1)
+
+
+# ok so it really doesn't matter if you include depth or not, the results using
+# the inshore model approach are way different from the original offshore methods
+# missing predictions for some years?
+c(1991:2022)[which(!1991:2022 %in% unique(all$year))]# 1998,2005,2007,2008,2020
+
 glm_mw <- glm(data=dat, wmw ~ sh + as.factor(year), family=gaussian(link="log"))
 glm_mw <- mod_eval(glm_mw)
 

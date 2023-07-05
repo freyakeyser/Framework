@@ -13,5 +13,3 @@ x <- officer::body_add_toc(x)
 print(x, target = "_book/final_resdoc.docx")
 
 
-
-### need to re-run the catch plot, and figure out 6 panel figure scaling.

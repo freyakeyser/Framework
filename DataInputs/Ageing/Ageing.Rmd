@@ -16,7 +16,7 @@ load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.Rdata
 
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/"
 
-french <- T # set to T for french
+french <- F # set to T for french
 if(french==T) {fr <- "_fr"}
 if(french==F) {fr <- ""}
 
@@ -371,12 +371,23 @@ if(bank=="BBn") {# Fresh ages from TPD
     filter(year %in% 2011:2012) %>%
     mutate(ager = "TPD")
   
-  age_summary <- rbind(alan_summary, tpd_summary)
+  age_summary <- rbind(#alan_summary, 
+    tpd_summary)
   #write.table(age_summary,"clipboard",sep="\t")
+  
+  increments <- tpd_long %>%
+    dplyr::mutate(ID=paste0(ID, ".", Scall.no)) %>%
+    group_by(AGE) %>%
+    summarize(bank="BBn", 
+              n_inc = length(unique(ID)),
+              med_height = median(HEIGHT),
+              sd_height=sd(HEIGHT))
+    
   
   age_summary <- age_summary %>%
     group_by(ager, year) %>%
-    summarize(increments=sum(increments),
+    summarize(bank="BBn", 
+              increments=sum(increments),
               shells=sum(shells),
               tows=length(unique(tow)))
   
@@ -385,6 +396,11 @@ if(bank=="BBn") {# Fresh ages from TPD
     summarize(increments=sum(increments),
               shells=sum(shells),
               tows=sum(tows))
+  
+
+  write.csv(increments, paste0(plotsGo, "/increments_bbn.csv"))
+  write.csv(age_summary, paste0(plotsGo, "/age_summary_bbn.csv"))
+  
   
   ggplot() +
     geom_bar(data=age_summary,
@@ -448,11 +464,23 @@ if(bank=="Sab") {
               increments=n()) %>%
     mutate(ager = "TPD")
   
+   increments <- tpd_long %>%
+    dplyr::mutate(ID=paste0(ID, ".", Scall.no)) %>%
+    group_by(AGE) %>%
+    summarize(bank="Sab", 
+              n_inc = length(unique(ID)),
+              med_height = median(HEIGHT),
+              sd_height=sd(HEIGHT))
+  
   age_summary <- tpd_summary %>%
     group_by(ager, year) %>%
-    summarize(increments=sum(increments),
+    summarize(bank="Sab", 
+              increments=sum(increments),
               shells=sum(shells),
               tows=length(unique(tow)))
+  
+  write.csv(increments, paste0(plotsGo, "/increments_Sab.csv"))
+  write.csv(age_summary, paste0(plotsGo, "/age_summary_Sab.csv"))
   
   all_summary <- age_summary %>%
     group_by(ager) %>%
@@ -1214,7 +1242,7 @@ dev.off()
 
 ### compare to survey SHF information
 ```{r, echo=F, eval=F}
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework.RData")
+#load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework.RData")
 
 shf_long <- dplyr::select(surv.Rand$BBn, year, tow, paste0("h", seq(5,200,5))) %>%
   pivot_longer(cols=!c("year", "tow"))

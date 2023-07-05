@@ -92,6 +92,10 @@ Figures:
 
 ## Ageing
 
+Tables:  
+\@ref(tab:age-summary)
+\@ref(tab:age-inc)
+
 Figures: 
 \@ref(fig:vb-sab)
 \@ref(fig:resid-sab)
@@ -126,4 +130,10 @@ Figures:
 \@ref(fig:cts-26)
 \@ref(fig:cfts-25)
 \@ref(fig:cfts-26)
+
+## Model inputs
+Figures:
+\@ref(fig:growth-26)
+\@ref(fig:relf)
+\@ref(fig:exp)
 

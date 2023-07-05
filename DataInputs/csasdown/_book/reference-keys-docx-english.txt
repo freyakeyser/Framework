@@ -1,5 +1,7 @@
 tab:strata-tab
 tab:ps-tab
+tab:age-summary
+tab:age-inc
 fig:map
 fig:hist
 fig:fts-25
@@ -7,9 +9,7 @@ fig:fts-26
 fig:foot-25
 fig:foot-26
 fig:mw-annual
-fig:mw-annual-box
 fig:mw-monthly
-fig:mw-monthly-box
 fig:nav-linear
 fig:nav-box
 fig:map-ban
@@ -26,10 +26,8 @@ fig:prop-ps-bbn
 fig:propss-ps-bbn
 fig:vb-sab
 fig:resid-sab
-fig:growth-sab
 fig:vb-bbn
 fig:resid-bbn
-fig:growth-bbn
 fig:rec-comp-25
 fig:rec-comp-26
 fig:sts-25
@@ -38,6 +36,9 @@ fig:cts-25
 fig:cts-26
 fig:cfts-25
 fig:cfts-26
+fig:growth-26
+fig:relf
+fig:exp
 introduction
 species-biology
 framework-objectives
@@ -53,6 +54,7 @@ ageing
 mwsh-model
 reviewing-fully-recruited-size
 survey-index
+model-inputs
 app:a
 app:a-1
 app:a-1-1

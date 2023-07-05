@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 \clearpage
 
 # Tables {-}
@@ -16,6 +21,10 @@ opts <- options(knitr.kable.NA = "")
 strata
 # strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
 #   kableExtra::collapse_rows(columns = 1:4, valign = "top")
+
+ps_tab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/ps_tab.csv")
+ps_tab <- select(ps_tab, -X, -main)
+names(ps_tab) <- c("SFA", "Management unit", "Number of samples", "Number of years with PS data", "Most recent year with PS data", "Number of months with PS data", "Long term median (mc)", "Standard deviation (mc)", "Minimum (mc)", "Maximum (mc)")
 
 ageing_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/summary_stats.csv")
 ageing_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/summary_stats.csv")
@@ -36,6 +45,21 @@ ageing2$`Management Unit`[ageing2$`Management Unit`=="Browns Bank North" & !is.n
 ageing3 <- ageing2[,c(1:2,9:7)]
 ageing4 <- ageing2[,c(1:2,10:15)]
 ageing2 <- ageing2[,c(1:6)]
+
+inc_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/increments_bbn.csv")
+sum_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/age_summary_bbn.csv")
+inc_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/increments_sab.csv")
+sum_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/age_summary_sab.csv")
+
+inc <- full_join(inc_bbn, inc_sab)
+inc$height <- paste0(inc$med_height, " (", round(inc$sd_height,2), ")")
+inc <- pivot_wider(select(inc, -X), id_cols=AGE, names_from = bank, values_from=c(n_inc, height))
+inc <- inc[,c("AGE", "n_inc_Sab", "height_Sab", "n_inc_BBn", "height_BBn")]
+names(inc) <- c("Age assigned", "Number of increments (Sab)", "Median height (Sab, SD)",  "Number of increments (BBn)", "Median height (BBn, SD)")
+
+age_summary <- full_join(sum_sab, sum_bbn)
+age_summary <- select(age_summary, bank, year, tows, shells, increments, -X, -ager)
+names(age_summary) <- c("Management unit", "Year", "Number of tows", "Number of shells", "Number of increments")
 
 opts <- options(knitr.kable.NA = "")
 
@@ -67,7 +91,10 @@ csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0
 #   )
 # )
 
-csas_table(data.frame(col="to come"), caption ="Port sampling data summary.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(ps_tab, caption ="Port sampling data summary.") %>% 
+  kableExtra::row_spec(0,bold=TRUE) %>% 
+  kableExtra::row_spec(0,bold=ifelse(ps_tab$`Management unit`%in% c("BBn", "Sab"), TRUE, FALSE))
+
 #qflextable(strata)
 
 #<!---BLOCK_LANDSCAPE_START--->
@@ -95,3 +122,33 @@ csas_table(data.frame(col="to come"), caption ="Port sampling data summary.") %>
 #<!---BLOCK_LANDSCAPE_START--->
 ```
 
+```{r age-summary, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+csas_table(age_summary, caption ="Aged shells by management unit.") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+```{r age-inc, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+csas_table(inc, caption ="Summary of age assignments and measurements by management unit. Increment height is measured in millimetres. Standard deviation in increment height is provided in parentheses.") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```

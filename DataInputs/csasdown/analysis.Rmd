@@ -8,6 +8,7 @@ require(ggplot2)
 require(tidyr)
 require(dplyr)
 require(patchwork)
+require(sf)
 
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework2.RData")
 framework2 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand)
@@ -15,13 +16,15 @@ load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_80-95.RData
 framework4 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.RData") #75-90
 framework3 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand)
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90_newareas_issue120.RData") # 80-95
+framework5 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand)
 #### MAKE SURE CHOSEN RDATA IS READ IN LAST!
 
-nickname <- "framework3"
+nickname <- "framework5"
 
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs"
 
-french <- T # set to T for french
+french <- F # set to T for french
 if(french == T) {
   nickname <- paste0(nickname, "_fr")
 }
@@ -38,7 +41,8 @@ for(fun in funs)
 
 funs <- c("https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Fishery/jackknife.r",
           "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/create_grid.R",
-          "https://raw.githubusercontent.com/mar-scal/Assessment_fns/master/Maps/pectinid_projector_sf.R")
+          "https://raw.githubusercontent.com/mar-scal/Assessment_fns/master/Maps/pectinid_projector_sf.R",
+          "https://raw.githubusercontent.com/mar-scal/Assessment_fns/master/Maps/github_spatial_import.R")
 # Now run through a quick loop to load each one, just be sure that your working directory is read/write!
 for(fun in funs) 
 {
@@ -53,7 +57,7 @@ for(fun in funs)
 # Abundance and Biomass TS, FR only
 bankpertow_all <- NULL
 # by recruit size bin range
-for (rdata in c("framework2", "framework3", "framework4")){
+for (rdata in c("framework2", "framework3", "framework4", "framework5")){
   
   # prep data for TS plotting
   bankpertow <- NULL
@@ -61,41 +65,48 @@ for (rdata in c("framework2", "framework3", "framework4")){
   # Mid, Ban
   for(bank in c("Mid", "Ban")){
     df <- get(rdata)$SS.summary[[bank]] %>%
-      dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv)
+      dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv) %>%
+      mutate(liner="lined")
+
     bankpertow <- rbind(bankpertow, df)
   }
-  
+
   dim(bankpertow)
-  
+
   # Ger
   dim(get(rdata)$merged.survey.obj)
   bankpertow <- get(rdata)$merged.survey.obj %>%
     dplyr::mutate(bank="Ger") %>%
     dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv) %>%
+    mutate(liner="lined") %>%
     full_join(bankpertow)
-  
+
   dim(bankpertow)
-  
+
   dim(get(rdata)$survey.obj$Ger$model.dat)
   bankpertow <- get(rdata)$survey.obj$Ger$model.dat %>%
     dplyr::mutate(bank="Ger") %>%
     dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv) %>%
+    mutate(liner="unlined") %>%
     full_join(bankpertow)
-  
+    
+
   dim(bankpertow)
-  
-  bankpertow <- full_join(bankpertow, data.frame(bank="Ger", year=2020))
-  
+
+  bankpertow <- full_join(bankpertow, data.frame(bank="Ger", year=2020, liner="lined"))
+
   # BBn, BBs
   for(b in c("BBn", "BBs")){
     print(dim(get(rdata)$survey.obj[[b]]$bankpertow))
-    bankpertow <- get(rdata)$survey.obj[[b]]$bankpertow %>%
-      dplyr::mutate(bank=b) %>%
-      dplyr::select(bank, year, N, NR, NPR, N.se, NR.se, NPR.se, I, IR, IPR, I.se, IR.se, IPR.se) %>%
-      rename(N.cv=N.se, NR.cv=NR.se, NPR.cv=NPR.se, I.cv=I.se, IR.cv = IR.se, IPR.cv=IPR.se)%>%
-      full_join(bankpertow)
-    
-    bankpertow <- full_join(bankpertow, data.frame(bank=b, year=2020))
+      bankpertow <- get(rdata)$survey.obj[[b]]$bankpertow %>%
+        dplyr::mutate(bank=b) %>%
+        dplyr::select(bank, year, N, NR, NPR, N.se, NR.se, NPR.se, I, IR, IPR, I.se, IR.se, IPR.se) %>%
+        rename(N.cv=N.se, NR.cv=NR.se, NPR.cv=NPR.se, I.cv=I.se, IR.cv = IR.se, IPR.cv=IPR.se)%>%
+        mutate(liner="lined") %>%
+        full_join(bankpertow)
+
+  
+    bankpertow <- full_join(bankpertow, data.frame(bank=b, year=2020, liner="lined"))
     
     print(dim(bankpertow))
   }
@@ -108,7 +119,8 @@ for (rdata in c("framework2", "framework3", "framework4")){
     pdf = F,
     areas = get(rdata)$surv.info$towable_area[surv.info$startyear==2018],
     se = T) %>%
-    mutate(bank="Sab") 
+    mutate(bank="Sab") %>%
+    mutate(liner="lined")
   ipertow <- survey.ts(
     get(rdata)$survey.obj$Sab[[1]],
     min(get(rdata)$survey.obj$Sab[[1]]$year, na.rm = T):yr,
@@ -116,7 +128,8 @@ for (rdata in c("framework2", "framework3", "framework4")){
     areas = get(rdata)$surv.info$towable_area[surv.info$startyear==2018],
     se = T,
     type="B") %>%
-    mutate(bank="Sab") 
+    mutate(bank="Sab") %>%
+    mutate(liner="lined")
   
   bankpertow <- full_join(npertow, ipertow) %>%
     full_join(bankpertow)
@@ -126,13 +139,14 @@ for (rdata in c("framework2", "framework3", "framework4")){
     pivot_longer(cols=c("N", "NR", "NPR", "I", "IPR", "IR"), values_to = "index.val", names_to="index")
   
   cv <- bankpertow %>%
-    dplyr::select(bank, year, n, N.cv, NR.cv, NPR.cv, I.cv, IPR.cv, IR.cv) %>%
+    dplyr::select(bank, year, n, liner, N.cv, NR.cv, NPR.cv, I.cv, IPR.cv, IR.cv) %>%
+    distinct() %>%
     pivot_longer(cols=c("N.cv", "NR.cv", "NPR.cv", "I.cv", "IPR.cv", "IR.cv"), values_to = "cv.val", names_to="index") %>%
-    dplyr::select(bank, year, n, index, cv.val)
+    dplyr::select(bank, year, n, liner, index, cv.val)
   cv$index <- gsub(x=cv$index, ".cv", "")
   
   bankpertow <- bankpertow %>%
-    dplyr::select(bank, year, n, index, index.val) %>%
+    dplyr::select(bank, year, n, liner, index, index.val) %>%
     full_join(cv)
   
   bankpertow$sfa[bankpertow$bank %in% c("Ban", "Mid", "Sab")] <- 25
@@ -196,9 +210,9 @@ sfa <- c(25,26)
 for(sfa in sfa){
   
   N <- ggplot() + geom_line(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
-                            aes(year, index.val, colour=bank)) +
+                            aes(year, index.val, colour=bank, linetype=liner)) +
     geom_point(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
-               aes(year, index.val, colour=bank)) +
+               aes(year, index.val, colour=bank, shape=bank)) +
     #geom_errorbar(data=bankpertow, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
     geom_ribbon(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
                 aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank), alpha=0.3)+
@@ -213,13 +227,13 @@ for(sfa in sfa){
     scale_fill_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
     #scale_y_log10() +
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
-    guides(colour = "none", fill="none") +
+    guides(colour = "none", fill="none", linetype="none", shape="none") +
     ylab(parse(text=as.character(unique(bankpertow$index2[bankpertow$index=="N"]))))
   
   I <- ggplot() + geom_line(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
-                            aes(year, index.val, colour=bank)) +
+                            aes(year, index.val, colour=bank, linetype=liner)) +
     geom_point(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
-               aes(year, index.val, colour=bank)) +
+               aes(year, index.val, colour=bank, shape=bank)) +
     #geom_errorbar(data=bankpertow, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
     geom_ribbon(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
                 aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank), alpha=0.3)+
@@ -232,9 +246,19 @@ for(sfa in sfa){
     theme(strip.background=element_blank()) +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
     scale_fill_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    scale_shape_discrete(name=man.unit) +
     #scale_y_log10() +
     xlab(en2fr("Year",translate = french, custom_terms=rosetta_terms)) +
     ylab(parse(text=as.character(unique(bankpertow$index2[bankpertow$index=="I"]))))
+  
+  if(sfa==25) {
+    I <- I + guides(linetype="none")
+  }
+  
+  if(sfa==26) {
+    I <- I + scale_linetype_discrete(name="", labels=en2fr(c("lined", "unlined"), translate = french, custom_terms=rosetta_terms)) +
+      guides(linetype = guide_legend(override.aes = list(colour = "blue")))
+  }
   
   require(patchwork)
   png(filename=paste0(plotsGo, "/timeseries_", sfa, "_", nickname, ".png"),width=6.5*1.25, height=6.5*1.25, units = "in", res=420)
@@ -302,6 +326,54 @@ for(sfa in sfa){
   dev.off()
 }
 
+# new strata areas
+bank <- c("BBn", "BBs", "Sab")
+for(b in bank){
+  
+  N <- ggplot() + 
+    geom_line(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="N" &bankpertow_all$rdata %in% c("framework3", "framework5"),],
+              aes(year, index.val, colour=bank, group=rdata)) +
+    geom_point(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="N" & bankpertow_all$rdata %in% c("framework3", "framework5"),],
+               aes(year, index.val, colour=bank, shape=rdata)) +
+    geom_ribbon(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="N" & bankpertow_all$rdata %in% c("framework3", "framework5"),],
+                 aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank, group=rdata), alpha=0.3)+
+    theme_bw() +
+    # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
+    #            scales="free_y")
+    facet_wrap(~size2, ncol=1,
+               scales="free_y",
+               strip.position="top") +
+    theme(strip.background=element_blank()) +
+    xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
+    guides(colour = "none", fill="none") #+
+   
+  I <- ggplot() + 
+    geom_line(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="I" &bankpertow_all$rdata %in% c("framework3", "framework5"),],
+              aes(year, index.val, colour=bank, group=rdata)) +
+    geom_point(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="I" & bankpertow_all$rdata %in% c("framework3", "framework5"),],
+               aes(year, index.val, colour=bank, shape=rdata)) +
+    geom_ribbon(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="I" & bankpertow_all$rdata %in% c("framework3", "framework5"),],
+                 aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank, group=rdata), alpha=0.3)+
+    theme_bw() +
+    # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
+    #            scales="free_y")
+    facet_wrap(~size2, ncol=1,
+               scales="free_y",
+               strip.position="top") +
+    theme(strip.background=element_blank()) +
+    xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
+    guides(colour = "none", fill="none") #+
+  require(patchwork)
+  # if(french==F) png(filename=paste0(plotsGo, "/timeseries_", sfa, "_compare.png"),width=6.5*1.25, height=6.5*1.25, units = "in", res=420)
+  # if(french==T) png(filename=paste0(plotsGo, "/timeseries_", sfa, "_compare_fr.png"),width=6.5*1.25, height=6.5*1.25, units = "in", res=420)
+  print(N+I + plot_layout(guides="collect") & theme(legend.position="bottom"))
+  #dev.off()
+}
+
+summary(bankpertow_all[bankpertow_all$rdata=="framework5",]$index.val / bankpertow_all[bankpertow_all$rdata=="framework3",]$index.val)
+summary(bankpertow_all[bankpertow_all$rdata=="framework5",]$index.val - bankpertow_all[bankpertow_all$rdata=="framework3",]$index.val)
+summary(bankpertow_all[bankpertow_all$rdata=="framework5",]$cv.val / bankpertow_all[bankpertow_all$rdata=="framework3",]$cv.val)
+summary(bankpertow_all[bankpertow_all$rdata=="framework5",]$cv.val - bankpertow_all[bankpertow_all$rdata=="framework3",]$cv.val)
 
 # condition
 
@@ -339,23 +411,25 @@ if(french==T) cflab <- expression(paste("Coefficient de condition  ",bgroup("(",
 
 png(filename=paste0(plotsGo, "/cfts_26", "_", nickname, ".png"),width=6.5, height=4, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank)) +
-        geom_line(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank, linetype=type)) +
+        geom_line(data=cfts[cfts$sfa==26,], aes(year, CF, colour=bank, linetype=type, shape=bank)) +
         xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) + 
         ylab(cflab) +
         theme_bw() +
         scale_linetype_discrete(name="", labels=en2fr(c("lined", "unlined"), translate = french, custom_terms=rosetta_terms)) +
         guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
-        scale_colour_manual(name=man.unit, values=c("black", "darkorange", "blue")) 
+        scale_colour_manual(name=man.unit, values=c("black", "darkorange", "blue")) +
+        scale_shape_discrete(name=man.unit) 
 )
 dev.off()
 
 png(filename=paste0(plotsGo, "/cfts_25", "_", nickname, ".png"),width=6.5, height=4, units = "in", res=420)
-print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
+print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank, shape=bank)) +
         geom_line(data=cfts[cfts$sfa==25,], aes(year, CF, colour=bank)) +
         xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) + 
         ylab(cflab) +
         theme_bw() +
-        scale_colour_manual(name=man.unit, values=c("black", "darkorange", "blue"))
+        scale_colour_manual(name=man.unit, values=c("black", "darkorange", "blue"))+
+        scale_shape_discrete(name=man.unit)
 )
 dev.off()
 
@@ -382,9 +456,30 @@ for(bank in banks){
 	dat <- full_join(yr.range, dat)
 	
 	dat$bank <- bank
+	dat$liner <- "lined"
 	
 	clappertow <- rbind(clappertow, dat)
 }
+
+surv.Clap.Rand[[bank]]$clap.propPre[surv.Clap.Rand[[bank]]$clap.propPre>100]<-NA
+surv.Clap.Rand[[bank]]$clap.propRec[surv.Clap.Rand[[bank]]$clap.propRec>100]<-NA
+surv.Clap.Rand[[bank]]$clap.propCom[surv.Clap.Rand[[bank]]$clap.propCom>100]<-NA
+
+# Subset the clapper time series and calculate the annual average
+dat <- data.frame(years=unique(surv.Clap.Rand[[bank]]$year))
+ts <- aggregate(clap.propPre~year,surv.Clap.Rand[[bank]],mean)
+ts$clap.propRec <- aggregate(clap.propRec~year,surv.Clap.Rand[[bank]],mean)$clap.propRec
+ts$clap.propCom <- aggregate(clap.propCom~year,surv.Clap.Rand[[bank]],mean)$clap.propCom
+dat$clapsPre[dat$year %in% ts$year]  <- ts$clap.propPre
+dat$clapsRec[dat$year %in% ts$year]  <- ts$clap.propRec
+dat$clapsCom[dat$year %in% ts$year]  <- ts$clap.propCom
+
+yr.range <- data.frame(years=min(dat$years):max(dat$years))
+dat <- full_join(yr.range, dat)
+
+dat$bank <- bank
+dat$liner <- "lined"
+
 
 
 clappertow$sfa[clappertow$bank %in% c("Ban", "Mid", "Sab")] <- 25
@@ -404,8 +499,8 @@ clappertow$size2 <- factor(clappertow$size2,
 if(french==F) man.unit <- "Management unit"
 if(french==T) man.unit <- "Zone de gestion"
 
-if(french==T) xlabel <- expression(frac("% mort", "trait"))
-if(french==F) xlabel <- expression(frac("% dead", "tow"))
+if(french==T) xlabel <- expression(frac("% claquettes", "trait"))
+if(french==F) xlabel <- expression(frac("% clappers", "tow"))
 
 sfa <- c(25,26)
 for(sfa in sfa){
@@ -433,6 +528,188 @@ for(sfa in sfa){
 
 ```
 
+
+# Growth
+```{r growth, echo=F, include=F}
+load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input.RData")
+growth <- data.frame(bank="BBn", year=mod.dat$BBn$year, g=mod.dat$BBn$g, g2=mod.dat$BBn$g2, version="original")
+
+load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input_framework_vonB.RData")
+growth <- rbind(growth, 
+                data.frame(bank="BBn", year=mod.dat$BBn$year, g=mod.dat$BBn$g, g2=mod.dat$BBn$g2, version="new")
+                )
+growth <- pivot_longer(data = growth, cols = c("g", "g2"))
+
+growth$name <- gsub(x=growth$name, pattern="g2", replacement="realized")
+growth$name <- gsub(x=growth$name, pattern="g", replacement="modelled")
+
+if(french==T){
+  growth$version <- gsub(x=growth$version, pattern="old", replacement="vieux")
+  growth$version <- gsub(x=growth$version, pattern="new", replacement="nouveau")
+  growth$name <- gsub(x=growth$name, pattern="realized", replacement="actuel")
+  growth$name <- gsub(x=growth$name, pattern="modelled", replacement="prédit")
+}
+
+png(filename=paste0(plotsGo, "/growth_BBn", fr, ".png"),width=6.5, height=4, units = "in", res=420)
+ggplot() + 
+  geom_line(data=growth, aes(year, value, colour=version, linetype=name)) +
+  geom_point(data=growth, aes(year, value, colour=version, shape=version)) +
+  theme_bw() + 
+  scale_colour_manual(values=c("black", "darkorange"), name=NULL) +
+  scale_shape_discrete(name=NULL) +
+  scale_linetype_discrete(name=NULL) +
+  ylab(en2fr("Growth", translate=french, custom_terms=rosetta_terms)) +
+  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms))
+dev.off()
+   
+
+```
+
+
+# Maps
+```{r maps, echo=F, include=F}
+boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
+strata <- github_spatial_import("offshore_survey_strata", "offshore_survey_strata.zip", quiet=T)
+ger <- github_spatial_import("other_boundaries", "other_boundaries.zip", specific_shp="WGS_84_German.shp", quiet=T) 
+
+# translate strata descriptions
+if(french==T) {
+  strata.title <- "Description de strate"
+  strata$PName <- gsub(x=strata$PName, pattern = "Low", replacement=en2fr("Low", translate=french, custom_terms=rosetta_terms))
+  strata$PName <- gsub(x=strata$PName, pattern = "Very", replacement="Tres")
+  strata$PName <- gsub(x=strata$PName, pattern = "Medium", replacement=en2fr("Medium", translate=french, custom_terms=rosetta_terms))
+  strata$PName <- gsub(x=strata$PName, pattern = "High", replacement=en2fr("High", translate=french, custom_terms=rosetta_terms))
+  strata$PName <- gsub(x=strata$PName, pattern = "North", replacement=en2fr("North", translate=french, custom_terms=rosetta_terms))
+  strata$PName <- gsub(x=strata$PName, pattern = "South", replacement=en2fr("South", translate=french, custom_terms=rosetta_terms))
+  strata$PName <- gsub(x=strata$PName, pattern = "scallops/tow", replacement="pétoncles/trait")
+  strata$PName <- gsub(x=strata$PName, pattern = "Gravel Lag with thin sand", replacement="Sédiments marqués par un dépôt de graviers avec du sable fin")
+  strata$PName <- gsub(x=strata$PName, pattern = "Thick sand", replacement="Sable épais")
+  strata$PName <- gsub(x=strata$PName, pattern = "Gravel lag", replacement="Sédiments marqués par un dépôt de graviers")
+  strata$PName <- gsub(x=strata$PName, pattern = "Thin sand over gravel lag", replacement="Sable fin au dessus de sédiments marqués par un dépôt de graviers")
+}
+if(french==F) strata.title <- "Stratum description"
+
+for(b in c("BBn", "BBs", "Sab")){
+  shpf <- strata[strata$label==b,]
+  stns <- all.surv.dat[all.surv.dat$bank==b,]
+  stns <- stns[stns$year==max(stns$year),]
+  stns$shape <- stns$random
+  stns$shape <- gsub(x=stns$shape, pattern=1, replacement = 16)
+  stns$shape <- gsub(x=stns$shape, pattern=5, replacement = 24)
+  stns$col <- stns$shape
+  stns$col <- gsub(x=stns$col, pattern=24, replacement = "transparent")
+  stns$col <- gsub(x=stns$col, pattern=16, replacement = "black")
+  stns$col <- gsub(x=stns$col, pattern=22, replacement = "black")
+  tows <- unique(stns[,c("random", "shape", "col")])
+  shpf_b <- st_union(shpf)
+    
+  p <- pecjector(area = b,plot = F,
+                 add_layer = list(eez = 'eez' , sfa = 'offshore',bathy = c(50, 'c'),scale.bar = "br")) +
+    coord_sf(expand=F)
+  
+  if(b=="Sab"){
+    shpf$are_km2[shpf$Strt_ID==501] <- surv.info$area_km2[surv.info$Strata_ID==501 & surv.info$label=="Sab" & surv.info$startyear==2018]
+    stns <- st_as_sf(stns, coords=c("lon", "lat"), crs=4326)# %>% st_transform(32620)
+    legend.loc <- c(0.7, 0.15)
+    p$layers[[4]]$aes_params$location <- "tr"
+    p$layers[[3]]$aes_params$location <- "tr"
+    #manual adjustment to scalebar text size
+    p$layers[[3]]$geom_params$text_cex <- 1.5
+  }
+  if(b=="BBn") {
+    shpf$are_km2 <- as.numeric(st_area(st_transform(shpf, 32619)))/1000000
+    stns <- st_as_sf(stns, coords=c("lon", "lat"), crs=4326)# %>% st_transform(32619)
+    legend.loc <- c(0.2, 0.15)
+    #manual adjustment to scalebar text size
+    p$layers[[4]]$geom_params$text_cex <- 1.5
+  }  
+  if(b=="BBs") {
+    shpf$are_km2 <- as.numeric(st_area(st_transform(shpf, 32620)))/1000000
+    stns <- st_as_sf(stns, coords=c("lon", "lat"), crs=4326) #%>% st_transform(32620)
+    legend.loc <- c(0.5, 0.15)
+    p$layers[[4]]$aes_params$location <- "tr"
+    p$layers[[5]]$aes_params$location <- "tr"
+    #manual adjustment to scalebar text size
+    p$layers[[4]]$geom_params$text_cex <- 1.5
+  }  
+  png(filename=paste0(plotsGo, "/surveymap_", b, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+  print(
+    p + 
+      geom_sf(data=shpf, aes(fill=Strt_ID), colour=NA, alpha=0.7) +
+      geom_sf(data=shpf_b, fill=NA)+
+      geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+      scale_fill_manual(values=shpf$col, name=strata.title, labels=shpf$PName) +
+      scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                         guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+      scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+      coord_sf(expand=F) +
+      theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent")) +
+      annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
+  )
+  dev.off()
+}
+  
+  
+  
+for(b in c("Mid", "Ban", "Ger")){
+  
+  if(b %in% c("Mid", "Ban")) shpf <- boundaries[boundaries$ID==b,]
+  if(b =="Ger") shpf <- ger
+  
+  stns <- all.surv.dat[all.surv.dat$bank==b,]
+  stns <- stns[stns$year==max(stns$year),]
+  stns$shape <- stns$random
+  stns$shape <- gsub(x=stns$shape, pattern=1, replacement = 16)
+  stns$shape <- gsub(x=stns$shape, pattern=5, replacement = 24)
+  stns$col <- stns$shape
+  stns$col <- gsub(x=stns$col, pattern=24, replacement = "transparent")
+  stns$col <- gsub(x=stns$col, pattern=16, replacement = "black")
+  stns$col <- gsub(x=stns$col, pattern=22, replacement = "black")
+  tows <- unique(stns[,c("random", "shape", "col")])
+  shpf_b <- st_union(shpf)
+    
+  p <- pecjector(area = b,plot = F,
+                 add_layer = list(eez = 'eez' , sfa = 'offshore',bathy = c(50, 'c'),scale.bar = "br")) +
+    coord_sf(expand=F)
+  
+  if(b=="Ger") {
+    stns <- st_as_sf(stns, coords=c("lon", "lat"), crs=4326) #%>% st_transform(32620)
+    legend.loc <- c(0.4, 0.15)
+    #manual adjustment to scalebar text size
+    p$layers[[5]]$geom_params$text_cex <- 1.5
+  }  
+  if(b=="Mid") {
+    stns <- st_as_sf(stns, coords=c("lon", "lat"), crs=4326) #%>% st_transform(32620)
+    legend.loc <- c(0.4, 0.15)
+    #manual adjustment to scalebar text size
+    p$layers[[3]]$geom_params$text_cex <- 1.5
+  }  
+   if(b=="Ban") {
+    stns <- st_as_sf(stns, coords=c("lon", "lat"), crs=4326) #%>% st_transform(32620)
+    legend.loc <- c(0.4, 0.15)
+    #manual adjustment to scalebar text size
+    p$layers[[5]]$geom_params$text_cex <- 1.5
+  }  
+  
+  png(filename=paste0(plotsGo, "/surveymap_", b, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+  print(
+    p + 
+      geom_sf(data=shpf, colour=NA, alpha=0.7) +
+      geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+      scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                         guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+      scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+      coord_sf(expand=F) +
+      theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
+      annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
+  )
+  dev.off()
+}
+
+
+```
+
+
 ```{r fishery-ts, echo=F, include=F}
 
 load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
@@ -443,7 +720,6 @@ fish.dat <- fish.dat[!fish.dat$lon==0,]
 fish.dat <- fish.dat[!fish.dat$lat==0,]
 fish_sf <- st_as_sf(fish.dat, coords=c(X="lon", Y="lat"), crs=4326)
 
-source("C:/Users/keyserf/Documents/Github/Assessment_fns/Maps/github_spatial_import.R")
 offshore <- github_spatial_import("offshore", "offshore.zip", quiet=T)
 
 sf_use_s2(FALSE)
@@ -464,6 +740,7 @@ table(check$sfa, check$ID.1) # relatively few misattributed records. Use interse
 fish_sf$sfa <- fish_sf$ID.1
 
 fishery <- fish_sf %>% 
+  dplyr::filter(!bank %in% c("GBa", "GBb")) %>%
   dplyr::filter(!is.na(bank)) %>%
   dplyr::group_by(bank, year) %>%
   dplyr::summarize(catch = sum(pro.repwt, na.rm=T),
@@ -482,13 +759,13 @@ for(bank in unique(fishery$bank)){
   cpue <- rbind(cpue, jack)
 }
 
-cpue$sfa[cpue$bank %in% c("Ban", "Sab", "Mid")] <- 25
-cpue$sfa[cpue$bank %in% c("BBn", "BBs", "Ger", "BB")] <- 26
-
 years <- expand.grid(year=1980:2022, bank=unique(fishery$bank))
 
 fishery <- left_join(years, as.data.frame(fishery))
 cpue <- left_join(years, as.data.frame(cpue))
+
+cpue$sfa[cpue$bank %in% c("Ban", "Sab", "Mid")] <- 25
+cpue$sfa[cpue$bank %in% c("BBn", "BBs", "Ger", "BB")] <- 26
 
 fishery$sfa[fishery$bank %in% c("Ban", "Sab", "Mid")] <- 25
 fishery$sfa[fishery$bank %in% c("BBn", "BBs", "Ger", "BB")] <- 26
@@ -501,29 +778,32 @@ if(french==T) man.unit <- "Zone de\ngestion"
 
 for(sfa in 25:26){
   png(filename=paste0(plotsGo, "/fishery_", sfa, "_", nickname, ".png"),width=6.5*1.5, height=4*1.5, units = "in", res=420)
-  kg <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=bank)) +
+  kg <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=bank, shape=bank), size=2) +
     geom_line(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=bank)) +
     theme_bw() +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    scale_shape_discrete(name=man.unit) +
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
     ylab(paste0(en2fr("Catch", translate=french, custom_terms=rosetta_terms), " (t)"))+
-    guides(colour="none")
+    guides(colour="none", shape="none")
   
-  hm <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=bank)) +
+  hm <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=bank, shape=bank), size=2) +
     geom_line(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=bank)) +
     theme_bw() +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    scale_shape_discrete(name=man.unit) +
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
     ylab(paste0(en2fr("Effort", translate=french, custom_terms=rosetta_terms), " (", en2fr("hour-metre", translate=french, custom_terms=rosetta_terms), ")"))
   
-  cp <- ggplot() + geom_point(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=bank)) +
+  cp <- ggplot() + geom_point(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=bank, shape=bank), size=2) +
     geom_line(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=bank)) +
     geom_errorbar(data=cpue[cpue$sfa==sfa,], aes(x=year, ymax=UCI, ymin=LCI, colour=bank), width=0) +
     theme_bw() +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
+    scale_shape_discrete(name=man.unit) +
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
     ylab(cpuelab) +
-    guides(colour=F)
+    guides(colour="none", shape="none")
   
   print(kg / hm / cp)
   dev.off()
@@ -623,7 +903,10 @@ for(sfa in 25:26){
   bp <- pecjector(area=list(y = c(lims$ymin[[1]], lims$ymax[[1]]),
                             x =c(lims$xmin[[1]], lims$xmax[[1]]),
                             crs = crs),
-                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(50,'c'), sfa = 'offshore', scale.bar="br"),plot=F, quiet=T)# + 
+                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), sfa = 'offshore', scale.bar="br"),plot=F, quiet=T)# + 
+  
+  #manual adjustment to scalebar text size
+  bp$layers[[5]]$geom_params$text_cex <- 1.5
 
   png(filename=paste0(plotsGo, "/footprint_", sfa, "_", nickname, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
   print(bp +
@@ -633,6 +916,7 @@ for(sfa in 25:26){
           coord_sf(expand=F)+
           geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
                        aes(label = final), 
+                       size=6,
                        fun.geometry = sf::st_centroid,
                        nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
                        nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
@@ -643,6 +927,7 @@ for(sfa in 25:26){
 
 #tac <- read.csv("Y:/Offshore/Assessment/Data/Model/Ref_pts_and_tac.csv")
 tac2 <- read.csv("C:/Users/keyserf/Downloads/RE2795A Fleet Quota Monitoring Report.csv")
+tac3 <- read.csv("Y:/Offshore/Resource Management/Fishing_and_TAC/TAC_Landings_IFMP.csv")
 head(tac2)
 tac2$sfa <- tac2$Stk.Quota.Description
 tac2$bank <- NA
@@ -652,34 +937,167 @@ tac2$bank[tac2$sfa=="SCALLOPS -  BROWNS BANK SOUTH"] <- "BBs"
 tac2$bank[tac2$sfa=="SCALLOPS -  EASTERN SCOTIAN SHELF"] <- "Sab/Mid"
 tac2$bank[tac2$sfa=="SCALLOPS -  GERMAN BANK"] <- "Ger"
 
-tac2$sfa[tac2$bank %in% c("BBn", "BBs", "Ger")] <- 26
-tac2$sfa[!tac2$bank %in% c("BBn", "BBs", "Ger")] <- 25
+# We have a bit more data for BBn, but not for other banks. But there is even more info in the IFMP. Not sure the origin. 
+# ggplot() + 
+#   geom_line(data=arrange(unique(tac[tac$bank=="BBn", c("Year", "TAC")]), Year), aes(Year, TAC), colour="blue") +
+#   geom_point(data=arrange(unique(tac[tac$bank=="BBn", c("Year", "TAC")]), Year), aes(Year, TAC), colour="blue") +
+#   geom_line(data=arrange(unique(tac2[tac2$bank=="BBn", c("Year", "Alloc.Amt.Tons")]), Year), aes(Year, Alloc.Amt.Tons)) +
+#   geom_point(data=arrange(unique(tac2[tac2$bank=="BBn", c("Year", "Alloc.Amt.Tons")]), Year), aes(Year, Alloc.Amt.Tons))
+# mismatch in 2005 and 2006. Use IFMP values for 2005 and 2006.
+
+tac2 <- tac2[tac2$Year>max(tac3$Year),]
+tac2$sfa <- NULL
+tac2$sfa[tac2$bank %in% c("BBn", "BBs", "Ger", "BBn/BBs")] <- as.numeric(26)
+tac2$sfa[tac2$bank %in% c("Ban", "Ban/Sab/Mid", "Sab/Mid")] <- as.numeric(25)
+tac2 <- tac2[tac2$sfa %in% 25:26,]
+tac2$year <- tac2$Year 
+tac3$bank <- factor(tac3$Bank, levels=c("Sab/Mid/Ban", "Ban", "Sab/Mid", "BBn/BBs", "BBn", "BBs", "Ger"))
+
+tac2 <- full_join(tac3, tac2)
+tac2$TAC[is.na(tac2$TAC)] <- tac2$Alloc.Amt.Tons[is.na(tac2$TAC)]
+
+fishery$bank[fishery$bank %in% c("Sab", "Mid")] <- "Sab/Mid"
+fishery2 <- fishery %>%
+  dplyr::group_by(sfa,bank, year) %>%
+  dplyr::summarize(Landings=sum(catch, na.rm=T))
+
+fishery2 <- fishery2[fishery2$year>max(tac3$Year),]
+
+fishery2$bank <- factor(fishery2$bank, levels=c("Sab/Mid/Ban", "Ban", "Sab/Mid", "BBn/BBs", "BBn", "BBs", "Ger"))
+tac2$bank <- factor(tac2$bank, levels=c("Sab/Mid/Ban", "Ban", "Sab/Mid", "BBn/BBs", "BBn", "BBs", "Ger"))
 
 if(french==T) t <- "tonnes de chair"
 if(french==F) t <- "meat, tonnes"
 
-tac2$year <- substr(x = tac2$Stk.Quota.Start.Date, start=1, stop=4)
 tac25 <- ggplot() + 
-  geom_bar(data=tac2[tac2$sfa %in% 25 & !is.na(tac2$bank),], aes(as.numeric(year), Alloc.Amt.Tons), stat="identity") + 
-  facet_grid(sfa~bank) +
+  geom_bar(data=tac2[tac2$sfa==25,], aes(Year, Landings), stat="identity", fill="grey", width=1) + 
+  geom_bar(data=fishery2[fishery2$sfa==25,], aes(year, Landings/1000), stat="identity", fill="grey", width=1) + 
+  geom_bar(data=tac2[tac2$sfa==25,], aes(Year, TAC), stat="identity", fill=NA, colour="black", width=1) + 
+  geom_hline(data=tac2[tac2$sfa==25,], aes(yintercept=0), colour="lightgrey") + 
+  facet_wrap(~bank, ncol=1) +
   theme_bw() +
   #scale_x_discrete(breaks=seq(min(tac2$year), max(tac2$year), 4)) +
-  ylab(paste0(en2fr("Total allowable catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
+  ylab(paste0(en2fr("Catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms))
 
-tac26 <- ggplot() + 
-  geom_bar(data=tac2[tac2$sfa %in% 26 & !is.na(tac2$bank),], aes(as.numeric(year), Alloc.Amt.Tons), stat="identity") + 
-  facet_grid(sfa~bank) + 
+tac26 <-  ggplot() + 
+  geom_bar(data=tac2[tac2$sfa==26,], aes(Year, Landings), stat="identity", fill="grey", width=1) + 
+  geom_bar(data=fishery2[fishery2$sfa==26,], aes(year, Landings/1000), stat="identity", fill="grey", width=1) + 
+  geom_bar(data=tac2[tac2$sfa==26,], aes(Year, TAC), stat="identity", fill=NA, colour="black", width=1) + 
+  geom_hline(data=tac2[tac2$sfa==26,], aes(yintercept=0), colour="lightgrey") + 
+  facet_wrap(~bank, ncol=1) +
   theme_bw() +
   #scale_x_discrete(breaks=seq(min(tac2$year), max(tac2$year), 4)) +
-  ylab(paste0(en2fr("Total allowable catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
+  ylab(paste0(en2fr("Catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms))
 
-areas <- "#AAAAAAAAA###\nBBBBBBBBBBBB#"
-png(filename=paste0(plotsGo, "/tac_", nickname, ".png"),width=6.5*1.5, height= 5*1.5, units = "in", res=420)
-print(tac25 / tac26 + plot_layout(design = areas))
+# areas <- "#AAAAAAAA####\nBBBBBBBBBBBB#"
+areas <- "#B\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\n#B"
+          
+png(filename=paste0(plotsGo, "/tac_", nickname, ".png"),width=6.5, height= 8, units = "in", res=420)
+print(tac25 + tac26 + plot_annotation(tag_levels=c("A", "B")) + plot_layout(design = areas))
 dev.off()
 
+# exploitation rates (relative, not modelled)
+# using survey year, so June to May
+fish.dat$surv.year <- fish.dat$year 
+fish.dat$month <- lubridate::month(lubridate::ymd(fish.dat$fished))
+fish.dat$surv.year[fish.dat$month %in% 6:12] <- fish.dat$year[fish.dat$month %in% 6:12]+1
+tail(fish.dat[, c("fished", "month", "year", "surv.year")], 50)
+survey.yr <- fish.dat %>%
+  group_by(surv.year, bank, sfa) %>%
+  summarize(mt = sum(pro.repwt)/1000) %>%
+  mutate(year=surv.year)
+  
+
+banks <- c("Sab/Mid", "Ban", "BBn", "BBs", "Ger")
+relative.F <- NULL
+for(b in banks) {
+  if(b=="Sab/Mid"){
+    sab <- cbind(survey.obj[["Sab"]]$model.dat[, c("year", "I")], bank="Sab")
+    mid <- cbind(survey.obj[["Mid"]]$model.dat[, c("year", "I")], bank="Mid")
+    sabmid <- full_join(sab, mid) %>%
+      group_by(year) %>%
+      summarize(I=sum(I, na.rm=T)/0.35) # survey catchability (between 0.2 and 0.5) 
+    fishing <- survey.yr %>%
+      filter(bank %in% c("Sab", "Mid")) %>%
+      group_by(year) %>%
+      summarize(mt=sum(mt)) %>%
+      mutate(bank="Sab/Mid")
+    compare <- full_join(sabmid, fishing[,c("year", "bank", "mt")])
+  }
+
+  if(!b=="Sab/Mid"){
+    if(b=="Ger") compare <- full_join(merged.survey.obj[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
+    if(!b=="Ger") compare <- full_join(survey.obj[[b]]$model.dat[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
+  }
+  compare$relative.F <- compare$mt / (compare$I/0.35) # survey catchability?
+  relative.F <- rbind(relative.F, compare)
+}
+relative.F <- relative.F[!is.na(relative.F$mt),]
+relative.F[relative.F$relative.F==Inf & !is.na(relative.F$relative.F),]$relative.F <- NA
+relative.F$sfa[relative.F$bank %in% c("BBn", "BBs", "Ger", "BBn/BBs")] <- as.numeric(26)
+relative.F$sfa[relative.F$bank %in% c("Ban", "Ban/Sab/Mid", "Sab/Mid")] <- as.numeric(25)
+
+if(french==T) flab <- "Mortalité par pêche, relative"
+if(french==F) flab <- "Relative fishing mortality"
+
+exp25 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==25,], aes(year, relative.F)) + 
+  geom_point(data=relative.F[relative.F$sfa==25,], aes(year, relative.F)) +
+  ylim(0,1) +
+  facet_wrap(~bank, ncol=1) +
+  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
+  ylab(flab) +
+  theme_bw()
+
+exp26 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==26,], aes(year, relative.F)) + 
+  geom_point(data=relative.F[relative.F$sfa==26,], aes(year, relative.F)) +
+  ylim(0,1) +
+  facet_wrap(~bank, ncol=1) +
+  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
+  ylab(flab) +
+  theme_bw()
+
+# areas <- "#AAAAAAAA####\nBBBBBBBBBBBB#"
+areas <- "#B\n#B\n#B\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\n#B\n#B\n#B"
+          
+png(filename=paste0(plotsGo, "/relF_", nickname, ".png"),width=6.5, height= 8, units = "in", res=420)
+print(exp25 + exp26 + plot_annotation(tag_levels=c("A", "B")) + plot_layout(design = areas))
+dev.off()
+
+
+load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Results/Final_model_results.RData")
+mod <- data.frame(mu=DD.out$BBn$median$mu, year=DD.dat$year)
+relative.F$mu <- -log(1-relative.F$relative.F)
+
+cols <- c("relative" = "black", "modelled"="blue")
+shps <- c("relative" = 16, "modelled"=17)
+
+if(french==F) explab <- "Exploitation rate"; labs <- c("modelled", "relative")
+if(french==T) explab <- "Taux d'exploitation"; labs <- c("prédit", "relative")
+
+png(filename=paste0(plotsGo, "/exploit_BBn_", nickname, ".png"),width=6.5, height= 4, units = "in", res=420)
+ggplot() + geom_line(data=relative.F[relative.F$bank=="BBn",], aes(year, mu, colour="relative")) + 
+  geom_point(data=relative.F[relative.F$bank=="BBn",], aes(year, mu, colour="relative", shape="relative")) +
+  geom_line(data=mod, aes(year, mu, colour="modelled")) + 
+  geom_point(data=mod, aes(year, mu, colour="modelled", shape="modelled")) +
+  ylim(0,1) +
+  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
+  ylab(explab) +
+  theme_bw() +
+  scale_colour_manual(values=cols, name="", labels=labs)+
+  scale_shape_manual(values=shps, name="", labels=labs)+
+  theme(legend.position=c(0.9, 0.9), legend.background=element_rect(fill="transparent")) 
+dev.off()
+
+# ggplot() + geom_line(data=relative.F[relative.F$bank=="BBn",], aes(year, mu)) + 
+#   geom_point(data=relative.F[relative.F$bank=="BBn",], aes(year, mu)) +
+#   geom_line(data=mod, aes(year, mu), colour="blue") + 
+#   geom_point(data=mod, aes(year, mu), colour="blue") +
+#   ylim(0,1) +
+#   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
+#   ylab(flab) +
+#   theme_bw() 
 
 ```
 

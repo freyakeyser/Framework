@@ -10,6 +10,9 @@ require(lubridate)
 require(dplyr)
 require(mgcv)
 require(ggplot2)
+require(ggridges)
+require(viridis)
+
 
 direct <- "Y:/Offshore/Assessment/"
 
@@ -44,60 +47,60 @@ for(fun in funs)
 # port.sampling$ps.date[1:10]
 # port.sampling$ps.fished[1:10]
 # summary(port.sampling$ps.fished)
-if(french==F) ylabel <- "Mass (per meat, g)"
-if(french==T) ylabel <- "Masse (de la chair, g)"
+if(french==F) ylabel <- "Meat weight (g)"
+if(french==T) ylabel <- "Masse de la chair (g)"
 
-png(paste0(plotsGo, "timeseries_mw", fr, ".png"), width=6.5, height=9, units = "in", res=420)
-ggplot() +
-  geom_point(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(ps.fished, meat_weight)) +
-  geom_smooth(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(ps.fished, meat_weight, group=bank)) +
-  facet_wrap(~bank, ncol=1) +
-  ylab(ylabel) +
-  scale_x_date(date_breaks="2 years") + 
-  xlab(NULL)+
-  theme_bw()
-dev.off()
-
-png(paste0(plotsGo, "boxplot_mw", fr, ".png"), width=6.5, height=9, units = "in", res=420)
-ggplot() +
-  geom_boxplot(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(year, meat_weight, group=year)) +
-  facet_wrap(~bank, ncol=1) +
-  theme_bw() +
-  ylab(ylabel) +
-  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms))
-dev.off()
-
-png(paste0(plotsGo, "mw_2022", fr, ".png"), width=6.5, height=9, units = "in", res=420)
-ggplot() +
-  geom_point(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab") & port.sampling$year==2022,], aes(ps.fished, meat_weight)) +
-  geom_smooth(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab") & port.sampling$year==2022,], aes(ps.fished, meat_weight, group=bank)) +
-  facet_wrap(~bank, ncol=1) +
-  ylab(ylabel) +
-  scale_x_date(date_breaks="2 years") + 
-  xlab(NULL)+
-  theme_bw()
-dev.off()
-
-png(paste0(plotsGo, "mw_monthly", fr, ".png"), width=6.5, height=9, units = "in", res=420)
-ggplot() +
-  geom_point(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(month, meat_weight)) +
-  geom_smooth(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(month, meat_weight, group=bank)) +
-  facet_wrap(~bank, ncol=1)  +
-  ylab(ylabel) +
-  xlab("Month")+
-  theme_bw() +
-  scale_x_continuous(breaks=1:12)
-dev.off()
-
-png(paste0(plotsGo, "mw_monthly_box", fr, ".png"), width=6.5, height=9, units = "in", res=420)
-ggplot() +
-  geom_boxplot(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(month, meat_weight, group=month)) +
-  facet_wrap(~bank, ncol=1) +
-  ylab(ylabel) +
-  xlab("Month")+
-  theme_bw() +
-  scale_x_continuous(breaks=1:12)
-dev.off()
+# png(paste0(plotsGo, "timeseries_mw", fr, ".png"), width=6.5, height=9, units = "in", res=420)
+# ggplot() +
+#   geom_point(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(ps.fished, meat_weight)) +
+#   geom_smooth(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(ps.fished, meat_weight, group=bank)) +
+#   facet_wrap(~bank, ncol=1) +
+#   ylab(ylabel) +
+#   scale_x_date(date_breaks="2 years") + 
+#   xlab(NULL)+
+#   theme_bw()
+# dev.off()
+# 
+# png(paste0(plotsGo, "boxplot_mw", fr, ".png"), width=6.5, height=9, units = "in", res=420)
+# ggplot() +
+#   geom_boxplot(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(year, meat_weight, group=year)) +
+#   facet_wrap(~bank, ncol=1) +
+#   theme_bw() +
+#   ylab(ylabel) +
+#   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms))
+# dev.off()
+# 
+# png(paste0(plotsGo, "mw_2022", fr, ".png"), width=6.5, height=9, units = "in", res=420)
+# ggplot() +
+#   geom_point(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab") & port.sampling$year==2022,], aes(ps.fished, meat_weight)) +
+#   geom_smooth(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab") & port.sampling$year==2022,], aes(ps.fished, meat_weight, group=bank)) +
+#   facet_wrap(~bank, ncol=1) +
+#   ylab(ylabel) +
+#   scale_x_date(date_breaks="2 years") + 
+#   xlab(NULL)+
+#   theme_bw()
+# dev.off()
+# 
+# png(paste0(plotsGo, "mw_monthly", fr, ".png"), width=6.5, height=9, units = "in", res=420)
+# ggplot() +
+#   geom_point(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(month, meat_weight)) +
+#   geom_smooth(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(month, meat_weight, group=bank)) +
+#   facet_wrap(~bank, ncol=1)  +
+#   ylab(ylabel) +
+#   xlab("Month")+
+#   theme_bw() +
+#   scale_x_continuous(breaks=1:12)
+# dev.off()
+# 
+# png(paste0(plotsGo, "mw_monthly_box", fr, ".png"), width=6.5, height=9, units = "in", res=420)
+# ggplot() +
+#   geom_boxplot(data = port.sampling[port.sampling$bank %in% c("BBn", "Sab"),], aes(month, meat_weight, group=month)) +
+#   facet_wrap(~bank, ncol=1) +
+#   ylab(ylabel) +
+#   xlab("Month")+
+#   theme_bw() +
+#   scale_x_continuous(breaks=1:12)
+# dev.off()
 
 port.sampling$ID <- 1:nrow(port.sampling)
 
@@ -116,33 +119,68 @@ medians2 <- port.sampling %>%
 medians <- left_join(medians, medians2)
 
 medians$monthyr <- ymd(paste0(medians$year, "-", medians$month, "-01"))
+medians2$monthyr <- ymd(paste0(medians2$year, "-01-01"))
+medians2$ndaysyr <- as.numeric(strftime(ymd(paste0(medians2$year, "12-31")), "%j"))
 
-if(french==F) ylabel <- "Mass (per meat, median, g)"
-if(french==T) ylabel <- "Masse (de la chair, médiane, g)"
+if(french==F) ylabel <- "Meat weight (median, g)"
+if(french==T) ylabel <- "Masse de la chair (médiane, g)"
 
-png(paste0(plotsGo, "medians_long", fr, ".png"), width=6.5, height=9, units = "in", res=420)
+png(paste0(plotsGo, "medians_long_vert", fr, ".png"), width=6.5, height=8, units = "in", res=420)
 ggplot() +
-  geom_line(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, monthly_med)) +
-  geom_errorbar(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)))+
-  facet_wrap(~bank, ncol=1) +
+  geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
+  geom_errorbar(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)), width=0)+
+  geom_point(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, monthly_med)) +
+  geom_text(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr + months(6), 0, label=nsamples_yr), vjust=0.5, hjust=1.1)+
+  #geom_line(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med), group=1, size=1) +
+  facet_wrap(~bank, ncol=2) +
   ylab(ylabel) +
-  xlab("Month")+
+  xlab("Date")+
   theme_bw() +
-  scale_x_continuous(breaks=1:12)
+  scale_x_date(breaks="1 year", date_labels = "%m/%Y") + 
+  scale_y_continuous(expand=c(0.25,0)) +
+  coord_flip() 
 dev.off()
 
+# anomaly (seasonal)
+
+medians$anom <- medians$annual_med - medians$monthly_med
+months <- medians %>%
+  dplyr::group_by(bank, month) %>%
+  dplyr::summarize(nsamples = sum(nsamples),
+                   bottom = boxplot(anom)$stats[1])
+
+if(french==F) ylabel <- "Meat weight anomaly (g)"
+if(french==T) ylabel <- "Anomalie en masse de la chair (g)"
+png(paste0(plotsGo, "medians_anom", fr, ".png"), width=6.5, height=8, units = "in", res=420)
+ggplot() +
+  geom_hline(data=medians[medians$bank %in% c("Sab", "BBn"),], aes(yintercept=0), linetype="dashed")+
+  geom_boxplot(data=medians[medians$bank %in% c("Sab", "BBn"),], aes(month, anom, group=month)) +
+  geom_text(data=months[months$bank %in% c("Sab", "BBn"),], aes(month, bottom, label=nsamples), vjust=1.5)+
+  facet_wrap(~bank, ncol=1, scales="free_y") +
+  ylab(ylabel) +
+  xlab(en2fr("Month", translate=french, custom_terms=rosetta_terms)) +
+  theme_bw() +
+  scale_x_continuous(breaks=1:12) +
+  scale_y_continuous(expand=c(0,3))
+dev.off()
+
+port.sampling$sfa <- NA
+port.sampling$sfa[port.sampling$bank %in% c("BBn", "BBs", "Ger")] <- 26
+port.sampling$sfa[port.sampling$bank %in% c("Sab", "Mid", "Ban")] <- 25
+
 ps_tab <- port.sampling %>% 
-  filter(bank %in% c("BBn", "Sab")) %>%
-  group_by(bank) %>%
+  filter(!bank %in% c("GBa", "GBb", "SPB")) %>%
+  group_by(sfa,bank) %>%
   summarize(total=length(unique(ID)),
             years=length(unique(year)),
+            recent=max(year),
             months = length(unique(month)),
-            ltm_mc = median(mc),
-            sd_mc = sd(mc),
-            min_mc = min(mc), 
-            max_mc = max(mc))
-ps_tab$months[ps_tab$bank == "BBn"] <- "1-12"
-ps_tab$months[ps_tab$bank=="Sab"] <- "3-12"
+            ltm_mc = round(median(mc),2),
+            sd_mc = round(sd(mc),2),
+            min_mc = round(min(mc),2), 
+            max_mc = round(max(mc),2))
+ps_tab$main<-NA
+ps_tab$main[ps_tab$bank %in% c("Sab", "BBn")] <- "*"
 
 #1:12 %in% unique(port.sampling[port.sampling$bank=="Sab",]$month)
 # Sable is missing data from Jan and Feb
@@ -160,115 +198,42 @@ bbn.dat <- port.sampling[port.sampling$bank == bank,]
 # The day here represents 100 days. FK changed ps.date to ps.fished
 bbn.dat$mod.day <- as.numeric(bbn.dat$ps.fished - as.Date(min(bbn.dat$ps.fished)))/100
 
-# Now we can move to a gam type of model to allow for non-linearity in the patterns....
-bbn.mod <- gamm(mc ~ s(mod.day),data=bbn.dat)
-summary(bbn.mod$lme)
-summary(bbn.mod$gam)
-
-# Let's take a closer look at these GAM results....
-anova(bbn.mod$gam)# Careful with these p values as the smoother comes into play on these...
-summary(bbn.mod) #Will be explained later
-
-#Model validation
-par(mfrow=c(3,1))
-plot(bbn.mod$gam,ylim=c(-10,10))
-par(mfrow=c(3,1))
-plot(bbn.mod$lme)
-
-#par(mfrow = c(2,2), mar = c(5,5,2,2))
-E1 <- resid(bbn.mod$lme, type ="n")
-F1 <- fitted(bbn.mod$lme)
-
-par(mfrow = c(2,2))
-plot(x = F1,
-     y = E1,
-     xlab = "Fitted values",
-     ylab ="Residuals",cex=0.01)
-abline(h=0, lty=2)
-
-plot(x = bbn.dat$mod.day,
-     y = E1,
-     xlab = "time",
-     ylab = "Residuals",cex=0.01)
-abline(h = 0, lty = 2)
-
-boxplot(E1 ~ fleet, data = bbn.dat)
-abline(h = 0, lty = 2)
-
-# get ready to predict
-pred.dates <- ymd(paste0(sort(rep(2006:2022,12)),"-",rep(1:12,12),"-",rep(0,144),rep(1,144)))
-
-# center on the day we believe the ASM's arrive on the scene (May 24, 2010 according to Ginette)
-pred.dat <- data.frame(date=pred.dates,
-                       mod.day=as.numeric(pred.dates - as.Date("2010-05-24"))/100)
-
-mod.pred <- predict(bbn.mod$gam, newdata = pred.dat, se = TRUE)
-
-# Glue them all together
-pred.dat$mc <- mod.pred$fit
-pred.dat$ub <- mod.pred$fit + 1.96 * mod.pred$se.fit
-pred.dat$lb <- mod.pred$fit - 1.96 * mod.pred$se.fit
-# Also stick the acutal meat weights on here...
-pred.dat$mw <- 500/pred.dat$mc
-pred.dat$mw.ub <- 500/pred.dat$ub
-pred.dat$mw.lb <- 500/pred.dat$lb
-
-# # Remove all ASM predictions before June 1st 2010 since there were no active vessels before this date (well May 24th, but I'm rounding...)
-# pred.dat <- pred.dat[-which(pred.dat$fleet == "ASM" & pred.dat$date < "2010-06-01"),]
-# head(pred.dat)
-ggplot() +
-  geom_point(data = bbn.dat, aes(y = mc, x = date), shape = 16, size = 0.01, alpha=0.05)+
-  geom_line(data=pred.dat, aes(date, mc))  +
-  geom_ribbon(data = pred.dat, aes(x = date, ymax = ub, ymin = lb), alpha = 0.5)+
-  #ylim(5,60) +
-  ylab("Meat count") +
-  xlab("") +
-  scale_x_date(date_breaks="1 year") +
-  #theme(text = element_text(size=16)) +
-  theme_bw()
-
-#ggsave(paste0(direct,"2018/Framework/Port_sampling/Fleet_port_sampling.png"),width=11,height=8.5)
-
-
 ####################################
 ### now we need a MW-SH relationship to estimate the SH of the landings
 
-# So for each year let's get the SH targeted as the average of the May and August surveys...
-SH.target <- aggregate(sh ~ year(date),pred.dat,mean)
-names(SH.target) <- c("year","sh")
-# Add an year month combo column to port.sampling...
-port.sampling$year_month <- ymd(paste(year(port.sampling$ps.fished),month(port.sampling$ps.fished),15,sep="-"))
-mw.by.month <- aggregate(meat_weight ~ year_month + year,port.sampling,mean)
-names(mw.by.month) <- c("date","year","mw")
-
-ggplot(mw.by.month,aes(x= date,mw)) + geom_point() + geom_line()
-
-ps.mw.sh <- merge(mw.by.month,SH.target,by =c("year"))
-
-ps.mw.sh$mc <- 500/ps.mw.sh$mw
-# Condition here is kinda interesting as it standardizes the meat weight between the fleets, i.e. what is the
-# meat weight the different fleets are picking up for a 100 mm scallop.  In theroy I wouldn't expect this to be any different...
-# What the questions around condition are:
-# 1:  How does condition vary throughout the year, when does condition appear to peak.
-# 2:  For a 100 mm scallop, is there any difference between the fleets in terms of the size of the meat they capture.
-# I'm not sure if my logic holds up here, but I think it does, hinges on the assumption that the targeted SH doesn't vary
-# significantly throughout the year
-ps.mw.sh$cond <- ps.mw.sh$mw/(ps.mw.sh$sh/100)^3
-ps.mw.sh$month <- as.factor(month(ps.mw.sh$date))
-
-ggplot() +
-  geom_point(data = ps.mw.sh, aes(month, cond)) +
-  geom_line(data = ps.mw.sh, aes(month, cond, group=1)) +
-  facet_wrap(~year)
-
-ggplot() +
-  geom_boxplot(data = ps.mw.sh, aes(month, cond, group=month))
-
-ggplot() +
-  geom_boxplot(data = ps.mw.sh, aes(month, mw, group=month)) 
-
-ggplot() +
-  geom_boxplot(data = ps.mw.sh, aes(month, mc, group=month)) 
+# # Add an year month combo column to port.sampling...
+# port.sampling$year_month <- ymd(paste(year(port.sampling$ps.fished),month(port.sampling$ps.fished),15,sep="-"))
+# mw.by.month <- aggregate(meat_weight ~ year_month + year,port.sampling,mean)
+# names(mw.by.month) <- c("date","year","mw")
+# 
+# #ggplot(mw.by.month,aes(x= date,mw)) + geom_point() + geom_line()
+# 
+# ps.mw.sh <- merge(mw.by.month,SH.target,by =c("year"))
+# 
+# ps.mw.sh$mc <- 500/ps.mw.sh$mw
+# # Condition here is kinda interesting as it standardizes the meat weight between the fleets, i.e. what is the
+# # meat weight the different fleets are picking up for a 100 mm scallop.  In theroy I wouldn't expect this to be any different...
+# # What the questions around condition are:
+# # 1:  How does condition vary throughout the year, when does condition appear to peak.
+# # 2:  For a 100 mm scallop, is there any difference between the fleets in terms of the size of the meat they capture.
+# # I'm not sure if my logic holds up here, but I think it does, hinges on the assumption that the targeted SH doesn't vary
+# # significantly throughout the year
+# ps.mw.sh$cond <- ps.mw.sh$mw/(ps.mw.sh$sh/100)^3
+# ps.mw.sh$month <- as.factor(month(ps.mw.sh$date))
+# 
+# ggplot() +
+#   geom_point(data = ps.mw.sh, aes(month, cond)) +
+#   geom_line(data = ps.mw.sh, aes(month, cond, group=1)) +
+#   facet_wrap(~year)
+# 
+# ggplot() +
+#   geom_boxplot(data = ps.mw.sh, aes(month, cond, group=month))
+# 
+# ggplot() +
+#   geom_boxplot(data = ps.mw.sh, aes(month, mw, group=month)) 
+# 
+# ggplot() +
+#   geom_boxplot(data = ps.mw.sh, aes(month, mc, group=month)) 
 
 # OK, so I want to see what propotion of the port sampling data might have a SH of < 95 mm, based on the MW-SH data.
 # This is similar to above, but I'm going to have to use the raw data, so this is gonna be slow....
@@ -293,9 +258,9 @@ for(i in 1:length(years))
   may.mws[[as.character(years[i])]]$sh_3 <- (may.mws[[as.character(years[i])]]$sh/100)^3 # cube the SH's
   may.mws[[as.character(years[i])]]$sh <- (may.mws[[as.character(years[i])]]$sh/100) # sh in decimeters
   # Run the model and save the results
-  a.may$a[i] <-  lme(fixed = wmw ~ sh_3 -1, data = may.mws[[as.character(years[i])]], random = ~ sh_3 -1 | tow, method="REML")$coefficients$fixed
+  all.may$a[i] <-  lme(fixed = wmw ~ sh_3 -1, data = may.mws[[as.character(years[i])]], random = ~ sh_3 -1 | tow, method="REML")$coefficients$fixed
   # What is the shell height being targeted in may
-  bbn.dat$sh[bbn.dat$year == years[i]] <- 100*(bbn.dat$meat_weight[bbn.dat$year == years[i]]/ a.may$a[i])^(1/3)
+  bbn.dat$sh[bbn.dat$year == years[i]] <- 100*(bbn.dat$meat_weight[bbn.dat$year == years[i]]/ all.may$a[i])^(1/3)
 }
 
 sh.plt <- ggplot(bbn.dat,aes(date,sh)) + 
@@ -311,6 +276,22 @@ sh.plt <- ggplot(bbn.dat,aes(date,sh)) +
 png(paste0(plotsGo, bank, "/timeseries_sh", fr, ".png"), width=6.5, height=4, units = "in", res=420)
 print(sh.plt)
 dev.off()
+
+# ggplot() + 
+#   geom_density_ridges_gradient(data=bbn.dat, aes(x=sh, y=as.factor(year), group=year), 
+#                                scale=0.7, #, # you may wish to adjust this
+#                                bandwidth=5 # you may wish to adjust this
+#                                ) +
+png(paste0(plotsGo, bank, "/shf_ps", fr, ".png"), width=6.5, height=8, units = "in", res=420)
+ggplot() + 
+  geom_density_ridges(data=bbn.dat, aes(x = sh, y = as.factor(year), height = stat(density)),
+                      stat = "binline", bins = 40, scale = 0.9, draw_baseline = F) +
+  theme_bw() +
+  ylab(en2fr("Year",translate=french, custom_terms=rosetta_terms)) + 
+  xlab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) +
+  scale_x_continuous(limits=c(50,200), breaks=seq(50,200,10)) +
+  scale_y_discrete(expand=c(0,0.9))
+dev.off()  
 
 # HERE IS THE MAIN ANALYSIS FOR the BBn Res doc, shows proportion below certain sizes
 n.bl.100 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 100) %>% dplyr::summarise(n = length(sh))
