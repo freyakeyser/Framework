@@ -8,25 +8,44 @@
 # •	Predict for 100mm
 # •	Growth input for model
 
+#### packages and data ########
 
 require(ggplot2)
 require(tidyverse)
 require(gratia)
+require(lme4)
 
 # hydration data
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.RData")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90_newareas_issue120.RData")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90_newareas_issue120.RData")
+
+#load("C:/Users/keyserf/Documents/temp_data/testing_results_spring2022_2.Rdata")
 
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH"
+
+funs <- c("https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Survey_and_OSAC/condFac.r")
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs)
+{
+  download.file(fun,destfile = basename(fun))
+  source(paste0(getwd(),"/",basename(fun)))
+  file.remove(paste0(getwd(),"/",basename(fun)))
+} # end for(un in funs)
+
 
 bank <- "BBn"
 dat <- mw.dat.all[[bank]]
 head(dat)
 
+### key data info ##########
+table(dat$year)
+(min(dat$year):max(dat$year))[which(!min(dat$year):max(dat$year) %in% unique(dat$year))]
+# missing data for 2020 only (BBn)
+# missing data for 2015 and 2020 for Sab
 
 ### Jonsen 2009 Equation 2 method #############################################################################
 # with condFac function
 # (runs shwt.lme inside condFac, which uses nlme to fit model)
-source("~/GitHub/Assessment_fns/Survey_and_OSAC/condFac.r")
 mw.dat.mod <- dat
 mw.dat.mod <- mw.dat.mod[complete.cases(mw.dat.mod),]
 #gam_f for BBn, BBs, Ger, Sab. glm for Ban, Mid
@@ -38,6 +57,7 @@ if(bank %in% c("Mid", "Ban")){
   condfac_res <- condFac(mw.dat.mod,model.type='glm',dirct=direct_fns)
   #condfac_res$CFyrs
 }
+condfac_res$CFyrs$type <- "gam_at_location_nlme_current"
 # note that we usually provide prediction data. I have not done that here yet!
 
 
@@ -48,7 +68,7 @@ shwt.dat$sh <- (shwt.dat$sh/100)^3
 shwt.dat$ID <- paste0(shwt.dat$year, ".", shwt.dat$tow)
 # fit MWSH model (replaces the shwt.lme step in condFac)
 # use ID as unique ID for tow and year. Allow random slope (different from previous method)
-require(lme4)
+
 # this matches the nlme model in shwt.lme
 lme4res <- lme4::lmer(data=shwt.dat, wmw ~ sh-1 + (sh-1|ID))
 # a = sh in fit
@@ -72,6 +92,7 @@ years <- unique(full.dat[!is.na(full.dat$CF),]$year)
 complete <- bank.dat[[bank]][bank.dat[[bank]]$year %in% years,]
 complete <- cbind(ID=complete$ID, as.data.frame(predict(CF.fit, newdata=complete, se.fit=T)))
 full.dat<- left_join(full.dat, complete)
+# so now all tows in years with sampling data have CF estimates
 
 annual.mean <- full.dat %>%
   filter(state=="live") %>%
@@ -86,12 +107,14 @@ pred.loc[["lon"]] <- mean(subset(shwt.dat, year >=2005 & year <2015)$lon,na.rm=T
 # Make a new object to build predictions from, previously we were using predictions for mean data for our data
 # But those change every year, this has been revised to predict on the same location every year.
 CFyrs<-data.frame(year=years,depth=pred.loc[["depth"]],lon=pred.loc[["lon"]],lat=pred.loc[["lat"]])
-CFyrs <- cbind(year=CFyrs$year, as.data.frame(predict(CF.fit, newdata=CFyrs, se.fit=T))) %>%
+CFyrs <- cbind(CFyrs, as.data.frame(predict(CF.fit, newdata=CFyrs, se.fit=T))) %>%
   arrange(year)
+CFyrs$type <- "gam_at_location_lme4"
+names(CFyrs) <- c("year", "depth", "lon", "lat", "CF", "CFse.fit", "type")
+CFJonsen <- rbind(condfac_res$CFyrs, CFyrs)
 
-
-ggplot() + geom_line(data=condfac_res$CFyrs, aes(as.numeric(year), CF), group=1) +
-  geom_line(data=CFyrs, aes(year, fit), colour="red", group=1)
+ggplot() + geom_line(data=CFJonsen, aes(as.numeric(year), CF, linetype=type)) +
+  theme_bw()
 
 
 ### one step GAM? ##############################################################################################
@@ -108,12 +131,13 @@ dat$cf <- dat$wmw/dat$sh*100
 #   CF.fit<-glm(CF~depth+as.factor(year),data=full.dat)
 # }
 
-
+# still predicting on a mean location but doing it all in one step with a gam.
 depth <- mean(dat[dat$year %in% 2005:2015,]$depth)
 lon <- mean(dat[dat$year %in% 2005:2015,]$lon)
 lat <- mean(dat[dat$year %in% 2005:2015,]$lat)
 preds <- data.frame(year=unique(dat$year), depth=depth, lon=lon, lat=lat, sh=100)
 
+# function for evaluating models
 mod_eval <- function(mod){
 
   if(!"lme" %in% names(mod)) {
@@ -155,18 +179,15 @@ mod_eval <- function(mod){
   return(list(preds=res, mod=mod))
 }
 
-
 # gam_cf <- gam(data=dat,
 #               cf ~ s(lon,lat) + s(depth) + as.factor(year),
 #               family=Gamma(link="log"))
 # gam_cf <- mod_eval(gam_cf)
 
-
 # glm_cf <- glm(data=dat,
 #               cf ~ depth + as.factor(year),
 #               family=Gamma(link="log"))
 # glm_cf <- mod_eval(glm_cf)
-
 
 # gamm_cf <- gamm(data=dat,
 #                 cf ~ as.factor(year) + s(depth) + s(lon, lat),
@@ -188,13 +209,16 @@ mod_eval <- function(mod){
 # include tow as random effect in all models (glmm/gamm)
 # centre wmw and sh
 # copy inshore mwsh model
-# run across all years and run for individual years (individual years will need depth:year)
+# run across all years and run for individual years (individual years will need depth:year) * try depth:year interaction for across years too
 # include depth and not
 # determine gaussian and gamma using residuals. Start with gaussian, and only do gamma if necessary (because resids suck)
 # see yihao yin 2022 spa3 paper canjfish (can cite this for gaussian)
 # https://github.com/Mar-scal/Inshore/blob/main/SFA29/Growth/SFA29_MeatWeightShellHeight.R
 
 ### using inshore approach
+
+#### July 6 - add as.factor(year) to across year models. Predict on year, not ID
+#### Look at residuals
 
 dat$Log.HEIGHT <- log(dat$sh)
 dat$Log.HEIGHT.CTR <- dat$Log.HEIGHT - mean(dat$Log.HEIGHT)
@@ -206,19 +230,27 @@ dat$year <- as.numeric(dat$year)
 #plot depths by tow
 plot(depth~tow, data=dat)
 
-#run model WITH DEPTH
+#run model WITH DEPTH for individual years (random effect is tow)
 mod.obj<-NULL
 liveweight <- NULL
-df_all <- NULL
+df_byyear <- NULL
+df_byyear_100 <- NULL
+family <- "gaussian" # could be gamma instead
 for(y in sort(unique(as.numeric(dat$year)))){
   print(y)
   sub <- dat[dat$year==y,]
   sub <- sub[complete.cases(sub),]
-  mod <- glmer(wmw~Log.HEIGHT.CTR+Log.DEPTH.CTR+(Log.HEIGHT.CTR|tow),data=sub,
-                    family=Gamma(link=log), na.action = na.omit)
+  if(family== "gamma") {mod <- glmer(wmw~Log.HEIGHT.CTR+Log.DEPTH.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                                     family=Gamma(link=log), na.action = na.omit)}
+  if(family=="gaussian") {mod <- lmer(wmw~Log.HEIGHT.CTR+Log.DEPTH.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                                      na.action = na.omit)}
 
-  df=data.frame(sub, resid=residuals(mod,"pearson"),
+  df <- data.frame(sub, resid=residuals(mod,"pearson"),
                 fit=fitted(mod))
+
+  sampled <- unique(dplyr::select(sub, ID, year, lon, lat, depth, tow, Log.DEPTH, Log.DEPTH.CTR))
+  df100 <- data.frame(sampled, Log.HEIGHT.CTR=rep(log(100), dim(sampled)[1])-mean(sub$Log.HEIGHT))
+  df100$fit <- predict(object = mod, newdata=df100, re.form=NULL, type="response")
 
   #Plot of tow level residuals
   print(ggplot() + geom_point(data=df, aes(fit, resid)) + facet_wrap(~tow) + geom_hline(yintercept=0) + ggtitle(y))
@@ -264,26 +296,39 @@ for(y in sort(unique(as.numeric(dat$year)))){
 
   mod.obj[[y]] <- list(mod=mod, summary=summary(mod), df=df, liveweightYYYY=liveweightYYYY)
   liveweight <- rbind(liveweight, liveweightYYYY)
-  df_all <- rbind(df_all, df)
+  df_byyear <- rbind(df_byyear, df)
+  df_byyear_100 <- rbind(df_byyear_100, df100)
 }
+# output: mod.obj, df_byyear, liveweight, df_byyear_100
+# singular fit in 1991, 1994, 1995, 1999, 2000, 2010
 
 
-mod.all<-NULL
+# with depth across all years (random effect is ID)
 sub <- dat[complete.cases(dat),]
-mod <- glmer(wmw~Log.HEIGHT.CTR+Log.DEPTH.CTR+(Log.HEIGHT.CTR|ID),data=sub,
-             family=Gamma(link=log), na.action = na.omit)
+family <- "gaussian"
+if(family=="gamma") {mod.allyrs <- glmer(wmw ~ as.factor(year) + Log.HEIGHT.CTR+Log.DEPTH.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                                         family=Gamma(link=log), na.action = na.omit)}
+if(family=="gaussian") {mod.allyrs <- lmer(wmw ~ as.factor(year) + Log.HEIGHT.CTR+Log.DEPTH.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                                           na.action = na.omit)}
 
-df=data.frame(sub, resid=residuals(mod,"pearson"),
-              fit=fitted(mod))
+plot(mod.allyrs)
 
-#Plot of tow level residuals
-print(ggplot() + geom_point(data=df, aes(fit, resid)) + facet_wrap(~year) + geom_hline(yintercept=0))
+df.allyrs <- data.frame(sub, resid=residuals(mod.allyrs,"pearson"),
+              fit=fitted(mod.allyrs))
 
-#Plot of tow level fitted values
-print(ggplot() + geom_point(data=df, aes(fit, wmw)) + facet_wrap(~year))
+sampled <- unique(dplyr::select(sub, ID, year, lon, lat, depth, tow, Log.DEPTH, Log.DEPTH.CTR))
+df100.allyrs <- data.frame(sampled, Log.HEIGHT.CTR=rep(log(100), dim(sampled)[1])-mean(sub$Log.HEIGHT))
+df100.allyrs$fit <- predict(object = mod.allyrs, newdata=df100.allyrs, re.form=NULL, type="response")
+
+#Plot of ID level residuals
+print(ggplot() + geom_point(data=df.allyrs, aes(fit, resid)) + facet_wrap(~year) + geom_hline(yintercept=0))
+
+#Plot of ID level fitted values
+print(ggplot() + geom_point(data=df.allyrs, aes(fit, wmw)) + facet_wrap(~year))
 
 #Construct data.frame similar to SFA29livefreq for weight per tow
 livefreqYYYY <- subset(all.surv.dat[all.surv.dat$bank==bank,])
+livefreqYYYY$ID <- paste0(livefreqYYYY$cruise, ".", livefreqYYYY$tow)
 liveweightYYYY <- livefreqYYYY
 
 #create matrix of depths by tow to use in predict function
@@ -292,47 +337,61 @@ Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(sub$Log.HEIGHT) #each shel
 
 temp <- matrix(NA,dim(liveweightYYYY)[1],40)
 
-#Use random effects for tows in detail sample and fixed effects otherwise
-#Random effects for tows that were sampled for meat weight shell height; here ID tows that were sampled
+#Use random effects for IDs in detail sample and fixed effects otherwise
+#Random effects for IDs that were sampled for meat weight shell height; here ID IDs that were sampled
 random.pred <- (1:dim(liveweightYYYY)[1])[is.element(liveweightYYYY$ID,unique(sub$ID))]
 
-#fixed effects for tows that weren't sampled for meat weight shell height; here ID tows that were NOT sampled
+#fixed effects for IDs that weren't sampled for meat weight shell height; here ID IDs that were NOT sampled
 fixed.pred <- (1:dim(liveweightYYYY)[1])[!is.element(liveweightYYYY$ID,unique(sub$ID))]
 
-#Predict using Random effects for tows that were sampled for meat weight shell height
+#Predict using Random effects for IDs that were sampled for meat weight shell height
+### DAVE - I DON'T THINK MY NEWDATA OBJECTS ARE RIGHT
 for(i in random.pred) {
-  temp[i,] <- as.vector(predict(object = mod,
+  temp[i,] <- as.vector(predict(object = mod.allyrs,
                                 newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
                                                    Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40),
-                                                   ID=liveweightYYYY$ID[i]),
+                                                   tow=liveweightYYYY$tow[i], year=liveweightYYYY$year[i]),
                                 re.form=NULL,type="response"))
 }
 
-#Predict using fixed effects for tows that weren't sampled for meat weight shell height
+#Predict using fixed effects for IDs that weren't sampled for meat weight shell height
+### DAVE - I DON'T THINK MY NEWDATA OBJECTS ARE RIGHT
 for(i in fixed.pred) {
-  temp[i,] <- as.vector(predict(object=mod,
+  temp[i,] <- as.vector(predict(object=mod.allyrs,
                                 newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
-                                                   Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40)),
+                                                   Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40),
+                                                   year=rep(liveweightYYYY$year[i], 40)),
                                 re.form=~0,type="response"))
 }
 #multply temp matrix (weight) by live numbers to get weight/size bin
 liveweightYYYY[,grep("h5", colnames(liveweightYYYY)):grep("h200", colnames(liveweightYYYY))] <-
   temp*livefreqYYYY[,grep("h5", colnames(livefreqYYYY)):grep("h200", colnames(livefreqYYYY))]
+liveweight.allyrs <- liveweightYYYY
+# output: mod.allyrs, liveweight.allyrs, df.allyrs, df100.allyrs
 
 
 #run model WITHOUT DEPTH
 mod.obj.nodepth<-NULL
 liveweight.nodepth <- NULL
-df_all_nodepth <- NULL
+df_byyear_nodepth <- NULL
+df_byyear_nodepth_100 <- NULL
+family <- "gaussian"
 for(y in sort(unique(as.numeric(dat$year)))){
   print(y)
   sub <- dat[dat$year==y,]
   sub <- sub[complete.cases(sub),]
-  mod <- glmer(wmw~Log.HEIGHT.CTR+(Log.HEIGHT.CTR|tow),data=sub,
-               family=Gamma(link=log), na.action = na.omit)
+  if(family=="gamma") {mod <- glmer(wmw~Log.HEIGHT.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                                    family=Gamma(link=log), na.action = na.omit)}
+  if(family=="gaussian") {mod <- lmer(wmw~Log.HEIGHT.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                                      na.action = na.omit)}
 
   df=data.frame(sub, resid=residuals(mod,"pearson"),
                 fit=fitted(mod))
+
+  sampled <- unique(dplyr::select(sub, ID, year, lon, lat, depth, tow, Log.DEPTH, Log.DEPTH.CTR))
+  df100 <- data.frame(sampled, Log.HEIGHT.CTR=rep(log(100), dim(sampled)[1])-mean(sub$Log.HEIGHT))
+  df100$fit <- predict(object = mod, newdata=df100, re.form=NULL, type="response")
+
 
   #Plot of tow level residuals
   print(ggplot() + geom_point(data=df, aes(fit, resid)) + facet_wrap(~tow) + geom_hline(yintercept=0) + ggtitle(y))
@@ -344,9 +403,8 @@ for(y in sort(unique(as.numeric(dat$year)))){
   livefreqYYYY <- subset(all.surv.dat[all.surv.dat$bank==bank,], year==y)
   liveweightYYYY <- livefreqYYYY
 
-  #create matrix of depths by tow to use in predict function
-  log.ctr.adj_depth <- log(abs(liveweightYYYY$depth)) - mean(dat$Log.DEPTH)
-  Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(dat$Log.HEIGHT) #each shell height bin to predict on
+  #each shell height bin to predict on
+  Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(dat$Log.HEIGHT)
 
   temp <- matrix(NA,dim(liveweightYYYY)[1],40)
 
@@ -361,7 +419,6 @@ for(y in sort(unique(as.numeric(dat$year)))){
   for(i in random.pred) {
     temp[i,] <- as.vector(predict(object = mod,
                                   newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
-                                                     Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40),
                                                      tow=liveweightYYYY$tow[i]),
                                   re.form=NULL,type="response"))
   }
@@ -369,8 +426,7 @@ for(y in sort(unique(as.numeric(dat$year)))){
   #Predict using fixed effects for tows that weren't sampled for meat weight shell height
   for(i in fixed.pred) {
     temp[i,] <- as.vector(predict(object=mod,
-                                  newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
-                                                     Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40)),
+                                  newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr),
                                   re.form=~0,type="response"))
   }
   #multply temp matrix (weight) by live numbers to get weight/size bin
@@ -378,31 +434,43 @@ for(y in sort(unique(as.numeric(dat$year)))){
 
   mod.obj.nodepth[[y]] <- list(mod=mod, summary=summary(mod), df=df, liveweightYYYY=liveweightYYYY)
   liveweight.nodepth <- rbind(liveweight.nodepth, liveweightYYYY)
-  df_all_nodepth <- rbind(df_all_nodepth, df)
+  df_byyear_nodepth <- rbind(df_byyear_nodepth, df)
+  df_byyear_nodepth_100 <- rbind(df_byyear_nodepth_100, df100)
 }
+# output: mod.obj.nodepth, liveweight.nodepth, df_byyear_nodepth, df_byyear_nodepth_100
+# singular fit in 1995, 1998, 1999, 2000, 2004, 2010
 
 
-mod.all.nodepth<-NULL
+
+# last time, run it without depth for all years. Now that as.factor(year) is included as FE, change ID to Tow for RE
 sub <- dat[complete.cases(dat),]
-mod.nodepth <- glmer(wmw~Log.HEIGHT.CTR+(Log.HEIGHT.CTR|ID),data=sub,
-             family=Gamma(link=log), na.action = na.omit)
+family <- "gaussian"
+if(family=="gamma") {mod.all.nodepth <- glmer(wmw~as.factor(year) + Log.HEIGHT.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                                              family=Gamma(link=log), na.action = na.omit)}
+if(family=="gaussian") {mod.all.nodepth <- lmer(wmw~as.factor(year) + Log.HEIGHT.CTR+(Log.HEIGHT.CTR|tow),data=sub,
+                                                na.action = na.omit)}
 
-df.nodepth=data.frame(sub, resid=residuals(mod.nodepth,"pearson"),
-              fit=fitted(mod.nodepth))
+df.all.nodepth=data.frame(sub, resid=residuals(mod.all.nodepth,"pearson"),
+              fit=fitted(mod.all.nodepth))
+
+sampled <- unique(dplyr::select(sub, ID, year, lon, lat, depth, tow, Log.DEPTH, Log.DEPTH.CTR))
+df.all.nodepth_100 <- data.frame(sampled, Log.HEIGHT.CTR=rep(log(100), dim(sampled)[1])-mean(sub$Log.HEIGHT))
+df.all.nodepth_100$fit <- predict(object = mod.all.nodepth, newdata=df.all.nodepth_100, re.form=NULL, type="response")
+
 
 #Plot of tow level residuals
-print(ggplot() + geom_point(data=df.nodepth, aes(fit, resid)) + facet_wrap(~year) + geom_hline(yintercept=0))
+print(ggplot() + geom_point(data=df.all.nodepth, aes(fit, resid)) + facet_wrap(~year) + geom_hline(yintercept=0))
 
 #Plot of tow level fitted values
-print(ggplot() + geom_point(data=df.nodepth, aes(fit, wmw)) + facet_wrap(~year))
+print(ggplot() + geom_point(data=df.all.nodepth, aes(fit, wmw)) + facet_wrap(~year))
 
 #Construct data.frame similar to SFA29livefreq for weight per tow
 livefreqYYYY.nodepth <- subset(all.surv.dat[all.surv.dat$bank==bank,])
+livefreqYYYY.nodepth$ID <- paste0(livefreqYYYY.nodepth$cruise, ".", livefreqYYYY.nodepth$tow)
 liveweightYYYY.nodepth <- livefreqYYYY.nodepth
 
-#create matrix of depths by tow to use in predict function
-log.ctr.adj_depth <- log(abs(liveweightYYYY.nodepth$depth)) - mean(sub$Log.DEPTH)
-Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(sub$Log.HEIGHT) #each shell height bin to predict on
+#each shell height bin to predict on
+Log.height.ctr <- log(seq(2.5, 197.5, by = 5)) - mean(sub$Log.HEIGHT)
 
 temp.nodepth <- matrix(NA,dim(liveweightYYYY.nodepth)[1],40)
 
@@ -414,83 +482,103 @@ random.pred <- (1:dim(liveweightYYYY.nodepth)[1])[is.element(liveweightYYYY.node
 fixed.pred <- (1:dim(liveweightYYYY.nodepth)[1])[!is.element(liveweightYYYY.nodepth$ID,unique(sub$ID))]
 
 #Predict using Random effects for tows that were sampled for meat weight shell height
+### DAVE - I don't think I did this right
 for(i in random.pred) {
-  temp.nodepth[i,] <- as.vector(predict(object = mod.nodepth,
+  temp.nodepth[i,] <- as.vector(predict(object = mod.all.nodepth,
                                 newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
-                                                   Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40),
-                                                   ID=liveweightYYYY$ID[i]),
+                                                   tow=liveweightYYYY.nodepth$tow[i],
+                                                   year=liveweightYYYY.nodepth$year[i]),
                                 re.form=NULL,type="response"))
 }
 
 #Predict using fixed effects for tows that weren't sampled for meat weight shell height
+### DAVE - I don't think I did this right. It doesn't work.
 for(i in fixed.pred) {
-  temp.nodepth[i,] <- as.vector(predict(object=mod.nodepth,
-                                newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
-                                                   Log.DEPTH.CTR=rep(log.ctr.adj_depth[i] ,40)),
+  temp.nodepth[i,] <- as.vector(predict(object=mod.all.nodepth,
+                                        newdata=data.frame(Log.HEIGHT.CTR=Log.height.ctr,
+                                                           tow=liveweightYYYY.nodepth$tow[i],
+                                                           year=liveweightYYYY.nodepth$year[i]),
                                 re.form=~0,type="response"))
 }
 #multply temp matrix (weight) by live numbers to get weight/size bin
 liveweightYYYY.nodepth[,grep("h5", colnames(liveweightYYYY.nodepth)):grep("h200", colnames(liveweightYYYY.nodepth))] <-
   temp*livefreqYYYY.nodepth[,grep("h5", colnames(livefreqYYYY.nodepth)):grep("h200", colnames(livefreqYYYY.nodepth))]
+liveweight.all.nodepth <- liveweightYYYY.nodepth
+# output: mod.all.nodepth, df.all.nodepth, liveweight.all.nodepth, df.all.nodepth_100
 
-
-allyears <- df %>%
-  filter(sh==100) %>%
+allyears <- df100.allyrs %>%
   group_by(year) %>%
   summarize(med_fit = median(fit),
             sd_fit = sd(fit)) %>%
   mutate(type="all_years")
 
-byyear <- df_all %>%
-  filter(sh==100) %>%
+byyear <- df_byyear_100 %>%
   group_by(year) %>%
   summarize(med_fit = median(fit),
             sd_fit = sd(fit)) %>%
   mutate(type="by_year")
 
-allyears_nodepth <- df.nodepth %>%
-  filter(sh==100) %>%
+allyears_nodepth <- df.all.nodepth_100 %>%
   group_by(year) %>%
   summarize(med_fit = median(fit),
             sd_fit = sd(fit)) %>%
   mutate(type="all_years_nodepth")
 
-byyear_nodepth <- df_all_nodepth %>%
-  filter(sh==100) %>%
+byyear_nodepth <- df_byyear_nodepth_100 %>%
   group_by(year) %>%
   summarize(med_fit = median(fit),
             sd_fit = sd(fit)) %>%
   mutate(type="by_year_nodepth")
 
-all <- rbind(allyears, byyear,allyears_nodepth, byyear_nodepth)
+all <- rbind(cbind(df.allyrs, type="all_years"),
+             cbind(df_byyear, type="by_year"),
+             cbind(df.all.nodepth, type="all_years_nodepth"),
+             cbind(df_byyear_nodepth, type="by_year_nodepth"))
 
-ggplot() + geom_boxplot(data=df, aes(year, fit))
+all_meds <- rbind(allyears, byyear,allyears_nodepth, byyear_nodepth)
 
-ggplot() + geom_boxplot(data=df_all, aes(year, fit))
+ggplot() + geom_boxplot(data=all[all$sh==100,], aes(as.factor(year), fit, fill=type))
 
-ggplot() + geom_smooth(data=df, aes(sh, fit, colour=tow)) +
-  geom_smooth(data=df_all, aes(sh, fit, colour=tow), linetype="dashed") +
-  facet_wrap(~year) +
+ggplot() + geom_line(data=all_meds, aes(as.factor(year), med_fit, colour=type, group=type))
+
+
+ggplot() + geom_smooth(data=all, aes(sh, fit, colour=ID)) +
+  facet_wrap(~type) +
   guides(colour="none")
 
+# compare against current methods (Jonsen)
+head(CFJonsen)
+combo <- CFJonsen
+names(combo)[which(names(combo) %in% c("CF", "CFse.fit"))] <- c("fit", "sd_fit")
+combo$year <- as.numeric(combo$year)
+combo2 <- all_meds
+names(combo2)[which(names(combo2) %in% c("med_fit"))] <- c("fit")
 
-ggplot() + geom_boxplot(data=df[df$sh==100,], aes(year, fit), colour="blue", fill="blue", alpha=0.3) +
-  geom_boxplot(data=df_all[df_all$sh==100,], aes(year, fit), colour="red", fill="red", alpha=0.3) #+
-  geom_boxplot(data=df_all[df_all$sh==100,], aes(year, wmw), fill="yellow", alpha=0.3)
-
-
-ggplot() + geom_point(data=all, aes(as.numeric(year), med_fit, colour=type)) +
-  geom_line(data=all, aes(as.numeric(year), med_fit, colour=type, group=type)) +
-  geom_point(data=condfac_res$CFyrs, aes(as.numeric(year), CF)) +
-  geom_line(data=condfac_res$CFyrs, aes(as.numeric(year), CF), group=1) +
-  geom_point(data=CFyrs, aes(as.numeric(year), fit), colour="grey") +
-  geom_line(data=CFyrs, aes(as.numeric(year), fit), colour="grey", group=1)
+combo <- full_join(combo, combo2)
 
 
+ggplot() + geom_point(data=combo, aes(as.numeric(year), fit, colour=type)) +
+  geom_line(data=combo, aes(as.numeric(year), fit, colour=type, linetype=type, group=type)) +
+  theme_bw()
+
+png(paste0(plotsGo, "/", bank, "/CF_model_compare_inshore.png"), height=4, width=6.5, units="in", res=420)
+print(ggplot() + geom_point(data=combo, aes(as.numeric(year), fit)) +
+  geom_line(data=combo, aes(as.numeric(year), fit, group=type)) +
+  theme_bw() +
+  facet_wrap(~type))
+dev.off()
+
+# conclusion from the first time (without using as.factor(year), and for gamma distribution):
 # ok so it really doesn't matter if you include depth or not, the results using
 # the inshore model approach are way different from the original offshore methods
 # missing predictions for some years?
-c(1991:2022)[which(!1991:2022 %in% unique(all$year))]# 1998,2005,2007,2008,2020
+c(1991:2022)[which(!1991:2022 %in% unique(all$year))]# just 2020 for BBn
+c(1991:2022)[which(!1991:2022 %in% unique(all_meds$year))]# just 2020 for BBn
+
+
+#########
+
+# this is more testing random other "simple" approaches.
 
 glm_mw <- glm(data=dat, wmw ~ sh + as.factor(year), family=gaussian(link="log"))
 glm_mw <- mod_eval(glm_mw)
@@ -506,7 +594,7 @@ gam_mw <- mod_eval(gam_mw)
 
 # gaussian and log link Gamma are pretty similar
 
-# pretty darn good
+# pretty good
 
 # gam_mw2 <- gam(data=dat, wmw ~ sh + s(lon, lat) + s(depth) + as.factor(year))
 # gam_mw2 <- mod_eval(gam_mw2)
