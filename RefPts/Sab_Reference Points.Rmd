@@ -28,19 +28,22 @@ library(forecast)
 theme_set(theme_few(base_size = 14))
 
 # Here's where I'm sticking the figures
-repo_loc <- "D:/Github/"
+mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
+fun.loc <-"D:/Github/Framework/RefPts/functions/"
+rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
+
 # Functions we need to source for this to all work
-source(paste0(repo_loc,"BBn_model/Scripts/projection_function.r"))
-source(paste0(repo_loc,"BBn_model/Scripts/Density_dependence_function.R"))
-source(paste0(repo_loc,"BBn_model/Scripts/breakpoint_function.R"))
-source(paste0(repo_loc,"BBn_model/Scripts/correlation_function.R"))
+source(paste0(fun.loc,"projection_function.r"))
+source(paste0(fun.loc,"Density_dependence_function.R"))
+source(paste0(fun.loc,"breakpoint_function.R"))
+source(paste0(fun.loc,"correlation_function.R"))
 
 
 
 
 #Loading the output from TLM BBN model
-tlm.select <- "1995_2022_qR_0_5"
-tlm.mod <- readRDS(paste0(repo_loc,"BBn_model/Results/Models/Sab/Sab_TLM_model_output_",tlm.select,".Rds"))
+tlm.select <- "1994_2022_qR_0_5"
+tlm.mod <- readRDS(paste0(mod.loc,"Results/Sab/R_75_FR_90/Sab_TLM_model_output_",tlm.select,".Rds"))
 tlm.mod$report$totB <- tlm.mod$report$B
 tlm.mod$report$totR <- tlm.mod$report$R
 tlm.mod$report$mean_m <- tlm.mod$report$m
@@ -49,8 +52,9 @@ tlm.mod$report$mean_m <- tlm.mod$report$m
 
 
 # # If running with SEBDAM this is what ya use.
-seam.select <- "1995_2022_vary_m_m0_1_R0_100_4_knots"
-seam.mod <- readRDS(paste0(repo_loc,"BBn_model/Results/Models/Sab/Sab_SEAM_model_output_",seam.select,".Rds"))
+seam.select <- "1994_2022_vary_m_m0_2_qR_0.5_12_knots"
+#seam.select <- "1994_2022_vary_m_m0_2_qR_0.5_7_knots"
+seam.mod <- readRDS(paste0(mod.loc,"Results/Sab/R_75_FR_90/Sab_SEAM_model_output_",seam.select,".Rds"))
 seam.mod$obj$env$data$g <- seam.mod$obj$env$data$gI
 seam.mod$report$totR <-c(seam.mod$report$totR,NA)
 #get_parameters(seam.mod)
@@ -61,7 +65,7 @@ seam.mod$report$totR <-c(seam.mod$report$totR,NA)
 
 # Setup...
 num.knots <- length(seam.mod$obj$env$data$area)
-years <- 1995:2023
+years <- 1994:2023
 NY <- length(years)
 matYear<-c(rep(years,each=num.knots))
 knots<-rep(1:num.knots,NY)
@@ -79,9 +83,8 @@ knots<-rep(1:num.knots,NY)
 
 ### ENd TLM Productivity Data
 
-
 # SEAMly version
-prod.dat <- data.frame(Year = years[-length(years)],
+prod.dat <- data.frame(Year = years[-NY],
                         B = seam.mod$report$totB[-length(seam.mod$report$totB)],
                         R = seam.mod$report$totR[-length(seam.mod$report$totR)], # For some reason the SEBDAM run needs a NA at the end here.
                         SSB = seam.mod$report$totB[-length(seam.mod$report$totB)] + seam.mod$report$totR[-length(seam.mod$report$totR)],
@@ -89,7 +92,7 @@ prod.dat <- data.frame(Year = years[-length(years)],
                         g = c(seam.mod$obj$env$data$g[-length(seam.mod$obj$env$data$g)]),
                         gR = c(seam.mod$obj$env$data$gR[-length(seam.mod$obj$env$data$g)]))#,
                         #CF = cond.dat$CF[cond.dat$year %in% years[-length(years)]])
-plot.url <- paste0("D:/Github/BBn_model/Results/Figures/Sab/Ref_points/",seam.select,"/")
+plot.url <- paste0(rp.loc,"Figures/Sab/R_75_FR_90/",seam.select,"/")
 # The m from the SEAM model isn't a weighted mean, which is should be, so do this to get a correct m here. We also have a few options here, as you can get an m for Recruits and FR this way.
 
 
@@ -191,12 +194,12 @@ von.B <- function(L.inf,to,K,age,R.size,FR.size)
 # There is no ageing for Sable since like the late 1980's, so for now I base this on that data, until we have new data, hopefully coming soon!! 
 # The interim values come from files found in here... Y:\Offshore\Assessment\Data\Ageing\archive\old_ageing_from_Amy_2022
 # Particularly SAB height at age 1989.pdf
-L.inf <- 136.7
+L.inf <- 159.2
 #to <- 1.335 # So this uses a 1 year offset that we no longer believe in, going to make this 0.335 to align more with what we now do...
-to <- 0.335
-K <- 0.2264
+to <- 0.2
+K <- 0.2
 ages <- seq(0,15,by=0.05)
-R.size = 80
+R.size = 75
 FR.size = 90
 res <- von.B(L.inf,to,K,ages,R.size =R.size,FR.size = FR.size)
 
@@ -214,10 +217,10 @@ save_plot(paste0(plot.url,"von_B.png"),p.vb,base_height = 6,base_width = 10)
 
 
 
-# OK, so we see recruits are probably 4-5 years old based on that von B, so we could use either RPS4 or RPS5 for the density dependence 
+# OK, so we see recruits are probably 3-4 years old based on that von B, so we could use either RPS3 or RPS4 for the density dependence 
 # See a very strong signal for both ages.  I'm going to go with 5 year olds as recruits, it's consistent with BBn and the recruit size bin mean would be 
 # closer to 5 than 4 based on the von B.  It shouldn't make much difference as the relationship is quite strong.
-p.rps.ts <- ggplot(prod.dat, aes(x=Year,y=RPS4))  + geom_point() + 
+p.rps.ts <- ggplot(prod.dat, aes(x=Year,y=RPS3))  + geom_point() + 
                                                     xlab("'Birth' year") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
                                                     geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 7))+
                                                     scale_y_log10() +  
@@ -225,7 +228,7 @@ p.rps.ts <- ggplot(prod.dat, aes(x=Year,y=RPS4))  + geom_point() +
 save_plot(paste0(plot.url,"RPS_ts.png"),p.rps.ts,base_height =6,base_width = 10)                                               
                        
 # Density dependence 
-p.rps.ssb <- ggplot(prod.dat,aes(y=RPS4,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3) + 
+p.rps.ssb <- ggplot(prod.dat,aes(y=RPS3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3) + 
                                                   xlab("Spawning Stock Biomass (tonnes)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
                                                   geom_smooth(method = 'lm') +
                                                   scale_y_log10() + geom_vline(xintercept = 7150,size=0.5,color='firebrick2',linetype='dashed')  + 
@@ -327,14 +330,14 @@ summary(mod.m) # No trend
 
 
 # So next up lets look for evidence of correlation between your productivity parameters, specifically RPS and m
-prod.dat$RPS4_offset <- c(rep(NA,4),na.omit(prod.dat$RPS4[]))
-ggplot(prod.dat,aes(x=Year,y=RPS4)) +geom_point() + geom_line(size=2) + geom_point(aes(y = m)) + geom_line(aes(y = m),color='blue') #+ geom_smooth(method = 'gam')
-ggplot(prod.dat,aes(x=m,y=RPS4)) + geom_text(aes(label = substr(Year,3,4))) + geom_smooth(method = 'gam')
+prod.dat$RPS3_offset <- c(rep(NA,3),na.omit(prod.dat$RPS3[]))
+ggplot(prod.dat,aes(x=Year,y=RPS3)) +geom_point() + geom_line(size=2) + geom_point(aes(y = m)) + geom_line(aes(y = m),color='blue') #+ geom_smooth(method = 'gam')
+ggplot(prod.dat,aes(x=m,y=RPS3)) + geom_text(aes(label = substr(Year,3,4))) + geom_smooth(method = 'gam')
 # If we offset the RPS to the year they are actually showing up, might be some weak correlation, but can't say it's anything more than noise, so we can ignore this I think.
-p.rpsoff.m <- ggplot(prod.dat,aes(x=Year,y=RPS4_offset)) + geom_text(aes(label = substr(Year-5,3,4)))  + 
+p.rpsoff.m <- ggplot(prod.dat,aes(x=Year,y=RPS3_offset)) + geom_text(aes(label = substr(Year-5,3,4)))  + 
                                                            xlab("") +ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9) & Natural mortality (Inst)") +
                                                            geom_line(aes(y = m),color='firebrick2',size=1,linetype='dashed')
-p.rps.m.ccf <- ggCcf(prod.dat$m,prod.dat$RPS4_offset) + ggtitle("")
+p.rps.m.ccf <- ggCcf(prod.dat$m,prod.dat$RPS3_offset) + ggtitle("")
 
 p.rps.m.ccf.combo <-  cowplot::plot_grid(p.rpsoff.m,p.rps.m.ccf,nrow=2)
 save_plot(paste0(plot.url,"CCF_ts_RPS_offset_m.png"),p.rps.m.ccf.combo,base_height =12,base_width = 10)                
@@ -347,56 +350,54 @@ save_plot(paste0(plot.url,"CCF_ts_RPS_offset_m.png"),p.rps.m.ccf.combo,base_heig
 
  # RUNME
 #g.strat <- data.frame(type = "cor",strat = 'dist', bp = 0,mn.mx = 1, sd.mx = 0.05,ar1=0,ar2=0) # The g correlation method seems to get g a bit too  high.
-g.strat <- data.frame(type = "bp",strat = 'dist', bp = 0,mn.mx = 1, sd.mx = 0.05)
+g.strat <- data.frame(type = "bp",strat = 'dist', bp = 8e3,mn.mx = 1, sd.mx = 0.05)
 #g.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = 1, sd.mx = 0.05)
-r.strat <- data.frame(type = "cor",strat = 'dist', bp = 7150,mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
-                     ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=0,rps.m.cor = 0,rps.m.lag = -5) # Note lag is -5, high RPS comes 5 years before high m due to RPS offset.
-# r.strat <- data.frame(type = "bp",strat = 'dist', bp = 7150,mn.mx = signif(min(prod.dat$RPS4,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
+r.strat <- data.frame(type = "bp",strat = 'dist', bp = 3.5e3,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=3,
+                     ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=0,rps.m.cor = 0.43,rps.m.lag = 2) # Note lag is -5, high RPS comes 5 years before high m due to RPS offset.
+# r.strat <- data.frame(type = "bp",strat = 'dist', bp = 7150,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
 #                       ar1=0,ar2=0,rps.m.cor = 0,rps.m.lag = 0)
 # #r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
-m.strat <- data.frame(type = "cor",strat = 'dist', bp = 0,mn.mx = 0.3, sd.mx = 0.1,ar1=0,ar2=signif(p.m.pacf$data$Freq[2],digits=2)) #
+m.strat <- data.frame(type = "bp",strat = 'dist', bp = 3e3,mn.mx = 2*signif(mean(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1,ar1=0,ar2=signif(p.m.pacf$data$Freq[2],digits=2)) #
 #m.strat <- data.frame(type = "bp",strat = 'dist', bp = 0,mn.mx = 0.1, sd.mx = 0.1) # Using the maximum here is batshit because it's soo high!!
 #m.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 mod = "SEAM"
-plot_url = "D:/Github/BBn_model/Results/Figures/Sab/"
-res_url = "D:/Github/BBn_model/Results/Models/Sab/"
+plot_url = "D:/Framework/SFA_25_26_2024/RefPts/Figures/Sab/R_75_FR_90/"
+res_url = "D:/Framework/SFA_25_26_2024/RefPts/Results/Sab/R_75_FR_90/"
 
-Res <- proj.mod(n_sim=500,n_y = 100,model=mod,plot_url = plot_url, run = 'not_model_error', res_url = res_url,save.results = T, exp.scenario=seq(0,0.1,0.01) ,
+Res <- proj.mod(n_sim=500,n_y = 100,model=mod,plot_url = plot_url, run = 'no_model_error', res_url = res_url,save.results = T, exp.scenario=seq(0,0.14,0.01) , mod.run = seam.select,
                 g.mod =   list(type = g.strat$type,bp.strategy = g.strat$strat,bp= g.strat$bp, mn.at.max = g.strat$mn.mx,sd.at.max = g.strat$sd.mx,ar1=g.strat$ar1,ar2=g.strat$ar2),
                 rec.mod = list(type = r.strat$type,bp.strategy = r.strat$strat,bp= r.strat$bp, mn.at.max = r.strat$mn.mx,sd.at.max = r.strat$sd.mx,rec.age = r.strat$rec.age,
                                 ar1=r.strat$ar1,ar2=r.strat$ar2,rps.m.cor = r.strat$rps.m.cor,rps.m.lag = r.strat$rps.m.lag),
                  m.mod =   list(type = m.strat$type,bp.strategy = m.strat$strat,bp= m.strat$bp, mn.at.max = m.strat$mn.mx,sd.at.max = m.strat$sd.mx,ar1=m.strat$ar1,ar2=m.strat$ar2))
 # End RUNME
-
-
-
+#summary(as.vector(Res$B[75:100,,1]))
 ```
 
 ```{r hcr-sims,include =F}
 
  # RUNME
-hcr.strat <-data.frame(TRP = 1.9e3,TRP.exp = 0.03,
-                       USR = 1.5e3, USR.exp = 0.01, 
-                       LRP = 7.6e2, LRP.exp = 0,exp.sd = 0.1)
+hcr.strat <-data.frame(TRP = 5.4e3,TRP.exp = 0.2, # Try 80% of B@0
+                       USR =   3e3, USR.exp = 0.05, # 40% of B@0
+                       LRP = 1.35e3, LRP.exp = 0,exp.sd = 0.1) # Around 5500 is the Biomass at 0 catch in the 0.4, 4 knot scenario.
 #g.strat <- data.frame(type = "cor",strat = 'dist', bp = 0,mn.mx = 1, sd.mx = 0.05,ar1=0,ar2=0) # The g correlation method seems to get g a bit too  high.
-g.strat <- data.frame(type = "bp",strat = 'dist', bp = 0,mn.mx = 1, sd.mx = 0.05)
+g.strat <- data.frame(type = "bp",strat = 'dist', bp = 8e3,mn.mx = 1, sd.mx = 0.05)
 #g.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = 1, sd.mx = 0.05)
-#r.strat <- data.frame(type = "cor",strat = 'dist', bp = 7150,mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
-#                      ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=signif(p.rps.pacf$data$Freq[2],digits=2),rps.m.cor = 0,rps.m.lag = -5) # Note lag is -5, high RPS comes 5 years before high m due to RPS offset.
-r.strat <- data.frame(type = "bp",strat = 'dist', bp = 7150,mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
-                     ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=0,rps.m.cor = 0,rps.m.lag = -5) # Note lag is -5, high RPS comes 5 years before high m due to RPS offset.
-#r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
-m.strat <- data.frame(type = "cor",strat = 'dist', bp = 0,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1,ar1=0,ar2=signif(p.m.pacf$data$Freq[2],digits=2)) #
+r.strat <- data.frame(type = "bp",strat = 'dist', bp = 3.5e3,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=3,
+                     ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=0,rps.m.cor = 0.43,rps.m.lag = 2) # Note lag is -5, high RPS comes 5 years before high m due to RPS offset.
+# r.strat <- data.frame(type = "bp",strat = 'dist', bp = 7150,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
+#                       ar1=0,ar2=0,rps.m.cor = 0,rps.m.lag = 0)
+# #r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS5,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
+m.strat <- data.frame(type = "bp",strat = 'dist', bp = 3e3,mn.mx = 2*signif(mean(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1,ar1=0,ar2=signif(p.m.pacf$data$Freq[2],digits=2)) #
 #m.strat <- data.frame(type = "bp",strat = 'dist', bp = 10000,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 #m.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 mod = "SEAM"
-plot_url = "D:/Github/BBn_model/Results/Figures/Sab/"
-res_url = "D:/Github/BBn_model/Results/Models/Sab/"
+plot_url = "D:/Framework/SFA_25_26_2024/RefPts/Figures/Sab/R_75_FR_90/"
+res_url = "D:/Framework/SFA_25_26_2024/RefPts/Results/Sab/R_75_FR_90/"
 
 
 # An HCR model
-hcr <- proj.mod(n_sim=500,n_y = 100,model=mod,plot_url = plot_url, run = 'model_error', res_url = res_url,save.results = T,
-                g.mod =   list(type = g.strat$type,bp.strategy = g.strat$strat,bp= g.strat$bp, mn.at.max = g.strat$mn.mx,sd.at.max = g.strat$sd.mx,ar1=g.strat$ar1,ar2=g.strat$ar2),
+hcr <- proj.mod(n_sim=500,n_y = 100,model=mod,plot_url = plot_url, run = 'no_model_error', res_url = res_url,save.results = T, mod.run = seam.select,
+               g.mod =   list(type = g.strat$type,bp.strategy = g.strat$strat,bp= g.strat$bp, mn.at.max = g.strat$mn.mx,sd.at.max = g.strat$sd.mx,ar1=g.strat$ar1,ar2=g.strat$ar2),
                 rec.mod = list(type = r.strat$type,bp.strategy = r.strat$strat,bp= r.strat$bp, mn.at.max = r.strat$mn.mx,sd.at.max = r.strat$sd.mx,rec.age = r.strat$rec.age,
                                 ar1=r.strat$ar1,ar2=r.strat$ar2,rps.m.cor = r.strat$rps.m.cor,rps.m.lag = r.strat$rps.m.lag),
                  m.mod =   list(type = m.strat$type,bp.strategy = m.strat$strat,bp= m.strat$bp, mn.at.max = m.strat$mn.mx,sd.at.max = m.strat$sd.mx,ar1=m.strat$ar1,ar2=m.strat$ar2),
@@ -410,7 +411,7 @@ summary(hcr$Rec)
 summary(prod.dat$R)
 summary(hcr$B)
 summary(hcr$rps)
-summary(prod.dat$RPS4)
+summary(prod.dat$RPS3)
 plot(hcr$rps[,4,1])
 ccf(hcr$mort[,2,1],hcr$rps[,2,1]) # High mort happening 5 years after the 'birth' of the high RPS'ers
 

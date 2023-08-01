@@ -16,14 +16,17 @@
       #a: type: Options right now are a linear model "lm", which will effectively be a Ricker model linearized, so log(RPS) ~ SSB model using the productivity data
           # 'bp' 
 #m.mod: What is our natural mortality model.  
-      
+#mod.run The model run that your projections are coming from. 
+#model.yrs: The years run in the model, excluding the projection year. Defaulting to 1994:2022 which is what we did for BBn and Sable.
+#base.yrs: Gives us the option to truncate the data used in the analyses to a subset of years.  Lets us explore different 'productivity regimes'.  Default is NULL which uses all the data.
+#          If using this then you'd want it something like base.yrs = 2010:2022
       
 
 proj.mod <- function(mods = list(tlm.mod = tlm.mod,seam.mod = seam.mod), n_sim = 300,exp.scenario=seq(0,0.4,0.025),n_y = 100, LRP = 1000, HCR.sim = NULL, save.results = F,
-                     ci.proj = data.frame(lci=0.25,uci=0.75),run = 'model_error',
+                     ci.proj = data.frame(lci=0.25,uci=0.75),run = 'model_error', base.yrs = NULL, model.yrs = 1994:2022,
                      plot_url = "D:/Github/BBn_model/Results/Figures/BBn/",
                      res_url = "D:/Github/BBn_model/Results/Models/BBn/",
-                     model = "TLM", max.SSB =NULL,
+                     model = "TLM", mod.run = NULL,max.SSB =NULL, 
                      # He we have our productivity models
                      g.mod =   list(type = 'bp',bp.strategy = 'sample',bp= 0,mn.at.max = 1.00,sd.at.max = 0.05,ar1=0,ar2=0), 
                      rec.mod = list(type = 'bp',bp.strategy = 'sample',bp= 0,mn.at.max = 0.01,sd.at.max = 0.01,rec.age = 5,
@@ -35,20 +38,53 @@ proj.mod <- function(mods = list(tlm.mod = tlm.mod,seam.mod = seam.mod), n_sim =
 {
   
 # Now get the plots and results folders sorted out...
-if(is.null(HCR.sim)) sims = paste0("RPs/",model)
-if(!is.null(HCR.sim))  sims = paste0("HCR/",model,"_TRP_",HCR.sim$TRP,"_",HCR.sim$TRP.exp,"_USR_",HCR.sim$USR,"_",HCR.sim$USR.exp,"_LRP_",HCR.sim$LRP,"_",HCR.sim$LRP.exp,"_",HCR.sim$exp.sd)
+if(is.null(HCR.sim)) 
+{ 
+  sims = paste0(mod.run,"/RPs/")
+  # Create the directories you want
+  if(!dir.exists(paste0(plot_url,mod.run))) dir.create(paste0(plot_url,mod.run))
+  if(!dir.exists(paste0(res_url,mod.run))) dir.create(paste0(res_url,mod.run))
+  if(!dir.exists(paste0(plot_url,sims))) dir.create(paste0(plot_url,sims))
+  if(!dir.exists(paste0(res_url,sims))) dir.create(paste0(res_url,sims))
+}
+  
+if(!is.null(HCR.sim))  
+{
+  sims = paste0(mod.run,"/HCR/","TRP_",HCR.sim$TRP,"_",HCR.sim$TRP.exp,"_USR_",HCR.sim$USR,"_",HCR.sim$USR.exp,"_LRP_",HCR.sim$LRP,"_",HCR.sim$LRP.exp,"_",HCR.sim$exp.sd)
+  if(!dir.exists(paste0(plot_url,mod.run))) dir.create(paste0(plot_url,mod.run))
+  if(!dir.exists(paste0(plot_url,mod.run,"/HCR"))) dir.create(paste0(plot_url,mod.run,"/HCR/"))
+  if(!dir.exists(paste0(res_url,mod.run))) dir.create(paste0(res_url,mod.run))
+  if(!dir.exists(paste0(res_url,mod.run,"/HCR/"))) dir.create(paste0(res_url,mod.run,"/HCR/"))
+  
+  #if(!dir.exists(paste0(plot_url,sims))) dir.create(paste0(plot_url,sims))
+  #if(!dir.exists(paste0(res_url,sims))) dir.create(paste0(res_url,sims))
+}
 
 # Names and locations of save objects
-plot_sims <- paste0(plot_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
+if(is.null(base.yrs))
+{
+  plot_sims <- paste0(plot_url,sims,model,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
                       rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
                       m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max,"/")
 
 
-res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
+  res_sims <- paste0(res_url,sims,model,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
                      rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
                      m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max,".Rds")
-
-
+}
+  
+if(!is.null(base.yrs))
+{
+    plot_sims <- paste0(plot_url,sims,model,"_yrs_",min(base.yrs),"-",max(base.yrs),"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
+                        rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
+                        m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max,"/")
+    
+    
+    res_sims <- paste0(res_url,sims,model,"_yrs_",min(base.yrs),"-",max(base.yrs),"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
+                       rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
+                       m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max,".Rds")
+  }  
+#browser()
 
 # Will need to do these up right when the repo goes public.  
 # source("D:/Github/BBn_model/Scripts/Density_dependence_function.R")
@@ -107,7 +143,8 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
                           R = mod.fit$report$totR[-length(mod.fit$report$totR)], # For some reason the SEBDAM run needs a NA at the end here.
                           m = mod.fit$report$mean_m[-length(mod.fit$report$mean_m)],
                           g = as.vector(mod.fit$obj$env$data$g[-length(mod.fit$obj$env$data$g)]),
-                          gR = as.vector(mod.fit$obj$env$data$gR[-length(mod.fit$obj$env$data$g)]))
+                          gR = as.vector(mod.fit$obj$env$data$gR[-length(mod.fit$obj$env$data$g)]),
+                          year = model.yrs)
   #browser()
   # A simple way to get gR estimate from the g estimate 
   prod.dat$g.ratio <- prod.dat$gR/prod.dat$g
@@ -129,8 +166,8 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
   # We are going to use max.SSB to reduce productivity when the population is at a level above anything observed historically, or should we use max SSB above... hmm.... B for now
   if(is.null(max.SSB)) max.SSB <- floor(max(prod.dat$SSB/100,na.rm=T)) * 100
   
+  if(!is.null(base.yrs)) prod.dat <- prod.dat %>% dplyr::filter(year %in% base.yrs)
   
-
     
   # If we are using some form a linear density dependence we run these here to the prediction object we will need to use to get a prediction of the response variable
   if(rec.mod$type %in% c('lm','glm','gam')) r.res <- dens.function(dat = prod.dat,type = rec.mod$type,min.cov.pred = min.SSB,max.cov.pred= max.SSB,step = 100,response = 'RPS',dd.term = "SSB",log.trans=T)
@@ -140,11 +177,11 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
 
   
 
-  for (i in 1:n.f.scen) 
+  for(i in 1:n.f.scen) 
   {
     #browser()
     Sim.res <- NULL # reset the Sim res object, it'll just be a temporary container of the sims
-    for (n in 1:n_sim)
+    for(nn in 1:n_sim)
     {  
       # If we are running the correlation analysis for any of these, we do that outside the j loop as we can 'make' a whole time series in one shot, of course the
       # values in that time series will need to be 'replaced' if the biomass gets too high, but we'll do that below just like how we do it with the lm models.
@@ -166,11 +203,11 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
                           ts = list(years=500,start.year =300, final.ts.len = n_y+10))$ts1.ts
         } # end else
       } #end g.mod$type == 'cor'
-      
+      #browser()
       # Now do the same thing for the recruits, but I also have a version where we allow rps and m to covary together, so this is the version where we only have recs doing their thing
       if(rec.mod$type == 'cor' & rec.mod$rps.m.cor ==0)
       {
-        #browser()
+  
         # Because this is done on log scale (needed for RPS and nm really), I'm going to force the variance to be a bit artificially low here, this seems to give very reasonable growths
         if(rec.mod$ar1 == 0 & rec.mod$ar2 == 0)
         {
@@ -206,7 +243,7 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
                              arima = list(proc = 'arima',cross.cor = 0,lag = 0,ts1.ar1= m.mod$ar1,ts1.ar2=m.mod$ar2),
                              ts = list(years=500,start.year =300, final.ts.len = n_y+10))$ts1.ts
         } # end else
-      } #end m.mod$type == 'cor'
+      } #end m.mod$type == 'cor' 
       
       
       if( m.mod$type == 'cor' & rec.mod$rps.m.cor !=0)
@@ -244,8 +281,8 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
         # After the first year we have last years results.
         if (j > 1) 
         {
-          B.init <- Bio[j,n,i]
-          Rec.init <- Rec[j-1,n,i]
+          B.init <- Bio[j,nn,i]
+          Rec.init <- Rec[j-1,nn,i]
         } # end if (j > 1)
         
         # Get our quasi-SSB from last year, this is what we'll have to use to parameterize our density terms.
@@ -259,23 +296,23 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
         # using the breakpoint method determine what growth is.  The BP method wraps 
         # all scenarios into one tidy bit of code.  Also, note that by default this includes all data because the default for bp.g.B = 0
 
-        if(g.mod$type == 'bp') g[j,n,i] <- bp.function(B = SSB.init,dat = prod.dat$g,type = g.mod$bp.strategy, bp = g.mod$bp,
+        if(g.mod$type == 'bp') g[j,nn,i] <- bp.function(B = SSB.init,dat = prod.dat$g,type = g.mod$bp.strategy, bp = g.mod$bp,
                                                        max.B = max.SSB,mn.at.max = g.mod$mn.at.max,sd.at.max = g.mod$sd.at.max)
         # Now if we are using a linear model to predict growth then we have to do this...
         if(g.mod$type %in% c("lm",'glm','gam'))
         {
           # If below the minimum SSB ever observed assume growth is what was observed at the lowest SSB in the time series. Do not extrapolate...
           # This isn't terrible for a log normal, the huge outliers were so outlier that this doesn't really go far enough on BBn
-          if(SSB.init < min.SSB) g[j,n,i] <- rlnorm(1,g.res$pred.dat$g.log[1],g.res$pred.dat$se[1])
+          if(SSB.init < min.SSB) g[j,nn,i] <- rlnorm(1,g.res$pred.dat$g.log[1],g.res$pred.dat$se[1])
           # If above the maximum SSB ever observed, set recruitment to vary around the lowest recruitment numbers ever observed
           # This lets the user pick what the distribution will look like above the max.SSB, default allows for about 100 tonnes of recruitment at very high SSB.
-          if(SSB.init > max.SSB) g[j,n,i] <- rlnorm(1,log(g.mod$mn.at.max),g.mod$sd.at.max) 
+          if(SSB.init > max.SSB) g[j,nn,i] <- rlnorm(1,log(g.mod$mn.at.max),g.mod$sd.at.max) 
           # Finally the most complicated one is to pick from the predictions and get a recruitment estimate based on the linear model predictions and uncertainty
           # We do this when the SSB is within observed bounds.
           if(SSB.init >= min.SSB & SSB.init <= max.SSB)
           {
             pick <- which(g.res$pred.dat$SSB == round(SSB.init/100)* 100)
-            g[j,n,i] <- rlnorm(1,g.res$pred.dat$g.log[pick],g.res$pred.dat$se[pick]) 
+            g[j,nn,i] <- rlnorm(1,g.res$pred.dat$g.log[pick],g.res$pred.dat$se[pick]) 
           } # end if(SSB.for.rec >= min.SSB & SSB.for.rec <= max.SSB)
         } # end if(rec.mod$type %in% c("lm",'glm','gam'))
         if(g.mod$type == 'cor')
@@ -283,15 +320,15 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
           
           # If above the maximum SSB ever observed, set recruitment to vary around the lowest recruitment numbers ever observed
           # This lets the user pick what the distribution will look like above the max.SSB, default allows for about 100 tonnes of recruitment at very high SSB.
-          if(SSB.init > max.SSB) g[j,n,i] <- rlnorm(1,log(g.mod$mn.at.max),g.mod$sd.at.max) 
+          if(SSB.init > max.SSB) g[j,nn,i] <- rlnorm(1,log(g.mod$mn.at.max),g.mod$sd.at.max) 
           # If above the breakpoint sample from the data above the breakpoint...
-          if(SSB.init > g.mod$bp & SSB.init <= max.SSB)  g[j,n,i] <- rnorm(1,median(prod.dat$g[prod.dat$SSB > g.mod$bp],na.rm=T),sd(prod.dat$g[prod.dat$SSB > g.mod$bp],na.rm=T))
+          if(SSB.init > g.mod$bp & SSB.init <= max.SSB)  g[j,nn,i] <- rnorm(1,median(prod.dat$g[prod.dat$SSB > g.mod$bp],na.rm=T),sd(prod.dat$g[prod.dat$SSB > g.mod$bp],na.rm=T))
           # For the rest grab the data from the correlation
-          if(SSB.init <= g.mod$bp)  g[j,n,i] <- g.ts[j]
+          if(SSB.init <= g.mod$bp)  g[j,nn,i] <- g.ts[j]
         } #end if g.mod$type == 'cor'
              # And since we know gR is related to g, let's just make gR be X% larger than g, we can just sample from the observed data to get that ratio...
         # We can see that growth differences really doesn't vary too much and that recruit growth is always larger (basically between 10 and 25% larger)
-         gR[j,n,i] <- sample(prod.dat$g.ratio,1) * g[j,n,i]
+         gR[j,nn,i] <- sample(prod.dat$g.ratio,1) * g[j,nn,i]
          #browser()
         
         ################################# End Growth Section ##################################
@@ -302,23 +339,23 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
         ### Recruit section
         # For the recruits I need to get the right biomass year to get the offset from recruits to the biomass that produced those recruits.  Easiest to do up here 
         if(j < (rec.mod$rec.age+1))  SSB.for.rec <- mod.fit$report$totB[length(mod.fit$report$totB)-rec.mod$rec.age] + mod.fit$report$totB[length(mod.fit$report$totB)-rec.mod$rec.age]
-        if(j >=(rec.mod$rec.age+1)) SSB.for.rec <- Bio[j-rec.mod$rec.age,n,i] + Rec[j-rec.mod$rec.age,n,i]
+        if(j >=(rec.mod$rec.age+1)) SSB.for.rec <- Bio[j-rec.mod$rec.age,nn,i] + Rec[j-rec.mod$rec.age,nn,i]
         # Now we can get our recruit estimate...
         # Using the predictions from our linear model above...
         if(rec.mod$type %in% c("lm",'glm','gam'))
         {
           # If below the minimum SSB ever observed assume RPS is what was predicted at the lowest SSB in the time series. Do not extrapolate...
           # This isn't terrible for a log normal, the huge outliers were so outlier that this doesn't really go far enough on BBn
-          if(SSB.for.rec < min.SSB) Rec[j,n,i] <- SSB.for.rec*  rlnorm(1,r.res$pred.dat$RPS.log[1],r.res$pred.dat$se[1]) 
+          if(SSB.for.rec < min.SSB) Rec[j,nn,i] <- SSB.for.rec*  rlnorm(1,r.res$pred.dat$RPS.log[1],r.res$pred.dat$se[1]) 
           # If above the maximum SSB ever observed, set recruitment to vary around the lowest recruitment numbers ever observed
           # This lets the user pick what the distribution will look like above the max.SSB, default allows for about 100 tonnes of recruitment at very high SSB.
-          if(SSB.for.rec > max.SSB) Rec[j,n,i] <- SSB.for.rec* rlnorm(1,log(rec.mod$mn.at.max),rec.mod$sd.at.max) 
+          if(SSB.for.rec > max.SSB) Rec[j,nn,i] <- SSB.for.rec* rlnorm(1,log(rec.mod$mn.at.max),rec.mod$sd.at.max) 
           # Finally the most complicated one is to pick from the predictions and get a recruitment estimate based on the linear model predictions and uncertainty
           # We do this when the SSB is within observed bounds.
           if(SSB.for.rec >= min.SSB & SSB.for.rec <= max.SSB)
           {
             pick <- which(r.res$pred.dat$SSB == round(SSB.for.rec/100)* 100)
-            Rec[j,n,i] <- rlnorm(1,r.res$pred.dat$RPS.log[pick],r.res$pred.dat$se[pick]) * SSB.for.rec
+            Rec[j,nn,i] <- rlnorm(1,r.res$pred.dat$RPS.log[pick],r.res$pred.dat$se[pick]) * SSB.for.rec
           } # end if(SSB.for.rec >= min.SSB & SSB.for.rec <= max.SSB)
         } # end if(rec.mod$type %in% c("lm",'glm','gam'))
 
@@ -330,10 +367,10 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
             #browser()
             # Should I use the RPS or Recruitment time series for these??
              #if(SSB.for.rec >=min.SSB)  
-            Rec[j,n,i] <-SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,
+            Rec[j,nn,i] <-SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,
                                                                             max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
             # # If below the minimum obsreved biomass than recruitment will be based on the RPS at low biomass levels.
-            #if(SSB.for.rec < min.SSB)  Rec[j,n,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,
+            #if(SSB.for.rec < min.SSB)  Rec[j,nn,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,
             #                                                             max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
           } # end if(run != 'model_error')     
           
@@ -342,10 +379,10 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
             
             # Should I use the RPS or Recruitment time series for these??
             #if(SSB.for.rec >= min.SSB) 
-              Rec[j,n,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,sd = sigma_phi,
+              Rec[j,nn,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,sd = sigma_phi,
                                                                             max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
             # If below the minimum obsreved biomass than recruitment will be based on the RPS at low biomass levels.
-            #if(SSB.for.rec < min.SSB)  Rec[j,n,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,sd = sigma_phi,
+            #if(SSB.for.rec < min.SSB)  Rec[j,nn,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,sd = sigma_phi,
             #                                                                          max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
           } # end if(run == 'model_error') 
            
@@ -356,14 +393,14 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
          {
            # If above the maximum SSB ever observed, set recruitment to vary around the lowest recruitment numbers ever observed
            # This lets the user pick what the distribution will look like above the max.SSB, default allows for about 100 tonnes of recruitment at very high SSB.
-           if(SSB.for.rec > max.SSB) Rec[j,n,i] <- SSB.for.rec* rlnorm(1,log(rec.mod$mn.at.max),rec.mod$sd.at.max) 
+           if(SSB.for.rec > max.SSB) Rec[j,nn,i] <- SSB.for.rec* rlnorm(1,log(rec.mod$mn.at.max),rec.mod$sd.at.max) 
            # If above the breakpoint sample from the data above the breakpoint...
-           if(SSB.for.rec > rec.mod$bp & SSB.for.rec <= max.SSB)  Rec[j,n,i] <-SSB.for.rec* rnorm(1,median(prod.dat$RPS[prod.dat$SSB > rec.mod$bp],na.rm=T),sd(prod.dat$RPS[prod.dat$SSB > rec.mod$bp],na.rm=T))
+           if(SSB.for.rec > rec.mod$bp & SSB.for.rec <= max.SSB)  Rec[j,nn,i] <-SSB.for.rec* rnorm(1,median(prod.dat$RPS[prod.dat$SSB > rec.mod$bp],na.rm=T),sd(prod.dat$RPS[prod.dat$SSB > rec.mod$bp],na.rm=T))
            # For the rest grab the data from the correlation
-           if(SSB.for.rec <= rec.mod$bp)  Rec[j,n,i] <- SSB.for.rec*rps.ts[j]
+           if(SSB.for.rec <= rec.mod$bp)  Rec[j,nn,i] <- SSB.for.rec*rps.ts[j]
          }
          # I'd like too be able to look at the rps time series too...
-         rps[j,n,i] <- Rec[j,n,i]/SSB.for.rec
+         rps[j,nn,i] <- Rec[j,nn,i]/SSB.for.rec
         
         ############################### End recruitment Section #######################################
 
@@ -375,26 +412,26 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
         {
           # If below the minimum SSB ever observed assume growth is what was observed at the lowest SSB in the time series. Do not extrapolate...
           # This isn't terrible for a log normal, the huge outliers were so outlier that this doesn't really go far enough on BBn
-          if(SSB.init < min.SSB) mort[j,n,i] <- rlnorm(1,m.res$pred.dat$m.log[1],m.res$pred.dat$se[1])
+          if(SSB.init < min.SSB) mort[j,nn,i] <- rlnorm(1,m.res$pred.dat$m.log[1],m.res$pred.dat$se[1])
           # If above the maximum SSB ever observed, set recruitment to vary around the lowest recruitment numbers ever observed
           # This lets the user pick what the distribution will look like above the max.SSB, default allows for about 100 tonnes of recruitment at very high SSB.
-          if(SSB.init > max.SSB) mort[j,n,i] <- rlnorm(1,log(m.mod$mn.at.max),m.mod$sd.at.max) 
+          if(SSB.init > max.SSB) mort[j,nn,i] <- rlnorm(1,log(m.mod$mn.at.max),m.mod$sd.at.max) 
           # Finally the most complicated one is to pick from the predictions and get a recruitment estimate based on the linear model predictions and uncertainty
           # We do this when the SSB is within observed bounds.
           if(SSB.init >= min.SSB & SSB.init <= max.SSB)
           {
             pick <- which(m.res$pred.dat$SSB == round(SSB.init/100)* 100)
-            mort[j,n,i] <- rlnorm(1,m.res$pred.dat$m.log[pick],m.res$pred.dat$se[pick]) 
+            mort[j,nn,i] <- rlnorm(1,m.res$pred.dat$m.log[pick],m.res$pred.dat$se[pick]) 
           } # end if(SSB.for.rec >= min.SSB & SSB.for.rec <= max.SSB)
         } # end if(rec.mod$type %in% c("lm",'glm','gam'))
         
         if(m.mod$type %in% 'bp')
         {
           # 
-          if(run != 'model_error') mort[j,n,i] <- bp.function(B = SSB.for.rec,dat = prod.dat$m, type = m.mod$bp.strategy, bp = m.mod$bp,
+          if(run != 'model_error') mort[j,nn,i] <- bp.function(B = SSB.for.rec,dat = prod.dat$m, type = m.mod$bp.strategy, bp = m.mod$bp,
                                                                               max.B = max.SSB,mn.at.max = m.mod$mn.at.max,sd.at.max = m.mod$sd.at.max)
           
-          if(run == 'model_error') mort[j,n,i] <- bp.function(B = SSB.for.rec,dat = prod.dat$m,type = m.mod$bp.strategy, bp = m.mod$bp,sd = sigma_m,
+          if(run == 'model_error') mort[j,nn,i] <- bp.function(B = SSB.for.rec,dat = prod.dat$m,type = m.mod$bp.strategy, bp = m.mod$bp,sd = sigma_m,
                                                                               max.B = max.SSB,mn.at.max = m.mod$mn.at.max,sd.at.max = m.mod$sd.at.max)
         } # end if(rec.mod$type %in% 'bp')    
          
@@ -402,11 +439,11 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
          {
            # If above the maximum SSB ever observed, set recruitment to vary around the lowest recruitment numbers ever observed
            # This lets the user pick what the distribution will look like above the max.SSB, default allows for about 100 tonnes of recruitment at very high SSB.
-           if(SSB.init > max.SSB) mort[j,n,i] <- rlnorm(1,log(m.mod$mn.at.max),m.mod$sd.at.max) 
+           if(SSB.init > max.SSB) mort[j,nn,i] <- rlnorm(1,log(m.mod$mn.at.max),m.mod$sd.at.max) 
            # If above the breakpoint sample from the data above the breakpoint...
-           if(SSB.init > m.mod$bp & SSB.init <= max.SSB)  mort[j,n,i]  <- rlnorm(1,median(log(prod.dat$m[prod.dat$SSB > m.mod$bp]),na.rm=T),sd(log(prod.dat$m[prod.dat$SSB > m.mod$bp]),na.rm=T))
+           if(SSB.init > m.mod$bp & SSB.init <= max.SSB)  mort[j,nn,i]  <- rlnorm(1,median(log(prod.dat$m[prod.dat$SSB > m.mod$bp]),na.rm=T),sd(log(prod.dat$m[prod.dat$SSB > m.mod$bp]),na.rm=T))
            # For the rest grab the data from the correlation
-           if(SSB.init <= m.mod$bp)  mort[j,n,i] <- m.ts[j]
+           if(SSB.init <= m.mod$bp)  mort[j,nn,i] <- m.ts[j]
          }
         
         ############################### End natural mortality Section #######################################
@@ -425,42 +462,44 @@ res_sims <- paste0(res_url,sims,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strat
        
         if(j == 1)
         {
-          Bio[j,n,i] <- B.init
-          Rec[j,n,i] <- Rec.init
+          Bio[j,nn,i] <- B.init
+          Rec[j,nn,i] <- Rec.init
         }
         if(j < n_y)
         {
+          #browser()
           # Our projection forward
-          if(is.null(HCR.sim)) Catch[j,n,i]<-B.init*exp.scenario[i]
+          if(is.null(HCR.sim)) Catch[j,nn,i]<-B.init*exp.scenario[i]
           
           if(!is.null(HCR.sim))
           {
             # LRP catch
-            if(B.init < HCR.sim$LRP)  Catch[j,n,i] <- rlnorm(1,log(HCR.sim$LRP.exp),HCR.sim$exp.sd) * B.init
+            if(B.init < HCR.sim$LRP)  Catch[j,nn,i] <- rlnorm(1,log(HCR.sim$LRP.exp),HCR.sim$exp.sd) * B.init
             # Assume linear decline in Explotation to LRP in Cautious zone
-            if(B.init > HCR.sim$LRP & B.init <= HCR.sim$USR)  Catch[j,n,i] <- rlnorm(1,log(HCR.sim$USR.exp),HCR.sim$exp.sd)*B.init*((B.init-HCR.sim$LRP)/HCR.sim$LRP)
+            if(B.init > HCR.sim$LRP & B.init <= HCR.sim$USR)  Catch[j,nn,i] <- rlnorm(1,log(HCR.sim$USR.exp),HCR.sim$exp.sd)*B.init*((B.init-HCR.sim$LRP)/HCR.sim$LRP)
             # Harvest at USR explotation here
-            if(B.init > HCR.sim$USR & B.init < HCR.sim$TRP)  Catch[j,n,i] <- rlnorm(1,log(HCR.sim$USR.exp),HCR.sim$exp.sd) * B.init
+            if(B.init > HCR.sim$USR & B.init < HCR.sim$TRP)  Catch[j,nn,i] <- rlnorm(1,log(HCR.sim$USR.exp),HCR.sim$exp.sd) * B.init
             # Harvest at TRP explotation here
-            if(B.init >= HCR.sim$TRP)  Catch[j,n,i] <- rlnorm(1,log(HCR.sim$TRP.exp),HCR.sim$exp.sd)*B.init
+            if(B.init >= HCR.sim$TRP)  Catch[j,nn,i] <- rlnorm(1,log(HCR.sim$TRP.exp),HCR.sim$exp.sd)*B.init
           }
           #browser()
-          Bio[j+1,n,i] <- rlnorm(1,log(exp(-mort[j,n,i])*g[j,n,i]*(B.init-Catch[j,n,i])+Rec[j,n,i]*exp(-mort[j,n,i])*gR[j,n,i]),sigma_tau)
+          Bio[j+1,nn,i] <- rlnorm(1,log(exp(-mort[j,nn,i])*g[j,nn,i]*(B.init-Catch[j,nn,i])+Rec[j,nn,i]*exp(-mort[j,nn,i])*gR[j,nn,i]),sigma_tau)
           # The Surplus production this won't match Bio
-          Surp.prod[j,n,i]<- Bio[j+1,n,i] - B.init + Catch[j,n,i]
+          Surp.prod[j,nn,i]<- Bio[j+1,nn,i] - B.init + Catch[j,nn,i]
           # The realized rate of growth (r_fish)
-          r.realized[j,n,i] <- log(Bio[j+1,n,i]/B.init)
+          r.realized[j,nn,i] <- log(Bio[j+1,nn,i]/B.init)
           # The potential rate of growth (r), this method allows the catch to grow (or shrink) based on m and g.
-          r.no.fishing[j,n,i]<-   log((Bio[j+1,n,i] + exp(-mort[j,n,i])*g[j,n,i]*Catch[j,n,i])/B.init) #log(((exp(-mort[j,n,i])*g[j,n,i]*B.init)+Rec[j,n,i]*exp(-mort[j,n,i])*gR[j,n,i]) /B.init)
+          r.no.fishing[j,nn,i]<-   log((Bio[j+1,nn,i] + exp(-mort[j,nn,i])*g[j,nn,i]*Catch[j,nn,i])/B.init) #log(((exp(-mort[j,nn,i])*g[j,nn,i]*B.init)+Rec[j,nn,i]*exp(-mort[j,nn,i])*gR[j,nn,i]) /B.init)
           # Also calculate F using the end biomass result which is what we'd currently report as F in our decision tables
           # DK Note: Add in different ways of calculating F to see how different the F estimates might be.
-          f.table[j+1,n,i] <-  Catch[j,n,i] / (Bio[j+1,n,i] +  Catch[j,n,i])
+          f.table[j+1,nn,i] <-  Catch[j,nn,i] / (Bio[j+1,nn,i] +  Catch[j,nn,i])
+          #browser()
         } # end if(j < n_y)
          #browser()
       } # end the j loop through the years
-      Sim.res[[n]] <- data.frame(year = 1:n_y,Sim = rep(n,n_y), B = Bio[,n,i],Rec = Rec[,n,i],g = g[,n,i],gR = gR[,n,i],M = mort[,n,i],
-                                 Catch = Catch[,n,i], SP = Surp.prod[,n,i],F.dec.table = f.table[,n,i],
-                                 r.real = r.realized[,n,i],r.no.f = r.no.fishing[,n,i])
+      Sim.res[[nn]] <- data.frame(year = 1:n_y,Sim = rep(nn,n_y), B = Bio[,nn,i],Rec = Rec[,nn,i],g = g[,nn,i],gR = gR[,nn,i],M = mort[,nn,i],
+                                 Catch = Catch[,nn,i], SP = Surp.prod[,nn,i],F.dec.table = f.table[,nn,i],
+                                 r.real = r.realized[,nn,i],r.no.f = r.no.fishing[,nn,i])
     } # end the n loop through the simulations
     Exp.res[[i]] <- data.frame(F.scenario = rep(exp.scenario[i],n_y*n_sim),do.call('rbind',Sim.res))
     
@@ -692,16 +731,16 @@ if(save.results == T)
                                                   
                                                                                                                                                                       SP.L95 = quantile(SP,probs=0.025,na.rm=T),         SP.L50 = quantile(SP,probs=0.25,na.rm=T))
     # Biomass realizations          
-    B.real <- ggplot(Exp.res,aes(x=year,y=B,group = Sim,color=Sim)) + geom_point() + #facet_wrap(~F.scenario) +
+    B.real <- ggplot(Exp.res,aes(x=year,y=B,group = Sim,color=Sim)) + geom_line() + #facet_wrap(~F.scenario) +
                                                                       ylab("Predicted Biomass (metric tonnes)") + xlab("") + 
                                                                       geom_hline(yintercept = c(hcr.strat$LRP,hcr.strat$USR,hcr.strat$TRP),color=c('firebrick2','green','blue')) +
                                                                       scale_color_viridis_b(alpha=0.4,end = 0.75) +
                                                                       theme_bw() + theme(legend.position = 'none')
     
-    ggsave(paste0(plot_sims,"Biomass_realizations.png"),plot=B.real,height=10,width=10)              
+    ggsave(paste0(plot_sims,"Biomass_realizations.png"),plot=B.real,height=10,width=10)               
     
     # Catch realizations          
-    C.real <- ggplot(Exp.res,aes(x=year,y=Catch,group = Sim,color=Sim)) + geom_point() + #facet_wrap(~F.scenario) +
+    C.real <- ggplot(Exp.res,aes(x=year,y=Catch,group = Sim,color=Sim)) + geom_line() + #facet_wrap(~F.scenario) +
                                                                           ylab("Predicted Catch (metric tonnes)") + xlab("") + 
                                                                           #geom_hline(yintercept = c(hcr.strat$LRP,hcr.strat$USR,hcr.strat$TRP),color=c('firebrick2','green','blue')) +
                                                                           scale_color_viridis_b(alpha=0.4,end = 0.75) +
