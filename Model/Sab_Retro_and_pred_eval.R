@@ -27,34 +27,39 @@ for(fun in funs)
 # Get the Sab area outline...
 
 Sab.shape <- st_read("D:/Github/GIS_layers/survey_boundaries/Sab.shp", quiet=T)
-# Bring in the survey data from the NAS
-surv.dat <- readRDS('D:/Github/BBn_model/Results/Sab_surv.dat.RDS')
-# Need to get condition factor out of here too
-
-mod.dat <- readRDS('D:/Github/BBn_model/Results/Sab_model.dat.RDS')
-
-Sab.fishs <- readRDS('D:/Github/BBn_model/Results/Fishery_data/Sab_fish.dat.RDS')
-Sab.fishs$pro.repwt <- Sab.fishs$pro.repwt/1000 # It looks like what I saved is already in tonnes.
-
+Sab.shape <- Sab.shape %>% st_transform(crs = 32620) # Sab is a solid 20
+# Bring in the survey data
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90.Rdata")
+#load("D:/Framework/SFA_25_26_2024/Model/Data/testing_results_framework3.Rdata")
+#surv.dat <- surv.dat$Sab
+#saveRDS(surv.dat,'D:/Github/Sab_model/Results/Sab_surv.dat.RDS')
+#surv.dat <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/Sab_surv.dat.RDS')
+surv.dat <- surv.dat$Sab
+mod.dat <- survey.obj$Sab$model.dat
+Sab.fishs <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/Sab_fish.dat.RDS')
+Sab.fishs$pro.repwt <- Sab.fishs$pro.repwt/1000
+#### Finshed Data prep and clean up!
 
 
 # Set parameters for the run...
-repo.loc <- "D:/Github/BBn_model/"
+repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 atow<-800*2.4384/10^6 # area of standard tow in km2
-num.knots <- 4 # for SEAM
-R0 <- 55 # for SEAM
-qR <- 0.5 # for TLM
-mods <- c("TLM")
+years <- 1994:2022
+num.knots <- 10 # for SEAM
+#R0 <- 55 # for SEAM
+lqr <- log(0.5)# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+l.init.m <- log(2) # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05R.size <- "75"
+FR.size <- "90"
+R.size <- "75"
+mods <- c("SEAM")
 n.mods <- length(mods)
-retro.years <- 2010:2022
+retro.years <- 2010:2021
 n.retro.years <- length(retro.years)
 c_sys = 32620
 
 for(i in 1:n.mods)
 {
   mod.select <- mods[i]
-  # Transform Sable to 32620
-  Sab.shape <- Sab.shape %>% st_transform(crs = c_sys) # Sab is totally in 32620 border so think they are basically equivalent options here
   # Just going to use the core area to see if that helps model and the prediction function...
   # The survey data....
   live.subset <- surv.dat %>% dplyr::filter(state == 'live')
@@ -80,10 +85,10 @@ for(i in 1:n.mods)
   mod.growth.dat <- mod.dat
   # # Grab the growth data, we have ageing data from 1980's that I'm going to use to calculate growth here.
   # Data is coming from ageing data in 1989, found here.... Y:\Offshore\Assessment\Data\Ageing\archive\old_ageing_from_Amy_2022\SAB height at age 1989_2.pdf 
-  L.inf <- 136.628
+  L.inf <- 159.2
   #to <- 1.337 # So this uses a 1 year offset that we no longer believe in, going to make this 0.337 to align more with what we now do...
-  to <- 0.337
-  K <- 0.2269
+  to <- 0.2
+  K <- 0.2
   
   
   # This is weight in this year, which becomes t-1 
@@ -135,10 +140,25 @@ for(i in 1:n.mods)
   growths <- data.frame(g = c(mod.growth.dat$g,mod.growth.dat$g2[nrow(mod.growth.dat)]), 
                        gR = c(mod.growth.dat$gR,mod.growth.dat$gR2[nrow(mod.growth.dat)]),
                        year =  c(mod.growth.dat$year,max(mod.growth.dat$year+1)))
+  
+  if(mod.select != "TLM")
+  {
+    # For the moment we need to have this starting at year 1.
+    Sab.mesh <- setup_mesh(mod.input.sfs,model_bound = Sab.shape,nknot=num.knots, max.edge = c(8,20),cutoff=2.5,seed=34) 
+    Sab.mesh.sf <- inla.mesh2sf(Sab.mesh$mesh)
+    Sab.mesh.sf$triangles$geometry <- Sab.mesh.sf$triangles$geometry*1000
+    Sab.mesh.sf$vertices$geometry <- Sab.mesh.sf$vertices$geometry*1000
+    st_crs(Sab.mesh.sf$triangles) <- c_sys
+    st_crs(Sab.mesh.sf$vertices) <- c_sys
+    
+    # Now make the prediction grid
+    pred.grid<-setup_pred_grid(knots=Sab.mesh$knots,model_bound=Sab.mesh$utm_bound)
+    st_crs(pred.grid$grid) <- c_sys
+  }
 
   for(j in 1:n.retro.years)
   {
-      years <- 1994:retro.years[j]
+      years <- min(years):retro.years[j]
       NY <- length(years)
       #survey.obj$Sab$model.dat
       growth <- growths %>% dplyr::filter(year %in% c(years,(max(years)+1)))
@@ -184,71 +204,237 @@ for(i in 1:n.mods)
       catch.sf <- Sab.fish.sf %>% dplyr::select(pro.repwt,survey.year)
       names(catch.sf) <- c("Catch","Year","geometry")
        
-      # For the moment we need to have this starting at year 1.
-      catch.sf$Year <-  catch.sf$Year - (min(years)-1)
-      Sab.mesh <- setup_mesh(mod.input.sf,model_bound = Sab.shape,nknot=num.knots, max.edge = c(8,20),cutoff=2.5,seed=34) 
-      Sab.mesh.sf <- inla.mesh2sf(Sab.mesh$mesh)
-      Sab.mesh.sf$triangles$geometry <- Sab.mesh.sf$triangles$geometry*1000
-      Sab.mesh.sf$vertices$geometry <- Sab.mesh.sf$vertices$geometry*1000
-      st_crs(Sab.mesh.sf$triangles) <- c_sys
-      st_crs(Sab.mesh.sf$vertices) <- c_sys
-      
-      # Now make the prediction grid
-      pred.grid<-setup_pred_grid(knots=Sab.mesh$knots,model_bound=Sab.mesh$utm_bound)
-      st_crs(pred.grid$grid) <- c_sys
-      
-      #Sebdam catches
-      catchy <- catch_spread(catch = catch.sf,knots = Sab.mesh$knots)
-      catchy$sum_catches <- catchy$sum_catches[,-1] # A hack until Raph gets new model code up and running.
-      # For now we need to toss the first column from there
-      #TLM catch 
-      catch.tlm <- catch.sf %>% group_by(Year,.drop=F) %>% dplyr::summarise(catch = sum(Catch,na.rm=T))
-      
-      
-      #SEBDAM version 
-      if(mod.select == "SEAM")
+      # The SEBDAM set data.
+      if(mod.select != "TLM")
       {
-      set_data<-data_setup(data=mod.input.sf,growths=growth,catch=as.data.frame(catchy$sum_catches),
-                           model="SEBDAM",mesh=Sab.mesh$mesh,obs_mort=T, prior=TRUE,prior_pars=c(10,12),
-                           mult_qI=T,spat_approach="spde",
-                           knot_obj=Sab.mesh$knots,knot_area=pred.grid$area,separate_R_aniso =T,all_se=FALSE)
-      # So this will fix the mean value of m0 to be whatever the intial value is set at.  Let's see what happens!
-      set_data$par$log_m0 <- 0 # 0 = 1
-      set_data$par$log_R0 <- log(R0) # 5.3 = 200, 5 = 148, 4 = 55, 5.9915 = 400, 4.606 = 100
-      set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA))
-  
-      }
-      #TLM version, Dude is this ever sensitive to the q priors! (5,12) actually looks solid in terms of results... maybe we can get so lucky with SEBDAM :-)
-      # Note that the Catch time series should be 1 year longer than the survey data here!!
+        catchy <- catch_spread(catch = catch.sf,knots = Sab.mesh$knots)
+        catchy$sum_catches[,ncol(catchy$sum_catches)+1] <- 0
+        set_data<-data_setup(data=mod.input.sf,growths=growth[,1:2],catch=catchy$sum_catches[],
+                             model="SEBDAM",mesh=Sab.mesh$mesh,obs_mort=T,prior=T,prior_pars=c(10,12),#fix_m = 0.3,
+                             mult_qI=T,spat_approach="spde",
+                             knot_obj=Sab.mesh$knots,knot_area=pred.grid$area,separate_R_aniso = T,
+                             all_se=T,weighted_mean_m = T)
+        str(set_data)
+        
+        # So this will fix the mean value of m0 to be whatever the initial value is set at in the data_setup step.  Let's see what happens!
+        set_data$par$log_m0 <- l.init.m
+        #set_data$par$log_R0 <- l.init.R 
+        set_data$par$log_qR <- lqr
+        #set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA),log_qR = factor(NA))
+        set_data$map <-list(log_m0=factor(NA),log_qR = factor(NA))
+        #set_data$map <-list(log_m0=factor(NA))
+      } # end if(mod.select != "TLM")
+
+      # A TLM version of the same...
       if(mod.select == "TLM")
       {
-      set_data<-data_setup(data=as.data.frame(mod.input.sf),growths=growth[,1:2],catch=catch.tlm$catch,
-                            model="TLM",obs_mort=T,prior=T,prior_pars=c(10,12))
-      set_data$par$log_q_R <- log(qR) #-0.7 # Around 0.5, similar to some of the seam models.
-  
-      set_data$map <-list(log_q_R=factor(NA))
-      }
-  
-  
+        catch.tlm <- catch.sf %>% group_by(Year,.drop=F) %>% dplyr::summarise(catch = sum(Catch,na.rm=T))
+        catch.tlm[nrow(catch.tlm)+1,] <- catch.tlm[nrow(catch.tlm),]
+        catch.tlm$Year[nrow(catch.tlm)] <- max(catch.tlm$Year) + 1
+        catch.tlm$catch[nrow(catch.tlm)] <- 0
+        set_data<-data_setup(data=as.data.frame(mod.input.sf),growths=growth[,1:2],
+                             catch=catch.tlm$catch, model="TLM",obs_mort=TRUE,prior=TRUE)
+        # So this will fix the mean value of m0 to be whatever the initial value is set at in the data_setup step.  Let's see what happens!
+        #set_data<-fix_param(obj=set_data, pars = list(log_q_R=lqr))
+        set_data$par$log_q_R <- lqr # 
+        set_data$map <-list(log_q_R=factor(NA))
+      } # end if(mod.select == "TLM")
+      
       mod.fit<-fit_model(set_data,silent=F)
       
       # Now save the results appropriately
       if(mod.select != "TLM") 
       {
-        m0.par <- exp(set_data$par$log_m0)
-        r0.par <- signif(exp(set_data$par$log_R0),digits=2)
-        scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",m0.par,"_R0_",r0.par,"_",num.knots,"_knots")
-        saveRDS(mod.fit,paste0(repo.loc,"Results/Models/Sab/Retros/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
-        saveRDS(Sab.mesh,paste0(repo.loc,"Results/Models/Sab/Retros/Sab_",mod.select,"_model_output_",scenario.select,"_mesh.Rds"))
-        saveRDS(pred.grid,paste0(repo.loc,"Results/Models/Sab/Retros/Sab_",mod.select,"_model_output_",scenario.select,"_predict_grid.Rds"))
-        
+        scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",exp(l.init.m),"_qR_",exp(lqr),"_",num.knots,"_knots")
+        saveRDS(mod.fit,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
+        saveRDS(Sab.mesh,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,"_mesh.Rds"))
+        saveRDS(pred.grid,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,"_predict_grid.Rds"))
       }
       
       if(mod.select == "TLM") 
       {
-        qR.par <- sub("0.","0_",signif(exp(set_data$par$log_q_R),digits=2))
-        scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR.par)
-        saveRDS(mod.fit,paste0(repo.loc,"Results/Models/Sab/Retros/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
         
+        scenario.select <- paste0(min(years),"_",max(years),"_qR_",exp(lqr))
+        saveRDS(mod.fit,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
       }
   }} # End the i and j loops
+
+
+
+###################  SECTION 2 Make the Retro plots ##############################  SECTION 2 Make the Retro plots ###########
+# Now make the retrospective plots...
+
+# Set parameters for the run...
+repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
+years <- 1994:2022
+R.size <- "75"
+FR.size <- "90"
+num.knots <- 10 # Going to test 10
+lqr <- log(0.5)
+l.init.m <- log(2) # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
+# The survey biomass index for 1994 says there were 249 tonnes of recruits that year.
+#l.init.R <- log(250) # Going to test 100, 250, and 500.
+
+mod.select <- "SEAM"
+retro.years <- 2010:2021
+n.retro.years <- length(retro.years)
+
+#scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",exp(l.init.m),"_R0_",exp(l.init.R),"_",num.knots,"_knots")
+#tst <- readRDS("D:/framework/SFA_25_26_2024/Model/Results/Sab/R_75_FR_90/Retros/Sab_SEAM_model_output_1994_2010_vary_m_m0_0.4_qR_0.5_4_knots.Rds")
+
+mod.fit <- NULL
+retro.trends <- NULL
+pred.proc <- NULL
+for(j in retro.years)
+{
+  if(mod.select != "TLM") scenario.select <- paste0(min(years),"_",j,"_vary_m_m0_",exp(l.init.m),"_qR_",exp(lqr),"_",num.knots,"_knots")
+  if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",j,"_qR_",exp(lqr))
+  mod.fit[[j]] <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
+  pred.proc[[j]] <- get_processes(mod.fit[[j]])
+  
+  if(mod.select == "TLM")
+  {
+    retro.trends[[as.character(j)]] <- data.frame(years = min(years):(j+1),
+                                                  B =     pred.proc[[j]]$processes$B,
+                                                  B.LCI = exp(pred.proc[[j]]$log_processes$log_B - 1.96*pred.proc[[j]]$log_processes$se_log_B),
+                                                  B.UCI = exp(pred.proc[[j]]$log_processes$log_B + 1.96*pred.proc[[j]]$log_processes$se_log_B),
+                                                  R =     pred.proc[[j]]$processes$R,
+                                                  R.LCI = exp(pred.proc[[j]]$log_processes$log_R - 1.96*pred.proc[[j]]$log_processes$se_log_R),
+                                                  R.UCI = exp(pred.proc[[j]]$log_processes$log_R + 1.96*pred.proc[[j]]$log_processes$se_log_R),
+                                                  m =    pred.proc[[j]]$processes$m,
+                                                  m.LCI = exp(pred.proc[[j]]$log_processes$log_m - 1.96*pred.proc[[j]]$log_processes$se_log_m),
+                                                  m.UCI = exp(pred.proc[[j]]$log_processes$log_m + 1.96*pred.proc[[j]]$log_processes$se_log_m),
+                                                  retro.year = as.character(j), mod = mod.select, scenario = scenario.select)
+    retro.trends[[as.character(j)]] <- retro.trends[[as.character(j)]][-nrow(retro.trends[[as.character(j)]]),]
+  }
+  
+  if(mod.select != "TLM")
+  {
+    # Get the overall estimates + the 95% CI
+    retro.trends[[as.character(j)]] <- data.frame(years = min(years):(j+1),
+                                                  B = exp(pred.proc[[j]]$log_tot_frame$log_totB),
+                                                  R = exp(pred.proc[[j]]$log_tot_frame$log_totR),
+                                                  m = pred.proc[[j]]$totals$mean_m,
+                                                  B.LCI = exp(pred.proc[[j]]$log_tot_frame$log_totB - 1.96*pred.proc[[j]]$log_tot_frame$se_log_totB),
+                                                  B.UCI = exp(pred.proc[[j]]$log_tot_frame$log_totB + 1.96*pred.proc[[j]]$log_tot_frame$se_log_totB),
+                                                  R.LCI = exp(pred.proc[[j]]$log_tot_frame$log_totR - 1.96*pred.proc[[j]]$log_tot_frame$se_log_totR),
+                                                  R.UCI = exp(pred.proc[[j]]$log_tot_frame$log_totR + 1.96*pred.proc[[j]]$log_tot_frame$se_log_totR),
+                                                  m.LCI = exp(pred.proc[[j]]$log_tot_frame$log_mean_m - 1.96*pred.proc[[j]]$log_tot_frame$se_log_mean_m),
+                                                  m.UCI = exp(pred.proc[[j]]$log_tot_frame$log_mean_m + 1.96*pred.proc[[j]]$log_tot_frame$se_log_mean_m),
+                                                  retro.year = as.character(j), mod = mod.select, scenario = scenario.select)
+  }
+}
+
+retros <- do.call("rbind",retro.trends)
+
+# Remove the projection year for SEAM (does nothing for TLM)
+retro <- retros[!is.na(retros$R),]
+
+if(mod.select != "TLM") scenario.select <- paste0(min(years),"_",2022,"_vary_m_m0_",exp(l.init.m),"_qR_",exp(lqr),"_",num.knots,"_knots")
+if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",2022,"_qR_",qR)
+base.mod <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
+pred.base <- get_processes(base.mod)
+
+if(mod.select == "TLM")
+{
+  base.trend <-  data.frame(years = min(years):(j+1),
+                            B =     pred.base$processes$B,
+                            B.LCI = exp(pred.base$log_processes$log_B - 1.96*pred.base$log_processes$se_log_B),
+                            B.UCI = exp(pred.base$log_processes$log_B + 1.96*pred.base$log_processes$se_log_B),
+                            R =     pred.base$processes$R,
+                            R.LCI = exp(pred.base$log_processes$log_R - 1.96*pred.base$log_processes$se_log_R),
+                            R.UCI = exp(pred.base$log_processes$log_R + 1.96*pred.base$log_processes$se_log_R),
+                            m =    pred.base$processes$m,
+                            m.LCI = exp(pred.base$log_processes$log_m - 1.96*pred.base$log_processes$se_log_m),
+                            m.UCI = exp(pred.base$log_processes$log_m + 1.96*pred.base$log_processes$se_log_m),
+                            retro.year = "Base model",mod = mod.select, scenario = scenario.select)
+}
+
+
+if(mod.select != "TLM")
+{
+  # Get the overall estimates + the 95% CI
+  base.trends <- data.frame(years = min(years):(2023),
+                            B = exp(pred.base$log_tot_frame$log_totB),
+                            R = exp(pred.base$log_tot_frame$log_totR),
+                            m = pred.base$totals$mean_m,
+                            B.LCI = exp(pred.base$log_tot_frame$log_totB - 1.96*pred.base$log_tot_frame$se_log_totB),
+                            B.UCI = exp(pred.base$log_tot_frame$log_totB + 1.96*pred.base$log_tot_frame$se_log_totB),
+                            R.LCI = exp(pred.base$log_tot_frame$log_totR - 1.96*pred.base$log_tot_frame$se_log_totR),
+                            R.UCI = exp(pred.base$log_tot_frame$log_totR + 1.96*pred.base$log_tot_frame$se_log_totR),
+                            m.LCI = exp(pred.base$log_tot_frame$log_mean_m - 1.96*pred.base$log_tot_frame$se_log_mean_m),
+                            m.UCI = exp(pred.base$log_tot_frame$log_mean_m + 1.96*pred.base$log_tot_frame$se_log_mean_m),
+                            retro.year = "Base model",mod = mod.select, scenario = scenario.select)
+}
+
+# Remove the projection year for SEAM (does nothing for TLM)
+base.trend <- base.trends[!is.na(base.trends$R),]
+# combine retro and base
+retro.base <- rbind(retro,base.trend)
+
+
+cols <- c(rep('#005BBB',4),rep('firebrick2',4),rep('darkgrey',4),rep('#FFD500',4))
+points <- rep(c(21:24),4) 
+b.retro <- ggplot(data=retro.base,aes(x= years, y = B,group=retro.year,color=retro.year,shape = retro.year,fill = retro.year)) +
+  geom_line(size=1) + geom_point(size=3) + scale_shape_manual("",values = points) + 
+  scale_color_manual("",values =cols) + scale_fill_manual("",values =cols) +
+  scale_x_continuous(breaks = seq(1990,2030,by=5)) + xlab("") + 
+  ylab("Fully recruited biomass (tonnes)")
+save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.select,
+                 "/Sab_Biomass_retro.png"),b.retro,base_width = 10,base_height =7)
+
+
+r.retro <- ggplot(data=retro.base,aes(x= years, y = R,group=retro.year,color=retro.year,shape = retro.year,fill = retro.year)) +
+  geom_line(size=1) + geom_point(size=3) + scale_shape_manual("",values = points) + 
+  scale_color_manual("",values =cols) + scale_fill_manual("",values =cols)  + 
+  scale_x_continuous(breaks = seq(1990,2030,by=5)) + xlab("") + 
+  ylab("Recruit biomass (tonnes)")
+save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.select,
+                 "/Sab_Recruit_retro.png"),r.retro,base_width = 10,base_height =7)
+
+
+m.retro <- ggplot(data=retro.base,aes(x= years, y = m,group=retro.year,color=retro.year,shape = retro.year,fill = retro.year)) +
+  geom_line(size=1) + geom_point(size=3) + scale_shape_manual("",values = points) + 
+  scale_color_manual("",values =cols) + scale_fill_manual("",values =cols)  + 
+  scale_x_continuous(breaks = seq(1990,2030,by=5)) + xlab("") + 
+  ylab("Natural mortality (instantaneous)")
+save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.select,
+                 "/Sab_mort_retro.png"),m.retro,base_width = 10,base_height =7)
+
+# Calculate mohn's rho, it is simply the Relative bias of the estimate...
+# So now bring in the final model run to get the 'true' value for the calculation
+
+bias <- NULL
+
+# Do a 5 year peel as recommend
+for(j in retro.years)
+{
+  retro.dat <- retro %>% dplyr::filter(retro.year==j,years ==j)
+  base.dat <- base.trend %>% dplyr::filter(years == j)
+  bias[[as.character(j)]] <- data.frame(B = (retro.dat$B - base.dat$B),
+                                        rel.B = (retro.dat$B - base.dat$B) / base.dat$B,
+                                        R = (retro.dat$R - base.dat$R),
+                                        rel.R = (retro.dat$R - base.dat$R) / base.dat$R,
+                                        m = (retro.dat$m - base.dat$m),
+                                        rel.m = (retro.dat$m - base.dat$m) / base.dat$m,
+                                        mod = mod.select)
+}
+
+
+# So now we can use this to calculate mohn's rho
+bias <- do.call('rbind',bias)
+#Remove 2020 as there is no survey data....
+bias <- bias[row.names(bias) != "2020",]
+# mohn's rho being fine when it is < 0.2 is found in Hutrtado-Ferro 2015 paper.
+# Not we are removing 2020 from this since we don't have any survey data.
+mohns.rhos <- data.frame(mr.B = sum(bias$rel.B)/n.retro.years,
+                         mr.R = sum(bias$rel.R)/n.retro.years,
+                         mr.m = sum(bias$rel.m)/n.retro.years,
+                         mr.B5 = sum(bias$rel.B[(nrow(bias)-4):nrow(bias)])/5,
+                         mr.R5 = sum(bias$rel.R[(nrow(bias)-4):nrow(bias)])/5,
+                         mr.m5 = sum(bias$rel.m[(nrow(bias)-4):nrow(bias)])/5,
+                         mod = mod.select)
+
+saveRDS(mohns.rhos,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_mohns_rose_",mod.select,"_",scenario.select,".Rds"))
+saveRDS(bias,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_bias_",mod.select,"_",scenario.select,".Rds"))
+

@@ -72,10 +72,10 @@ R.size <- "75"
 FR.size <- "90"
 num.knots <- 10 # Going to test 10, 15, and 20
 lqr <- log(0.5)# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1. Can be used with SEAM too in place of the m and R initiailztion.
-l.init.m <- log(0.15) # This is for SEAM, sets first year natural mortality, going to test 0.8,0.4, 0.15, and 0.05
+l.init.m <- log(1) # This is for SEAM, sets first year natural mortality, going to test 0.8,0.4, 0.15, and 0.05
 # The survey biomass index for 1994 says there were 249 tonnes of recruits that year.
-l.init.R <- log(5) # I think this is initializing the knots, i.e. each knots with this number of recruits.  Aim for 250 total
-#qR.par <- log(0.5) # Trying with a fixed qR for SEAM instead
+#l.init.R <- log(5) # I think this is initializing the knots, i.e. each knots with this number of recruits.  Aim for 250 total
+#qR.par <- log(0.9) # Trying with a fixed qR for SEAM instead
 
 live.subset <- surv.dat %>% dplyr::filter(state == 'live' & random ==1)
 dead.subset <- surv.dat %>% dplyr::filter(state== "dead" & random ==1)
@@ -97,7 +97,7 @@ mod.input.sf <- mod.input.sf %>% dplyr::filter(year %in% years)
 # We need to recalculate the growth data using the new von B curves and size bins... breaking out the ugly code to do this...
 vonB.par <- data.frame(Linf = 164.4,K = 0.2, t0 = -0.2)
 #vonB.par <- data.frame(Linf = 168.2,K = 0.189, t0 = -0.23)
-vonB.par <- data.frame(Linf = 148,K = 0.19, t0 = 0.11)
+#vonB.par <- data.frame(Linf = 148,K = 0.19, t0 = 0.11)
 
 
 # Back to real code
@@ -213,7 +213,7 @@ knots.sf$geometry <- knots.sf$geometry*1000
 st_crs(knots.sf) <- 32619
 
 # Plot the mesh
-#ggplot(bbn.mesh.sf$triangles) + geom_sf() + geom_sf(data= bbn.shape,fill = NA,color = 'blue',size=2) + geom_sf(data = knots.sf,fill = NA)
+#ggplot(bbn.mesh.sf$triangles) + geom_sf() + geom_sf(data= bbn.shape,fill = NA,color = 'darkblue',size=2) + geom_sf(data = knots.sf,fill = NA)
 # Now make the prediction grid
 pred.grid<-setup_pred_grid(knots=bbn.mesh$knots,model_bound=bbn.mesh$utm_bound)
 # Plot the grid
@@ -275,13 +275,17 @@ mod.fit<-fit_model(set_data,silent=F)
 if(mod.select != "TLM")
 {
   m0.par <- signif(exp(set_data$par$log_m0),digits=2)
-  r0.par <- signif(exp(set_data$par$log_R0),digits=2)
-
+  #r0.par <- signif(exp(set_data$par$log_R0),digits=2)
+  qR.par <- signif(exp(set_data$par$log_qR),digits=2)
   scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",m0.par,"_qR_",qR.par,"_",num.knots,"_knots")
-  # scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",m0.par,"_R0_",r0.par,"_",num.knots,"_knots")
+  #scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",m0.par,"_R0_",r0.par,"_",num.knots,"_knots")
   saveRDS(mod.fit,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,".Rds"))
   saveRDS(bbn.mesh,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_mesh.Rds"))
   saveRDS(pred.grid,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_predict_grid.Rds"))
+  # Other explorations...
+  # saveRDS(mod.fit,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_q_0_33.Rds"))
+  # saveRDS(bbn.mesh,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_q_0_33_mesh.Rds"))
+  # saveRDS(pred.grid,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_q_0_33_predict_grid.Rds"))
 }
 
 if(mod.select == "TLM") 
@@ -305,7 +309,7 @@ if(mod.select == "TLM")
 atow<-800*2.4384/10^6 # area of standard tow in km2
 num.knots <- 10 # 10, 15, and 20
 RO <- 5 # Going to test 100, 250, and 500.
-m0 <- 0.15 # log(0.05) # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
+m0 <- 2 # log(0.05) # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
 lqr <- log(0.5)
 qR  <- "0_3" # This is just for TLM models, 0_5, 0_3, and 0_1
 R.size <- "75"
@@ -718,68 +722,117 @@ ann.exploit$FM.UCI <- 1-exp(-ann.exploit$exploit.UCI)
 
 # Biomass time series
 bm.ts.plot <- ggplot(pred.proc$log_processes) + geom_line(aes(year,exp(log_B)),color='firebrick2',linewidth=1.5) + 
-  geom_ribbon(aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.5,fill='blue',color='blue') +
+  geom_ribbon(aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
   xlab("") + ylab("Fully Recruited Biomass (tonnes)") + scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,4.25e4))
 save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Biomass_time_series.png"),bm.ts.plot,base_width = 11,base_height = 8.5)
 # Recruit time series
 rec.ts.plot <- ggplot(pred.proc$log_processes) + geom_line(aes(year,exp(log_R)),color='firebrick2',linewidth=1.5) + 
-  geom_ribbon(aes(ymin=totR.LCI,ymax=totR.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+  geom_ribbon(aes(ymin=totR.LCI,ymax=totR.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
   xlab("") + ylab("Recruit Biomass (tonnes)")  + scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.95e4))
 save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Recruit_time_series.png"),rec.ts.plot,base_width = 11,base_height = 8.5)
 # Natural mortality time series...
 mort.ts.plot <- ggplot(pred.proc$log_processes) + geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) + 
-  geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+  geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
   xlab("") + ylab("Natural mortality (Instantaneous)") + scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.35))
 save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_nat_mort_time_series.png"),mort.ts.plot,base_width = 11,base_height = 8.5)
 # Explotation Rate Time Series
-exploit.plot <- ggplot(ann.exploit) + geom_line(aes(x=year,y=exploit),size=1.5) + geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.5,fill='blue',color='blue') +
+exploit.plot <- ggplot(ann.exploit) + geom_line(aes(x=year,y=exploit),size=1.5) + geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
   xlab("") + ylab("Exploitation Rate (Proportional)") + scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.35))
 save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_exploit_time_series.png"),exploit.plot,base_width = 11,base_height = 8.5)
 
 
 # Same plots but remvoing missing survey years....
 bm.ts.plot <- ggplot(pred.proc$log_processes %>% dplyr::filter(year < c(2020))) + 
-                            geom_line(aes(year,exp(log_B)),color='firebrick2',linewidth=1.5) +  geom_ribbon(aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            geom_line(aes(year,exp(log_B)),color='firebrick2',linewidth=1.5) +  geom_ribbon(aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             # geom_line(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(year,exp(log_B)),color='firebrick2',linewidth=1.5) +  
-                            # geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            # geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             geom_line(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(year,exp(log_B)),color='firebrick2',linewidth=1.5) +  
-                            geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             ylim(c(0,4.25e4)) + xlab("") + ylab("Fully Recruited Biomass (tonnes)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Biomass_time_series_no_missing_surveys.png"),bm.ts.plot,base_width = 11,base_height = 8.5)
 # Recruit time seris
 rec.ts.plot <- ggplot(pred.proc$log_processes %>% dplyr::filter(year < c(2020))) + 
-                            geom_line(aes(year,exp(log_R)),color='firebrick2',linewidth=1.5) +  geom_ribbon(aes(ymin=totR.LCI,ymax=totR.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            geom_line(aes(year,exp(log_R)),color='firebrick2',linewidth=1.5) +  geom_ribbon(aes(ymin=totR.LCI,ymax=totR.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             # geom_line(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(year,exp(log_R)),color='firebrick2',linewidth=1.5) +  
-                            # geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(ymin=totR.LCI,ymax=totR.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            # geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(ymin=totR.LCI,ymax=totR.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             geom_line(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(year,exp(log_R)),color='firebrick2',linewidth=1.5) +  
-                            geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(ymin=totR.LCI,ymax=totR.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(ymin=totR.LCI,ymax=totR.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             xlab("") + ylab("Recruit Biomass (tonnes)") + ylim(c(0,1.95e4)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Recruit_time_series_no_missing_surveys.png"),rec.ts.plot,base_width = 11,base_height = 8.5)
 # Natural mortality time series...
 mort.ts.plot <- ggplot(pred.proc$log_processes %>% dplyr::filter(year < c(2020))) + 
-                            geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) +  geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) +  geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             #geom_line(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) +  
-                            #geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            #geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             geom_line(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) +  
-                            geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.5,fill='blue',color='blue') + 
+                            geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
                             xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,1.35)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_nat_mort_time_series_no_missing_surveys.png"),mort.ts.plot,base_width = 11,base_height = 8.5)
 
 
 # Explotation Rate Time Series
 exploit.plot <- ggplot(ann.exploit%>% dplyr::filter(year < c(2020))) + geom_line(aes(x=year,y=exploit),linewidth = 1.5) +
-                            geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.5,fill='blue',color='blue') +
+                            geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
                             geom_line(data= ann.exploit%>% dplyr::filter(year %in% 2021:2022),aes(x=year,y=exploit),linewidth = 1.5) +
-                            geom_ribbon(data= ann.exploit%>% dplyr::filter(year %in% 2021:2022),aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.5,fill='blue',color='blue') +
+                            geom_ribbon(data= ann.exploit%>% dplyr::filter(year %in% 2021:2022),aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.5,fill='darkblue',color='darkblue') +
                             xlab("") + ylab("Exploitation Rate (Proportional)") + ylim(c(0,0.35)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_exploit_time_series_no_missing_surveys.png"),exploit.plot,base_width = 11,base_height = 8.5)
 
 
 ## One Step ahead residuals, this seems to work pretty well, but is slow so only
-# calculate these for my favourite model. Also figure out what they mean!!
-tst <- oneStepPredict(mod.fit$obj,observation.name="logI", 
-                      data.term.indicator = 'keep_I',
-                      method="oneStepGaussianOffMode",discrete = F)
-qqnorm(tst$residual); abline(0,1)
+# calculate these for my favourite models. Also figure out what they mean!!
+osr <- oneStepPredict(mod.fit$obj,observation.name="logI", data.term.indicator = 'keep_I', method="oneStepGaussianOffMode",discrete = F)
+saveRDS(osr,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_",scenario.select,"_One_Step_residuals.Rds"))
+
+osr <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_",scenario.select,"_One_Step_residuals.Rds"))
+# So this takes about 3 seconds for every observation
+plot(osr$residual)
+# I think we can combine these with the data and look at them by year and probably spatially, go explore that tomorrow....
+osr.dat <- data.frame(osr,I = mod.fit$obj$env$data$logI,
+                      IR = mod.fit$obj$env$data$logIR)
+
+ggplot(osr.dat) + geom_point(aes(x=I,y=residual))
+ggplot(osr.dat) + geom_point(aes(x=IR,y=residual))
 
 
+
+
+qq.plt <- gg_qq(osr$residual)
+
+gg_qq <- function(x, distribution = "norm", ..., line.estimate = NULL, conf = 0.95,
+                  labels = names(x)){
+  q.function <- eval(parse(text = paste0("q", distribution)))
+  d.function <- eval(parse(text = paste0("d", distribution)))
+  x <- na.omit(x)
+  ord <- order(x)
+  n <- length(x)
+  P <- ppoints(length(x))
+  df <- data.frame(ord.x = x[ord], z = q.function(P, ...))
+  
+  if(is.null(line.estimate)){
+    Q.x <- quantile(df$ord.x, c(0.25, 0.75))
+    Q.z <- q.function(c(0.25, 0.75), ...)
+    b <- diff(Q.x)/diff(Q.z)
+    coef <- c(Q.x[1] - b * Q.z[1], b)
+  } else {
+    coef <- coef(line.estimate(ord.x ~ z))
+  }
+  
+  zz <- qnorm(1 - (1 - conf)/2)
+  SE <- (coef[2]/d.function(df$z)) * sqrt(P * (1 - P)/n)
+  fit.value <- coef[1] + coef[2] * df$z
+  df$upper <- fit.value + zz * SE
+  df$lower <- fit.value - zz * SE
+  
+  if(!is.null(labels)){ 
+    df$label <- ifelse(df$ord.x > df$upper | df$ord.x < df$lower, labels[ord],"")
+  }
+  
+  p <- ggplot(df, aes(x=z, y=ord.x)) +
+    geom_point() + 
+    geom_abline(intercept = coef[1], slope = coef[2]) +
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha=0.2) 
+  if(!is.null(labels)) p <- p + geom_text( aes(label = label))
+  print(p)
+  coef
+}
