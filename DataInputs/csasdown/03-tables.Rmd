@@ -14,6 +14,7 @@ require(kableExtra)
 require(officedown)
 require(officer)
 require(flextable)
+require(dplyr)
 strata <- readxl::read_excel("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/survey_design.xlsx")
 strata$`Area (km^2)` <- round(x=as.numeric(strata$`Area (km^2)`), digits=2)
 strata <- strata[1:17,]
@@ -23,8 +24,21 @@ strata
 #   kableExtra::collapse_rows(columns = 1:4, valign = "top")
 
 ps_tab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/ps_tab.csv")
-ps_tab <- select(ps_tab, -X, -main)
+ps_tab <- dplyr::select(ps_tab, -X, -main)
 names(ps_tab) <- c("SFA", "Management unit", "Number of samples", "Number of years with PS data", "Most recent year with PS data", "Number of months with PS data", "Long term median (mc)", "Standard deviation (mc)", "Minimum (mc)", "Maximum (mc)")
+
+mwsh_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/AICtable.csv")
+mwsh_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/AICtable.csv")
+mwsh_bbn$`Management Unit` <- "Browns Bank North"
+mwsh_sab$`Management Unit` <- "Sable Bank"
+mwsh <- rbind(mwsh_sab, mwsh_bbn)
+mwsh <- dplyr::select(mwsh, -X)
+mwsh <- data.frame(mwsh$`Management Unit`, mwsh[,1:(ncol(mwsh)-1)])
+names(mwsh) <- c("Management Unit", "dAIC", "df", "Model", "Formula")
+mwsh <- unique(dplyr::select(mwsh, `Management Unit`, Model, Formula, df, dAIC))
+mwsh$`Management Unit`[mwsh$`Management Unit`=="Sable Bank"] <- c("Sable Bank", rep(NA, (length(unique(mwsh$Model))-1)))
+mwsh$`Management Unit`[mwsh$`Management Unit`=="Browns Bank North" & !is.na(mwsh$`Management Unit`)] <- c("Browns Bank North", rep(NA, (length(unique(mwsh$Model))-1)))
+
 
 ageing_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/summary_stats.csv")
 ageing_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/summary_stats.csv")
@@ -53,12 +67,12 @@ sum_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/
 
 inc <- full_join(inc_bbn, inc_sab)
 inc$height <- paste0(inc$med_height, " (", round(inc$sd_height,2), ")")
-inc <- pivot_wider(select(inc, -X), id_cols=AGE, names_from = bank, values_from=c(n_inc, height))
+inc <- pivot_wider(dplyr::select(inc, -X), id_cols=AGE, names_from = bank, values_from=c(n_inc, height))
 inc <- inc[,c("AGE", "n_inc_Sab", "height_Sab", "n_inc_BBn", "height_BBn")]
 names(inc) <- c("Age assigned", "Number of increments (Sab)", "Median height (Sab, SD)",  "Number of increments (BBn)", "Median height (BBn, SD)")
 
 age_summary <- full_join(sum_sab, sum_bbn)
-age_summary <- select(age_summary, bank, year, tows, shells, increments, -X, -ager)
+age_summary <- dplyr::select(age_summary, bank, year, tows, shells, increments, -X, -ager)
 names(age_summary) <- c("Management unit", "Year", "Number of tows", "Number of shells", "Number of increments")
 
 opts <- options(knitr.kable.NA = "")
@@ -99,6 +113,26 @@ csas_table(ps_tab, caption ="Port sampling data summary.") %>%
 
 #<!---BLOCK_LANDSCAPE_START--->
 ```
+
+
+
+```{r mwsh-tab, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+csas_table(mwsh, caption ="Meat weight-shell height model comparison results.") %>% 
+  kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
 
 ```{r echo=F, message=F, eval=F}
 ### IGNORE THIS CHUNK. FOR PRESENTATION ONLY

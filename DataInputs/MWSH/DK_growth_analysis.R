@@ -20,9 +20,26 @@ library(arm)
 
 # hydration data
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90_newareas_issue120.RData")
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90_newareas_issue120.RData")
+#load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90_newareas_issue120.RData")
 
 #load("C:/Users/keyserf/Documents/temp_data/testing_results_spring2022_2.Rdata")
+
+nickname<-NULL
+
+french <- F # set to T for french
+if(french == T) {
+  nickname <- paste0(nickname, "_fr")
+}
+
+require(rosettafish)
+funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs)
+{
+  download.file(fun,destfile = basename(fun))
+  rosetta_terms <- read.csv(paste0(getwd(),"/",basename(fun)), encoding = "UTF-8")
+  file.remove(paste0(getwd(),"/",basename(fun)))
+}
 
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH"
 direct_fns <- "D:/Github/Assessment_fns/"
@@ -36,7 +53,7 @@ for(fun in funs)
 } # end for(un in funs)
 
 # A qqplot function
-qqplot.data <- function (dat,facet=F) 
+qqplot.data <- function (dat,facet=F, ncol=NULL,...)
   # argument: vector of numbers if facet = F, or if facet =T two columns first being a vector of numbers and a second column with faceting variable
 {
   # following four lines from base R's qqline()
@@ -47,9 +64,13 @@ qqplot.data <- function (dat,facet=F)
     slope <- diff(y)/diff(x)
     int <- y[1L] - slope * x[1L]
     d <- data.frame(resids = dat)
-    p <- ggplot(d, aes(sample = resids)) + stat_qq() + geom_abline(slope = slope, intercept = int)
+    p <- ggplot(d, aes(sample = resids)) +
+      stat_qq(size=0.5) +
+      geom_abline(slope = slope, intercept = int) +
+      xlab(en2fr("Theoretical", custom_terms=rosetta_terms, translate=french)) +
+      ylab(en2fr("Sample", custom_terms=rosetta_terms, translate=french))
   } # end if is.null(facet)
-  
+
   if(facet == T)
   {
     names(dat) <- c("var","facet")
@@ -66,8 +87,13 @@ qqplot.data <- function (dat,facet=F)
       dat.res[[i]] <- data.frame(var = dt$var,facet = dt$facet,slope = rep(slope,nrow(dt)),int = rep(int,nrow(dt)))
     }
     dat.res <- do.call("rbind",dat.res)
-    p <- ggplot(dat.res, aes(sample = var)) + stat_qq() + geom_abline(aes(slope = slope, intercept = int)) + facet_wrap(~facet)
-    
+    p <- ggplot(dat.res, aes(sample = var)) +
+      stat_qq(size=0.5) +
+      geom_abline(aes(slope = slope, intercept = int)) +
+      facet_wrap(~facet, ncol=ncol) +
+      xlab(en2fr("Theoretical", custom_terms=rosetta_terms, translate=french)) +
+      ylab(en2fr("Sample", custom_terms=rosetta_terms, translate=french))
+
     }# end facet == T
   print(p)
 } # end fun
@@ -88,7 +114,7 @@ sub <- sub %>% dplyr::filter(sh >= 65)
 sh.cond <- 100
 sub$log.sh.cen <- log(sub$sh) - log(sh.cond)
 # Same idea here, if we center depth on the bank median, then our intercept is the condition at the median
-# Bank depth, which should be our measure of condition 
+# Bank depth, which should be our measure of condition
 #Going to say median depth of the survey tows between 2010 and 2022 see above
 # For BBn this is 75 meters, which makes loads of sense. So Center the depth at the bank mean
 med.depth <- sub %>% dplyr::filter(year %in% 2010:2022) %>% dplyr::summarise(med = median(depth,na.rm=T)) %>% signif(digits=2)
@@ -123,30 +149,30 @@ yellows <- "#FFDD00"
 # Start the analysis here. I think the logical flow for this section is
 # !!!!FREYA KEYSER!!!!!! look here for what I think is a logical flow for this section.
 # 1: We attempted to model the data using a single generalized mixed effects model, but unfortunately the model was unable to converge when attempting to included
-#    annual variability in the intercept or slope of the MW-SH relationship or if we tried to include depth. 
-# 2: In lieu of this we fit several simple general linear models, the results from these models, we see the AICtab results in a table that indicate that 
+#    annual variability in the intercept or slope of the MW-SH relationship or if we tried to include depth.
+# 2: In lieu of this we fit several simple general linear models, the results from these models, we see the AICtab results in a table that indicate that
 #    allowing SH and depth to vary by year is clearly preferred over more simple models. The residual patterns of these models weren't brilliant, but we're terrible
 # 3: Given that scallop collected from a survey tow are not 'independent' and this needs to be accounted for, since we can't do this using one glmer
 #    we decided to develop separate MW-SH models for each year (cite inshore for this too)
 #    using a mixed effect framework with tow as a random effect (intercept only) and having both SH and a linear depth term included in the models as fixed effects.
 # 4: For the condition, by centering the sh at 100 mm (i.e. 0 = 100mm) and centering the depth at the median for the bank (75m =0), the intercept
-#    of the glmer is actually our condition estimate at 100 mm. The other nice thing about that is we now are able to get an estimate of uncertainty 
+#    of the glmer is actually our condition estimate at 100 mm. The other nice thing about that is we now are able to get an estimate of uncertainty
 #    right out of the model, it is dead simple solution and I think it's iron clad.
-# 4: I think the AIC table for the glms should be fine to summarize the obvious need for allowing slope and depth to vary by year.  
+# 4: I think the AIC table for the glms should be fine to summarize the obvious need for allowing slope and depth to vary by year.
 # 4: The figures I think we should include in the Res Doc have all been given a name, and I'm open to adding more figures if you think we should.
 
 ####################################################################
 
 
 
-################## Section 1  Section 1  Section 1  ################## ################## ################## ################## 
+################## Section 1  Section 1  Section 1  ################## ################## ################## ##################
 # This section was useful to show that the Gamma models have better residual structure than the Gaussian models, but we can't do much with them because
 # the more complex models we'd need don't converge.
 # So here I'm deviating from ZUUR who suggests making a highly complex fixed effect structure before exploring the
 # random effects, but from a understanding what we are doing perspective I find this much more intuitive
 # So we have million options, clearly the model we have has some issues.  We know we have a random tow effect, so let's move to lmer...
 mod.lmer <- lmer(log(wmw) ~ log.sh.cen + (1|new_ID),data=sub, na.action = na.omit)
-# or glmer, more statistically correct 
+# or glmer, more statistically correct
 mod.glmer <- glmer(wmw ~ log.sh.cen + (1|new_ID),data=sub, na.action = na.omit,family = gaussian(link=log))
 # Get data to compare
 diag.lmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.lmer))
@@ -180,7 +206,7 @@ ggplot(data=diag.gamma.glmer,aes(depth,y=residuals)) +  geom_boxplot(aes(group =
 # What about tow effects. can see that these are way better now, some tows are really highly variable.
 ggplot(data=diag.gamma.glmer,aes(x=tow,y=residuals)) + geom_point()
 # Now we could make the random effect more complex and fit the MW-SH relationship for each tow like this.
-mod.gamma.re.slope.glmer <- glmer(wmw ~ log.sh.cen + (1+ Log.HEIGHT.CTR|new_ID),data=sub, na.action = na.omit,family = Gamma(link=log))
+mod.gamma.re.slope.glmer <- glmer(wmw ~ log.sh.cen + (1+ log.sh.cen|new_ID),data=sub, na.action = na.omit,family = Gamma(link=log))
 summary(mod.gamma.re.slope.glmer)
 
 
@@ -202,8 +228,8 @@ ggplot(data=diag.gamma.re.slope.glmer,aes(x=tow,y=residuals)) + geom_point()
 # The logic of using this model is fairly simple... We want to allow each tow to have it's own MW-SH relationship
 # the belief being that growth will differ across the area.
 # We can easily argue the converse that this is chasing noise in the data and we can't estimate a MW-SH relationship for each tow, thus
-# we assume a 'global' slope of the MW-SH relationship and just allow the intercept to change for each tow.  
-# The results are very similar. 
+# we assume a 'global' slope of the MW-SH relationship and just allow the intercept to change for each tow.
+# The results are very similar.
 # From an applied perspective I think either option is reasonable, thus I'll suggest we go for the more simple model
 # it also looks like we have convergence issues with a full model.
 
@@ -212,20 +238,20 @@ ggplot(data=diag.gamma.re.slope.glmer,aes(x=tow,y=residuals)) + geom_point()
 # change each year.
 
 # BUT THESE MODELS aren't able to converge... so the full models are out the window!!
-mod.gamma.full.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year) + depth.cen* as.factor(year)  + (1|new_ID),data=sub, 
-                              na.action = na.omit,family = Gamma(link=log))
-# Now there are 4 models we can compare here, drop the depth changing by year
-mod.gamma.dep.static.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year) + depth.cen  + (1|new_ID),data=sub, 
-                                    na.action = na.omit,family = Gamma(link=log))
-# Or drop the slope changing by year
-mod.gamma.slope.static.glmer <- glmer(wmw ~ log.sh.cen + depth.cen* as.factor(year)  + (1|new_ID),data=sub, 
-                                      na.action = na.omit,family = Gamma(link=log))
-# We could get rid of the depth term altogether but keep slope of MW-SH varying by year
-mod.gamma.no.depth.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year)  + (1|new_ID),data=sub, 
-                                  na.action = na.omit,family = Gamma(link=log))
-# We could get rid of the depth term altogether and just allow year to influence intercept of MW-SH
-mod.gamma.no.depth.no.slope.vary.glmer <- glmer(wmw ~ log.sh.cen+ as.factor(year)  + (1|new_ID),data=sub, 
-                                                na.action = na.omit,family = Gamma(link=log))
+# mod.gamma.full.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year) + depth.cen* as.factor(year)  + (1|new_ID),data=sub,
+#                               na.action = na.omit,family = Gamma(link=log))
+# # Now there are 4 models we can compare here, drop the depth changing by year
+# mod.gamma.dep.static.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year) + depth.cen  + (1|new_ID),data=sub,
+#                                     na.action = na.omit,family = Gamma(link=log))
+# # Or drop the slope changing by year
+# mod.gamma.slope.static.glmer <- glmer(wmw ~ log.sh.cen + depth.cen* as.factor(year)  + (1|new_ID),data=sub,
+#                                       na.action = na.omit,family = Gamma(link=log))
+# # We could get rid of the depth term altogether but keep slope of MW-SH varying by year
+# mod.gamma.no.depth.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year)  + (1|new_ID),data=sub,
+#                                   na.action = na.omit,family = Gamma(link=log))
+# # We could get rid of the depth term altogether and just allow year to influence intercept of MW-SH
+# mod.gamma.no.depth.no.slope.vary.glmer <- glmer(wmw ~ log.sh.cen+ as.factor(year)  + (1|new_ID),data=sub,
+#                                                 na.action = na.omit,family = Gamma(link=log))
 
 
 # So as fun as that exploration was, the answer is full models are too complex
@@ -256,7 +282,7 @@ ggplot(diag.glm) + geom_point(aes(x=tow,y=residuals)) + facet_wrap(~mod)
 # What about linear model log transformed... it really sucks...
 mod.lm <- lm(log(wmw) ~ log.sh.cen ,data=sub, na.action = na.omit)
 # Now look at model diagnostics.
-# Combine the residuals into the sub data to compare against 
+# Combine the residuals into the sub data to compare against
 diag.lm <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = mod.lm$residuals)
 # Normality is a big fail for a straight linear model, interesting how much worse it is than the Gaussian glm eh!
 qqplot.data(diag.lm$residuals)
@@ -275,7 +301,7 @@ ggplot(data=diag.lm,aes(x=tow,y=residuals)) + geom_point()
 
 
 # So the takeaway from the above is we should use a glm
-# Since the glms are clearly better than the lm models, lets compare the glm's with Gamma 
+# Since the glms are clearly better than the lm models, lets compare the glm's with Gamma
 mod.full.glm <- glm(wmw ~ log.sh.cen*as.factor(year) + depth.cen*as.factor(year),data=sub, na.action = na.omit,family=Gamma(link="log"))
 mod.2.glm<- glm(wmw ~ log.sh.cen*as.factor(year) + depth.cen,data=sub, na.action = na.omit,family=Gamma(link="log"))
 mod.3.glm <- glm(wmw ~ log.sh.cen+as.factor(year) + depth.cen*as.factor(year),data=sub, na.action = na.omit,family=Gamma(link="log"))
@@ -288,7 +314,15 @@ mod.6.glm <- glm(wmw ~ log.sh.cen + depth.cen,data=sub, na.action = na.omit,fami
 # So from all of this in section 2, I think the only thing we need to show as a result is this AIC Table
 # Wow is that not even close, the full model kills it, suggesting both depth and sh slope should be allowed to vary by year
 # I did this with the lm models and effectively got the same result as this, which is reassuring!
-AIC.comp <- AICtab(mod.full.glm,mod.glm.gamma,mod.2.glm,mod.3.glm,mod.4.glm,mod.5.glm,mod.6.glm)
+AIC.comp <- as.data.frame(AICtab(mod.full.glm,mod.glm.gamma,mod.2.glm,mod.3.glm,mod.4.glm,mod.5.glm,mod.6.glm))
+AIC.comp$Model <- row.names(AIC.comp)
+AIC.comp$formula <- NA
+for(i in 1:nrow(AIC.comp)){
+  AIC.comp$formula[i] <- deparse(formula(get(AIC.comp$Model[i])))
+}
+
+write.csv(x = AIC.comp, paste0(plotsGo, "/", banker, "/AICtable.csv"))
+
 #########################
 
 # Lets see what the full model diagnostics look like, might be ok...
@@ -309,8 +343,8 @@ ggplot(data=diag.full.glm,aes(x=tow,y=residuals)) + geom_point()
 
 #################### Section 3, YEARLY model with random effects #############################
 # But we need to include the random effects of tow as they matter, thus we'll be fitting a model for each year. The above exploration has shown that the model fits
-# are much better when depth and slope of the MW-SH relationship can vary each year.  The RE part shows that the Gamma does fit the 
-# full dataset better than the Gaussian (he glm models are much less conclusive about this, but the Gamma is never worse) 
+# are much better when depth and slope of the MW-SH relationship can vary each year.  The RE part shows that the Gamma does fit the
+# full dataset better than the Gaussian (he glm models are much less conclusive about this, but the Gamma is never worse)
 # it seems having the intercept/slope vary for each tow is effectively equivalent, so might as well keep things simple
 # So it's a glmer by year, I will simplify the model to be intercept only for the random effect (this also helps as the models don't converge in several of the early years
 # if we try to estimate that slope for each tow)
@@ -334,23 +368,106 @@ for(i in 1:n.yrs)
 resid <- do.call('rbind',resids)
 
 # Here are the residual plots which I think we should show, not sure if we want the smooth on there or not?
-p.res.d <- ggplot(resid,aes(x=depth,y=residuals)) + geom_point() + facet_wrap(~year) + 
-                                                    geom_hline(yintercept = 0,color=blues,linetype='dashed') + 
-                                                    geom_smooth(method = 'loess',color=yellows) + 
-                                                    xlab("Depth (meters)") = ylab("Residual") + theme_bw()
 
-p.res.sh <- ggplot(resid,aes(x=sh,y=residuals)) + geom_point() + facet_wrap(~year) + 
-                                                  geom_hline(yintercept = 0,color=blues,linetype='dashed')+
-                                                  geom_smooth(method = 'gam',color=yellows) + 
-                                                  xlab("Shell height (mm)") + ylab("Residual") + theme_bw()
+ys <- c(1992, 2002, 2012)
+depthrange <- range(resid$depth)
+shrange <- range(resid$sh)
+mwrange <- range(resid$wmw)
 
-p.res.mw <- ggplot(resid,aes(x=wmw,y=residuals)) + geom_point() + facet_wrap(~year) + 
-                                                        geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-                                                        geom_smooth(method = 'gam',color=yellows) + 
-                                                        xlab("Meat weight (grams)") + ylab("Residual") + theme_bw()
+for(y in 1:length(ys)){
+
+  if(y<length(ys)) yrange <- ys[y]:(ys[y+1]-1)
+  if(y==length(ys)) yrange <- ys[y]:2022
+
+  p.res.d <- ggplot() +
+    geom_point(data=resid[resid$year %in% yrange,],aes(x=depth,y=residuals), size=0.5) +
+    facet_wrap(~year, ncol=2) +
+    ylim(-1,1) +
+    xlim(floor(depthrange[1]),ceiling(depthrange[2]))+
+    geom_hline(yintercept = 0,color=blues,linetype='dashed') +
+    geom_smooth(method = 'loess',color=yellows) +
+    xlab(paste0(en2fr("Depth",  custom_terms=rosetta_terms, translate=french), " (m)")) +
+    ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
+
+  p.res.sh <- ggplot(resid[resid$year %in% yrange,],aes(x=sh,y=residuals)) + geom_point(size=0.5) +
+    facet_wrap(~year, ncol=2) +
+    ylim(-1,1) +
+    xlim(floor(shrange[1]),ceiling(shrange[2]))+
+    geom_hline(yintercept = 0,color=blues,linetype='dashed')+
+    geom_smooth(method = 'gam',color=yellows) +
+    xlab(paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)")) +
+    ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
+
+  p.res.mw <- ggplot(resid[resid$year %in% yrange,],aes(x=wmw,y=residuals)) + geom_point(size=0.5) +
+    facet_wrap(~year, ncol=2) +
+    ylim(-1,1) +
+    xlim(floor(mwrange[1]),ceiling(mwrange[2]))+
+    geom_hline(yintercept = 0,color=blues,linetype='dashed') +
+    geom_smooth(method = 'gam',color=yellows) +
+    xlab(paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)")) +
+    ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()#+
+    #scale_x_continuous(expand=c(0.075,0.075))
+
+  png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_depth_", y, nickname, ".png"), height=6, width=5, units="in", res=420)
+  print(p.res.d)
+  dev.off()
+
+  png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_sh_", y, nickname, ".png"), height=6, width=5, units="in", res=420)
+  print(p.res.sh)
+  dev.off()
+
+  png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_mw_", y, nickname, ".png"), height=6, width=5, units="in", res=420)
+  print(p.res.mw)
+  dev.off()
+}
+
+#landscape versions for presentation purposes
+
+p.res.d <- ggplot() +
+  geom_point(data=resid,aes(x=depth,y=residuals), size=0.5) +
+  facet_wrap(~year, ncol=6) +
+  geom_hline(yintercept = 0,color=blues,linetype='dashed') +
+  geom_smooth(method = 'loess',color=yellows) +
+  xlab(paste0(en2fr("Depth",  custom_terms=rosetta_terms, translate=french), " (m)")) +
+  ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
+
+p.res.sh <- ggplot(resid,aes(x=sh,y=residuals)) + geom_point(size=0.5) +
+  facet_wrap(~year, ncol=6) +
+  geom_hline(yintercept = 0,color=blues,linetype='dashed')+
+  geom_smooth(method = 'gam',color=yellows) +
+  xlab(paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)")) +
+  ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
+
+p.res.mw <- ggplot(resid,aes(x=wmw,y=residuals)) + geom_point(size=0.5) +
+  facet_wrap(~year, ncol=6) +
+  geom_hline(yintercept = 0,color=blues,linetype='dashed') +
+  geom_smooth(method = 'gam',color=yellows) +
+  xlab(paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)")) +
+  ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()+
+  scale_x_continuous(expand=c(0.075,0.075))
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_depth_landscape", nickname, ".png"), height=6, width=10, units="in", res=420)
+print(p.res.d)
+dev.off()
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_sh_landscape", nickname, ".png"), height=6, width=10, units="in", res=420)
+print(p.res.sh)
+dev.off()
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_mw_landscape", nickname, ".png"), height=6, width=10, units="in", res=420)
+print(p.res.mw)
+dev.off()
+
+
 
 # And here's a facet qqplot. They aren't brilliant, but I think they are reasonable
-p.qqs <- qqplot.data(data.frame(var=resid$residuals,facet = resid$year),facet = T) +theme_bw()
+p.qqs <- qqplot.data(data.frame(var=resid$residuals,facet = resid$year),facet = T, ncol=5)
+p.qqs <- p.qqs + theme_bw()
+
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_qq", nickname, ".png"), height=6, width=5, units="in", res=420)
+print(p.qqs)
+dev.off()
 
 # Ok so we have our models run, now how to do the predictions, for the tows that were sampled we use the random effects
 # from the model, for the other tows we use the fixed effects only since we don't have the randoms.
@@ -378,7 +495,7 @@ fixed.pred <- (1:nrow(s.dat))[!is.element(s.dat$tow,unique(mw.dat$new_ID))]
 #Predict using Random effects for IDs that were sampled for meat weight shell height
 temp <- matrix(NA,nrow(s.dat),40)
 
-for(j in random.pred) 
+for(j in random.pred)
 {
   temp[j,] <- as.vector(predict(object = mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
                                                                   depth.cen=rep(s.dat$depth.cen[j] ,40),
@@ -387,7 +504,7 @@ for(j in random.pred)
 } # end the random loop
 
 #Predict using fixed effects for IDs that weren't sampled for meat weight shell height
-for(j in fixed.pred) 
+for(j in fixed.pred)
 {
   temp[j,] <- as.vector(predict(object=mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
                                                                 depth.cen=rep(s.dat$depth.cen[j] ,40)),
@@ -446,12 +563,12 @@ ggplot(condition.ts, aes(cond,cond.inter)) + geom_point() + geom_abline(intercep
 p.cond.inter <- ggplot(condition.ts,aes(x=year,y=cond.inter)) + geom_ribbon(aes(ymin=cond.inter.LCI,ymax=cond.inter.UCI,x=year),color=blues,fill=blues,alpha=0.5)+
                                                 geom_hline(yintercept = mean(condition.ts$cond,na.rm=T),color=yellows,linetype = 'dashed',size=1.5) +
                                                 geom_line(size=1.5) + geom_point(size=3) +
-                                                ylim(c(min(condition.ts$cond.inter.LCI),max(condition.ts$cond.inter.UCI)))+ 
+                                                ylim(c(min(condition.ts$cond.inter.LCI),max(condition.ts$cond.inter.UCI)))+
                                                 xlab("") + ylab("Meat Weight of 100 mm Scallop (grams)") +
-                                                theme_bw() 
+                                                theme_bw()
 
-# So now we need a new MW-SH figure and for the Res Doc we probably should show the Depth covariate, or at least 
-# create that figure. 
+# So now we need a new MW-SH figure and for the Res Doc we probably should show the Depth covariate, or at least
+# create that figure.
 slope <- mw.sh.coef %>% dplyr::filter(year == max(yrs)) %>% dplyr::pull(fix.slope)
 int <- mw.sh.coef %>% dplyr::filter(year == max(yrs)) %>% dplyr::pull(fix.int)
 rand.int <- mw.sh.coef %>% dplyr::filter(year == max(yrs),!is.na(ran.int.act)) %>% dplyr::pull(ran.int.act,tow)
@@ -464,18 +581,18 @@ fix.mw <- data.frame(sh = 100* sh, mw = exp(int)[1] * sh^slope[1])
 
 # Based on our current figure, I don't think this goes in RES DOC, but is basically what we want for our SS.
 p.ss <- ggplot(rand.tows) + geom_line(aes(x=sh,y=mw,group=tow),color=yellows)+
-                            geom_point(data=sub %>% dplyr::filter(year == max(yrs)),aes(x=sh,y=wmw),color=blues) + 
-                            geom_line(data = fix.mw,aes(x=sh,y=mw),color='black',size=2) + 
+                            geom_point(data=sub %>% dplyr::filter(year == max(yrs)),aes(x=sh,y=wmw),color=blues) +
+                            geom_line(data = fix.mw,aes(x=sh,y=mw),color='black',size=2) +
                             scale_x_continuous(limits = c(65,sub %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
                                                name = "Shell Height (mm)",
                                                breaks = seq(0,200,by=10), expand = c(0.005,0.005)) +
                             scale_y_continuous(limits = c(0,sub %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
                                                name = "Meat Weight (grams)",
                                                breaks = seq(0,100,by=10)) +
-                            theme_bw() 
-                    
-# I was thinking we could show the line with some uncertainty instead of showing the tows, but 
-# that's not so easy since we only have the parameter uncertainties and not the uncertainty of the line itself (again bootstraping may be an option, but 
+                            theme_bw()
+
+# I was thinking we could show the line with some uncertainty instead of showing the tows, but
+# that's not so easy since we only have the parameter uncertainties and not the uncertainty of the line itself (again bootstraping may be an option, but
 # I'm kinda meh on that, I think the above is fine).
 # For the Res Doc we may need a MW-SH facet plot, given the number of years, I'm gonna say we make three of them, 1992-2001, 2002-2011, 2012-2022
 
@@ -492,7 +609,7 @@ for(j in 1:n.yrs)
   rts <- do.call("rbind",rt)
   r.tows[[j]] <- data.frame(rts,year = yrs[j])
   f.mws[[j]] <- data.frame(sh = 100* sh, mw = exp(int) * sh^slope,year = yrs[j])
-  
+
 }
 
 r.tow <- do.call('rbind',r.tows)
@@ -503,46 +620,58 @@ y3 <- 2012:2022
 
 # SO I THINK WE WANT THESE THREE FIGURES FOR RES DOC
 # 1992-2001
-p1 <- ggplot(r.tow %>% dplyr::filter(year %in% y1)) + 
-                    geom_line(aes(x=sh,y=mw,group=tow),color=yellows)+ facet_wrap(~year) +
-                    geom_point(data=sub %>% dplyr::filter(year %in% y1),aes(x=sh,y=wmw),color=blues) + 
-                    geom_line(data = f.mw %>% dplyr::filter(year %in% y1),aes(x=sh,y=mw),color='black',size=2) + 
-                    scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
-                                       name = "Shell Height (mm)",
-                                       breaks = seq(0,200,by=10), expand = c(0.01,0.01)) +
-                    scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
-                                       name = "Meat Weight (grams)",
-                                       breaks = seq(0,100,by=10)) +
-                    theme_bw() 
+p1 <- ggplot(r.tow %>% dplyr::filter(year %in% y1)) +
+  geom_point(data=sub %>% dplyr::filter(year %in% y1),aes(x=sh,y=wmw),color=blues) +
+  geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
+  geom_line(data = f.mw %>% dplyr::filter(year %in% y1),aes(x=sh,y=mw),color='black',size=2) +
+  scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
+                     name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
+                     breaks = seq(0,200,by=20), expand = c(0.01,0.01)) +
+  scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
+                     name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
+                     breaks = seq(0,100,by=20)) +
+  theme_bw()
 
 # 2002-2011
-p2 <- ggplot(r.tow %>% dplyr::filter(year %in% y2)) + 
-                    geom_line(aes(x=sh,y=mw,group=tow),color=yellows)+ facet_wrap(~year) +
-                    geom_point(data=sub %>% dplyr::filter(year %in% y2),aes(x=sh,y=wmw),color=blues) + 
-                    geom_line(data = f.mw %>% dplyr::filter(year %in% y2),aes(x=sh,y=mw),color='black',size=2) + 
-                    scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
-                                       name = "Shell Height (mm)",
-                                       breaks = seq(0,200,by=10), expand = c(0.01,0.01)) +
-                    scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
-                                       name = "Meat Weight (grams)",
-                                       breaks = seq(0,100,by=10)) +
-                    theme_bw() 
+p2 <- ggplot(r.tow %>% dplyr::filter(year %in% y2)) +
+  geom_point(data=sub %>% dplyr::filter(year %in% y2),aes(x=sh,y=wmw),color=blues) +
+  geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
+  geom_line(data = f.mw %>% dplyr::filter(year %in% y2),aes(x=sh,y=mw),color='black',size=2) +
+  scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
+                     name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
+                     breaks = seq(0,200,by=20), expand = c(0.01,0.01)) +
+  scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
+                     name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
+                     breaks = seq(0,100,by=20)) +
+  theme_bw()
 
 # Now 2012-2022
-p3 <- ggplot(r.tow %>% dplyr::filter(year %in% y3)) + 
-                    geom_line(aes(x=sh,y=mw,group=tow),color=yellows)+ facet_wrap(~year) +
-                    geom_point(data=sub %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues) + 
-                    geom_line(data = f.mw %>% dplyr::filter(year %in% y3),aes(x=sh,y=mw),color='black',size=2) + 
-                    scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
-                                       name = "Shell Height (mm)",
-                                       breaks = seq(0,200,by=10), expand = c(0.01,0.01)) +
-                    scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
-                                       name = "Meat Weight (grams)",
-                                       breaks = seq(0,100,by=10)) +
-                    theme_bw() 
+p3 <- ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
+  geom_point(data=sub %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues) +
+  geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
+  geom_line(data = f.mw %>% dplyr::filter(year %in% y3),aes(x=sh,y=mw),color='black',size=2) +
+  scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
+                     name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
+                     breaks = seq(0,200,by=20), expand = c(0.01,0.01)) +
+  scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
+                     name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
+                     breaks = seq(0,100,by=20)) +
+  theme_bw()
+
+pall <- ggplot(r.tow %>% dplyr::filter(year %in% 1992:2022)) +
+  geom_point(data=sub %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=wmw),color=blues, size=0.5) +
+  geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=6) +
+  geom_line(data = f.mw %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=mw),color='black',size=1) +
+  scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
+                     name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
+                     breaks = seq(0,200,by=25), expand = c(0.01,0.01)) +
+  scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
+                     name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
+                     breaks = seq(0,100,by=25)) +
+  theme_bw()
 
 # Ok so final thing is to show the depth effects, I was gonna get fancy but why bother.. it's easy...
- 
+
 depth.effect <- data.frame(effect = NA,se=NA,year=NA)
 for(i in 1:n.yrs) depth.effect[i,] <- data.frame(effect = mw.sh.coef$depth1[mw.sh.coef$year == yrs[i]][1],se = mw.sh.coef$depth1.se[mw.sh.coef$year == yrs[i]][1],year=yrs[i])
 depth.effect$UCI <- depth.effect$effect + 1.96*depth.effect$se
@@ -550,9 +679,34 @@ depth.effect$LCI <- depth.effect$effect - 1.96*depth.effect$se
 
 # Plot of the effect of depth.  In most years the slope is negative as would be expected, but it is infrequently significantly negative in any one year.
 # But overall given it's always negative, there is no doubt a general decrease in mw with increasing depth.
-p.depth <- ggplot(depth.effect,aes(x=year,y=effect)) + geom_ribbon(aes(ymin=LCI,ymax=UCI,x=year),color=blues,fill=blues,alpha=0.5)+
+if(french==T) depthlab <- "Effet de profondeur"
+if(french==F) depthlab <- "Depth effect"
+p.depth <- ggplot(depth.effect,aes(x=year,y=effect)) +
+  geom_ribbon(aes(ymin=LCI,ymax=UCI,x=year),color=blues,fill=blues,alpha=0.5)+
   geom_hline(yintercept = 0,color=yellows,linetype = 'dashed',size=1.5) +
-  geom_line(size=1.5) + geom_point(size=3) +
-  #ylim(c(min(condition.ts$cond.inter.LCI),max(condition.ts$cond.inter.UCI)))+ 
-  xlab("") + ylab("Depth Effect") +
-  theme_bw() 
+  #geom_line(size=1.5) + geom_point(size=3) +
+  geom_line() + geom_point() +
+  #ylim(c(min(condition.ts$cond.inter.LCI),max(condition.ts$cond.inter.UCI)))+
+  xlab("") +
+  ylab(depthlab) +
+  theme_bw()
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_y1", nickname, ".png"), height=6, width=5, units="in", res=420)
+print(p1)
+dev.off()
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_y2", nickname, ".png"), height=6, width=5, units="in", res=420)
+print(p2)
+dev.off()
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_y3", nickname, ".png"), height=6, width=5, units="in", res=420)
+print(p3)
+dev.off()
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_depth", nickname, ".png"), height=4, width=5, units="in", res=420)
+print(p.depth)
+dev.off()
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_yall", nickname, ".png"), height=6, width=10, units="in", res=420)
+print(pall)
+dev.off()

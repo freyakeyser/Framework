@@ -25,7 +25,7 @@ load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.Rdata
 # plot destination
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/"
 
-french <- F # set to T for french
+french <- T # set to T for french
 if(french==T) {fr <- "_fr"}
 if(french==F) {fr <- ""}
 
@@ -121,16 +121,18 @@ medians <- left_join(medians, medians2)
 medians$monthyr <- ymd(paste0(medians$year, "-", medians$month, "-01"))
 medians2$monthyr <- ymd(paste0(medians2$year, "-01-01"))
 medians2$ndaysyr <- as.numeric(strftime(ymd(paste0(medians2$year, "12-31")), "%j"))
+medians2$xend <- ymd(medians2$monthyr) + years(1)
 
 if(french==F) ylabel <- "Meat weight (median, g)"
 if(french==T) ylabel <- "Masse de la chair (médiane, g)"
 
 png(paste0(plotsGo, "medians_long_vert", fr, ".png"), width=6.5, height=8, units = "in", res=420)
 ggplot() +
-  geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
+  # geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
+  geom_segment(data=medians2[medians2$bank %in% c("BBn", "Sab"),],mapping=aes(x=monthyr, xend=xend,y=annual_med, yend=annual_med), colour="blue", size=1) +
   geom_errorbar(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)), width=0)+
   geom_point(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, monthly_med)) +
-  geom_text(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr + months(6), 0, label=nsamples_yr), vjust=0.5, hjust=1.1)+
+  geom_text(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr + months(6), 0, label=nsamples_yr), vjust=0.5, hjust=1.1, colour="blue")+
   #geom_line(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med), group=1, size=1) +
   facet_wrap(~bank, ncol=2) +
   ylab(ylabel) +

@@ -90,6 +90,30 @@ Figures:
 
 # Results
 
+## MWSH
+Tables: 
+\@ref(tab:mwsh-tab)
+\@ref(fig:mwsh-sab-rs-1)
+\@ref(fig:mwsh-sab-rs-2)
+\@ref(fig:mwsh-sab-rs-3)
+\@ref(fig:mwsh-sab-rm-1)
+\@ref(fig:mwsh-sab-rm-2)
+\@ref(fig:mwsh-sab-rm-3)
+\@ref(fig:mwsh-sab-depth)
+\@ref(fig:mwsh-sab-y1)
+\@ref(fig:mwsh-sab-y2)
+\@ref(fig:mwsh-sab-y3)
+\@ref(fig:mwsh-bbn-rs-1)
+\@ref(fig:mwsh-bbn-rs-2)
+\@ref(fig:mwsh-bbn-rs-3)
+\@ref(fig:mwsh-bbn-rm-1)
+\@ref(fig:mwsh-bbn-rm-2)
+\@ref(fig:mwsh-bbn-rm-3)
+\@ref(fig:mwsh-bbn-depth)
+\@ref(fig:mwsh-bbn-y1)
+\@ref(fig:mwsh-bbn-y2)
+\@ref(fig:mwsh-bbn-y3)
+
 ## Ageing
 
 Tables:  

@@ -78,6 +78,12 @@ for (rdata in c("framework2", "framework3", "framework4", "framework5")){
   bankpertow <- get(rdata)$merged.survey.obj %>%
     dplyr::mutate(bank="Ger") %>%
     dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv) %>%
+    dplyr::mutate(N.cv = N*N.cv,
+                  NR.cv = NR*NR.cv,
+                  NPR.cv=NPR*NPR.cv,
+                  I.cv=I*I.cv,
+                  IR.cv=IR*IR.cv,
+                  IPR.cv=IPR*IPR.cv) %>%
     mutate(liner="lined") %>%
     full_join(bankpertow)
 
@@ -87,10 +93,15 @@ for (rdata in c("framework2", "framework3", "framework4", "framework5")){
   bankpertow <- get(rdata)$survey.obj$Ger$model.dat %>%
     dplyr::mutate(bank="Ger") %>%
     dplyr::select(bank, year, n, N, NR, NPR, N.cv, NR.cv, NPR.cv, I, IR, IPR, I.cv, IR.cv, IPR.cv) %>%
-    mutate(liner="unlined") %>%
+    dplyr::mutate(N.cv = N*N.cv,
+                  NR.cv = NR*NR.cv,
+                  NPR.cv=NPR*NPR.cv,
+                  I.cv=I*I.cv,
+                  IR.cv=IR*IR.cv,
+                  IPR.cv=IPR*IPR.cv) %>%
+    dplyr::mutate(liner="unlined") %>%
     full_join(bankpertow)
-    
-
+  
   dim(bankpertow)
 
   bankpertow <- full_join(bankpertow, data.frame(bank="Ger", year=2020, liner="lined"))
