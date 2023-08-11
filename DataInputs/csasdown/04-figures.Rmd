@@ -76,7 +76,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/footprint_26_", nickname, ".png"))
 ```
 
-```{r mw-annual, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams) collected from the port sampling program for Browns Bank North (BBn) and Sable Bank (Sab). Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. Grey shading represents the annual median meat weight, with the number of samples collected each year labelled."}
+```{r mw-annual, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams) collected from the port sampling program for Browns Bank North (BBn) and Sable Bank (Sab). Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. The blue vertical line segments represent annual median meat weights, with the number of samples collected each year labelled."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, ".png"))
 ```
 
@@ -123,6 +123,105 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```{r map-bbn, echo=F, message=F, fig.cap=paste0(params$bankname[6], " survey design in ", params$surv.year[6], ".")}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/surveymap_", params$bank[6], fr, ".png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+
+
+
+<!-- ```{r mwsh-sab-qq, echo=F, message=F, fig.cap="QQ-plot of meat weight-shell height model predictions (points) for Sable Bank from 1992-2022. The 1:1 line represents the expectation if the data were normally distributed."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_qq",fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-sab-rd, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by depth for Sable Bank from 1992-2022. The dashed blue line represents a residual value of 0."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_depth",fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-sab-rs-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height for Sable Bank from 1992-2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_1", fr, ".png"))
+```
+
+```{r mwsh-sab-rs-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height for Sable Bank from 2002-2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_2", fr, ".png"))
+```
+
+```{r mwsh-sab-rs-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height for Sable Bank from 2012-2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_3", fr, ".png"))
+```
+
+```{r mwsh-sab-rm-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight for Sable Bank from 1992-2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_1", fr, ".png"))
+```
+
+```{r mwsh-sab-rm-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight for Sable Bank from 2002-2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_2", fr, ".png"))
+```
+
+```{r mwsh-sab-rm-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight for Sable Bank from 2012-2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_3", fr, ".png"))
+```
+
+```{r mwsh-sab-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for Sable Bank (black points and line). Blue shading represents the 95% confidence interval, and the dashed yellow line highlights an effect of 0 (no effect)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_depth", fr, ".png"))
+```
+
+```{r mwsh-sab-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Sable Bank (years 1992-2001)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_y1", fr, ".png"))
+```
+
+```{r mwsh-sab-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Sable Bank (years 2002-2011)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_y2", fr, ".png"))
+```
+
+```{r mwsh-sab-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Sable Bank (years 2012-2022)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_y3", fr, ".png"))
+```
+
+<!-- ```{r mwsh-bbn-qq, echo=F, message=F, fig.cap="QQ-plot of meat weight-shell height model predictions (points) for Browns Bank north from 1992-2022. The 1:1 line represents the expectation if the data were normally distributed."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_qq",fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-bbn-rd, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by depth for Browns Bank north from 1992-2022. The dashed blue line represents a residual value of 0."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_depth",fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-bbn-rs-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height for Browns Bank north from 1992-2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_1", fr, ".png"))
+```
+
+```{r mwsh-bbn-rs-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height for Browns Bank north from 2002-2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_2", fr, ".png"))
+```
+
+```{r mwsh-bbn-rs-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height for Browns Bank north from 2012-2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_3", fr, ".png"))
+```
+
+```{r mwsh-bbn-rm-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight for Browns Bank north from 1992-2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_1", fr, ".png"))
+```
+
+```{r mwsh-bbn-rm-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight for Browns Bank north from 2002-2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_2", fr, ".png"))
+```
+
+```{r mwsh-bbn-rm-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight for Browns Bank north from 2012-2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_3", fr, ".png"))
+```
+
+```{r mwsh-bbn-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for Browns Bank north (black points and line). Blue shading represents the 95% confidence interval, and the dashed yellow line highlights an effect of 0 (no effect)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_depth", fr, ".png"))
+```
+
+```{r mwsh-bbn-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Browns Bank north (years 1992-2001)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y1", fr, ".png"))
+```
+
+```{r mwsh-bbn-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Browns Bank north (years 2002-2011)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y2", fr, ".png"))
+```
+
+```{r mwsh-bbn-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Browns Bank north (years 2012-2022)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y3", fr, ".png"))
 ```
 
 
