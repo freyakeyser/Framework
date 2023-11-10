@@ -6,21 +6,25 @@
 #       in the model and the Rec/m uncertainty is coming from the data itself.  I'm still unsure how I want to handle this...
 #g.mod: What is our growth model.  
       #a:  type: Basically the options are a linear model looking at RPS~SSB, or a breakpoint analysis that splits the RPS into a low and high period.  If the relationship appears to be
-      #          density independent, you can do a 'bp' and set the bp to be 0.  Options are 'lm', 'glm', 'gam', and 'bp'.  Default is 'bp'
+      #          density independent, you can do a 'bp' and set the bp to be 0.  Options are 'lm', 'glm', 'gam', 'sv",and 'bp'.  Default is 'bp'. Also a 'cor' option to make it a correlated TS.
+      #          added a new option to set the growth rate at a value you want (e.g. the median of the time series). This method keeps the gR raio I used, so if gR will be
+      #          larger than gR by whatever is generally observed in the data (is prod.dat$g.ratio)
 
       #b: bp.strategy: This is only used if type = 'bp'.  Options are 'sample' where we just sample growth from the historically observed growth data and 'dist' where we select growth from a 
       #                normal distribution with mean/variance observed in data  Default is 'sample'
       #c: B.rec.bp : Is there a biomass breakpoint where growth appears to be lower/higher on either side.  The model will select growth rates appropriate for the current biomass based on the breakpoint.
           # Default sets this to 0 which effectively is no breakpoint.
 #rec.mod: What is our recruitment model.  This currently has a few options, pretty much infinitely more options are possible to add in here.
-      #a: type: Options right now are a linear model "lm", which will effectively be a Ricker model linearized, so log(RPS) ~ SSB model using the productivity data
+      #a: type: Options right now are a linear model "lm", which will effectively be a Ricker model linearized, so log(RPS) ~ SSB model using the productivity data. Also a 'cor' option to make it a correlated TS.
+      #          added a new option to set the growth rate at a value you want (e.g. the median of the time series)
           # 'bp' 
 #m.mod: What is our natural mortality model.  
 #mod.run The model run that your projections are coming from. 
 #model.yrs: The years run in the model, excluding the projection year. Defaulting to 1994:2022 which is what we did for BBn and Sable.
 #base.yrs: Gives us the option to truncate the data used in the analyses to a subset of years.  Lets us explore different 'productivity regimes'.  Default is NULL which uses all the data.
 #          If using this then you'd want it something like base.yrs = 2010:2022
-      
+# for type I am adding in a 'sv' option in case you want to set something at a value. This is being done for growth for now, but could be useful for anything.  You need to specify what the
+# set.value is as well, default of set.value is NULL
 
 proj.mod <- function(mods = list(tlm.mod = tlm.mod,seam.mod = seam.mod), n_sim = 300,exp.scenario=seq(0,0.4,0.025),n_y = 100, LRP = 1000, HCR.sim = NULL, save.results = F,
                      ci.proj = data.frame(lci=0.25,uci=0.75),run = 'model_error', base.yrs = NULL, model.yrs = 1994:2022,
@@ -28,64 +32,72 @@ proj.mod <- function(mods = list(tlm.mod = tlm.mod,seam.mod = seam.mod), n_sim =
                      res_url = "D:/Github/BBn_model/Results/Models/BBn/",
                      model = "TLM", mod.run = NULL,max.SSB =NULL, 
                      # He we have our productivity models
-                     g.mod =   list(type = 'bp',bp.strategy = 'sample',bp= 0,mn.at.max = 1.00,sd.at.max = 0.05,ar1=0,ar2=0), 
-                     rec.mod = list(type = 'bp',bp.strategy = 'sample',bp= 0,mn.at.max = 0.01,sd.at.max = 0.01,rec.age = 5,
+                     g.mod =   list(type = 'bp',set.value = "off",bp.strategy = 'sample',bp= 0,mn.at.max = 1.00,sd.at.max = 0.05,ar1=0,ar2=0), 
+                     rec.mod = list(type = 'bp',set.value = "off",bp.strategy = 'sample',bp= 0,mn.at.max = 0.01,sd.at.max = 0.01,rec.age = 5,
                                     ar1=0,ar2=0,rps.m.cor = 0,rps.m.lag=0), # the rps.m.cor and rps.m.lag are only relevant if both rec.mod and m.mod are set as 'cor'),
-                     m.mod =   list(type = 'bp',bp.strategy = 'sample',bp= 0,mn.at.max = 0.30,sd.at.max = 0.05,ar1=0,ar2=0)
+                     m.mod =   list(type = 'bp',set.value = "off",bp.strategy = 'sample',bp= 0,mn.at.max = 0.30,sd.at.max = 0.05,ar1=0,ar2=0)
                      )
                      
 
 {
   
 # Now get the plots and results folders sorted out...
-if(is.null(HCR.sim)) 
+   
+  if(is.null(HCR.sim)) 
 { 
-  sims = paste0(mod.run,"/RPs/")
+  
+  sims = paste0(model,"_",mod.run,"/RPs/")
   # Create the directories you want
-  if(!dir.exists(paste0(plot_url,mod.run))) dir.create(paste0(plot_url,mod.run))
-  if(!dir.exists(paste0(res_url,mod.run))) dir.create(paste0(res_url,mod.run))
+  if(!dir.exists(paste0(plot_url,model,"_",mod.run))) dir.create(paste0(plot_url,model,"_",mod.run))
+  if(!dir.exists(paste0(res_url,model,"_",mod.run))) dir.create(paste0(res_url,model,"_",mod.run))
   if(!dir.exists(paste0(plot_url,sims))) dir.create(paste0(plot_url,sims))
   if(!dir.exists(paste0(res_url,sims))) dir.create(paste0(res_url,sims))
-}
+} 
   
 if(!is.null(HCR.sim))  
 {
-  sims = paste0(mod.run,"/HCR/","TRP_",HCR.sim$TRP,"_",HCR.sim$TRP.exp,"_USR_",HCR.sim$USR,"_",HCR.sim$USR.exp,"_LRP_",HCR.sim$LRP,"_",HCR.sim$LRP.exp,"_",HCR.sim$exp.sd)
-  if(!dir.exists(paste0(plot_url,mod.run))) dir.create(paste0(plot_url,mod.run))
-  if(!dir.exists(paste0(plot_url,mod.run,"/HCR"))) dir.create(paste0(plot_url,mod.run,"/HCR/"))
-  if(!dir.exists(paste0(res_url,mod.run))) dir.create(paste0(res_url,mod.run))
-  if(!dir.exists(paste0(res_url,mod.run,"/HCR/"))) dir.create(paste0(res_url,mod.run,"/HCR/"))
-  
-  #if(!dir.exists(paste0(plot_url,sims))) dir.create(paste0(plot_url,sims))
-  #if(!dir.exists(paste0(res_url,sims))) dir.create(paste0(res_url,sims))
+  sims = paste0(model,"_",mod.run,"/HCR/")
+  HCR <- paste0("TRP_",HCR.sim$TRP,"_",HCR.sim$TRP.exp,"_USR_",HCR.sim$USR,"_",HCR.sim$USR.exp,"_LRP_",HCR.sim$LRP,"_",HCR.sim$LRP.exp,"_",HCR.sim$exp.sd)
 }
 
 # Names and locations of save objects
 if(is.null(base.yrs))
 {
-  plot_sims <- paste0(plot_url,sims,model,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
-                      rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
-                      m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max,"/")
+  
+  run.dets <- paste0(model,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$set.value,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
+                     rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$set.value,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
+                     m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$set.value,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max)
 
-
-  res_sims <- paste0(res_url,sims,model,"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
-                     rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
-                     m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max,".Rds")
+  plot_sims <- paste0(plot_url,sims,run.dets,"/")
+  res_sims <- paste0(res_url,sims,run.dets,".Rds")
 }
   
 if(!is.null(base.yrs))
 {
-    plot_sims <- paste0(plot_url,sims,model,"_yrs_",min(base.yrs),"-",max(base.yrs),"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
-                        rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
-                        m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max,"/")
+    run.dets <- paste0(model,"_yrs_",min(base.yrs),"-",max(base.yrs),"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$set.value,"_",
+                        g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
+                        rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$set.value,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
+                        m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$set.value,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max)
     
-    
-    res_sims <- paste0(res_url,sims,model,"_yrs_",min(base.yrs),"-",max(base.yrs),"_g_",g.mod$type,"_",g.mod$bp,"_",g.mod$bp.strategy,"_",g.mod$mn.at.max,"_",g.mod$sd.at.max,"_r_",
-                       rec.mod$type,"_",rec.mod$bp.strategy,"_",rec.mod$bp,"_",rec.mod$mn.at.max,"_",rec.mod$sd.at.max,rec.mod$rec.age,"_m_",
-                       m.mod$type,"_",m.mod$bp.strategy,"_",m.mod$bp,"_",m.mod$mn.at.max,"_",m.mod$sd.at.max,".Rds")
+    plot_sims <- paste0(plot_url,sims,run.dets,"/")
+    res_sims <- paste0(res_url,sims,run.dets,".Rds")
   }  
-#browser()
-
+ 
+# Now we can create our HCR locations
+if(!is.null(HCR.sim))  
+{
+  
+  if(!dir.exists(paste0(plot_url,model,"_",mod.run))) dir.create(paste0(plot_url,model,"_",mod.run))
+  if(!dir.exists(paste0(plot_url,model,"_",mod.run,"/HCR"))) dir.create(paste0(plot_url,model,"_",mod.run,"/HCR/"))
+  if(!dir.exists(paste0(plot_url,model,"_",mod.run,"/HCR/",run.dets))) dir.create(paste0(plot_url,model,"_",mod.run,"/HCR/",run.dets))
+  if(!dir.exists(paste0(res_url,model,"_",mod.run))) dir.create(paste0(res_url,model,"_",mod.run))
+  if(!dir.exists(paste0(res_url,model,"_",mod.run,"/HCR/"))) dir.create(paste0(res_url,model,"_",mod.run,"/HCR/"))
+  if(!dir.exists(paste0(res_url,model,"_",mod.run,"/HCR/",run.dets))) dir.create(paste0(res_url,model,"_",mod.run,"/HCR/",run.dets))
+  
+  plot_sims <- paste0(plot_url,model,"_",mod.run,"/HCR/",run.dets,"/",HCR,"/")
+  res_sims <- paste0(res_url,sims,run.dets,"/",HCR,".Rds")
+}
+  
 # Will need to do these up right when the repo goes public.  
 # source("D:/Github/BBn_model/Scripts/Density_dependence_function.R")
 # source("D:/Github/BBn_model/Scripts/breakpoint_function.R")
@@ -99,7 +111,7 @@ if(!is.null(base.yrs))
   #DK note: I've turned off the process error term in the model, it just results in the model producing biomass out of nothing, which I don't think is good behaviour for projections.
   if(run == 'model_error' & model == "TLM")
   {
-    sigma_tau <- 0 #mod.fit$sdrep$value[names(mod.fit$sdrep$value) == 'sigma_tau'] #Biomass
+    sigma_tau <- 0 #mod.fit$sdrep$value[names(mod.fit$sdrep$value) == 'sigma_tau'] #Biomass/process error in model
     sigma_phi <- mod.fit$sdrep$value[names(mod.fit$sdrep$value) == 'sigma_phi'] # Recruits
     sigma_m   <- mod.fit$sdrep$value[names(mod.fit$sdrep$value) == 'sigma_m'] # Natural mort
   }
@@ -136,7 +148,7 @@ if(!is.null(base.yrs))
   rps <- array(rep(NA,n_y*(n_sim)*n.f.scen),c(n_y,(n_sim),n.f.scen))
   
   Exp.res <- NULL
-  #browser()
+  
   # Finally I make this dataframe to make our lives easier where I combine the main productivity parameters we need.
   # We want to scrub off the most recent year as that is a projection year.
   prod.dat <- data.frame(B = mod.fit$report$totB[-length(mod.fit$report$totB)],
@@ -144,11 +156,21 @@ if(!is.null(base.yrs))
                           m = mod.fit$report$mean_m[-length(mod.fit$report$mean_m)],
                           g = as.vector(mod.fit$obj$env$data$g[-length(mod.fit$obj$env$data$g)]),
                           gR = as.vector(mod.fit$obj$env$data$gR[-length(mod.fit$obj$env$data$g)]),
+                          #g = as.vector(mod.fit$obj$env$data$g),
+                          #gR = as.vector(mod.fit$obj$env$data$gR),
                           year = model.yrs)
-  #browser()
-  # A simple way to get gR estimate from the g estimate 
+  
+  # If modelling just a few years trim the data here.
+  if(!is.null(base.yrs)) prod.dat <- prod.dat %>% dplyr::filter(year %in% base.yrs)
+  
+  # We can set the values for the parameters here...
+  
+  
+  
+  # A simple way to get gR estimate from the g estimate
   prod.dat$g.ratio <- prod.dat$gR/prod.dat$g
-   
+  
+
   # For the growth data we are could divide it into high and low growth dataframes based on g.mod$bp.g.B setting
   # first step, divide the growth data if we have a bp.g.B which means we have simple density dependent growth
   # where there is evidence that growth is a function of biomass (but there isn't a tidy linear relationship)
@@ -166,7 +188,6 @@ if(!is.null(base.yrs))
   # We are going to use max.SSB to reduce productivity when the population is at a level above anything observed historically, or should we use max SSB above... hmm.... B for now
   if(is.null(max.SSB)) max.SSB <- floor(max(prod.dat$SSB/100,na.rm=T)) * 100
   
-  if(!is.null(base.yrs)) prod.dat <- prod.dat %>% dplyr::filter(year %in% base.yrs)
   
     
   # If we are using some form a linear density dependence we run these here to the prediction object we will need to use to get a prediction of the response variable
@@ -179,7 +200,7 @@ if(!is.null(base.yrs))
 
   for(i in 1:n.f.scen) 
   {
-    #browser()
+    
     Sim.res <- NULL # reset the Sim res object, it'll just be a temporary container of the sims
     for(nn in 1:n_sim)
     {  
@@ -188,7 +209,7 @@ if(!is.null(base.yrs))
       # Finally we can run a stand alone correlation analysis for g.mod.
       if(g.mod$type == 'cor')
       {
-       #browser()
+       
         # Because this is done on log scale (needed for RPS and nm really), I'm going to force the variance to be a bit artificially low here, this seems to give very reasonable growths
         if(g.mod$ar1 == 0 & g.mod$ar2 == 0)
         {
@@ -203,7 +224,7 @@ if(!is.null(base.yrs))
                           ts = list(years=500,start.year =300, final.ts.len = n_y+10))$ts1.ts
         } # end else
       } #end g.mod$type == 'cor'
-      #browser()
+      
       # Now do the same thing for the recruits, but I also have a version where we allow rps and m to covary together, so this is the version where we only have recs doing their thing
       if(rec.mod$type == 'cor' & rec.mod$rps.m.cor ==0)
       {
@@ -226,7 +247,7 @@ if(!is.null(base.yrs))
       # Now do the same thing for the natural mortality, but I also have a version where we allow rps and m to covary together, so this is the version where we only have recs doing their thing
       if( m.mod$type == 'cor' & rec.mod$rps.m.cor ==0)
       {
-        #browser()
+        
         # Because this is done on log scale (needed for RPS and nm really), I'm going to force the variance to be a bit artificially low here, this seems to give very reasonable growths
         if(m.mod$ar1 == 0 & m.mod$ar2 == 0)
         {
@@ -248,7 +269,7 @@ if(!is.null(base.yrs))
       
       if( m.mod$type == 'cor' & rec.mod$rps.m.cor !=0)
       {
-        #browser()
+        
         # Because this is done on log scale (needed for RPS and nm really), I'm going to force the variance to be a bit artificially low here, this seems to give very reasonable growths
         if(m.mod$ar1 == 0 & m.mod$ar2 == 0)
         {
@@ -275,8 +296,9 @@ if(!is.null(base.yrs))
         # For the first year we take the biomass from last year as our starting point
         if (j == 1) 
         {
-          B.init <- mod.fit$report$totB[length(mod.fit$report$totB)]
-          Rec.init <- mod.fit$report$totR[length(mod.fit$report$totR)-1]
+          # Last year of real data...
+          B.init <- prod.dat$B[nrow(prod.dat)] 
+          Rec.init <- prod.dat$R[nrow(prod.dat)] 
         } # end  if (j == 1) 
         # After the first year we have last years results.
         if (j > 1) 
@@ -291,13 +313,23 @@ if(!is.null(base.yrs))
         SSB.init <- B.init + Rec.init
         ##################################################
         ### Growth Section ###
-        
+         
         # First up commercial sized growth
         # using the breakpoint method determine what growth is.  The BP method wraps 
         # all scenarios into one tidy bit of code.  Also, note that by default this includes all data because the default for bp.g.B = 0
 
         if(g.mod$type == 'bp') g[j,nn,i] <- bp.function(B = SSB.init,dat = prod.dat$g,type = g.mod$bp.strategy, bp = g.mod$bp,
                                                        max.B = max.SSB,mn.at.max = g.mod$mn.at.max,sd.at.max = g.mod$sd.at.max)
+        
+        if(g.mod$type == 'sv') g[j,nn,i] <- g.mod$set.value
+        
+        
+        
+        if(g.mod$type == 'set') 
+        {
+          g[j,nn,i] <- rlnorm(1,log(g.mod$set.g),g.mod$sd.at.max)
+          gR[j,nn,i] <- rlnorm(1,log(g.mod$set.gR),g.mod$sd.at.max)
+        }
         # Now if we are using a linear model to predict growth then we have to do this...
         if(g.mod$type %in% c("lm",'glm','gam'))
         {
@@ -328,8 +360,9 @@ if(!is.null(base.yrs))
         } #end if g.mod$type == 'cor'
              # And since we know gR is related to g, let's just make gR be X% larger than g, we can just sample from the observed data to get that ratio...
         # We can see that growth differences really doesn't vary too much and that recruit growth is always larger (basically between 10 and 25% larger)
-         gR[j,nn,i] <- sample(prod.dat$g.ratio,1) * g[j,nn,i]
-         #browser()
+        if(g.mod$type != 'sv') gR[j,nn,i] <-  sample(prod.dat$g.ratio,1) * g[j,nn,i] #sample(prod.dat$gR,1) # * g[j,nn,i]
+        if(g.mod$type == 'sv') gR[j,nn,i] <-  sample(prod.dat$gR,1) 
+         
         
         ################################# End Growth Section ##################################
         
@@ -364,7 +397,7 @@ if(!is.null(base.yrs))
           # DK been playing around with the best way too do this.
           if(!run %in% 'model_error') 
           {
-            #browser()
+            
             # Should I use the RPS or Recruitment time series for these??
              #if(SSB.for.rec >=min.SSB)  
             Rec[j,nn,i] <-SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,
@@ -399,6 +432,9 @@ if(!is.null(base.yrs))
            # For the rest grab the data from the correlation
            if(SSB.for.rec <= rec.mod$bp)  Rec[j,nn,i] <- SSB.for.rec*rps.ts[j]
          }
+        
+        if(rec.mod$type == 'sv') Rec[j,nn,i] <- rec.mod$set.value
+        
          # I'd like too be able to look at the rps time series too...
          rps[j,nn,i] <- Rec[j,nn,i]/SSB.for.rec
         
@@ -445,14 +481,16 @@ if(!is.null(base.yrs))
            # For the rest grab the data from the correlation
            if(SSB.init <= m.mod$bp)  mort[j,nn,i] <- m.ts[j]
          }
+         
+         if(m.mod$type == 'sv') mort[j,nn,i] <- m.mod$set.value
         
         ############################### End natural mortality Section #######################################
-        #browser()
+        
         
         
         ### Now if we are running the correlation on two of the above (that's the most we can do)
         
-        
+          
         
         #### Now we run the model and extract some metric of interest while we are at it.
         # Get our Catch based on the exp.scenario scenario and based on the previous years biomass
@@ -467,7 +505,7 @@ if(!is.null(base.yrs))
         }
         if(j < n_y)
         {
-          #browser()
+          
           # Our projection forward
           if(is.null(HCR.sim)) Catch[j,nn,i]<-B.init*exp.scenario[i]
           
@@ -482,7 +520,9 @@ if(!is.null(base.yrs))
             # Harvest at TRP explotation here
             if(B.init >= HCR.sim$TRP)  Catch[j,nn,i] <- rlnorm(1,log(HCR.sim$TRP.exp),HCR.sim$exp.sd)*B.init
           }
-          #browser()
+          
+          # The growth term is the whole trick, if g > m, the populations grow like stink, I'm thinking we shouldn't account for adult growth in the projections
+          # and just have it rely on growth of recruits.
           Bio[j+1,nn,i] <- rlnorm(1,log(exp(-mort[j,nn,i])*g[j,nn,i]*(B.init-Catch[j,nn,i])+Rec[j,nn,i]*exp(-mort[j,nn,i])*gR[j,nn,i]),sigma_tau)
           # The Surplus production this won't match Bio
           Surp.prod[j,nn,i]<- Bio[j+1,nn,i] - B.init + Catch[j,nn,i]
@@ -493,9 +533,9 @@ if(!is.null(base.yrs))
           # Also calculate F using the end biomass result which is what we'd currently report as F in our decision tables
           # DK Note: Add in different ways of calculating F to see how different the F estimates might be.
           f.table[j+1,nn,i] <-  Catch[j,nn,i] / (Bio[j+1,nn,i] +  Catch[j,nn,i])
-          #browser()
+          
         } # end if(j < n_y)
-         #browser()
+         
       } # end the j loop through the years
       Sim.res[[nn]] <- data.frame(year = 1:n_y,Sim = rep(nn,n_y), B = Bio[,nn,i],Rec = Rec[,nn,i],g = g[,nn,i],gR = gR[,nn,i],M = mort[,nn,i],
                                  Catch = Catch[,nn,i], SP = Surp.prod[,nn,i],F.dec.table = f.table[,nn,i],
@@ -506,12 +546,13 @@ if(!is.null(base.yrs))
     print(paste("Explotation Scenario",i, "Completed"))
   } # end the i loop through the exp.scenario scenarios
   
-Exp.res <-  do.call('rbind',Exp.res)
+Exp.res <-  do.call('rbind',Exp.res) 
 
 
 # Save and plot the results if you want to
 if(save.results == T)
 {
+  
   # save our results
   saveRDS(Exp.res,res_sims)
   
@@ -548,138 +589,138 @@ if(save.results == T)
     
     
   # Biomass
-    bio_hists<-ggplot(data=Exp.res,aes(x=B))+
+    bio_hists<-ggplot(data=Exp.res,aes(x=B/1000))+
                       geom_histogram(fill="gray",col="black")+
                       facet_wrap(~F.scenario,scales="free")+
-                      ylab("Count")+xlab("Predicted Biomass (metric tonnes)") +theme_bw()
+                      ylab("Count")+xlab("Predicted Biomass (metric tonnes x 1000)") 
     
-    ggsave(paste0(plot_sims,"Bio_hists.png"),plot=bio_hists,height=10,width=10)
+    ggsave(paste0(plot_sims,"Bio_hists.png"),plot=bio_hists,height=15,width=15)
     # Recruits
-    rec_hists<-ggplot(data=Exp.res,aes(x=Rec))+
+    rec_hists<-ggplot(data=Exp.res,aes(x=Rec/1000))+
                       geom_histogram(fill="gray",col="black")+
                       facet_wrap(~F.scenario,scales="free") +
-                      ylab("Count")+xlab("Predicted Recruitment (metric tonnes)")+ theme_bw()
+                      ylab("Count")+xlab("Predicted Recruitment (metric tonnes x 1000)")
     
-    ggsave(paste0(plot_sims,"Rec_hists.png"),plot=rec_hists,height=10,width=10)
+    ggsave(paste0(plot_sims,"Rec_hists.png"),plot=rec_hists,height=15,width=15)
     
     # Catch
-    catch_hists<-ggplot(data=Exp.res,aes(x=Catch))+
+    catch_hists<-ggplot(data=Exp.res,aes(x=Catch/1000))+
                         geom_histogram(fill="gray",col="black")+
                         facet_wrap(~F.scenario,scales="free")+
-                        ylab("Count")+xlab("Commercial Landings (metric tonnes)") + theme_bw()
+                        ylab("Count")+xlab("Commercial Landings (metric tonnes x 1000)") 
     
-    ggsave(paste0(plot_sims,"Catch_hists.png"),plot=catch_hists,height=10,width=10)
-    #browser()
+    ggsave(paste0(plot_sims,"Catch_hists.png"),plot=catch_hists,height=15,width=15)
+    
     # Natural Mortality
     m_hists<-ggplot(data=Exp.res,aes(x=M))+
                     geom_histogram(fill="gray",col="black")+
                     facet_wrap(~F.scenario,scales="free")+
-                    ylab("Count")+xlab("Predicted Natural Mortality") + theme_bw()
+                    ylab("Count")+xlab("Predicted Natural Mortality") 
     
-    ggsave(paste0(plot_sims,"M_hists.png"),plot=m_hists,height=10,width=10)
+    ggsave(paste0(plot_sims,"M_hists.png"),plot=m_hists,height=15,width=15)
     
     # Fishing Mortality 
     F_hists<-ggplot(data=Exp.res,aes(x=F.dec.table))+
                     geom_histogram(fill="gray",col="black")+
                     facet_wrap(~F.scenario,scales="free")+
-                    ylab("Count")+xlab("F from Decision Table") + theme_bw()
+                    ylab("Count")+xlab("F from Decision Table") 
     
-    ggsave(paste0(plot_sims,"F_hists.png"),plot=F_hists,height=10,width=10)
+    ggsave(paste0(plot_sims,"F_hists.png"),plot=F_hists,height=15,width=15)
     
     # Surplus Production
-    SP_hists<-ggplot(data=Exp.res,aes(x=SP))+
+    SP_hists<-ggplot(data=Exp.res,aes(x=SP/1000))+
                     geom_histogram(fill="gray",col="black")+
                     facet_wrap(~F.scenario,scales="free")+
-                    ylab("Count")+xlab("Surplus Production (metric tonnes)") + theme_bw()
+                    ylab("Count")+xlab("Surplus Production (metric tonnes x 1000)") 
     
-    ggsave(paste0(plot_sims,"SP_hists.png"),plot=SP_hists,height=10,width=10)
+    ggsave(paste0(plot_sims,"SP_hists.png"),plot=SP_hists,height=15,width=15)
   
   
   # Now make plots of the realizations over time
   # First the Biomass
-  B.real <- ggplot(Exp.res,aes(x=year,y=B,group = Sim,color=Sim)) + 
+  B.real <- ggplot(Exp.res,aes(x=year,y=B/1000,group = Sim,color=Sim)) + 
                   geom_line() + facet_wrap(~F.scenario) +
-                  ylab("Predicted Biomass (metric tonnes)") + xlab("") + 
+                  ylab("Predicted Biomass (metric tonnes x 1000)") + xlab("") + 
                   scale_color_viridis_b(alpha=0.4,end = 0.75) +
-                  theme_bw() + theme(legend.position = 'none')
+                   theme(legend.position = 'none')
   
-  ggsave(paste0(plot_sims,"Biomass_realizations.png"),plot=B.real,height=10,width=10)
+  ggsave(paste0(plot_sims,"Biomass_realizations.png"),plot=B.real,height=15,width=15)
   # Then the Recruits
   
-  R.real <- ggplot(Exp.res,aes(x=year,y=Rec,group = Sim,color=Sim)) + 
+  R.real <- ggplot(Exp.res,aes(x=year,y=Rec/1000,group = Sim,color=Sim)) + 
                   geom_line() + facet_wrap(~F.scenario) +
-                  ylab("Predicted Recruitment (metric tonnes)") + xlab("") + 
+                  ylab("Predicted Recruitment (metric tonnes x 1000)") + xlab("") + 
                   scale_color_viridis_b(alpha=0.4,end = 0.75) +
-                  theme_bw() + theme(legend.position = 'none')
-  ggsave(paste0(plot_sims,"Recruit_realizations.png"),plot=R.real,height=10,width=10)
+                   theme(legend.position = 'none')
+  ggsave(paste0(plot_sims,"Recruit_realizations.png"),plot=R.real,height=15,width=15)
   # Next the Catch
   C.real <- ggplot(Exp.res,aes(x=year,y=Catch,group = Sim,color=Sim)) + 
                   geom_line() + facet_wrap(~F.scenario) +
                   ylab("Predicted Catch (metric tonnes)") + xlab("") + 
                   scale_color_viridis_b(alpha=0.4,end = 0.75) +
-                  theme_bw() + theme(legend.position = 'none')
+                   theme(legend.position = 'none')
   
-  ggsave(paste0(plot_sims,"Catch_realizations.png"),plot=C.real,height=10,width=10)
+  ggsave(paste0(plot_sims,"Catch_realizations.png"),plot=C.real,height=15,width=15)
   #Natural Mortality
   M.real <- ggplot(Exp.res,aes(x=year,y=M,group = Sim,color=Sim)) + 
                   geom_line() + facet_wrap(~F.scenario) +
                   ylab("Natural Mortality (Instantaneous)") + xlab("") + 
                   scale_color_viridis_b(alpha=0.4,end = 0.75) +
-                  theme_bw() + theme(legend.position = 'none')
+                   theme(legend.position = 'none')
     
-  ggsave(paste0(plot_sims,"M_realizations.png"),plot=M.real,height=10,width=10)
+  ggsave(paste0(plot_sims,"M_realizations.png"),plot=M.real,height=15,width=15)
   
   #Fishing Mortality
   F.real <- ggplot(Exp.res,aes(x=year,y=F.dec.table,group = Sim,color=Sim)) + 
                   geom_line() + facet_wrap(~F.scenario) +
                   ylab("Fishing Mortality (Proportional)") + xlab("") + 
                   scale_color_viridis_b(alpha=0.4,end = 0.75) +
-                  theme_bw() + theme(legend.position = 'none')
+                   theme(legend.position = 'none')
   
-  ggsave(paste0(plot_sims,"F_realizations.png"),plot=F.real,height=10,width=10)
+  ggsave(paste0(plot_sims,"F_realizations.png"),plot=F.real,height=15,width=15)
   
   # Surplus Production
   SP.real <- ggplot(Exp.res,aes(x=year,y=SP,group = Sim,color=Sim)) + 
                     geom_line() + facet_wrap(~F.scenario) +
                     ylab("Surplus Production (tonnes)") + xlab("") + 
                     scale_color_viridis_b(alpha=0.4,end = 0.75) +
-                    theme_bw() + theme(legend.position = 'none')
-  ggsave(paste0(plot_sims,"SP_realizations.png"),plot=SP.real,height=10,width=10)
+                     theme(legend.position = 'none')
+  ggsave(paste0(plot_sims,"SP_realizations.png"),plot=SP.real,height=15,width=15)
   
   
   
   
   ################# estimates with 95% CI bands
   #### Biomass
-  B.ts <- ggplot(MSY.summarized,aes(x=year,y=B.mn)) + geom_line() + facet_wrap(~F.scenario) +
-                                                      geom_ribbon(aes(x=year,ymax = B.U50,ymin=B.L50),fill='firebrick2',alpha=0.2) + 
-                                                      theme_bw() + xlab("") + ylab("Biomass (metric tonnes)")
-  ggsave(paste0(plot_sims,"B_mn_ts.png"),plot=B.ts,height=10,width=10)
+  B.ts <- ggplot(MSY.summarized,aes(x=year,y=B.mn/1000)) + geom_line() + facet_wrap(~F.scenario) +
+                                                      geom_ribbon(aes(x=year,ymax = B.U50/1000,ymin=B.L50/1000),fill='firebrick2',alpha=0.2) + 
+                                                       xlab("") + ylab("Biomass (metric tonnes x 1000)")
+  ggsave(paste0(plot_sims,"B_mn_ts.png"),plot=B.ts,height=15,width=15)
   # Recruits
-  Rec.ts <- ggplot(MSY.summarized,aes(x=year,y=Rec.mn)) + geom_line() + facet_wrap(~F.scenario) +
-                                                          geom_ribbon(aes(x=year,ymax = Rec.U95,ymin=Rec.L95),fill='firebrick2',alpha=0.2) + 
-                                                          theme_bw() + xlab("") + ylab("Recruitment (metric tonnes)")
-  ggsave(paste0(plot_sims,"R_mn_ts.png"),plot=Rec.ts,height=10,width=10)
+  Rec.ts <- ggplot(MSY.summarized,aes(x=year,y=Rec.mn/1000)) + geom_line() + facet_wrap(~F.scenario) +
+                                                          geom_ribbon(aes(x=year,ymax = Rec.U95/1000,ymin=Rec.L95/1000),fill='firebrick2',alpha=0.2) + 
+                                                           xlab("") + ylab("Recruitment (metric tonnes x 1000)")
+  ggsave(paste0(plot_sims,"R_mn_ts.png"),plot=Rec.ts,height=15,width=15)
   # Catch
   Catch.ts <- ggplot(MSY.summarized,aes(x=year,y=Catch.mn)) + geom_line() + facet_wrap(~F.scenario) +
                                                               geom_ribbon(aes(x=year,ymax = Catch.U95,ymin=Catch.L95),fill='firebrick2',alpha=0.2) + 
-                                                              theme_bw() + xlab("") + ylab("Catch (metric tonnes)")
-  ggsave(paste0(plot_sims,"Catch_mn_ts.png"),plot=Catch.ts,height=10,width=10)
+                                                               xlab("") + ylab("Catch (metric tonnes)")
+  ggsave(paste0(plot_sims,"Catch_mn_ts.png"),plot=Catch.ts,height=15,width=15)
   # Natural mortality
   M.ts <- ggplot(MSY.summarized,aes(x=year,y=M.mn)) + geom_line() + facet_wrap(~F.scenario) +
                                                       geom_ribbon(aes(x=year,ymax = M.U95,ymin=M.L95),fill='firebrick2',alpha=0.2) + 
-                                                      theme_bw() + xlab("") + ylab("Natural mortality (instantaneous)")
-  ggsave(paste0(plot_sims,"M_mn_ts.png"),plot=M.ts,height=10,width=10)
+                                                       xlab("") + ylab("Natural mortality (instantaneous)")
+  ggsave(paste0(plot_sims,"M_mn_ts.png"),plot=M.ts,height=15,width=15)
   # Fishing mortality
   F.ts <- ggplot(MSY.summarized,aes(x=year,y=F.mn)) + geom_line() + facet_wrap(~F.scenario) +
                                                       geom_ribbon(aes(x=year,ymax = F.U95,ymin=F.L95),fill='firebrick2',alpha=0.2) + 
-                                                      theme_bw() + xlab("") + ylab("Fishing mortality (proportional)")
-  ggsave(paste0(plot_sims,"F_mn_ts.png"),plot=F.ts,height=10,width=10)
+                                                       xlab("") + ylab("Fishing mortality (proportional)")
+  ggsave(paste0(plot_sims,"F_mn_ts.png"),plot=F.ts,height=15,width=15)
   # Surplus Production
   SP.ts <- ggplot(MSY.summarized,aes(x=year,y=SP.mn)) + geom_line() + facet_wrap(~F.scenario) +
                                                         geom_ribbon(aes(x=year,ymax = SP.U95,ymin=SP.L95),fill='firebrick2',alpha=0.2) + 
-                                                        theme_bw() + xlab("") + ylab("Surplus Production (metric tonnes)")
-  ggsave(paste0(plot_sims,"SP_mn_ts.png"),plot=SP.ts,height=10,width=10)
+                                                         xlab("") + ylab("Surplus Production (metric tonnes)")
+  ggsave(paste0(plot_sims,"SP_mn_ts.png"),plot=SP.ts,height=15,width=15)
   
   
   ####################### Reference Points peice
@@ -687,30 +728,30 @@ if(save.results == T)
   #Lets take the mean of the last 25 years and use that as our steady state
   
   # Biomass Equilibrium
-  B.equil.plt<- ggplot(Equilib.dat,aes(x=F.scenario,y=B.mn)) + geom_point()+ geom_line()+
-                                                               geom_ribbon(aes(x=F.scenario,ymin=B.L95, ymax=B.U95),alpha=0.05,fill='firebrick2') +
-                                                               theme_bw()+ylab("Equilibrium Biomass (metric tonnes)") + xlab("Explotation Rate (proportional)")
-  ggsave(paste0(plot_sims,"B_equilibrum.png"),plot=B.equil.plt,height=6,width=6)
+  B.equil.plt<- ggplot(Equilib.dat,aes(x=F.scenario,y=B.mn/1000)) + geom_point()+ geom_line()+
+                                                               geom_ribbon(aes(x=F.scenario,ymin=B.L95/1000, ymax=B.U95/1000),alpha=0.05,fill='firebrick2') +
+                                                               ylab("Equilibrium Biomass (metric tonnes x 1000)") + xlab("Explotation Rate (proportional)")
+  ggsave(paste0(plot_sims,"B_equilibrum.png"),plot=B.equil.plt,height=8,width=12)
   # Catch Equilibrium
   C.equil.plt<-ggplot(Equilib.dat,aes(x=F.scenario,y=Catch.mn)) + geom_point()+ geom_line()+
                                                                   geom_ribbon(aes(x=F.scenario,ymin=Catch.L95, ymax=Catch.U95),alpha=0.05,fill='firebrick2') +
-                                                                  theme_bw()+ylab("Equilibrium Catch (metric tonnes)")  + xlab("Explotation Rate (proportional)")
-  ggsave(paste0(plot_sims,"Catch_equilibrium.png"),plot=C.equil.plt,height=6,width=6)
+                                                                  ylab("Equilibrium Catch (metric tonnes)")  + xlab("Explotation Rate (proportional)")
+  ggsave(paste0(plot_sims,"Catch_equilibrium.png"),plot=C.equil.plt,height=8,width=12)
   # Biomass per Recruit (Biomass)
   BPR.equil.plt<-ggplot(Equilib.dat,aes(x=F.scenario,y=BPR)) + geom_point()+ geom_line()+
-                                                               theme_bw()+ylab("Biomass per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
-  ggsave(paste0(plot_sims,"BPR_equilibrium.png"),plot=BPR.equil.plt,height=6,width=6)
+                                                               ylab("Biomass per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
+  ggsave(paste0(plot_sims,"BPR_equilibrium.png"),plot=BPR.equil.plt,height=8,width=12)
   
   
   # Yield per Recruit (Biomass)
   YPR.equil.plt<-ggplot(Equilib.dat,aes(x=F.scenario,y=YPR)) + geom_point()+ geom_line()+
-                                                               theme_bw()+ylab("Yield per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
-  ggsave(paste0(plot_sims,"YPR_equilibrium.png"),plot=YPR.equil.plt,height=6,width=6)
+                                                               ylab("Yield per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
+  ggsave(paste0(plot_sims,"YPR_equilibrium.png"),plot=YPR.equil.plt,height=8,width=12)
   
   } #end if is.null(HCR.sim)
   
   
-  #browser()
+  
   if(!is.null(HCR.sim))
   {
     # Summarize the data to make a nice time series plot.
@@ -731,38 +772,40 @@ if(save.results == T)
                                                   
                                                                                                                                                                       SP.L95 = quantile(SP,probs=0.025,na.rm=T),         SP.L50 = quantile(SP,probs=0.25,na.rm=T))
     # Biomass realizations          
-    B.real <- ggplot(Exp.res,aes(x=year,y=B,group = Sim,color=Sim)) + geom_line() + #facet_wrap(~F.scenario) +
-                                                                      ylab("Predicted Biomass (metric tonnes)") + xlab("") + 
-                                                                      geom_hline(yintercept = c(hcr.strat$LRP,hcr.strat$USR,hcr.strat$TRP),color=c('firebrick2','green','blue')) +
+    B.real <- ggplot(Exp.res,aes(x=year,y=B/1000,group = Sim,color=Sim)) + geom_line() + #facet_wrap(~F.scenario) +
+                                                                      ylab("Predicted Biomass (metric tonnes x 1000)") + xlab("") + 
+                                                                      geom_hline(yintercept = c(hcr.strat$LRP/1000,hcr.strat$USR/1000,hcr.strat$TRP/1000),
+                                                                                 color=c('firebrick2','green','blue')) +
                                                                       scale_color_viridis_b(alpha=0.4,end = 0.75) +
-                                                                      theme_bw() + theme(legend.position = 'none')
+                                                                       theme(legend.position = 'none')
     
-    ggsave(paste0(plot_sims,"Biomass_realizations.png"),plot=B.real,height=10,width=10)               
+    ggsave(paste0(plot_sims,"B_reals.png"),plot=B.real,height=15,width=15)               
     
     # Catch realizations          
     C.real <- ggplot(Exp.res,aes(x=year,y=Catch,group = Sim,color=Sim)) + geom_line() + #facet_wrap(~F.scenario) +
                                                                           ylab("Predicted Catch (metric tonnes)") + xlab("") + 
-                                                                          #geom_hline(yintercept = c(hcr.strat$LRP,hcr.strat$USR,hcr.strat$TRP),color=c('firebrick2','green','blue')) +
+                                                                          #geom_hline(yintercept = c(hcr.strat$LRP/1000,hcr.strat$USR/1000,hcr.strat$TRP/1000),color=c('firebrick2','green','blue')) +
                                                                           scale_color_viridis_b(alpha=0.4,end = 0.75) +
-                                                                          theme_bw() + theme(legend.position = 'none')
+                                                                           theme(legend.position = 'none')
     
-    ggsave(paste0(plot_sims,"Catch_realizations.png"),plot=C.real,height=10,width=10)  
+    ggsave(paste0(plot_sims,"C_reals.png"),plot=C.real,height=15,width=15)  
     
     
     # Biomass time series
-    B.ts <- ggplot(HCR.summarized,aes(x=year,y=B.mn)) + geom_line() + 
-                                                        geom_ribbon(aes(x=year,ymax = B.U95,ymin=B.L95),fill='firebrick2',alpha=0.2) + 
-                                                        geom_hline(yintercept = c(hcr.strat$LRP,hcr.strat$USR,hcr.strat$TRP),color=c('firebrick2','green','blue')) +
-                                                        theme_bw() + xlab("") + ylab("Biomass (metric tonnes)") 
-    ggsave(paste0(plot_sims,"B_mn_ts.png"),plot=B.ts,height=10,width=10)
+    B.ts <- ggplot(HCR.summarized,aes(x=year,y=B.mn/1000)) + geom_line() + 
+                                                        geom_ribbon(aes(x=year,ymax = B.U95/1000,ymin=B.L95/1000),fill='firebrick2',alpha=0.2) + 
+                                                        geom_hline(yintercept = c(hcr.strat$LRP/1000,hcr.strat$USR/1000,hcr.strat$TRP/1000),
+                                                                   color=c('firebrick2','green','blue')) +
+                                                         xlab("") + ylab("Biomass (metric tonnes x 1000)") 
+    ggsave(paste0(plot_sims,"B_mn_ts.png"),plot=B.ts,height=15,width=15)
     
     
     # Catch time series 
     C.ts <- ggplot(HCR.summarized,aes(x=year,y=Catch.mn)) + geom_line() + 
                                                             geom_ribbon(aes(x=year,ymax = Catch.U95,ymin=Catch.L95),fill='firebrick2',alpha=0.2) + 
                                                             #geom_hline(yintercept = c(2700,7200,9000),color=c('firebrick2','green','blue')) +
-                                                            theme_bw() + xlab("") + ylab("Catch (metric tonnes)") 
-    ggsave(paste0(plot_sims,"C_mn_ts.png"),plot=C.ts,height=10,width=10)
+                                                             xlab("") + ylab("Catch (metric tonnes)") 
+    ggsave(paste0(plot_sims,"C_mn_ts.png"),plot=C.ts,height=15,width=15)
     
     
     
@@ -786,28 +829,28 @@ if(save.results == T)
     # B.equil.plt<- ggplot(Equilib.dat,aes(x=F.scenario,y=B.mn)) + 
     #   geom_point()+ geom_line()+
     #   geom_ribbon(aes(x=F.scenario,ymin=B.L95, ymax=B.U95),alpha=0.05,fill='firebrick2') +
-    #   theme_bw()+ylab("Equilibrium Biomass (metric tonnes)") + xlab("Explotation Rate (proportional)")
-    # ggsave(paste0(plot_sims,"B_equilibrum.png"),plot=B.equil.plt,height=6,width=6)
+    #   ylab("Equilibrium Biomass (metric tonnes)") + xlab("Explotation Rate (proportional)")
+    # ggsave(paste0(plot_sims,"B_equilibrum.png"),plot=B.equil.plt,height=8,width=12)
     # # Catch Equilibrium
     # C.equil.plt<-ggplot(Equilib.dat,aes(x=F.scenario,y=Catch.mn)) + 
     #   geom_point()+ geom_line()+
     #   geom_ribbon(aes(x=F.scenario,ymin=Catch.L95, ymax=Catch.U95),alpha=0.05,fill='firebrick2') +
-    #   theme_bw()+ylab("Equilibrium Catch (metric tonnes)")  + xlab("Explotation Rate (proportional)")
-    # ggsave(paste0(plot_sims,"Catch_equilibrium.png"),plot=C.equil.plt,height=6,width=6)
+    #   ylab("Equilibrium Catch (metric tonnes)")  + xlab("Explotation Rate (proportional)")
+    # ggsave(paste0(plot_sims,"Catch_equilibrium.png"),plot=C.equil.plt,height=8,width=12)
     # # Biomass per Recruit (Biomass)
     # BPR.equil.plt<-ggplot(Equilib.dat,aes(x=F.scenario,y=BPR)) + 
     #   geom_point()+ geom_line()+
     #   #geom_ribbon(aes(x=F.scenario,ymin=Catch.L95, ymax=Catch.U95),alpha=0.05,fill='firebrick2') +
-    #   theme_bw()+ylab("Biomass per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
-    # ggsave(paste0(plot_sims,"BPR_equilibrium.png"),plot=BPR.equil.plt,height=6,width=6)
+    #   ylab("Biomass per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
+    # ggsave(paste0(plot_sims,"BPR_equilibrium.png"),plot=BPR.equil.plt,height=8,width=12)
     # 
     # 
     # # Yield per Recruit (Biomass)
     # YPR.equil.plt<-ggplot(Equilib.dat,aes(x=F.scenario,y=YPR)) + 
     #   geom_point()+ geom_line()+
     #   #geom_ribbon(aes(x=F.scenario,ymin=Catch.L95, ymax=Catch.U95),alpha=0.05,fill='firebrick2') +
-    #   theme_bw()+ylab("Yield per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
-    # ggsave(paste0(plot_sims,"YPR_equilibrium.png"),plot=YPR.equil.plt,height=6,width=6)
+    #   ylab("Yield per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
+    # ggsave(paste0(plot_sims,"YPR_equilibrium.png"),plot=YPR.equil.plt,height=8,width=12)
   }
 } # end if(save.results==T)
 

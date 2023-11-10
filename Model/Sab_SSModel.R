@@ -35,7 +35,7 @@ theme_set(theme_few(base_size = 22))
 direct <- "Y:/Offshore/Assessment/"
 
 
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90.Rdata")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH.Rdata")
 # Get the survey boundary file...
 temp <- tempfile()
 
@@ -209,7 +209,7 @@ DDpriors=list(
   m=				    list(a=-2,		b=2,		d="dlnorm",	l=NY	),		# natural mortality fully recruited a= meanlog  b = sdlog
   mR=				    list(a=-2,		b=2,		d="dlnorm",	l=NY	),		# natural mortality  recruits a= meanlog  b = sdlog
   S=				    list(a=8, 		b=11,		d="dbeta",  l=1		),		# clapper dissolution rate a= shape1, b=shape2, 8 & 11 gives ~ normal mean of .45ish
-  q=				    list(a=20, 		b=40,		d="dbeta",	l=1		),		# survey catchability fully recruited a= shape1, b=shape2
+  q=				    list(a=10, 		b=12,		d="dbeta",	l=1		),		# survey catchability fully recruited a= shape1, b=shape2
   qU=				    list(a=0,		  b=1,	  d="dunif",	l=1		),		# fishery catchability CPUE a= min, b = max
   sigma=			  list(a=0, 		b=5,		d="dunif",	l=1		),		# process error (SD) a = min, b = max
   ikappa.tau2=	list(a=3, 		b=2.2407,	d="dgamma",	l=1		),	# measurement error FR clappers  a = shape, b = scale (1/rate)
@@ -525,35 +525,35 @@ saveRDS(res.gg,file = "D:/Framework/SFA_25_26_2024/Model/Results/Sab_SS_model/R_
 
 #windows(11,11)
 p.ssmod.res <- ggplot(res.gg, aes(x=year,y=med)) + geom_line(linewidth=1.5) + facet_wrap(~term,scales = 'free_y') + 
-                                                   geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + xlab("")
+                                                   geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + xlab("")
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Key_results.png",p.ssmod.res,base_height = 7,base_width = 20)
 
 # Just the biomass
 
 p.ssmod.bm <- ggplot(res.gg %>% dplyr::filter(term == "Biomass (tonnes)"), aes(x=year,y=med)) + geom_line(linewidth=1.5,color='firebrick2') +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2,alpha = 0.5) + ylab("Biomass (tonnes)") + xlab("")  + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.6e4))
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Fully Recruited Biomass (tonnes)") + xlab("")  + 
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.15e4))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Biomass.png",p.ssmod.bm,base_height = 8.5,base_width = 11)
 
 # Just the recruits
 
 p.ssmod.rec <- ggplot(res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2,alpha = 0.5) + ylab("Recruit Biomass (tonnes)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,3.5e3))
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Recruit Biomass (tonnes)") + xlab("") + 
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.8e3))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Recruits.png",p.ssmod.rec,base_height = 8.5,base_width = 11)
 
 # Natural mortality
 
 p.ssmod.nat.mort <- ggplot(res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2,alpha = 0.5) + ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,2.5))
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + 
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.4))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/FR_nm.png",p.ssmod.nat.mort,base_height = 8.5,base_width = 11)
 
 # Exploitation Rate
 
 p.ssmod.F <- ggplot(res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2,alpha = 0.5) + ylab("Fishing Mortality (instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.2))
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Fishing Mortality (instantaneous)") + xlab("") + 
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.11))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/FR_F.png",p.ssmod.nat.mort,base_height = 8.5,base_width = 11)
 
 # Remove the years with missing survey
@@ -561,53 +561,53 @@ save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/FR_F
 
 # Just the biomass
 
-p.ssmod.bm <- ggplot(res.gg %>% dplyr::filter(term == "Biomass (tonnes)" & year < 2014), aes(x=year,y=med)) + 
-  geom_line(linewidth=1.5,color='firebrick2') +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2,alpha = 0.5) + 
+p.ssmod.bm <- ggplot(res.gg %>% dplyr::filter(term == "Biomass (tonnes)" & year <= 2014), aes(x=year,y=med)) + 
+  geom_line(linewidth=1.5,color='firebrick2')  +
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   geom_line(data = res.gg %>% dplyr::filter(term == "Biomass (tonnes)" & year %in% 2016:2019),linewidth=1.5,color='firebrick2') +
-  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Biomass (tonnes)" & year %in% 2016:2019),aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
+  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Biomass (tonnes)" & year %in% 2016:2019),aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   geom_line(data = res.gg %>% dplyr::filter(term == "Biomass (tonnes)" & year %in% 2021:2022), linewidth=1.5,color='firebrick2') +
-  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Biomass (tonnes)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
-  ylab("Biomass (tonnes)") + xlab("")  + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.6e4))
+  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Biomass (tonnes)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
+  ylab("Fully Recruited Biomass (tonnes)") + xlab("")  + 
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.15e4))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Biomass_no_missing_surveys.png",p.ssmod.bm,base_height = 8.5,base_width = 11)
 
 # Just the recruits
 
-p.ssmod.rec <- ggplot(res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year < 2014), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2,alpha = 0.5) + 
+p.ssmod.rec <- ggplot(res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year <= 2014), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   geom_line(data = res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year %in% 2016:2019),linewidth=1.5,color='firebrick2') +
-  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year %in% 2016:2019),aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
+  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year %in% 2016:2019),aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   geom_line(data = res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year %in% 2021:2022), linewidth=1.5,color='firebrick2') +
-  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
+  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   
   ylab("Recruit Biomass (tonnes)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,3.5e3))
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.8e3))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Recruits_no_missing_surveys.png",p.ssmod.rec,base_height = 8.5,base_width = 11)
 
 # Natural mortality
 
-p.ssmod.nat.mort <- ggplot(res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)" & year < 2014), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2,alpha = 0.5) + 
+p.ssmod.nat.mort <- ggplot(res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)" & year <= 2014), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   geom_line(data = res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)" & year %in% 2016:2019),linewidth=1.5,color='firebrick2') +
-  geom_ribbon(data = res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)" & year %in% 2016:2019),aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
+  geom_ribbon(data = res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)" & year %in% 2016:2019),aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   geom_line(data = res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)" & year %in% 2021:2022), linewidth=1.5,color='firebrick2') +
-  geom_ribbon(data = res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
+  geom_ribbon(data = res.gg %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   
   ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.5))
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.4))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/FR_nm_no_missing_surveys.png",p.ssmod.nat.mort,base_height = 8.5,base_width = 11)
 
 # Exploitation Rate
 
-p.ssmod.F <- ggplot(res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)" & year < 2014), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2,alpha = 0.5) + 
+p.ssmod.F <- ggplot(res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)" & year <= 2014), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   geom_line(data = res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)" & year %in% 2016:2019),linewidth=1.5,color='firebrick2') +
-  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)" & year %in% 2016:2019),aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
+  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)" & year %in% 2016:2019),aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   geom_line(data = res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)" & year %in% 2021:2022), linewidth=1.5,color='firebrick2') +
-  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
+  geom_ribbon(data = res.gg %>% dplyr::filter(term == "Fishing Mortality (instantaneous)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   ylab("Fishing Mortality (instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.2))
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.11))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/FR_F_no_missing_surveys.png",p.ssmod.nat.mort,base_height = 8.5,base_width = 11)
 
 
