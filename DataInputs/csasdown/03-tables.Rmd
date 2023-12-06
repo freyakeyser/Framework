@@ -38,6 +38,8 @@ names(mwsh) <- c("Management Unit", "dAIC", "df", "Model", "Formula")
 mwsh <- unique(dplyr::select(mwsh, `Management Unit`, Model, Formula, df, dAIC))
 mwsh$`Management Unit`[mwsh$`Management Unit`=="Sable Bank"] <- c("Sable Bank", rep(NA, (length(unique(mwsh$Model))-1)))
 mwsh$`Management Unit`[mwsh$`Management Unit`=="Browns Bank North" & !is.na(mwsh$`Management Unit`)] <- c("Browns Bank North", rep(NA, (length(unique(mwsh$Model))-1)))
+mwsh$dAIC <- round(mwsh$dAIC,0)
+mwsh <- dplyr::select(mwsh, -Model)
 
 
 ageing_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/summary_stats.csv")

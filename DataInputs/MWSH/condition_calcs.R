@@ -1,3 +1,5 @@
+## This is not used in Res doc anywhere. Just FK trying to understand the condition calculations before developing new method.
+
 require(dplyr)
 # compare cf approaches
 for(b in  c("Mid", "Ban", "Sab", "BBn", "BBs")){

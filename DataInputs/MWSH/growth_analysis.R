@@ -1,5 +1,10 @@
 # ageing and growth analysis
 
+### REPLACED BY DK_growth_analysis.R
+# This is an earlier attempt to try out other methods, but Dave came up with better options for comparison etc.
+# DO NOT USE THIS FOR ANYTHING!!!!
+
+
 # 	Explore doing a different model for growth (e.g. jonsen equation 2)
 # •	Do it the Jonsen way
 # •	Do it with a GAM

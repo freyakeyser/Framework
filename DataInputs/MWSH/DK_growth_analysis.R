@@ -19,7 +19,8 @@ library(arm)
 
 
 # hydration data
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90_newareas_issue120.RData")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_oldMWSH.RData")
+# used for mw data, to develop new MWSH model
 #load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90_newareas_issue120.RData")
 
 #load("C:/Users/keyserf/Documents/temp_data/testing_results_spring2022_2.Rdata")
@@ -101,7 +102,7 @@ qqplot.data <- function (dat,facet=F, ncol=NULL,...)
 # Start analysis
 
 
-banker <- "BBn"
+banker <- "Sab"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
@@ -318,7 +319,7 @@ AIC.comp <- as.data.frame(AICtab(mod.full.glm,mod.glm.gamma,mod.2.glm,mod.3.glm,
 AIC.comp$Model <- row.names(AIC.comp)
 AIC.comp$formula <- NA
 for(i in 1:nrow(AIC.comp)){
-  AIC.comp$formula[i] <- deparse(formula(get(AIC.comp$Model[i])))
+  AIC.comp$formula[i] <- deparse1(formula(get(AIC.comp$Model[i])))
 }
 
 write.csv(x = AIC.comp, paste0(plotsGo, "/", banker, "/AICtable.csv"))
@@ -479,69 +480,71 @@ log.sh.cen <- log(seq(2.5, 197.5, by = 5)) - log(sh.cond) #each shell height bin
 mw.res.t <- NULL
 cond.pred <- NULL
 all.coef <- NULL
+# Takes about 1 second per year
 for(i in 1:n.yrs)
 {
-mw.dat <- sub %>% dplyr::filter(year== yrs[i])
-s.dat <- all.surv.dat %>% dplyr::filter(bank==banker & year == yrs[i])
+  mw.dat <- sub %>% dplyr::filter(year== yrs[i])
+  s.dat <- all.surv.dat %>% dplyr::filter(bank==banker & year == yrs[i])
 
-mod.r <- mod.res[[as.character(yrs[i])]]
-# Now try and do the predictions
+  mod.r <- mod.res[[as.character(yrs[i])]]
+  # Now try and do the predictions
 
-random.pred <- (1:nrow(s.dat))[is.element(s.dat$tow,unique(mw.dat$new_ID))]
+  #get IDs for the sampled tows. Use the random effects for those.
+  random.pred <- (1:nrow(s.dat))[is.element(s.dat$tow,unique(mw.dat$new_ID))]
 
-#fixed effects for IDs that weren't sampled for meat weight shell height; here ID IDs that were NOT sampled
-fixed.pred <- (1:nrow(s.dat))[!is.element(s.dat$tow,unique(mw.dat$new_ID))]
+  #get IDs for the unsampled tows. Use fixed effects for IDs that weren't sampled for meat weight shell height
+  fixed.pred <- (1:nrow(s.dat))[!is.element(s.dat$tow,unique(mw.dat$new_ID))]
 
-#Predict using Random effects for IDs that were sampled for meat weight shell height
-temp <- matrix(NA,nrow(s.dat),40)
+  #Predict using Random effects for IDs that were sampled for meat weight shell height
+  temp <- matrix(NA,nrow(s.dat),40)
 
-for(j in random.pred)
-{
-  temp[j,] <- as.vector(predict(object = mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
-                                                                  depth.cen=rep(s.dat$depth.cen[j] ,40),
-                                                                  new_ID=s.dat$tow[j]),
-                                re.form=NULL,type="response"))
-} # end the random loop
+  for(j in random.pred)
+  {
+    temp[j,] <- as.vector(predict(object = mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
+                                                                    depth.cen=rep(s.dat$depth.cen[j] ,40),
+                                                                    new_ID=s.dat$tow[j]),
+                                  re.form=NULL,type="response"))
+  } # end the random loop
 
-#Predict using fixed effects for IDs that weren't sampled for meat weight shell height
-for(j in fixed.pred)
-{
-  temp[j,] <- as.vector(predict(object=mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
-                                                                depth.cen=rep(s.dat$depth.cen[j] ,40)),
-                                re.form=~0,type="response"))
-} # end the fixed loop
+  #Predict using fixed effects for IDs that weren't sampled for meat weight shell height
+  for(j in fixed.pred)
+  {
+    temp[j,] <- as.vector(predict(object=mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
+                                                                  depth.cen=rep(s.dat$depth.cen[j] ,40)),
+                                  re.form=~0,type="response"))
+  } # end the fixed loop
 
-#multply temp matrix (weight) by live numbers to get weight/size bin
-s.dat[,grep("h5", colnames(s.dat))[1]:grep("h200", colnames(s.dat))] <-
-  temp*s.dat[,grep("h5", colnames(s.dat))[1]:grep("h200", colnames(s.dat))]
-mw.res.t[[i]] <- s.dat
+  #multply temp matrix (weight) by live numbers to get weight/size bin
+  s.dat[,grep("h5", colnames(s.dat))[1]:grep("h200", colnames(s.dat))] <-
+    temp*s.dat[,grep("h5", colnames(s.dat))[1]:grep("h200", colnames(s.dat))]
+  mw.res.t[[i]] <- s.dat
 
 
-# So finally we need to use our models to predict condition on the bank, seemingly the easiest way is to pick a depth and MW to predict at
-# for the bank and just leave it at that.  MW will be 100 mm, Going to say median depth (which is 0 as set up above) of the survey tows between 2010 and 2022 see above
-# For BBn this is 75 meters, which makes loads of sense. Downside is only way to get an SE is to try and bootstrap one, which I'm too lazy to do
-cond.est <-   as.vector(predict(object=mod.r, newdata=data.frame(log.sh.cen=0,
-                                                                 depth.cen=0),
-                                                                 re.form=~0,type="response"))
-# We can pull out the intercept now as well and see how this compares
-inter <- summary(mod.r)$coefficients[1,1]
-inter.se <- summary(mod.r)$coefficients[1,2]
-# While we are at this, let's pull out the fixed slope and the random intercepts for the mw-sh figure and the depth terms.
-slope <- summary(mod.r)$coefficients[2,1]
-slope.se <- summary(mod.r)$coefficients[2,2]
-dep.1 <- summary(mod.r)$coefficients[3,1]
-dep.1.se <- summary(mod.r)$coefficients[3,2]
+  # So finally we need to use our models to predict condition on the bank, seemingly the easiest way is to pick a depth and MW to predict at
+  # for the bank and just leave it at that.  SH will be 100 mm, Going to say median depth (which is 0 as set up above) of the survey tows between 2010 and 2022 see above
+  # For BBn this is 75 meters, which makes loads of sense. Downside is only way to get an SE is to try and bootstrap one, which I'm too lazy to do
+  cond.est <-   as.vector(predict(object=mod.r, newdata=data.frame(log.sh.cen=0,
+                                                                   depth.cen=0),
+                                  re.form=~0,type="response"))
+  # We can pull out the intercept now as well and see how this compares
+  inter <- summary(mod.r)$coefficients[1,1]
+  inter.se <- summary(mod.r)$coefficients[1,2]
+  # While we are at this, let's pull out the fixed slope and the random intercepts for the mw-sh figure and the depth terms.
+  slope <- summary(mod.r)$coefficients[2,1]
+  slope.se <- summary(mod.r)$coefficients[2,2]
+  dep.1 <- summary(mod.r)$coefficients[3,1]
+  dep.1.se <- summary(mod.r)$coefficients[3,2]
 
-# Now extract the random terms
-rand.coef <- data.frame(rand.int = ranef(mod.r)$new_ID[[1]], rand.se = se.ranef(mod.r)$new_ID[[1]],
-                         tow = attr(se.ranef(mod.r)$new_ID,'dimnames')[[1]])
-fix.coef <- data.frame(fix.int = inter, fix.int.se = inter.se, fix.slope = slope, fix.slope.se = slope.se,
-                       depth1 = dep.1, depth1.se = dep.1.se,
-                       tow = as.character(sort(unique(s.dat$tow))),year = yrs[i])
-all.coef[[i]] <- left_join(fix.coef,rand.coef,by='tow')
+  # Now extract the random terms
+  rand.coef <- data.frame(rand.int = ranef(mod.r)$new_ID[[1]], rand.se = se.ranef(mod.r)$new_ID[[1]],
+                          tow = attr(se.ranef(mod.r)$new_ID,'dimnames')[[1]])
+  fix.coef <- data.frame(fix.int = inter, fix.int.se = inter.se, fix.slope = slope, fix.slope.se = slope.se,
+                         depth1 = dep.1, depth1.se = dep.1.se,
+                         tow = as.character(sort(unique(s.dat$tow))),year = yrs[i])
+  all.coef[[i]] <- left_join(fix.coef,rand.coef,by='tow')
 
-# Object for condition prediction
-cond.pred[[i]] <- data.frame(cond = cond.est,year = yrs[i],intercept = inter,inter.se = inter.se)
+  # Object with condition prediction
+  cond.pred[[i]] <- data.frame(cond = cond.est,year = yrs[i],intercept = inter,inter.se = inter.se)
 
 
 } # end the i loop
@@ -560,18 +563,20 @@ mw.sh.coef$ran.int.act <- mw.sh.coef$rand.int+ mw.sh.coef$fix.int
 ggplot(condition.ts, aes(cond,cond.inter)) + geom_point() + geom_abline(intercept=0,slope=1,color=blues)
 
 # Use the intercept which gives us a CI around the Condition, which is fun and I think it's legit the condition of a 100mm scallop at the median depth of the bank
-p.cond.inter <- ggplot(condition.ts,aes(x=year,y=cond.inter)) + geom_ribbon(aes(ymin=cond.inter.LCI,ymax=cond.inter.UCI,x=year),color=blues,fill=blues,alpha=0.5)+
-                                                geom_hline(yintercept = mean(condition.ts$cond,na.rm=T),color=yellows,linetype = 'dashed',size=1.5) +
-                                                geom_line(size=1.5) + geom_point(size=3) +
-                                                ylim(c(min(condition.ts$cond.inter.LCI),max(condition.ts$cond.inter.UCI)))+
-                                                xlab("") + ylab("Meat Weight of 100 mm Scallop (grams)") +
-                                                theme_bw()
+p.cond.inter <- ggplot(condition.ts,aes(x=year,y=cond.inter)) +
+  geom_ribbon(aes(ymin=cond.inter.LCI,ymax=cond.inter.UCI,x=year),color=blues,fill=blues,alpha=0.5)+
+  geom_hline(yintercept = mean(condition.ts$cond,na.rm=T),color=yellows,linetype = 'dashed',size=1.5) +
+  geom_line(size=1.5) +
+  geom_point(size=3) +
+  ylim(c(min(condition.ts$cond.inter.LCI),max(condition.ts$cond.inter.UCI)))+
+  xlab("") + ylab("Meat Weight of 100 mm Scallop (grams)") +
+  theme_bw()
 
 # So now we need a new MW-SH figure and for the Res Doc we probably should show the Depth covariate, or at least
 # create that figure.
 slope <- mw.sh.coef %>% dplyr::filter(year == max(yrs)) %>% dplyr::pull(fix.slope)
 int <- mw.sh.coef %>% dplyr::filter(year == max(yrs)) %>% dplyr::pull(fix.int)
-rand.int <- mw.sh.coef %>% dplyr::filter(year == max(yrs),!is.na(ran.int.act)) %>% dplyr::pull(ran.int.act,tow)
+rand.int <- mw.sh.coef[mw.sh.coef$year==max(yrs) & !is.na(mw.sh.coef$ran.int.act),] %>% dplyr::pull(ran.int.act,tow)
 sh <- 65:200/100
 # So now we can make the curve for every tow and our overall fixed effect.
 rand.tow <- NULL
@@ -580,16 +585,17 @@ rand.tows <- do.call("rbind",rand.tow)
 fix.mw <- data.frame(sh = 100* sh, mw = exp(int)[1] * sh^slope[1])
 
 # Based on our current figure, I don't think this goes in RES DOC, but is basically what we want for our SS.
-p.ss <- ggplot(rand.tows) + geom_line(aes(x=sh,y=mw,group=tow),color=yellows)+
-                            geom_point(data=sub %>% dplyr::filter(year == max(yrs)),aes(x=sh,y=wmw),color=blues) +
-                            geom_line(data = fix.mw,aes(x=sh,y=mw),color='black',size=2) +
-                            scale_x_continuous(limits = c(65,sub %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
-                                               name = "Shell Height (mm)",
-                                               breaks = seq(0,200,by=10), expand = c(0.005,0.005)) +
-                            scale_y_continuous(limits = c(0,sub %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
-                                               name = "Meat Weight (grams)",
-                                               breaks = seq(0,100,by=10)) +
-                            theme_bw()
+p.ss <- ggplot(rand.tows) +
+  geom_point(data=sub %>% dplyr::filter(year == max(yrs)),aes(x=sh,y=wmw),color=blues) +
+  geom_line(aes(x=sh,y=mw,group=tow),color=yellows)+
+  geom_line(data = fix.mw,aes(x=sh,y=mw),color='black',size=2) +
+  scale_x_continuous(limits = c(65,sub %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
+                     name = "Shell Height (mm)",
+                     breaks = seq(0,200,by=10), expand = c(0.005,0.005)) +
+  scale_y_continuous(limits = c(0,sub %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
+                     name = "Meat Weight (grams)",
+                     breaks = seq(0,100,by=10)) +
+  theme_bw()
 
 # I was thinking we could show the line with some uncertainty instead of showing the tows, but
 # that's not so easy since we only have the parameter uncertainties and not the uncertainty of the line itself (again bootstraping may be an option, but
@@ -604,7 +610,7 @@ for(j in 1:n.yrs)
   rt <- NULL
   slope <- mw.sh.coef %>% dplyr::filter(year == yrs[j]) %>% dplyr::pull(fix.slope); slope <- slope[1]
   int <- mw.sh.coef %>% dplyr::filter(year == yrs[j]) %>% dplyr::pull(fix.int); int <- int[1]
-  rand.int <- mw.sh.coef %>% dplyr::filter(year == yrs[j],!is.na(ran.int.act)) %>% dplyr::pull(ran.int.act,tow)
+  rand.int <- mw.sh.coef[mw.sh.coef$year==year & !is.na(mw.sh.coef$ran.int.act),] %>% dplyr::pull(ran.int.act,tow)
   for(i in 1:length(rand.int)) rt[[i]] <- data.frame(sh = 100*sh,mw = exp(rand.int)[i] * sh^slope,tow = names(rand.int)[i])
   rts <- do.call("rbind",rt)
   r.tows[[j]] <- data.frame(rts,year = yrs[j])

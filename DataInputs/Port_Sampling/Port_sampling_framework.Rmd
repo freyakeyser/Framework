@@ -18,9 +18,11 @@ direct <- "Y:/Offshore/Assessment/"
 
 # Bring in the port sampling data, which contains meat weights and meat counts for sampled fishing trips
 load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.rData"))
+# for port.sampling object, which becomes "bbn.dat" (even for sable)
 
 # survey data 
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.Rdata")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+# for mw[[bnk]] object containing all survey and hydration mw data. 
 
 # plot destination
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/"
@@ -292,7 +294,7 @@ ggplot() +
   ylab(en2fr("Year",translate=french, custom_terms=rosetta_terms)) + 
   xlab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) +
   scale_x_continuous(limits=c(50,200), breaks=seq(50,200,10)) +
-  scale_y_discrete(expand=c(0,0.9))
+  scale_y_discrete(expand=c(0,0.9), limits=rev)
 dev.off()  
 
 # HERE IS THE MAIN ANALYSIS FOR the BBn Res doc, shows proportion below certain sizes

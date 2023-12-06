@@ -132,4 +132,8 @@ fr <- ""
 if(fr=="") language <- "english"
 if(!fr=="") language <- "french"
 nickname <- "framework5"
+
+if(nickname=="framework5") MWSH <- "_newMWSH"
+if(nickname=="framework2") MWSH <- "_oldMWSH"
+
 ```
