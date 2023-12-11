@@ -918,6 +918,94 @@ for(b in c("Mid", "Ban", "Ger")){
 }
 
 
+
+
+for(sfa in 25:27){
+  
+  if(sfa==25) { 
+    crs <- 32620
+    sfoot <- st_as_sf(all.surv.dat[all.surv.dat$bank %in% c("Sab", "Mid", "Ban") & all.surv.dat$random %in% c(1,3),], 
+                      coords=c(X="lon", Y="lat"), 
+                      crs=4326) %>%
+      st_transform(crs)
+    base <- boundaries[boundaries$ID %in% c("Sab", "Mid", "Ban"),] %>% st_transform(crs) %>%st_buffer(10000)
+    
+  years <- paste0(min(sfoot$year), "-", max(sfoot$year))
+  }
+  
+  if(sfa==26) {
+    crs <- 32619
+    sfoot <- st_as_sf(all.surv.dat[all.surv.dat$bank %in% c("BBn","BBs") & all.surv.dat$random %in% c(1),], 
+                      coords=c(X="lon", Y="lat"), 
+                      crs=4326) %>%
+      st_transform(crs)
+    sfootger <- st_as_sf(all.surv.dat[all.surv.dat$bank %in% c("Ger") & all.surv.dat$random %in% c(1,3),], 
+                      coords=c(X="lon", Y="lat"), 
+                      crs=4326) %>%
+      st_transform(crs)
+    sfoot <- rbind(sfoot, sfootger)
+    base <- boundaries[boundaries$ID %in% c("BBn","BBs",0),] %>% st_transform(crs) %>% st_buffer(5000)
+    years <- paste0(min(sfoot$year), "-", max(sfoot$year))
+  }  
+  
+  if(sfa==27) {
+    crs <- 32619
+    sfoot <- st_as_sf(all.surv.dat[all.surv.dat$bank %in% c("GBb") & all.surv.dat$random==1,], 
+                      coords=c(X="lon", Y="lat"), 
+                      crs=4326) %>%
+      st_transform(crs)
+    base <- boundaries[boundaries$ID %in% c("GBb"),] %>% st_transform(crs) %>% st_buffer(5000)
+    years <- paste0(min(sfoot$year), "-", max(sfoot$year))
+  }  
+  
+  r <- create_grid(gridsize = sqrt(10)*1000, polygon = base)
+  
+  #plot(r)
+  
+  sfoot <- sfoot %>% 
+    st_intersection(r) %>%
+    group_by(bank, cell) %>%
+    dplyr::summarize(n=n())
+
+  st_geometry(sfoot) <- NULL
+  
+  sfoot <- dplyr::left_join(r, sfoot)
+  
+  lims <- sfoot[!is.na(sfoot$n),] %>% 
+    st_combine() %>% 
+    st_convex_hull() %>% 
+    st_buffer(dist=50000) %>% 
+    st_bbox()
+  
+  # if(french==T) nonGB$final <- nonGB$fr
+  # if(french==F) nonGB$final <- nonGB$lab_short
+  
+  bp <- pecjector(area=list(y = c(lims$ymin[[1]], lims$ymax[[1]]),
+                            x =c(lims$xmin[[1]], lims$xmax[[1]]),
+                            crs = crs),
+                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), sfa = 'offshore', scale.bar="br"),plot=F, quiet=T)# + 
+  
+  #manual adjustment to scalebar text size
+  if(sfa==27) bp$layers[[4]]$geom_params$text_cex <- 1.5
+  if(sfa %in% c(25:26)) bp$layers[[5]]$geom_params$text_cex <- 1.5
+
+  png(filename=paste0(plotsGo, "/Survey/", nickname, "/survey_footprint_", sfa, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+  print(bp +
+          geom_sf(data=sfoot[!is.na(sfoot$n),], aes(fill=n), colour=NA, show.legend=T) +
+          theme(legend.position=c(0.25,0.85), legend.background=element_blank()) +
+          scale_fill_viridis_c(name=paste0(en2fr(x = "Number of survey tows", translate=french, custom_terms=rosetta_terms), "\n", years), option="G", begin=0.95, end=0)+
+          coord_sf(expand=F)#+
+          # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,],
+          #              aes(label = final),
+          #              size=6,
+          #              fun.geometry = sf::st_centroid,
+          #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+          #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+          # )
+  )
+  dev.off()
+} 
+
 ```
 
 
@@ -1093,9 +1181,9 @@ for(sfa in 25:27){
   
   if(sfa==27) {
     crs <- 32619
-    foot <- st_as_sf(fish_sf[grep(x=fish_sf$sfa, pattern="27"),]) %>%
+    foot <- st_as_sf(fish_sf[grep(x=fish_sf$sfa, pattern="27B"),]) %>%
       st_transform(crs)
-    base <- offshore[grep(x=offshore$ID, pattern="27"),] %>% st_transform(crs)
+    base <- offshore[grep(x=offshore$ID, pattern="27B"),] %>% st_transform(crs)
   }  
   
   r <- create_grid(gridsize = sqrt(10)*1000, polygon = base)
@@ -1242,13 +1330,24 @@ dev.off()
 # using survey year, so June to May
 fish.dat$surv.year <- fish.dat$year 
 fish.dat$month <- lubridate::month(lubridate::ymd(fish.dat$fished))
-fish.dat$surv.year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26] <- fish.dat$year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26]+1
+fish.dat$sfa[grep(x=fish.dat$sfa, "25")] <- 25
+fish.dat$sfa[grep(x=fish.dat$sfa, "26")] <- 26
+fish.dat$sfa[grep(x=fish.dat$sfa, "27")] <- 27
+fish.dat$sfa[fish.dat$bank %in% c("Ban", "Sab","Mid")] <- 25
+fish.dat$sfa[fish.dat$bank %in% c("BBn", "BBs", "Ger")] <- 26
+fish.dat$sfa[fish.dat$bank %in% c("GBb")] <- 27
+
+fish.dat$surv.year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26]+1
 fish.dat$surv.year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27]+1
-tail(fish.dat[, c("fished", "month", "year", "surv.year")], 50)
+#tail(fish.dat[, c("fished", "month", "year", "surv.year")], 50)
 survey.yr <- fish.dat %>%
   group_by(surv.year, bank, sfa) %>%
   summarize(mt = sum(pro.repwt)/1000) %>%
   mutate(year=surv.year)
+
+fishing.yr <- fish.dat %>%
+  group_by(year, bank, sfa) %>%
+  summarize(mt = sum(pro.repwt)/1000) 
   
 
 ##### SOMETHING IS WRONG WITH FISH.DAT HERE. BBn NO LONGER MATCHES, AND REL F's ARE TOO HIGH
@@ -1274,7 +1373,7 @@ for(b in banks) {
 
   if(!b=="Sab/Mid"){
     if(b=="Ger") compare <- full_join(merged.survey.obj[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
-    if(!b=="Ger") compare <- full_join(survey.obj[[b]]$model.dat[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
+    if(!b=="Ger") compare <- full_join(survey.obj[[b]]$model.dat[, c("year", "I")], survey.yr[survey.yr$bank==b &!is.na(survey.yr$bank),c("year", "bank", "mt")])
   }
   compare$relative.F <- compare$mt / (compare$I) #/0.35) # survey catchability? don't use this
   relative.F <- rbind(relative.F, compare)
@@ -1290,7 +1389,7 @@ if(french==F) flab <- "Relative fishing mortality"
 
 exp25 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==25,], aes(year, relative.F)) + 
   geom_point(data=relative.F[relative.F$sfa==25,], aes(year, relative.F)) +
-  ylim(0,1) +
+  ylim(0,2) +
   facet_wrap(~bank, ncol=1) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
   ylab(flab) +
@@ -1298,7 +1397,7 @@ exp25 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==25,], aes(year, re
 
 exp26 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==26,], aes(year, relative.F)) + 
   geom_point(data=relative.F[relative.F$sfa==26,], aes(year, relative.F)) +
-  ylim(0,1) +
+  ylim(0,2) +
   facet_wrap(~bank, ncol=1) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
   ylab(flab) +
@@ -1306,7 +1405,7 @@ exp26 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==26,], aes(year, re
 
 exp27 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==27,], aes(year, relative.F)) + 
   geom_point(data=relative.F[relative.F$sfa==27,], aes(year, relative.F)) +
-  ylim(0,1) +
+  ylim(0,2) +
   facet_wrap(~bank, ncol=1) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
   ylab(flab) +

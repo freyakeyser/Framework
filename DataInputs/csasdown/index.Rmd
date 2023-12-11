@@ -122,9 +122,9 @@ library(csasdown)
 
 params <- NULL
 params$bank <- c("Ban", "Mid", 
-  "Sab", "Ger", "BBs", "BBn")
-params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022)
-params$bankname <- c("Banquereau", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North")
+  "Sab", "Ger", "BBs", "BBn", "GBb")
+params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022, 2022)
+params$bankname <- c("Banquereau", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North", "Georges Bank 'b'")
 params$banknum <- 1:length(params$bank)
 
 fr <- ""

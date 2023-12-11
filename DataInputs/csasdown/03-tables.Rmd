@@ -17,7 +17,7 @@ require(flextable)
 require(dplyr)
 strata <- readxl::read_excel("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/survey_design.xlsx")
 strata$`Area (km^2)` <- round(x=as.numeric(strata$`Area (km^2)`), digits=2)
-strata <- strata[1:17,]
+strata <- strata[c(1:17, 25:29),] # to exclude GBa
 opts <- options(knitr.kable.NA = "")
 strata
 # strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
@@ -82,22 +82,6 @@ opts <- options(knitr.kable.NA = "")
 ```
 
 
-
-```{r strata-tab, echo=F, message=F}
-#<!---BLOCK_LANDSCAPE_START--->
-# block_section(
-#   prop_section(
-#     page_size = page_size(orient = "landscape"),
-#     type="continuous"
-#   )
-# )
-
-csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0,bold=TRUE)
-#qflextable(strata)
-
-#<!---BLOCK_LANDSCAPE_START--->
-```
-
 ```{r ps-tab, echo=F, message=F}
 #<!---BLOCK_LANDSCAPE_START--->
 # block_section(
@@ -116,7 +100,20 @@ csas_table(ps_tab, caption ="Port sampling data summary.") %>%
 #<!---BLOCK_LANDSCAPE_START--->
 ```
 
+```{r strata-tab, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
 
+csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0,bold=TRUE)
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
 
 ```{r mwsh-tab, echo=F, message=F}
 #<!---BLOCK_LANDSCAPE_START--->

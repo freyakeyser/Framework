@@ -1,53 +1,53 @@
 # Introduction
 
-Scallop fishery description. Introduce SFAs and management scheme. The last full assessment for the Offshore Scallop fishery occurred in 2013, and focused on Georges Bank 'a' and Browns Bank north, which are part of SFA 27 and 26, respectively. Annual updates for these two stocks have occurred since***. However, the offshore scallop fishery consists of 9 management units in total. SFA 26 also includes Browns Bank South and German Bank, SFA 27 includes Georges Bank 'b', and SFA 25, known as the eastern scotian shelf, includes management units 25 (Sable and Middle Bank), and 25b (Banquereau Bank). An annual review of fishery and survey data summaries for all 9 stocks occurs as part of the OSAC process, however, the methodology underlying the current fishery and survey summaries has not been peer-reviewed. Furthermore, stock status information has not been published since 2001 for the Eastern Scotian Shelf stocks (Sable and Middle Banks) and 1997 for German Bank; Browns Bank South and Banquereau Bank have not been published before.
+The Maritimes Region Offshore Scallop stock is managed as nine management units called Scallop Fishing Areas (SFAs, Figure \@ref(fig:map)). Information on scallop population dynamics within each SFA are provided annually by Fisheries and Oceans Canada (DFO) during meetings of the Offshore Scallop Advisory Committee (OSAC). Statistically-modelled science advice is also provided annually for SFA 27A Georges Bank 'a' and SFA 26A Browns Bank north using the assessment framework established in 2009 [@jonsen_georges_2009] and accepted during the peer-reviewed Regional Advisory Process of 2013 [@dfo_assessment_2013; @hubley_georges_2014]. Stock status advice has not been published since 2001 for the SFA 25 Eastern Scotian Shelf stocks (Sable and Middle Banks) and 1997 for SFA 26C German Bank; SFA 26B Browns Bank South, SFA 25B Banquereau Bank and SFA 27B Georges Bank 'b' have not been published before.
 
-\@ref(fig:map)
+This document will review the available fishery and survey data for SFAs 25, 26 and 27B to support the development of reference points for all management units. Methods used to collect data (survey design and protocols), and calculate survey indices and model inputs will be reviewed. Methodological changes will be proposed for the relationship between meat weight and shell height, the relationship between shell height and age, and the size of recruit and fully-recruited scallops. 
+
 
 ## Species biology
+
+Sea scallop (_Placopecten magellanicus_) biology is summarized by Jonsen et al. (2009). Since that time, studies have refined our understanding of spatial distribution (McDonald et al. 2021, 2022 and 2023), growth (Hart and Chute 2009, Hennen and Hart 2012, Pousse et al. 2023), swimming (Mason et al. 2014), spawning (Thompson et al. 2014), natural mortality (Hart and Cheng 2022, Siemann et al. 2019) and environmental influences on biology (Friedland et al. 2023, Liu et al. 2021). 
 
 
 ## Framework objectives
 
 The objectives of this framework are:  
 
-- To describe the fishery, survey, and biological data informing the assessment of SFAs 25 and 26 (Part 1, this document)
-- To evaluate the analysis methodology used to summarize the above data for SFAs 25 and 26 (Part 2, separate document)
-- To propose reference points for SFAs 25 and 26 (Part 2, separate document)  
+- To describe the fishery, survey, and biological data informing the assessment of SFAs 25, 26, and 27B (Part 1, this document)
+- To evaluate the analysis methodology used to summarize the above data for SFAs 25, 26, and 27B (Part 2, separate document)
+- To propose reference points for SFAs 25, 26, and 27B (Part 2, separate document)  
 
 This Data Inputs review document will:  
 
-- Summarize and review the sampling protocols used during the surveys of SFA 25 and 26 over time
-- Review the statistical design(s) of the surveys of SFA 25 and 26 over time
-- Review the fishery data collected for trips occurring in SFA 25 and 26 (process, volume of data, quality and validation)
+- Summarize and review the sampling protocols used during the surveys of SFA 25, 26,and 27B over time
+- Review the statistical design(s) of the surveys of SFA 25, 26, and 27B over time
+- Review the fishery data collected for trips occurring in SFA 25, 26, and 27B (process, volume of data, quality and validation)
 - Review the methods used to summarize survey and fishery data into Science advice
 - Present the summarized survey and fishery data for each management unit
-
-notes
-
-- tow-by-tow summary. station locations over time?
-- clappers only for sable and north
-- ts figures for all banks (fishery, abund, biomass, cond)
-- survey map for all banks... example for german
 
 
 # Fishery
 
-- Fishery independent data
-- Logbooks
+The Maritimes Region Offshore Scallop fishery is described in an [Integrated Fisheries Management Plan] (https://www.dfo-mpo.gc.ca/fisheries-peches/ifmp-gmp/scallop-petoncle/2018/index-eng.html) (DFO 2022) that is updated as needed by DFO Resource Management. To summarize, there are six license holding companies and currently ten active vessels. The fishery is managed using a total allowable catch (TAC) with Enterprise Allocations (quotas) for each company based on a percent share of the TAC. In addition to following license conditions, each fishing trip must complete a fishing logbook and participate in dockside monitoring upon landing. These data are used to manage quotas and for stock assessment purposes. 
+
+TACs have varied over time, but are consistently highest in SFA 27A (not included here), followed by SFA 26A and 27B (\@ref(fig:hist)). Fishing seasons run from January 1 to December 31 for all SFAs, except SFA 26C German Bank which runs from June 15 to October 31 to avoid gear conflicts with the lobster fishery (DFO 2022). Each SFA corresponds to a bathymetric bank, except SFA 25, which represents the Eastern Scotian Shelf and contains both Sable and Middle Banks. Western Bank has historically been included in SFA 25 as well, but became part of the Western/Emerald Bank Conservation Area (WEBCA) in 2017 and as such is no longer fished. Middle Bank is shown separately from Sable Bank in our fishery figures as they are surveyed separately. 
 
 
 ## Fishery history
 
-- Fleet dynamic
-- Management Figures: \@ref(fig:hist)
+Historically, Georges Bank has been the primary focus of the offshore scallop fishery. In 1977, Canada and the US both declared 200-mile fishing zones. This limited Canadian vessels to fishing a disputed zone of Georges Bank. The dispute and the competitive fishery continued in this area until the International Court of Justice (ICJ) established an international boundary in October 1984, which awarded the Northeast portion of Georges Bank to Canada. The establishment of the ICJ line initiated discussions between DFO and industry on how to rebuild and maintain the offshore scallop stocks (for more details see Jonsen et al., 2009).  This led to opportunities and interest in the potential exploitation of other banks within the Canadian offshore jurisdiction.  In September 1986, the Minister divided the inshore and offshore scallop fleets with a separation at the 43°40’ North latitude line near Yarmouth, Nova Scotia. This led to the inshore fleet being phased out of the Georges Bank, Browns Bank and German Bank fisheries over the next few years, while the offshore fleet was not permitted to fish in what were classified as inshore waters (Jonsen et al., 2009). These changes to the available fishing areas for the offshore fleet led to competition for access to fishing grounds and resulted in the exploitation of all known beds, even in areas quite distant from home ports (e.g. Banquereau) (Robert et al., 1988). As a result the coverage of the DFO survey expanded to cover the new fishing grounds.
+
+Since 2010, the offshore scallop fleet has gradually shifted towards the use of factory freezer trawler vessels and automatic shucking machines. This has lead to divergence in catch rates between different vessel types possibly reflective of different fishing strategies. As of 2023, the majority of the fleet (8 out of 10 active vessels) are freezer trawlers. Further analysis is needed to understand the impact of these changes. 
 
 
 ## Fishery data
 
-- Footprint Figures: \@ref(fig:foot-25) \@ref(fig:foot-26)
-- CPUE Figures: \@ref(fig:fts-25) \@ref(fig:fts-26)
-- Port sampling Figures: \@ref(fig:mw-annual) \@ref(fig:mw-monthly) Tables: \@ref(tab:ps-tab)
+In SFA 25, scallop catch has been below 100 tonnes in recent years (Figure \@ref(fig:fts-25)). In SFA 25, landings have traditionally been highest from Sable Bank, however it was last fished in 2021. Fishing effort has been below 50 000 hour-metres in all SFA 25 management units since 2000, with catch rates (kilograms per hour-metre) below 10 in most years. Catch rates were above 10 kg/hm in SFA 25B Banquereau in some years, but this area was fished in fewer years overall. Fishing has occurred over much of Middle and Sable Bank since 1980, with landings highest in the western portion of Sable Bank, and southeast of Middle Bank (Figure \@ref(fig:foot-25)). Fishing on Banquereau has been targeted to small areas, possibly due to the discontinuous fishing activity over time (Figure \@ref(fig:foot-25)). Meat counts (the number of scallop meats in a 500g sample) varied within and between management units in SFA 25 (\@ref(tab:ps-tab)). On Sable Bank, median annual meat weights only exceeded 20 grams in 2012 (Figure \@ref(fig:mw-annual)), and were generally above the median from March to June and below the median from July to November (Figures \@ref(fig:mw-annual), \@ref(fig:mw-monthly)).
+
+In SFA 26, scallop catch varies between management units. SFA 26A Browns Bank north has been below 500 tonnes in recent years, but has exceeded 1000 tonnes historically, while SFA 26B Browns Bank south and 26C German Bank have been below 250 tonnes for many years (Figure \@ref(fig:fts-26)). Fishing on SFA 26B Browns Bank south is more sporadic than in the other two areas; for example the area was not fished from 2014-2016 or 2020-2021 (Figure \@ref(fig:fts-26)). Fishing effort has rarely exceeded 50 000 hour-metres in any of the SFA 26 management units, while catch rates (kilograms per hour-metre) have been variable (Figure \@ref(fig:fts-26)). Fishing has occurred throughout SFA 26 since 1980, but overall catches have been highest on SFA 26A Browns Bank north, particularly in the northern half of the management unit (Figure \@ref(fig:foot-26)). Meat counts varied within and between management units in SFA 26, with the long term median for SFA 26B Browns Bank south reaching 45, while the other two areas were 26-29 (\@ref(tab:ps-tab)). On SFA 26A Browns Bank north, median annual meat weights only exceeded 20 grams in five years (Figure \@ref(fig:mw-annual)), and were generally above the median in December, February and March and below the median from May to September (Figures \@ref(fig:mw-annual), \@ref(fig:mw-monthly)).
+
+In SFA 27B, annual scallop catch has generally been below 750 tonnes (Figure \@ref(fig:fts-27)). The area has been fished every year since 1981, except 2011. Fishing effort has rarely exceeded 30 000 hour-metres since 2002, while catch rates have increased to exceed 20 kilograms per hour-metre in recent years (Figure \@ref(fig:fts-27)). Fishing has occurred throughout SFA 27B since 1980, and catches are usually highest along the border with SFA27A (Figure \@ref(fig:foot-27)). Meat counts varied in SFA 27B, with a long term median of 36, which is above SFA 26A but below SFA 26B (\@ref(tab:ps-tab)). 
 
 
 # Survey
@@ -56,13 +56,25 @@ The Offshore Scallop Survey Database (SCALOFF) contains data collected through C
 
 ## Survey history  
 
-The Offshore Scallop Survey has occurred between May and September annually since 1978 with few exceptions, but spatial coverage and survey designs have changed over time (see Survey Design).  
+In 1979, funded by the Department of Fisheries and Oceans and conducted on the CCGS E.E. Prince, the first official surveys took place on Browns and German Banks.  The station allocation methodology employed a stratified sampling design based on commercial catch rate (Robert & Jamieson, 1986), where catch rate strata for each bank were defined annually.  The individual commercial catch rate strata for each of the offshore banks were customized to the specific catch levels encountered on the bank, and stations were randomly allocated within each strata.  
+
+In 1983 Middle and Sable/Western Banks were added to the survey.  For the next decade, survey coverage depended on the levels of fishing activity/effort on the individual banks with occasional limited surveys of Banquereau Bank.  The area surveyed on each bank (or “survey domain”) changed significantly during these years, leading to a lack of continuity in survey results (Robert et al., 1987)  During this period, there were additional projects (not detailed here) included in the survey activities, including scallop tagging, phytoplankton and larval sampling, monitoring of juvenile hake within scallops, monitoring of epiphytes, genetic analysis, and meat sampling for heavy metal analysis (cruise reports).   The evolving survey sampling designs are detailed by bank below. 
+
+In 1994, the CCGS E.E. Prince was slated for retirement.  Under the shared stewardship arrangement   between the Offshore Scallop Industry and the Department, the Industry provided a commercial scallop fishing vessel, FV Cape Keltic, and crew to conduct the annual stock assessment surveys of the offshore scallop banks under the direction of a DFO Biologist (IFMP, 2018).  Comparative survey towing activities took place on Middle (12 tows), Sable (58 tows), Browns North (30 tows) and Georges Banks (12 tows) in 1994 and the survey vessel transition took place.  Since this time there have been three additional vessel changes; no comparative surveys were undertaken for these vessel changes.  In 2007 and 2008, the survey took place on the FV E.E. Pierce, from 2009-2014 the survey took place on the FV Tenacity and starting in 2015 the FV Fundy Leader has been used for the survey. 
+
+In 2015, there were delays in survey vessel preparations and therefore survey operations.  Due to the delays, Middle and Sable/Western Banks were not surveyed.  Browns Bank North was surveyed in July/August, with additional tows taking place in late September along with a German Bank survey in September.  
+In 2020, due to the Covid-19 pandemic, a limited survey of Browns Bank North and the northern portion of Georges Bank was conducted by Industry partners with support from the department but no DFO staff leadership on the vessel.  These data were collected for information and advisory purposes but are not included in stock assessment analysis. A selection of stations from the 2018 and 2019 surveys of these banks formed the survey design in 2020.
+
 
 ## Sampling protocols  
 
-Regardless of survey design, the same sampling protocol is followed: At each survey station, the 8-ft scallop dredge lined with 38 mm mesh is towed for 10 minutes, and every scallop is counted and assigned to a 5 mm shell height bin (ranging from 0-200 mm). Detailed sampling occurs at a selection of the stations, where the exact shell heights and meat weights are measured for a sub-sample of the scallops caught. Bottom temperature data has also been collected on the Offshore Scallop survey since 2011.  
+Regardless of survey design, the same sampling protocol is followed: At each survey station, a 2.44 m New Bedford style scallop dredge (75 mm ring size) lined with 38 mm polypropylene netting used to conduct tows at predetermined locations. Each survey tow occurs for 10 minutes at a speed of 3 to 4 knots. 
 
-As part of the Offshore Scallop Survey protocol, tows are tracked to provide information on location and length (Hubley et al. 2014). Tow lengths can vary due to conditions such as vessel speed, tides, and sea state. For this reason, accurate tow lengths are required to standardize shell height frequency data across tows of various lengths to a common 800m tow length. Over the past two of decades, Ocean Vision was the navigational system used to record tow tracks, but this program has become outdated.  
+The scallop catch from each tow is sorted into baskets (for scallops > 50mm) and buckets (for scallops ≤ 50mm or less). The individual scallops' shell heights are measured to the nearest 5 millimeters and their mortality state (dead or alive) is recorded.
+
+At the start of the survey time series, biological samples of 30 scallops were taken from a tow every 10 minute square of latitude and longitude.  The scallops were dissected into meat, gonad, and soft parts while on board the vessel. The individual components were then frozen while at sea. In a DFO lab onshore at a later date; the biological components were thawed, weighed (wet and dry weight), had their shell heights measured precisely (instead of using the 5 mm bins) and aged.  In Summer of 2010, the procedure was revised such that only meat weight and shell height information were collected, but for an increased number of scallops; this sampling process now takes place exclusively on the vessel during the survey. The relationship between the shell height and adductor muscle weight is particularly useful for monitoring the condition of scallops in a given place and time (Hubley et al., 2011).
+
+Tows are tracked using a global positioning system (GPS) to provide information on location and length (Hubley et al. 2014). Tow lengths can vary due to conditions such as vessel speed, tides, and sea state. For this reason, accurate tow lengths are required to standardize shell height frequency data across tows of various lengths to a common 800m tow length. Over the past two of decades, Ocean Vision was the navigational system used to record tow tracks, but this program has become outdated.  
 
 During the 2022 Offshore Scallop surveys of German Bank, Browns Bank North, and Georges Bank (a and b), the Olex navigational system was trialed as a replacement for Ocean Vision. A total of 449 tows were recorded using both systems. Tow tracking followed the same at-sea protocol as usual, but two systems were used simultaneously. Tow lengths were calculated based on the tracks recorded by each system and compared by tow using the sf package in R. The tows were recorded using the WGS 84 coordinate reference system, but were converted to the appropriate UTM zone for the purposes of length calculation.  
 
@@ -72,11 +84,73 @@ L_tow=L_olex/φ
 
 This correction factor will be applied to all future Olex tows to ensure comparability with historical data collected under the Ocean Vision system (Figure \@ref(fig:nav-box)). Historical data collected using Ocean Vision will not be affected by the transition to Olex.
 
+As of March 2022, all of the Offshore Scallop assessment survey data (1978-Present) is housed in an internal DFO oracle database called SCALOFF. As annual surveys take place, the data are validated and uploaded to the SCALOFF database. This allows for consistent data handling, quality control, and data security. 
 
 ## Survey design  
 
-- by bank
-- stratification  
+### Banquereau Bank
+
+The first survey on Banquereau Bank was an extension of the survey that was taking place on Sable/Western Bank in 1985.  Over the next two decades there were a few years (1987, 1988, 1999) with limited surveys that employed a simple random sampling design that was informed by historical catch rates.  
+
+In absence of new knowledge of scallop distribution, the 2006 survey repeated 15 of the 18 survey tows from 1999, plus an additional 3 exploratory tows.  The stations sampled in 2012 were random but informed by fishing effort distribution, these stations were repeated in 2019 with three additional exploratory stations. 
+On Banquereau Bank, Sea scallops and Icelandic scallops both occur in harvestable quantities.  In 2006, 2012, and 2019, both Sea scallops and Icelandic scallops were measured and enumerated separately but with the same onboard procedures to provide abundance estimates for both scallop species. 
+
+Currently, there is no plan to survey Banquereau Bank on an annual basis.
+
+### Middle Bank
+
+In 1983, Middle Bank was added to the offshore scallop survey plan due to fishing effort expanding on to the Eastern Scotian Shelf.  Survey coverage of the bank used a stratified design based on catch.  An example of how the catch stratification was implemented can be found using the 1984 data, in this year, Middle Bank (10.6 % total Scotian Shelf catch) was assigned two strata (>7% total catch, <7% total catch). High strata made up 60% of the total area to be surveyed, so 12 of the 20 stations were randomly allocated to high strata and 8 stations were randomly allocated to the low strata.  This design was used between 1984 and 1988 with the number of stations varying from 6 to 20.
+
+There was no survey between 1989 and 1991 (Robert & Butler-Connolly, 1991). In 1992,  there were 8 catch rate stratified tows (Robert & Butler, 1993).  Due to low stock levels and minimal fishing activity the survey was cancelled in 1993 (Robert & Butler, 1994).
+
+In 1994, the survey was used to establish baseline data. Stratification for the 1994 survey using the 1993 catch would have provided poor coverage since fishing activity was very limited.  Additional tows were added to the survey (exploratory stratum) to cover areas fished in the past (Robert & Butler, 1996).  The Middle Bank survey was also included in the comparative survey between the CCGS E.E. Prince and the industry supplied FV Cape Keltic.  From 1994-1996, the survey maintained this fixed station design with 12 stations.  In 1997, three additional fixed stations were added and this survey design has not changed since.
+
+### Sable/Western Bank
+
+In 1983, Sable/Western Bank was added to the survey plan due to the fishing effort expanding on to the Eastern Scotian Shelf. Survey coverage of the bank used a stratified design based on catch. Station locations were randomly assigned within the 10’ units with at least 5 fishing days according to a low, medium, and high strata defined by percentage of total catch for the area. The 1983 survey was cancelled due to weather conditions.
+
+An example of how the catch stratification was implemented can be found using the 1984 data.  In this year, the Sable/Western Bank survey (18.6% total Scotian Shelf catch) assigned stations to High >8% total catch (45% of total area, 13 stations), Med 4-8% total catch (33% total area, 13 stations), and low 0-4% total catch (23% total area, 14 stations) stratum.   
+
+By 1986, the new management regime for Georges Bank stocks (Enterprise Allocation, or EA) had changed the patterns of exploitation on the Scotian Shelf from opportunistic to quasi-permanent with catches from Sable/Western being the highest to date (Robert et al., 1987).  Due to these changes the Sable/Western survey area coverage expanded significantly from 1986 to 1990. There was a lack of continuity in the survey results due to the changes in the survey domain over this period (Robert et al., 1988 and Robert et al., 1990).
+
+In 1991, the survey of the northern section of Western Bank was not completed due to ship crew overtime regulations; only 76 of the 90 planned stations were completed. The high stratum was completed as planned, the medium stratum was missing 2 tows, and only 50% of the planned tows in the low stratum were completed (Robert & Butler, 1992). In 1994, the aforementioned comparative survey was also undertaken on Sable/Western Bank.  As with other areas, there were no significant differences in abundance(?) for scallop shell height classes over 100mm (Robert & Butler, 1995).  Half of the survey stations in 1994 were selected to explore areas not presently fished to obtain base line data for these areas.  Stratification for the 1994 survey using the 1993 catch would have provided poor coverage since the geographical area of fishing activities was limited.  The stations conducted on Sable/Western Bank in 1994 were repeated in 1995 to provide a baseline of scallop abundance (Robert & Butler, 1996).
+
+In the next few years, additional tows were added to the survey (exploratory stratum) to cover grounds fished in the past on Sable/Western Bank.  From 1999-2009, the survey design was based on the catch rate stratification methodology and 135 stations were sampled each year. 
+From 2010 onwards, the stratification has been based on the historical survey index (Table 5). There was a reduction in survey stations in 2012 due to reduced fishing effort and area covered by the fleet.  The survey area (domain) was further reduced in 2018 to accommodate the Western/Emerald Banks Conservation Area (IFMP, 2018).  
+
+### Browns Bank
+
+The first opportunistic survey in 1978 consisted of 7 randomly selected stations in areas where the commercial fleet was active.  The following year, an official survey took place using randomly selected locations, allocated in units of 10 minutes of latitude and longitude and based on scallop fishing activity.  In 1981, the commercial fishing logs from September 1980 to June 1981 were used to determine areas (in 10 minute squares) with at least 10 days of fishing.  These data were then separated into 4 catch strata levels (low, med, high and exploratory), and stations were allocated randomly within these strata.  Some station locations were adjusted due to unsuitable substrate for towing.  Similar methodology was used in subsequent years with the catch strata levels and strata areas being refined annually to reflect the catch rates experienced during fishing activities.  The 1982 survey was cancelled due to weather (Cruise Report).
+
+An example of how the catch stratification was implemented can be found using the 1984 data. In this year, Browns Bank/Tusket (11.3% total Scotian Shelf catch) was assigned High >10% total catch (66% total area, 10 stations), Med 4-10% total catch (25% total area, 7 stations), and Low 0-4% total catch (8% total area, 3 stations). In 1985, an exploratory stratum was added to Browns Bank to allow survey stations to occur in an area that   was not fished in 1984, that had high numbers of age 2 scallops in previous surveys (Robert et al., 1986).  In 1988 and 1989 the Browns Bank survey was cancelled due to a lack of fishing activity. (Robert et al., 1989).
+
+An experimental fishery and management plan was implemented in 1989 for Browns Bank. Exploitation increased substantially because there had been an accumulation of biomass due to lack of fishing activity and there was a perception that the bank could potentially sustain long-term continuous exploitation (Robert et al.,1990).  The 1990 survey focused on the areas fished during the experimental fishery since there had been little fishing activity for several years before this.
+
+In 1994, comparative surveys took place using the retiring CCGS E.E Prince and the industry supplied commercial scallop dragger, FV Cape Keltic to facilitate the change to a new survey vessel.  There were no significant differences between the two vessels for scallop shell height classes over 100mm (Robert & Butler, 1995).  The catch distribution from the previous 9 months derived from log records was used to stratify survey stations which were randomized within low, medium and high strata.  A very high stratum was also added in 1994 to reduce the variability in the high stratum given the catch-rates observed.  In future years, an exploratory stratum was occasionally added to address any areas that warranted additional investigation (Robert & Butler, 1997).
+
+In the fall of 1994, an additional survey took place on the south side of Browns Bank.  The areas sampled were based on the locations fished between 1976 and 1985 and set in a grid pattern (Robert & Butler, 1995).  This led to the expansion of the survey area in 1995 and 1996.  Areas previously fished accounted for 64% of the total survey area in these years (Robert & Butler, 1997).
+
+In the late 1990s, information from a multibeam bathymetric survey (Canadian Hydrographic Service and Atlantic Geological Survey of Canada) of a portion of Browns Bank became available and was used in planning survey tows and towing direction (Kostylev et al. 2001).  These mapping data provided higher resolution delineation of bottom type and topography.  The introduction of bottom mapping data lead to a re-evaluation of effort and catch-rate measurements used for the survey design (Robert & Butler, 1998).
+
+By 2001, the relationship between bottom type (surficial geology) and scallop abundance was better understood.  As a result, the stratification scheme for the survey was changed to a design based on surficial geology (Kostylev et al. 2001 and 2003). The survey stations were randomly selected and allocated proportionally to the area of the 5 surficial geology strata; the 5 strata were Gravel lag with thin sand, Gravel Lag, thin sand over gravel lag, thick sand, and sand with barchans.  Surficial geology strata were fixed from year to year between 2001 and 2012 (Tables 1 and 2). Additionally in 2001, Browns Bank was divided into North and South management areas and the areas were assigned separate surveys (Hubley et al., 2011).  
+
+Since 2011, Browns Bank South has not been surveyed every year, but the intermittent surveys continue to use the surficial geology design for stratification. However, on Browns Bank north, over time it became evident that the surficial geology were unable to account for the spatial variability in scallop abundance (Hubley et al., 2013).  A 2013 science and industry working group recommended a change in design to fixed strata that were based on a more direct measure of scallop abundance.  The historical commercial catch rate (HCR) for 2002-2012 was chosen as a stratifying variable because of limited survey coverage in previous years (Table 3).  This new design had significant gains in realized and potential efficiency (Hubley et al., 2013). The survey strata area were refined  in 2021 (Table 4) and is the current design used for Browns Bank north 
+
+### German Bank
+
+In 1979, the first official survey on German Bank took place using a random station design allocated using a ten minute (10’) square grid and the amount of scallop fishing activity that took place.
+
+In 1981, sampling locations were determined from commercial fishing activity from September 1980 to June 1981. Unit areas (10’) with 10 days of fishing were separated into four strata levels based on landings from the unit area.  Some station locations were adjusted due to unsuitable substrate for towing.  At the start of the survey series, German Bank was surveyed using the liner in the dredge but upon experiencing extensive damage to the liner due to the bathymetry of the area, it was decided to survey the area without a liner.  In 2009, after accumulating years of experience surveying German Bank, the addition of high resolution bathymetry maps, and completing a trial survey with lined tows in 2008, it was decided to return to surveying the area with a liner.
+
+The 1982 survey was cancelled due to weather.  In 1983, station locations were randomly assigned within the 10’ units with 5 fishing days according to a low, medium, and high strata defined by percentage total catch for the area.  An example of how the catch stratification was implemented can be found using the 1984 data, in this year, German (59.5% total Scotian Shelf catch) was assigned High <10% total catch, Med 4-10% total catch and Low <4% total catch stratum.  From 1986 to 1993 German bank was not surveyed due to lack of fishing activity in the area (Robert & Butler-Connolly, 1991).
+
+In the Fall of 1994, survey operations resumed on German Bank after a 8 year hiatus (there was no fishing activity for 7 years). This survey took place using the industry supplied commercial scallop dragger, FV Cape Keltic.  This survey covered areas south of the 43°40’ line and occurred after the lobster season to avoid gear conflicts.  The restriction on the area surveyed was due to the inshore/offshore fleet separation that occurred in December of 1986 (Robert & Butler, 1995).  The catch distribution derived from log records from the previous year was used to stratify survey stations; the stations were randomized within arbitrarily set strata. An exploratory stratum was occasionally added to the survey and the area surveyed depended on the location of the fishing activity in the previous year (Robert & Butler, 1995, Robert& Butler, 1997).
+
+In 1997 and 1998 the German Bank survey was cancelled due to a lack of fishing activity.  Survey activities resumed in 1999 with the same catch stratification methodology.  Starting in 2003, a subset of the survey stations were repeated from the previous surveys, this was undertaken to better understand and improve the evaluation of the stock in this unique area. This continued until 2008. 
+
+In 2008, a trial was conducted in which 30 of the 80 planned survey tows used a 38mm mesh polypropylene netting liner, and one exploratory tow that was conducted with a liner.  The results of this trial led to the use of lined gear from this point forward. In addition, from 2009 onwards the survey design was revamped to sampling with partial replacement design.  For this design, 25% of the stations are randomly selected from stations conducted in the previous year and 75% of the stations are randomly generated from areas with towable bottom.
+
+### Georges Bank 'b'
 
 Tables: 
 \@ref(tab:strata-tab)
@@ -84,35 +158,28 @@ Figures:
 \@ref(fig:map-ban)
 \@ref(fig:map-mid)
 \@ref(fig:map-sab)
+\@ref(fig:sfoot-25)
 \@ref(fig:map-ger)
 \@ref(fig:map-bbs)
 \@ref(fig:map-bbn)
+\@ref(fig:sfoot-26)
+\@ref(fig:map-gbb)
+\@ref(fig:sfoot-27)
 
-# Results
+# Estimation methods
 
-## MWSH
-Tables: 
-\@ref(tab:mwsh-tab)
-\@ref(fig:mwsh-sab-rs-1)
-\@ref(fig:mwsh-sab-rs-2)
-\@ref(fig:mwsh-sab-rs-3)
-\@ref(fig:mwsh-sab-rm-1)
-\@ref(fig:mwsh-sab-rm-2)
-\@ref(fig:mwsh-sab-rm-3)
-\@ref(fig:mwsh-sab-depth)
-\@ref(fig:mwsh-sab-y1)
-\@ref(fig:mwsh-sab-y2)
-\@ref(fig:mwsh-sab-y3)
-\@ref(fig:mwsh-bbn-rs-1)
-\@ref(fig:mwsh-bbn-rs-2)
-\@ref(fig:mwsh-bbn-rs-3)
-\@ref(fig:mwsh-bbn-rm-1)
-\@ref(fig:mwsh-bbn-rm-2)
-\@ref(fig:mwsh-bbn-rm-3)
-\@ref(fig:mwsh-bbn-depth)
-\@ref(fig:mwsh-bbn-y1)
-\@ref(fig:mwsh-bbn-y2)
-\@ref(fig:mwsh-bbn-y3)
+## Meat weight-shell height relationship
+
+A meat weight-shell height (MWSH) model is used to extrapolate from the subset of detailed samples that are collected during each survey to the total survey catch, which when combined with abundance data, enables the estimation of biomass. 
+
+Here, we evaluated various modelling approaches and propose a model that is more flexible than the previous method, which assumes the classic length-weight relationship formulation (a/b exponential thingy.) This method is more intuitive while still achieving similar results to the previous method. 
+
+First, we modelled the detailed sampling measurements. We fit a set of generalized linear mixed effect models with tow as an intercept-only random effect and shell height as a fixed effect. The set of models tested included combinations of including and excluding depth and year as fixed effects, as well as interactions between all explanatory variables. Shell height was log-transformed and centred at 100mm, while depth was centred at the median depth of measurements from each management unit. 
+
+For both Sable Bank and Browns Bank North, the AIC model selection statistic suggested that allowing shell height and depth to vary by year is preferred over simpler models (Table \@ref(tab:mwsh-tab)). Residual patterns were deemed acceptable for the selected model for both management units (Figures \@ref(fig:mwsh-sab-rs-1), \@ref(fig:mwsh-sab-rs-2), \@ref(fig:mwsh-sab-rs-3), \@ref(fig:mwsh-sab-rm-1), \@ref(fig:mwsh-sab-rm-2), \@ref(fig:mwsh-sab-rm-3), \@ref(fig:mwsh-bbn-rs-1), \@ref(fig:mwsh-bbn-rs-2), \@ref(fig:mwsh-bbn-rs-3), \@ref(fig:mwsh-bbn-rm-1), \@ref(fig:mwsh-bbn-rm-2),\@ref(fig:mwsh-bbn-rm-3)). The effect of depth on the predictions also varied over time for both management units (Figures \@ref(fig:mwsh-sab-depth, \@ref(fig:mwsh-bbn-depth)).
+
+Fitting the single model (as proposed above) did not converge,so the model was applied to the full survey dataset for each year independently (Figures \@ref(fig:mwsh-sab-y1), \@ref(fig:mwsh-sab-y2), \@ref(fig:mwsh-sab-y3), \@ref(fig:mwsh-bbn-y1), \@ref(fig:mwsh-bbn-y2), \@ref(fig:mwsh-bbn-y3)). This annual modelling approach has been used in other scallop populations (INSHORE). This method also enables the estimation of uncertainty, which was not previously possible. 
+
 
 ## Ageing
 
@@ -129,10 +196,7 @@ Figures:
 \@ref(fig:growth-bbn)
 
 
-## MWSH Model
-
-
-## Reviewing fully recruited size
+## Fully recruited size
 
 Figures: 
 \@ref(fig:sh-ps-sab)
@@ -145,19 +209,36 @@ Figures:
 \@ref(fig:rec-comp-26)
 
 
-## Survey index
+# Model inputs
+
+## Survey indices
 
 Figures: 
 \@ref(fig:sts-25)
 \@ref(fig:sts-26)
+\@ref(fig:sts-27)
+\@ref(fig:shf-ban)
+\@ref(fig:shf-mid)
+\@ref(fig:shf-sab)
+\@ref(fig:shf-sab-75)
+\@ref(fig:shf-bbn)
+\@ref(fig:shf-bbn-75)
+\@ref(fig:shf-bbs)
+\@ref(fig:shf-bbs-75)
+\@ref(fig:shf-gbb)
+\@ref(fig:shf-gbb-75)
 \@ref(fig:cts-25)
 \@ref(fig:cts-26)
+\@ref(fig:cts-27)
+
+
+## Condition and growth
+Figures:
 \@ref(fig:cfts-25)
 \@ref(fig:cfts-26)
-
-## Model inputs
-Figures:
+\@ref(fig:cfts-27)
 \@ref(fig:growth-26)
+
+## Relative fishing mortality
 \@ref(fig:relf)
-\@ref(fig:exp)
 

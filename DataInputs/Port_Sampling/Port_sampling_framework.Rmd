@@ -21,13 +21,13 @@ load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_pro
 # for port.sampling object, which becomes "bbn.dat" (even for sable)
 
 # survey data 
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata")
 # for mw[[bnk]] object containing all survey and hydration mw data. 
 
 # plot destination
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/"
 
-french <- T # set to T for french
+french <- F # set to T for french
 if(french==T) {fr <- "_fr"}
 if(french==F) {fr <- ""}
 
@@ -171,9 +171,10 @@ dev.off()
 port.sampling$sfa <- NA
 port.sampling$sfa[port.sampling$bank %in% c("BBn", "BBs", "Ger")] <- 26
 port.sampling$sfa[port.sampling$bank %in% c("Sab", "Mid", "Ban")] <- 25
+port.sampling$sfa[port.sampling$bank %in% "GBb"] <- 27
 
 ps_tab <- port.sampling %>% 
-  filter(!bank %in% c("GBa", "GBb", "SPB")) %>%
+  filter(!bank %in% c("GBa", "SPB")) %>%
   group_by(sfa,bank) %>%
   summarize(total=length(unique(ID)),
             years=length(unique(year)),
