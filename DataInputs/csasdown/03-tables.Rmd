@@ -11,21 +11,38 @@ editor_options:
 require(tidyverse)
 require(csasdown)
 require(kableExtra)
-require(officedown)
+#require(officedown)
 require(officer)
-require(flextable)
+# require(flextable)
 require(dplyr)
 strata <- readxl::read_excel("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/survey_design.xlsx")
 strata$`Area (km^2)` <- round(x=as.numeric(strata$`Area (km^2)`), digits=2)
 strata <- strata[c(1:17, 25:29),] # to exclude GBa
 opts <- options(knitr.kable.NA = "")
+strata$`Management Unit`[strata$`Management Unit`=="Sab"] <- "25A-Sab"
+strata$`Management Unit`[strata$`Management Unit`=="Mid"] <- "25A-Mid"
+strata$`Management Unit`[strata$`Management Unit`=="Ban"] <- "25B-Ban"
+strata$`Management Unit`[strata$`Management Unit`=="BBn"] <- "26A-BBn"
+strata$`Management Unit`[strata$`Management Unit`=="BBs"] <- "26B-BBs"
+strata$`Management Unit`[strata$`Management Unit`=="Ger"] <- "26C-Ger"
+strata$`Management Unit`[strata$`Management Unit`=="GBb"] <- "27B-GBb"
 strata
+
+
 # strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
 #   kableExtra::collapse_rows(columns = 1:4, valign = "top")
 
 ps_tab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/ps_tab.csv")
 ps_tab <- dplyr::select(ps_tab, -X, -main)
 names(ps_tab) <- c("SFA", "Management unit", "Number of samples", "Number of years with PS data", "Most recent year with PS data", "Number of months with PS data", "Long term median (mc)", "Standard deviation (mc)", "Minimum (mc)", "Maximum (mc)")
+ps_tab$`Management unit`[ps_tab$`Management unit`=="Sab"] <- "25A-Sab"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="Mid"] <- "25A-Mid"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="Ban"] <- "25B-Ban"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="BBn"] <- "26A-BBn"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="BBs"] <- "26B-BBs"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="Ger"] <- "26C-Ger"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="GBb"] <- "27B-GBb"
+
 
 mwsh_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/AICtable.csv")
 mwsh_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/AICtable.csv")
@@ -40,12 +57,14 @@ mwsh$`Management Unit`[mwsh$`Management Unit`=="Sable Bank"] <- c("Sable Bank", 
 mwsh$`Management Unit`[mwsh$`Management Unit`=="Browns Bank North" & !is.na(mwsh$`Management Unit`)] <- c("Browns Bank North", rep(NA, (length(unique(mwsh$Model))-1)))
 mwsh$dAIC <- round(mwsh$dAIC,0)
 mwsh <- dplyr::select(mwsh, -Model)
+mwsh$`Management Unit`[mwsh$`Management Unit`=="Sable Bank"] <- "25A-Sab"
+mwsh$`Management Unit`[mwsh$`Management Unit`=="Browns Bank North"] <- "26A-BBn"
 
 
 ageing_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/summary_stats.csv")
 ageing_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/summary_stats.csv")
-ageing_bbn$`Management Unit` <- "Browns Bank North"
-ageing_sab$`Management Unit` <- "Sable Bank"
+ageing_bbn$`Management Unit` <- "26A-BBn"
+ageing_sab$`Management Unit` <- "25A-Sab"
 ageing <- rbind(ageing_sab, ageing_bbn)
 ageing <- dplyr::select(ageing, -X)
 ageing <- data.frame(ageing$`Management Unit`, ageing[,1:(ncol(ageing)-1)])
@@ -56,8 +75,8 @@ ageing2$AIC <- round(ageing2$AIC, 0)
 ageing2$r.sq <- round(ageing2$r.sq, 3)
 ageing2$scale.est <- round(ageing2$scale.est, 2)
 ageing2[,c("H10", "H5", "H2", "K_maxR", "K_avgFR", "K_2_to_5")] <- round(ageing2[,c("H10", "H5", "H2", "K_maxR", "K_avgFR", "K_2_to_5")], 1)
-ageing2$`Management Unit`[ageing2$`Management Unit`=="Sable Bank"] <- c("Sable Bank", NA, NA)
-ageing2$`Management Unit`[ageing2$`Management Unit`=="Browns Bank North" & !is.na(ageing2$`Management Unit`)] <- c("Browns Bank North", NA, NA)
+ageing2$`Management Unit`[ageing2$`Management Unit`=="25A-Sab"] <- c("25A-Sab", NA, NA)
+ageing2$`Management Unit`[ageing2$`Management Unit`=="26A-BBn" & !is.na(ageing2$`Management Unit`)] <- c("26A-BBn", NA, NA)
 ageing3 <- ageing2[,c(1:2,9:7)]
 ageing4 <- ageing2[,c(1:2,10:15)]
 ageing2 <- ageing2[,c(1:6)]
@@ -71,10 +90,12 @@ inc <- full_join(inc_bbn, inc_sab)
 inc$height <- paste0(inc$med_height, " (", round(inc$sd_height,2), ")")
 inc <- pivot_wider(dplyr::select(inc, -X), id_cols=AGE, names_from = bank, values_from=c(n_inc, height))
 inc <- inc[,c("AGE", "n_inc_Sab", "height_Sab", "n_inc_BBn", "height_BBn")]
-names(inc) <- c("Age assigned", "Number of increments (Sab)", "Median height (Sab, SD)",  "Number of increments (BBn)", "Median height (BBn, SD)")
+names(inc) <- c("Age assigned", "Number of increments (25A-Sab)", "Median height (25A-Sab, SD)",  "Number of increments (26A-BBn)", "Median height (26A-BBn, SD)")
 
 age_summary <- full_join(sum_sab, sum_bbn)
 age_summary <- dplyr::select(age_summary, bank, year, tows, shells, increments, -X, -ager)
+age_summary$bank[age_summary$bank=="Sab"] <- "25A-Sab"
+age_summary$bank[age_summary$bank=="BBn"] <- "26A-BBn"
 names(age_summary) <- c("Management unit", "Year", "Number of tows", "Number of shells", "Number of increments")
 
 opts <- options(knitr.kable.NA = "")
@@ -93,7 +114,7 @@ opts <- options(knitr.kable.NA = "")
 
 csas_table(ps_tab, caption ="Port sampling data summary.") %>% 
   kableExtra::row_spec(0,bold=TRUE) %>% 
-  kableExtra::row_spec(0,bold=ifelse(ps_tab$`Management unit`%in% c("BBn", "Sab"), TRUE, FALSE))
+  kableExtra::row_spec(0,bold=ifelse(ps_tab$`Management unit`%in% c("26A-BBn", "25A-Sab"), TRUE, FALSE))
 
 #qflextable(strata)
 

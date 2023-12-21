@@ -31,6 +31,7 @@ french <- F # set to T for french
 if(french == T) {
   nickname <- paste0(nickname, "_fr")
 }
+nickname2 <- nickname
 
 require(rosettafish)
 funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
@@ -610,7 +611,7 @@ for(j in 1:n.yrs)
   rt <- NULL
   slope <- mw.sh.coef %>% dplyr::filter(year == yrs[j]) %>% dplyr::pull(fix.slope); slope <- slope[1]
   int <- mw.sh.coef %>% dplyr::filter(year == yrs[j]) %>% dplyr::pull(fix.int); int <- int[1]
-  rand.int <- mw.sh.coef[mw.sh.coef$year==year & !is.na(mw.sh.coef$ran.int.act),] %>% dplyr::pull(ran.int.act,tow)
+  rand.int <- mw.sh.coef[mw.sh.coef$year==yrs[j] & !is.na(mw.sh.coef$ran.int.act),] %>% dplyr::pull(ran.int.act,tow)
   for(i in 1:length(rand.int)) rt[[i]] <- data.frame(sh = 100*sh,mw = exp(rand.int)[i] * sh^slope,tow = names(rand.int)[i])
   rts <- do.call("rbind",rt)
   r.tows[[j]] <- data.frame(rts,year = yrs[j])
@@ -716,3 +717,53 @@ dev.off()
 png(filename = paste0(plotsGo, "/", banker, "/MWSH_yall", nickname, ".png"), height=6, width=10, units="in", res=420)
 print(pall)
 dev.off()
+
+### for the other banks after running in survey summary
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
+nickname <- nickname2
+banks <- c("Mid", "Ban", "Ger", "BBs", "GBb")
+for (bank in banks){
+  sh <- 65:200/100
+  y3 <- rev(rev(sort(unique(cf.data[[bank]]$HtWt.fit$resid$year)))[1:10])
+  y3 <- y3[!is.na(y3)]
+
+  dat <- mw.dat.all[[bank]]
+  # with depth across all years (random effect is ID)
+  sub <- dat[complete.cases(dat),]
+
+  r.tows <- NULL
+  f.mws <- NULL
+  n.yrs <- length(y3)
+  mw.sh.coef <- cf.data[[bank]]$CF.fit$mw.sh.coef
+  for(j in 1:n.yrs)
+  {
+    rt <- NULL
+    slope <- mw.sh.coef %>% dplyr::filter(year == y3[j]) %>% dplyr::pull(fix.slope); slope <- slope[1]
+    int <- mw.sh.coef %>% dplyr::filter(year == y3[j]) %>% dplyr::pull(fix.int); int <- int[1]
+    rand.int <- mw.sh.coef[mw.sh.coef$year==y3[j] & !is.na(mw.sh.coef$ran.int.act),] %>% dplyr::pull(ran.int.act,tow)
+    for(i in 1:length(rand.int)) rt[[i]] <- data.frame(sh = 100*sh,mw = exp(rand.int)[i] * sh^slope,tow = names(rand.int)[i])
+    rts <- do.call("rbind",rt)
+    r.tows[[j]] <- data.frame(rts,year = y3[j])
+    f.mws[[j]] <- data.frame(sh = 100* sh, mw = exp(int) * sh^slope,year = y3[j])
+  }
+
+  r.tow <- do.call('rbind',r.tows)
+  f.mw <- do.call('rbind',f.mws)
+
+  png(filename = paste0(plotsGo, "/MWSH_y3_", bank, nickname, ".png"), height=6, width=5, units="in", res=420)
+  print(
+    ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
+      geom_point(data=cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues) +
+      geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
+      geom_line(data = f.mw %>% dplyr::filter(year %in% y3),aes(x=sh,y=mw),color='black',size=2) +
+      scale_x_continuous(limits = c(65,cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year == max(y3)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
+                         name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
+                         breaks = seq(0,200,by=20), expand = c(0.01,0.01)) +
+      scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
+                         name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
+                         breaks = seq(0,100,by=20)) +
+      theme_bw()
+  )
+  dev.off()
+}
+

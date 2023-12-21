@@ -180,10 +180,10 @@ ps_tab <- port.sampling %>%
             years=length(unique(year)),
             recent=max(year),
             months = length(unique(month)),
-            ltm_mc = round(median(mc),2),
-            sd_mc = round(sd(mc),2),
-            min_mc = round(min(mc),2), 
-            max_mc = round(max(mc),2))
+            ltm_mw = round(median(meat_weight),2),
+            sd_mw = round(sd(meat_weight),2),
+            min_mw = round(min(meat_weight),2), 
+            max_mw = round(max(meat_weight),2))
 ps_tab$main<-NA
 ps_tab$main[ps_tab$bank %in% c("Sab", "BBn")] <- "*"
 
@@ -195,7 +195,7 @@ write.csv(ps_tab, paste0(plotsGo, "/ps_tab.csv"))
 
 # Single bank results
 ```{r}
-bank <- "Sab"
+bank <- "BBn"
 
 bbn.dat <- port.sampling[port.sampling$bank == bank,]
 
@@ -263,9 +263,16 @@ for(i in 1:length(years))
   may.mws[[as.character(years[i])]]$sh_3 <- (may.mws[[as.character(years[i])]]$sh/100)^3 # cube the SH's
   may.mws[[as.character(years[i])]]$sh <- (may.mws[[as.character(years[i])]]$sh/100) # sh in decimeters
   # Run the model and save the results
-  all.may$a[i] <-  lme(fixed = wmw ~ sh_3 -1, data = may.mws[[as.character(years[i])]], random = ~ sh_3 -1 | tow, method="REML")$coefficients$fixed
+  # all.may$a[i] <-  lme(fixed = wmw ~ sh_3 -1, data = may.mws[[as.character(years[i])]], random = ~ sh_3 -1 | tow, method="REML")$coefficients$fixed
+  
+  r.tows <- NULL
+  f.mws <- NULL
+  fix.slope <- cf.data[[bank]]$CF.fit$mw.sh.coef[cf.data[[bank]]$CF.fit$mw.sh.coef$year==years[i],]$fix.slope[1]
+  fix.int <- cf.data[[bank]]$CF.fit$mw.sh.coef[cf.data[[bank]]$CF.fit$mw.sh.coef$year==years[i],]$fix.int[1]
+  bbn.dat$sh[bbn.dat$year == years[i]] <- ((bbn.dat$meat_weight[bbn.dat$year == years[i]]/exp(fix.int))^ (1/fix.slope))*100
   # What is the shell height being targeted in may
-  bbn.dat$sh[bbn.dat$year == years[i]] <- 100*(bbn.dat$meat_weight[bbn.dat$year == years[i]]/ all.may$a[i])^(1/3)
+  # old model
+  # bbn.dat$sh[bbn.dat$year == years[i]] <- 100*(bbn.dat$meat_weight[bbn.dat$year == years[i]]/all.may$a[i])^(1/3)
 }
 
 sh.plt <- ggplot(bbn.dat,aes(date,sh)) + 
@@ -287,7 +294,7 @@ dev.off()
 #                                scale=0.7, #, # you may wish to adjust this
 #                                bandwidth=5 # you may wish to adjust this
 #                                ) +
-png(paste0(plotsGo, bank, "/shf_ps", fr, ".png"), width=6.5, height=8, units = "in", res=420)
+png(paste0(plotsGo, bank, "/shf_ps", fr, "_new.png"), width=6.5, height=8, units = "in", res=420)
 ggplot() + 
   geom_density_ridges(data=bbn.dat, aes(x = sh, y = as.factor(year), height = stat(density)),
                       stat = "binline", bins = 40, scale = 0.9, draw_baseline = F) +
@@ -360,7 +367,7 @@ if(french==T) {
 }
 
 
-png(paste0(plotsGo, bank, "/proportion_boxplot", fr, ".png"), width=6.5, height=4, units = "in", res=420)
+png(paste0(plotsGo, bank, "/proportion_boxplot", fr, "_new.png"), width=6.5, height=4, units = "in", res=420)
 ggplot() + 
   geom_boxplot(data=overall, aes(lim, prop, group=lim))+
   theme_bw() +
@@ -405,7 +412,7 @@ overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
 ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
-png(paste0(plotsGo, bank, "/proportion_boxplot_ss", fr, ".png"), width=6.5, height=4, units = "in", res=420)
+png(paste0(plotsGo, bank, "/proportion_boxplot_ss", fr, "_new.png"), width=6.5, height=4, units = "in", res=420)
 ggplot() + 
   geom_boxplot(data=overall, aes(lim, prop, group=lim))+
   theme_bw() +

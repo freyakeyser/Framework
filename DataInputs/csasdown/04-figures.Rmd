@@ -64,20 +64,20 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_25", fr, ".png"))
 ```
 
-```{r fts-26, echo=F, fig.cap="Catch (commercial landings, tonnes), effort (hour-metre), and catch per unit effort (kilograms per hour-metre) for SFA 26 management units."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_26", fr, ".png"))
-```
-
-```{r fts-27, echo=F, fig.cap="Catch (commercial landings, tonnes), effort (hour-metre), and catch per unit effort (kilograms per hour-metre) for the SFA 27B management unit."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_27", fr, ".png"))
-```
-
 ```{r foot-25, echo=F, fig.cap="Spatial distribution of commercial catch (tonnes) in 10km^2 cells for SFA 25 management units."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/footprint_25", fr, ".png"))
 ```
 
+```{r fts-26, echo=F, fig.cap="Catch (commercial landings, tonnes), effort (hour-metre), and catch per unit effort (kilograms per hour-metre) for SFA 26 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_26", fr, ".png"))
+```
+
 ```{r foot-26, echo=F, fig.cap="Spatial distribution of commercial catch (tonnes) in 10km^2 cells for SFA 26 management units."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/footprint_26", fr, ".png"))
+```
+
+```{r fts-27, echo=F, fig.cap="Catch (commercial landings, tonnes), effort (hour-metre), and catch per unit effort (kilograms per hour-metre) for the SFA 27B management unit."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_27", fr, ".png"))
 ```
 
 ```{r foot-27, echo=F, fig.cap="Spatial distribution of commercial catch (tonnes) in 10km^2 cells for the SFA 27B management unit."}
@@ -88,11 +88,9 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, ".png"))
 ```
 
-```{r mw-monthly, echo=FALSE, message=F, fig.align="center", fig.cap="Anomalies (the difference between the annual median and same-year monthly median) in meat weights (grams) collected from the port sampling program for Browns Bank North (BBn) and Sable Bank (Sab). The horizontal dashed line represents no difference between the annual and monthly medians. The number of samples collected in each month (across all years) are provided under each boxplot."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_anom", fr, ".png"))
-```
-
-
+<!-- ```{r mw-monthly, echo=FALSE, message=F, fig.align="center", fig.cap="Anomalies (the difference between the annual median and same-year monthly median) in meat weights (grams) collected from the port sampling program for Browns Bank North (BBn) and Sable Bank (Sab). The horizontal dashed line represents no difference between the annual and monthly medians. The number of samples collected in each month (across all years) are provided under each boxplot."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_anom", fr, ".png")) -->
+<!-- ``` -->
 
 ```{r nav-linear, echo=F, message=F, fig.cap="Tow lengths derived from Olex and Ocean Vision tow tracks, in metres. Raw lengths of Olex tracks are shown in black, while lengths following the application of the correction factor are show in orange. Each point corresponds to a specific tow. The solid black and orange lines are linear trendlines for each relationship. The dashed black line represents the 1:1 relationship between Ocean Vision tow lengths and Olex tow lengths."}
 knitr::include_graphics("Y:/Offshore/Assessment/2023/Supporting_tasks/Olex_transition_linear.png")
@@ -126,8 +124,8 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 
-```{r map-ger, echo=F, message=F, fig.cap=paste0(params$bankname[4], " survey design in ", params$surv.year[4], ".")}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr,  "/surveymap_", params$bank[4], ".png"))
+```{r map-bbn, echo=F, message=F, fig.cap=paste0(params$bankname[6], " survey design in ", params$surv.year[6], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr,  "/surveymap_", params$bank[6], ".png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
@@ -136,8 +134,8 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
-```{r map-bbn, echo=F, message=F, fig.cap=paste0(params$bankname[6], " survey design in ", params$surv.year[6], ".")}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr,  "/surveymap_", params$bank[6], ".png"))
+```{r map-ger, echo=F, message=F, fig.cap=paste0(params$bankname[4], " survey design in ", params$surv.year[4], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr,  "/surveymap_", params$bank[4], ".png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
@@ -251,31 +249,48 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y3", fr, ".png"))
 ```
 
+```{r mwsh-ban, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Banquereau for all survey years with detailed sampling."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_Ban", fr, ".png"))
+```
 
+```{r mwsh-mid, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Middle Bank for recent survey years."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_Mid", fr, ".png"))
+```
 
+```{r mwsh-bbs, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Browns Bank south for recent survey years."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_BBs", fr, ".png"))
+```
+
+```{r mwsh-ger, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for German Bank for recent survey years."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_Ger", fr, ".png"))
+```
+
+```{r mwsh-gbb, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for Georges Bank 'b' for recent survey years."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_GBb", fr, ".png"))
+```
 
 ```{r sh-ps-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (mm) of meats from Sable Bank collected during port sampling, based on the relationship between meat weight and shell height derived from Sable Bank survey data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/shf_ps", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from Sable Bank fishing trips (year-round) collected during port sampling with estimated shell heights below various shell height levels (fully recruited size minimums)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/proportion_boxplot", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from Sable Bank fishing trips (spring and summer only) collected during port sampling with estimated shell heights below various shell height levels (fully recruited size minimums)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/proportion_boxplot_ss", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 ```{r sh-ps-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (mm) of meats from Browns Bank North collected during port sampling, based on the relationship between meat weight and shell height derived from Browns Bank North survey data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_ps", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from Browns Bank North fishing trips (year-round) collected during port sampling with estimated shell heights below various shell height levels (fully recruited size minimums)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/proportion_boxplot", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from Browns Bank North fishing trips (spring and summer only) collected during port sampling with estimated shell heights below various shell height levels (fully recruited size minimums)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/proportion_boxplot_ss", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 

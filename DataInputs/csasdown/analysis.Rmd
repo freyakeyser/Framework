@@ -230,16 +230,25 @@ for (rdata in c("framework1", "framework2", "framework3", "framework4", "framewo
 #bankpertow_all contains a bankpertow dataframe for each bank and for three different recruit size bins (so it contains nBanks * 3 dataframes)
 bankpertow <- bankpertow_all[bankpertow_all$rdata==gsub(x=nickname, pattern="_fr", replacement=""),]
 
+bankpertow$subarea[bankpertow$bank=="Mid"] <- "25A-Mid"
+bankpertow$subarea[bankpertow$bank=="Sab"] <- "25A-Sab"
+bankpertow$subarea[bankpertow$bank=="Ban"] <- "25B"
+bankpertow$subarea[bankpertow$bank=="BBn"] <- "26A"
+bankpertow$subarea[bankpertow$bank=="BBs"] <- "26B"
+bankpertow$subarea[bankpertow$bank=="Ger"] <- "26C"
+bankpertow$subarea[bankpertow$bank=="GBb"] <- "27B"
+
+
 sfa <- c(25,26, 27)
 for(sfa in sfa){
   
   N <- ggplot() + geom_line(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
-                            aes(year, index.val, colour=bank, linetype=liner)) +
+                            aes(year, index.val, colour=subarea, linetype=liner)) +
     geom_point(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
-               aes(year, index.val, colour=bank, shape=bank)) +
+               aes(year, index.val, colour=subarea, shape=subarea)) +
     #geom_errorbar(data=bankpertow, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
     geom_ribbon(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="N",],
-                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank), alpha=0.3)+
+                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=subarea), alpha=0.3)+
     theme_bw() +
     # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
     #            scales="free_y")
@@ -255,12 +264,12 @@ for(sfa in sfa){
     ylab(parse(text=as.character(unique(bankpertow$index2[bankpertow$index=="N"]))))
   
   I <- ggplot() + geom_line(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
-                            aes(year, index.val, colour=bank, linetype=liner)) +
+                            aes(year, index.val, colour=subarea, linetype=liner)) +
     geom_point(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
-               aes(year, index.val, colour=bank, shape=bank)) +
+               aes(year, index.val, colour=subarea, shape=subarea)) +
     #geom_errorbar(data=bankpertow, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
     geom_ribbon(data=bankpertow[bankpertow$sfa==sfa & bankpertow$index=="I",],
-                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank), alpha=0.3)+
+                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=subarea), alpha=0.3)+
     theme_bw() +
     # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
     #            scales="free_y")
@@ -318,15 +327,23 @@ if(grepl(x=nickname, pattern="framework2")){
   bankpertow_all <- bankpertow_all[!bankpertow_all$rdata %in% c("framework4", "framework5", "framework6"),]
 }
 
+bankpertow_all$subarea[bankpertow_all$bank=="Mid"] <- "25A-Mid"
+bankpertow_all$subarea[bankpertow_all$bank=="Sab"] <- "25A-Sab"
+bankpertow_all$subarea[bankpertow_all$bank=="Ban"] <- "25B"
+bankpertow_all$subarea[bankpertow_all$bank=="BBn"] <- "26A"
+bankpertow_all$subarea[bankpertow_all$bank=="BBs"] <- "26B"
+bankpertow_all$subarea[bankpertow_all$bank=="Ger"] <- "26C"
+bankpertow_all$subarea[bankpertow_all$bank=="GBb"] <- "27B"
+
 sfa <- c(25,26)
 for(sfa in sfa){
   
-  N <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize),],
+  N <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                             aes(year, index.val, colour=bank, group=recsize)) +
-    geom_point(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize),],
+    geom_point(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                aes(year, index.val, colour=bank, shape=recsize)) +
     #geom_errorbar(data=bankpertow_all, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
-    geom_ribbon(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize),],
+    geom_ribbon(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                 aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank, group=recsize), alpha=0.3)+
     theme_bw() +
     # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
@@ -343,12 +360,12 @@ for(sfa in sfa){
     guides(colour = "none", fill="none") +
     ylab(parse(text=as.character(unique(bankpertow_all$index_rec[bankpertow_all$index=="N" & bankpertow_all$size=="R"]))))
   
-  I <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize),],
+  I <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                             aes(year, index.val, colour=bank, group=recsize)) +
-    geom_point(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize),],
+    geom_point(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                aes(year, index.val, colour=bank, shape=recsize)) +
     #geom_errorbar(data=bankpertow_all, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
-    geom_ribbon(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize),],
+    geom_ribbon(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                 aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank, group=recsize), alpha=0.3)+
     theme_bw() +
     # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
@@ -503,6 +520,14 @@ cfts <- full_join(cfts, cfts_old)
 if(french==F) cflab <- expression(paste("Condition factor  ",bgroup("(",frac(g,dm^3)   ,")")))
 if(french==T) cflab <- expression(paste("Coefficient de condition  ",bgroup("(",frac(g,dm^3)   ,")")))
 
+cfts$subarea[cfts$bank=="Mid"] <- "25A-Mid"
+cfts$subarea[cfts$bank=="Sab"] <- "25A-Sab"
+cfts$subarea[cfts$bank=="Ban"] <- "25B"
+cfts$subarea[cfts$bank=="BBn"] <- "26A"
+cfts$subarea[cfts$bank=="BBs"] <- "26B"
+cfts$subarea[cfts$bank=="Ger"] <- "26C"
+cfts$subarea[cfts$bank=="GBb"] <- "27B"
+
 png(filename=paste0(plotsGo, "/Survey/", nickname, "/cfts_26.png"),width=6.5, height=9, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=version, shape=version)) +
         geom_line(data=cfts[cfts$sfa==26,], aes(year, CF, linetype=type, colour=version)) +
@@ -513,7 +538,7 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=versi
         #guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
         scale_colour_manual(name=version, values=c("darkorange", "black")) +
         scale_shape_discrete(name=version) +
-        facet_wrap(~bank, ncol=1)
+        facet_wrap(~subarea, ncol=1)
 )
 dev.off()
 
@@ -527,11 +552,11 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=versi
         #guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
         scale_colour_manual(name=version, values=c("darkorange", "black")) +
         scale_shape_discrete(name=version) +
-        facet_wrap(~bank, ncol=1)
+        facet_wrap(~subarea, ncol=1)
 )
 dev.off()
 
-png(filename=paste0(plotsGo, "/Survey/", nickname, "/cfts_27.png"),width=6.5, height=9, units = "in", res=420)
+png(filename=paste0(plotsGo, "/Survey/", nickname, "/cfts_27.png"),width=6.5, height=5, units = "in", res=420)
 print(ggplot() + geom_point(data=cfts[cfts$sfa==27,], aes(year, CF, colour=version, shape=version)) +
         geom_line(data=cfts[cfts$sfa==27,], aes(year, CF, colour=version)) +
         xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) + 
@@ -541,13 +566,12 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==27,], aes(year, CF, colour=versi
         #guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
         scale_colour_manual(name=version, values=c("darkorange", "black")) +
         scale_shape_discrete(name=version) +
-        facet_wrap(~bank, ncol=1)
+        facet_wrap(~subarea, ncol=1)
 )
 dev.off()
 
 
 # comparing to CF using new glmer MWSH model
-
 
 
 # clappers
@@ -619,13 +643,21 @@ if(french==T) man.unit <- "Zone de gestion"
 if(french==T) xlabel <- expression(frac("% claquettes", "trait"))
 if(french==F) xlabel <- expression(frac("% clappers", "tow"))
 
+clappertow$subarea[clappertow$bank=="Mid"] <- "25A-Mid"
+clappertow$subarea[clappertow$bank=="Sab"] <- "25A-Sab"
+clappertow$subarea[clappertow$bank=="Ban"] <- "25B"
+clappertow$subarea[clappertow$bank=="BBn"] <- "26A"
+clappertow$subarea[clappertow$bank=="BBs"] <- "26B"
+clappertow$subarea[clappertow$bank=="Ger"] <- "26C"
+clappertow$subarea[clappertow$bank=="GBb"] <- "27B"
+
 sfa <- c(25,26, 27)
 for(sfa in sfa){
   
   clap <- ggplot() + geom_line(data=clappertow[clappertow$sfa==sfa,],
-                            aes(years, index.val, colour=bank)) +
+                            aes(years, index.val, colour=subarea)) +
     geom_point(data=clappertow[clappertow$sfa==sfa,],
-               aes(years, index.val, colour=bank)) +
+               aes(years, index.val, colour=subarea)) +
     theme_bw() +
     facet_wrap(~size2, ncol=1,
                scales="free_y",
@@ -696,8 +728,7 @@ for(sfa in sfa){
       scale_x_continuous(limits=c(0,200), breaks=seq(0,200,10)) +
       scale_y_discrete(expand=c(0,0.9), limits=rev) +
       geom_vline(data=shf, aes(xintercept=RS)) +
-      geom_vline(data=shf, aes(xintercept=CS)) +
-      ggtitle(bank)
+      geom_vline(data=shf, aes(xintercept=CS))
     )
     dev.off()
     
@@ -711,8 +742,7 @@ for(sfa in sfa){
       scale_x_continuous(limits=c(75,200), breaks=seq(70,200,10)) +
       scale_y_discrete(expand=c(0,0.9), limits=rev) +
       geom_vline(data=shf[shf$name>75 | is.na(shf$name),], aes(xintercept=RS)) +
-      geom_vline(data=shf[shf$name>75 | is.na(shf$name),], aes(xintercept=CS)) +
-      ggtitle(bank)
+      geom_vline(data=shf[shf$name>75 | is.na(shf$name),], aes(xintercept=CS)) 
     )
     dev.off()
   }
@@ -1054,7 +1084,7 @@ fishery <- fishery[fishery$sfa %in% 25:27,]
 
 cpue <- NULL
 for(bank in unique(fishery$bank)){
-  sub <- fish_sf[fish_sf$bank==bank,]
+  sub <- fish_sf[fish_sf$bank==bank & fish_sf$datclass==1,]
   jack <- jackknife(data = data.frame(year=sub$year, catch=sub$pro.repwt, effort=sub$hm))
   jack$bank <- bank
   cpue <- rbind(cpue, jack)
@@ -1078,11 +1108,28 @@ if(french==T) cpuelab <- expression(paste("Captures par unité d’effort  ",bgr
 
 if(french==F) man.unit <- "Management\nunit"
 if(french==T) man.unit <- "Zone de\ngestion"
+
+fishery$subarea[fishery$bank=="Mid"] <- "25A-Mid"
+fishery$subarea[fishery$bank=="Sab"] <- "25A-Sab"
+fishery$subarea[fishery$bank=="Ban"] <- "25B"
+fishery$subarea[fishery$bank=="BBn"] <- "26A"
+fishery$subarea[fishery$bank=="BBs"] <- "26B"
+fishery$subarea[fishery$bank=="Ger"] <- "26C"
+fishery$subarea[fishery$bank=="GBb"] <- "27B"
+
+cpue$subarea[cpue$bank=="Mid"] <- "25A-Mid"
+cpue$subarea[cpue$bank=="Sab"] <- "25A-Sab"
+cpue$subarea[cpue$bank=="Ban"] <- "25B"
+cpue$subarea[cpue$bank=="BBn"] <- "26A"
+cpue$subarea[cpue$bank=="BBs"] <- "26B"
+cpue$subarea[cpue$bank=="Ger"] <- "26C"
+cpue$subarea[cpue$bank=="GBb"] <- "27B"
+
  
 for(sfa in 25:27){
   png(filename=paste0(plotsGo, "/Fishery/fishery_", sfa, fr, ".png"),width=6.5*1.5, height=4*1.5, units = "in", res=420)
-  kg <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=bank, shape=bank), size=2) +
-    geom_line(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=bank)) +
+  kg <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=subarea, shape=subarea), size=2) +
+    geom_line(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=subarea)) +
     theme_bw() +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
     scale_shape_discrete(name=man.unit) +
@@ -1090,17 +1137,17 @@ for(sfa in 25:27){
     ylab(paste0(en2fr("Catch", translate=french, custom_terms=rosetta_terms), " (t)"))+
     guides(colour="none", shape="none")
   
-  hm <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=bank, shape=bank), size=2) +
-    geom_line(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=bank)) +
+  hm <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=subarea, shape=subarea), size=2) +
+    geom_line(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=subarea)) +
     theme_bw() +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
     scale_shape_discrete(name=man.unit) +
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
     ylab(paste0(en2fr("Effort", translate=french, custom_terms=rosetta_terms), " (", en2fr("hour-metre", translate=french, custom_terms=rosetta_terms), ")"))
   
-  cp <- ggplot() + geom_point(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=bank, shape=bank), size=2) +
-    geom_line(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=bank)) +
-    geom_errorbar(data=cpue[cpue$sfa==sfa,], aes(x=year, ymax=UCI, ymin=LCI, colour=bank), width=0) +
+  cp <- ggplot() + geom_point(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=subarea, shape=subarea), size=2) +
+    geom_line(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=subarea)) +
+    geom_errorbar(data=cpue[cpue$sfa==sfa,], aes(x=year, ymax=UCI, ymin=LCI, colour=subarea), width=0) +
     theme_bw() +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
     scale_shape_discrete(name=man.unit) +
@@ -1284,12 +1331,34 @@ tac2 <- tac2[tac2$Year<2023,]
 if(french==T) t <- "tonnes de chair"
 if(french==F) t <- "meat, tonnes"
 
+
+fishery2$subarea[fishery2$bank=="Sab/Mid/Ban"] <- "25"
+fishery2$subarea[fishery2$bank=="Ban"] <- "25B"
+fishery2$subarea[fishery2$bank=="Sab/Mid"] <- "25A"
+fishery2$subarea[fishery2$bank=="BBn/BBs"] <- "26AB"
+fishery2$subarea[fishery2$bank=="BBn"] <- "26A"
+fishery2$subarea[fishery2$bank=="BBs"] <- "26B"
+fishery2$subarea[fishery2$bank=="Ger"] <- "26C"
+fishery2$subarea[fishery2$bank=="GBb"] <- "27B"
+
+tac2$subarea[tac2$bank=="Sab/Mid/Ban"] <- "25"
+tac2$subarea[tac2$bank=="Ban"] <- "25B"
+tac2$subarea[tac2$bank=="Sab/Mid"] <- "25A"
+tac2$subarea[tac2$bank=="BBn/BBs"] <- "26AB"
+tac2$subarea[tac2$bank=="BBn"] <- "26A"
+tac2$subarea[tac2$bank=="BBs"] <- "26B"
+tac2$subarea[tac2$bank=="Ger"] <- "26C"
+tac2$subarea[tac2$bank=="GBb"] <- "27B"
+
+tac2$subarea <- factor(x = tac2$subarea, levels=c("25", "25A", "25B", "26AB", "26A", "26B", "26C", "27B" ))
+fishery2$subarea <- factor(x = fishery2$subarea, levels=c("25", "25A", "25B", "26AB", "26A", "26B", "26C", "27B" ))
+
 tac25 <- ggplot() + 
   geom_bar(data=tac2[tac2$sfa==25,], aes(Year, Landings), stat="identity", fill="grey", width=1) + 
   geom_bar(data=fishery2[fishery2$sfa==25,], aes(year, Landings/1000), stat="identity", fill="grey", width=1) + 
   geom_bar(data=tac2[tac2$sfa==25,], aes(Year, TAC), stat="identity", fill=NA, colour="black", width=1) + 
   geom_hline(data=tac2[tac2$sfa==25,], aes(yintercept=0), colour="lightgrey") + 
-  facet_wrap(~bank, ncol=1) +
+  facet_wrap(~subarea, ncol=1) +
   theme_bw() +
   #scale_x_discrete(breaks=seq(min(tac2$year), max(tac2$year), 4)) +
   ylab(paste0(en2fr("Catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
@@ -1300,7 +1369,7 @@ tac26 <-  ggplot() +
   geom_bar(data=fishery2[fishery2$sfa==26,], aes(year, Landings/1000), stat="identity", fill="grey", width=1) + 
   geom_bar(data=tac2[tac2$sfa==26,], aes(Year, TAC), stat="identity", fill=NA, colour="black", width=1) + 
   geom_hline(data=tac2[tac2$sfa==26,], aes(yintercept=0), colour="lightgrey") + 
-  facet_wrap(~bank, ncol=1) +
+  facet_wrap(~subarea, ncol=1) +
   theme_bw() +
   #scale_x_discrete(breaks=seq(min(tac2$year), max(tac2$year), 4)) +
   ylab(paste0(en2fr("Catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
@@ -1311,7 +1380,7 @@ tac27 <-  ggplot() +
   geom_bar(data=fishery2[fishery2$sfa==27,], aes(year, Landings/1000), stat="identity", fill="grey", width=1) + 
   geom_bar(data=tac2[tac2$sfa==27,], aes(Year, TAC), stat="identity", fill=NA, colour="black", width=1) + 
   geom_hline(data=tac2[tac2$sfa==27,], aes(yintercept=0), colour="lightgrey") + 
-  facet_wrap(~bank, ncol=1) +
+  facet_wrap(~subarea, ncol=1) +
   theme_bw() +
   scale_x_continuous(limits=c(1990,max(tac2$year))) +
   ylab(paste0(en2fr("Catch", translate=french, custom_terms=rosetta_terms), " (", t, ")")) +
@@ -1350,10 +1419,6 @@ fishing.yr <- fish.dat %>%
   summarize(mt = sum(pro.repwt)/1000) 
   
 
-##### SOMETHING IS WRONG WITH FISH.DAT HERE. BBn NO LONGER MATCHES, AND REL F's ARE TOO HIGH
-# Probably has to do with survey year bits above, but I ran out of time. 
-
-
 banks <- c("Sab/Mid", "Ban", "BBn", "BBs", "Ger", "GBb")
 relative.F <- NULL
 for(b in banks) {
@@ -1387,10 +1452,17 @@ relative.F$sfa[relative.F$bank %in% c("GBb")] <- as.numeric(27)
 if(french==T) flab <- "Mortalité par pêche, relative"
 if(french==F) flab <- "Relative fishing mortality"
 
+relative.F$subarea[relative.F$bank=="Ban"] <- "25B"
+relative.F$subarea[relative.F$bank=="Sab/Mid"] <- "25A"
+relative.F$subarea[relative.F$bank=="BBn"] <- "26A"
+relative.F$subarea[relative.F$bank=="BBs"] <- "26B"
+relative.F$subarea[relative.F$bank=="Ger"] <- "26C"
+relative.F$subarea[relative.F$bank=="GBb"] <- "27B"
+
 exp25 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==25,], aes(year, relative.F)) + 
   geom_point(data=relative.F[relative.F$sfa==25,], aes(year, relative.F)) +
   ylim(0,2) +
-  facet_wrap(~bank, ncol=1) +
+  facet_wrap(~subarea, ncol=1) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
   ylab(flab) +
   theme_bw()
@@ -1398,7 +1470,7 @@ exp25 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==25,], aes(year, re
 exp26 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==26,], aes(year, relative.F)) + 
   geom_point(data=relative.F[relative.F$sfa==26,], aes(year, relative.F)) +
   ylim(0,2) +
-  facet_wrap(~bank, ncol=1) +
+  facet_wrap(~subarea, ncol=1) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
   ylab(flab) +
   theme_bw()
@@ -1406,7 +1478,7 @@ exp26 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==26,], aes(year, re
 exp27 <- ggplot() + geom_line(data=relative.F[relative.F$sfa==27,], aes(year, relative.F)) + 
   geom_point(data=relative.F[relative.F$sfa==27,], aes(year, relative.F)) +
   ylim(0,2) +
-  facet_wrap(~bank, ncol=1) +
+  facet_wrap(~subarea, ncol=1) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
   ylab(flab) +
   theme_bw()
