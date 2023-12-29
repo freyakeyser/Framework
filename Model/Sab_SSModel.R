@@ -199,9 +199,9 @@ uIR=log(DD.lst$IR.cv^2+1)
 IRp.a=2+(uIR/uIR)^2
 IRp.b=1/(uIR*((uIR/uIR)^2+1))
 # Catch Rate CV, see above comments for details.
-uU=log(DD.lst$U.cv^2+1)
-Up.a=2+(uU/uU)^2
-Up.b=1/(uU*((uU/uU)^2+1))
+# uU=log(DD.lst$U.cv^2+1)
+# Up.a=2+(uU/uU)^2
+# Up.b=1/(uU*((uU/uU)^2+1))
 
 DDpriors=list(
   logK=			    list(a=7,		  b=7,		d="dnorm",	l=1		),		# scaler to total biomass, a= mean  b = sd, this gives a huge range of starting values
@@ -209,14 +209,14 @@ DDpriors=list(
   m=				    list(a=-2,		b=2,		d="dlnorm",	l=NY	),		# natural mortality fully recruited a= meanlog  b = sdlog
   mR=				    list(a=-2,		b=2,		d="dlnorm",	l=NY	),		# natural mortality  recruits a= meanlog  b = sdlog
   S=				    list(a=8, 		b=11,		d="dbeta",  l=1		),		# clapper dissolution rate a= shape1, b=shape2, 8 & 11 gives ~ normal mean of .45ish
-  q=				    list(a=10, 		b=12,		d="dbeta",	l=1		),		# survey catchability fully recruited a= shape1, b=shape2
-  qU=				    list(a=0,		  b=1,	  d="dunif",	l=1		),		# fishery catchability CPUE a= min, b = max
+  q=				    list(a=20, 		b=40,		d="dbeta",	l=1		),		# survey catchability fully recruited a= shape1, b=shape2
+  #qU=				    list(a=0,		  b=1,	  d="dunif",	l=1		),		# fishery catchability CPUE a= min, b = max
   sigma=			  list(a=0, 		b=5,		d="dunif",	l=1		),		# process error (SD) a = min, b = max
   ikappa.tau2=	list(a=3, 		b=2.2407,	d="dgamma",	l=1		),	# measurement error FR clappers  a = shape, b = scale (1/rate)
   ikappa.rho2=	list(a=3, 		b=2.2407,	d="dgamma",	l=1		),	# measurement error recruit clappers a = shape, b = scale (1/rate)
   I.precision=	list(a=Ip.a,	b=Ip.b,	d="dgamma",	l=NY	),		# measurement error variance survey FR a = shape, b = scale (1/rate)
-  IR.precision=	list(a=IRp.a,	b=IRp.b,d="dgamma",	l=NY	),		# measurement error variance survey recruits a = shape, b = scale (1/rate)
-  U.precision=	list(a=Up.a,	b=Up.b,	d="dgamma",	l=NY	)		  # measurement error variance CPUE  a = shape, b = scale
+  IR.precision=	list(a=IRp.a,	b=IRp.b,d="dgamma",	l=NY	)		# measurement error variance survey recruits a = shape, b = scale (1/rate)
+  #U.precision=	list(a=Up.a,	b=Up.b,	d="dgamma",	l=NY	)		  # measurement error variance CPUE  a = shape, b = scale
 )
 
 #Prepare priors for JAGS
@@ -255,9 +255,9 @@ parameters <- c(names(DDpriors),'K','P','B','R','mu','Imed','Ipred','Irep', 'IRm
 # Run the model now.
 start<-Sys.time()
 ## Call to JAGS, do you want to run in parallel?
-jags.model = "Assessment_fns/Model/DDwSE3_jags.bug"
+jags.model = "D:/Github/Framework/Model/DD_no_cpue.bug"
   out <- jags.parallel(data =  c(prior.lst,DD.lst), inits = NULL,parameters.to.save = parameters,  
-                       model.file = paste(direct,jags.model,sep=""),n.chains = 8, n.iter = 375000, n.burnin = 300000, 
+                       model.file = jags.model,n.chains = 8, n.iter = 375000, n.burnin = 300000, 
                        n.thin = 20,jags.seed = 1)
 print(Sys.time()-start)
 
@@ -355,10 +355,12 @@ rhat <- summary(DD.out$summary[,8])
 #Not sure what our minimum should be here, but using the Rhat + looking at the chains should indicate where there are problems...
 neff <- range(DD.out$summary[,9])
 
+# extract the catchability posterior...
+q <- mod.out$BUGSoutput$sims.list$q
 
-save(mort,TACI,BM.proj.1yr,B.quantiles,percent.B.change,prob.below.USR,FR.bm,FR.ltm,rec.bm,rec.ltm,neff,rhat,
+save(mort,TACI,BM.proj.1yr,B.quantiles,percent.B.change,prob.below.USR,FR.bm,FR.ltm,rec.bm,rec.ltm,neff,rhat,q,
                            file="D:/Framework/SFA_25_26_2024/Model/Results/Sab_SS_model/R_75_FR_90/Model_results_and_diagnostics.RData")
-
+saveRDS(q,file = "D:/Framework/SFA_25_26_2024/Model/Results/Sab_SS_model/R_75_FR_90/q_posterior.Rds")
 # OK, so happy with model lets load up some stuff
 load("D:/Framework/SFA_25_26_2024/Model/Results/Sab_SS_model/R_75_FR_90/Model_results_and_diagnostics.RData")
 load("D:/Framework/SFA_25_26_2024/Model/Results/Sab_SS_model/R_75_FR_90/Sable_SSmodel_results.RData")
@@ -539,7 +541,7 @@ save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Biom
 
 p.ssmod.rec <- ggplot(res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
   geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Recruit Biomass (tonnes)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.8e3))
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,2.5e3))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Recruits.png",p.ssmod.rec,base_height = 8.5,base_width = 11)
 
 # Natural mortality
@@ -548,6 +550,11 @@ p.ssmod.nat.mort <- ggplot(res.gg %>% dplyr::filter(term == "FR Natural Mortalit
   geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + 
   scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.4))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/FR_nm.png",p.ssmod.nat.mort,base_height = 8.5,base_width = 11)
+
+p.ssmod.rec.nat.mort <- ggplot(res.gg %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
+  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + 
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1))
+save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Rec_nm.png",p.ssmod.rec.nat.mort,base_height = 8.5,base_width = 11)
 
 # Exploitation Rate
 
@@ -582,7 +589,7 @@ p.ssmod.rec <- ggplot(res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)
   geom_ribbon(data = res.gg %>% dplyr::filter(term == "Recruit Biomass (tonnes)" & year %in% 2021:2022), aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
   
   ylab("Recruit Biomass (tonnes)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.8e3))
+  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,2.5e3))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/Sab/R_75_FR_90/SSModel/Recruits_no_missing_surveys.png",p.ssmod.rec,base_height = 8.5,base_width = 11)
 
 # Natural mortality

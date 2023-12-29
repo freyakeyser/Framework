@@ -52,14 +52,14 @@ atow<-800*2.4384/10^6 # area of standard tow in km2
 years <- 1994:2022
 num.knots <- 10 # for SEAM
 #R0 <- 55 # for SEAM
-qR <- 0.45# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05R.size <- "75"
 FR.size <- "90"
 R.size <- "75"
 # The different growth models.
-#g.mod <- 'g_original'
+g.mod <- 'g_original'
 #g.mod <- 'alt_g'
-g.mod <- 'proper_g'
+#g.mod <- 'proper_g'
 # models
 mods <- c("SEAM")
 n.mods <- length(mods)
@@ -320,7 +320,7 @@ for(i in 1:n.mods)
         catchy <- catch_spread(catch = catch.sf,knots = Sab.mesh$knots)
         
         set_data<-data_setup(data=mod.input.sf,growths=data.frame(g = g$g,gR = g$gR),catch=as.data.frame(catchy$sum_catches),
-                             model="SEBDAM",mesh=Sab.mesh$mesh,obs_mort=T,prior=T,prior_pars=c(10,12),#fix_m = 0.3,
+                             model="SEBDAM",mesh=Sab.mesh$mesh,obs_mort=T,prior=T,prior_pars=c(20,40),#fix_m = 0.3,
                              mult_qI=T,spat_approach="spde",
                              knot_obj=Sab.mesh$knots,knot_area=pred.grid$area,separate_R_aniso = T,
                              all_se=T,weighted_mean_m = T)
@@ -377,11 +377,11 @@ years <- 1994:2022
 R.size <- "75"
 FR.size <- "90"
 num.knots <- 10 # Going to test 10
-qR <- 0.45
+qR <- 0.33
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
-#g.mod <- 'g_original'
+g.mod <- 'g_original'
 #g.mod <- 'alt_g'
-g.mod <- 'proper_g'
+#g.mod <- 'proper_g'
 # The survey biomass index for 1994 says there were 249 tonnes of recruits that year.
 #l.init.R <- log(250) # Going to test 100, 250, and 500.
 
@@ -493,7 +493,7 @@ retro <- retros[!is.na(retros$R),]
 retro.base <- rbind(retro,base.trend)
 
 
-cols <- c(rep('#005BBB',4),rep('firebrick2',4),rep('darkgrey',4),rep('#FFD500',4))
+cols <- c(rep('#005BBB',4),rep('firebrick2',4),rep('darkgrey',4),rep('#FFD500',3),'black')
 points <- c(rep(21:24,4)) 
 b.retro <- ggplot(data=retro.base %>% dplyr::filter(years < 2015),aes(x= years, y = B,group=retro.year,color=retro.year,shape = retro.year,fill = retro.year)) +
   geom_line(size=1) + 
@@ -554,7 +554,7 @@ for(j in retro.years)
 # So now we can use this to calculate mohn's rho
 bias <- do.call('rbind',bias)
 # mohn's rho being fine when it is < 0.2 is found in Hutrtado-Ferro 2015 paper.
-# Not we are removing 2020 from this since we don't have any survey data.
+# Note we are removing 2020 from this since we don't have any survey data.
 mohns.rhos <- data.frame(mr.B = sum(bias$rel.B)/n.retro.years,
                          mr.R = sum(bias$rel.R)/n.retro.years,
                          mr.m = sum(bias$rel.m)/n.retro.years,
@@ -565,5 +565,5 @@ mohns.rhos <- data.frame(mr.B = sum(bias$rel.B)/n.retro.years,
 
 saveRDS(mohns.rhos,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_mohns_rose_",mod.select,"_",scenario.select,".Rds"))
 saveRDS(bias,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_bias_",mod.select,"_",scenario.select,".Rds"))
-
+saveRDS(retro.base,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_retro_",mod.select,"_",scenario.select,".Rds"))
 #tst <- readRDS("D:/Framework/SFA_25_26_2024/Model/Results/Sab/R_75_FR_90/Retros/archive/Sab_bias_SEAM_1994_2022_vary_m_m0_2_qR_0.5_10_knots.Rds")

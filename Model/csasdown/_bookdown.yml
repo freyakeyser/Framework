@@ -1,0 +1,10 @@
+book_filename: "resdoc"
+rmd_files: ["tmp-index.Rmd",
+            "tmp-analysis.Rmd",
+            "tmp-01-text.Rmd",
+            "tmp-02-references.Rmd",
+            "tmp-03-tables.Rmd",
+            "tmp-04-figures.Rmd",
+            "tmp-05-appendix.Rmd",
+            "tmp-06-formatting.Rmd"]
+delete_merged_file: true
