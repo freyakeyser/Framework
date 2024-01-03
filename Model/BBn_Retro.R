@@ -49,12 +49,13 @@ NY <- length(years)
 R.size <- "75"
 FR.size <- "90"
 num.knots <- 20 # Going to test 10, 15, and 20
-qR <- 0.45# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+qR <- 0.33 # This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
 # Various explorations of the g models.
-#g.mod <- 'g_original'
+g.mod <- 'g_original'
 #g.mod <- 'alt_g'
-g.mod <- 'proper_g'
+#g.mod <- 'proper_g'
+vary.q <- T
 # The survey biomass index for 1994 says there were 249 tonnes of recruits that year.
 #l.init.R <- log(250) # Going to test 100, 250, and 500.
 
@@ -261,7 +262,7 @@ for(i in 1:n.mods)
   
   mod.input.sf <- mod.input.sf[order(mod.input.sf$year),]
  
-  bbn.fish$survey.year[bbn.fish$month %in% c("January","February","March","April","May")] <- bbn.fish$survey.year[bbn.fish$month %in% c("January","February","March","April","May")] -1
+  bbn.fish$survey.year[bbn.fish$month %in% 1:5] <- bbn.fish$survey.year[bbn.fish$month %in% 1:5] -1
   bbn.fish.sfs <- st_as_sf(bbn.fish,coords = c("lon","lat"),remove =F, crs = 4326)
   bbn.fish.sfs <- bbn.fish.sfs %>% st_transform(crs= 32619)
   # Now lets clip this to be data inside of our bbn boundary.
@@ -307,7 +308,7 @@ for(i in 1:n.mods)
       catchy <- catch_spread(catch = catch.sf,knots = bbn.mesh$knots)
       #catchy$sum_catches[,ncol(catchy$sum_catches)+1] <- 0
       set_data<-data_setup(data=mod.input.sfs,growths=data.frame(g = g$g,gR = g$gR),catch=as.data.frame(catchy$sum_catches),
-                           model="SEBDAM",mesh=bbn.mesh$mesh,obs_mort=T,prior=T,prior_pars=c(10,12),#fix_m = 0.3,
+                           model="SEBDAM",mesh=bbn.mesh$mesh,obs_mort=T,prior=T,prior_pars=c(20,40),#fix_m = 0.3,
                            mult_qI=T,spat_approach="spde",
                            knot_obj=bbn.mesh$knots,knot_area=pred.grid$area,separate_R_aniso = T,
                            all_se=T,weighted_mean_m = T)
@@ -344,7 +345,7 @@ for(i in 1:n.mods)
     if(mod.select != "TLM")
     {
       
-      scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+      scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod,"_vary_q=",vary.q)
       saveRDS(mod.fit,paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_",mod.select,"_model_output_",scenario.select,".Rds"))
       saveRDS(bbn.mesh,paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_",mod.select,"_model_output_",scenario.select,"_mesh.Rds"))
       saveRDS(pred.grid,paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_",mod.select,"_model_output_",scenario.select,"_predict_grid.Rds"))
@@ -370,14 +371,14 @@ mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 years <- 1994:2022
 R.size <- "75"
 FR.size <- "90"
-qR <- 0.45# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
 init.m <- 0.2
 num.knots <- 20 # Going to test 10, 15, and 20
 #lqr <- 0.45_#This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
-#g.mod <- 'g_original'
+g.mod <- 'g_original'
 #g.mod <- 'alt_g'
-g.mod <- 'proper_g'
-
+#g.mod <- 'proper_g'
+vary.q <- TRUE
 mod.select <- "SEAM"
 retro.years <- c(2005:2019,2021)
 n.retro.years <- length(retro.years)
@@ -390,7 +391,7 @@ retro.trends <- NULL
 pred.proc <- NULL
 for(j in retro.years)
 {
-  if(mod.select != "TLM") scenario.select.retro <- paste0(min(years),"_",j,"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+  if(mod.select != "TLM") scenario.select.retro <- paste0(min(years),"_",j,"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod,"_vary_q=",vary.q)
   
   if(mod.select == "TLM") scenario.select.retro <- paste0(min(years),"_",j,"_qR_",exp(lqr))
   mod.fit[[j]] <- readRDS(paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_",mod.select,"_model_output_",scenario.select.retro,".Rds"))
@@ -435,7 +436,7 @@ retros <- do.call("rbind",retro.trends)
 retro <- retros[!is.na(retros$R),]
 
 # So now bring in the final model run to get the 'true' value for the calculation
-if(mod.select != "TLM") scenario.select <- paste0(min(years),"_",2022,"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+if(mod.select != "TLM") scenario.select <- paste0(min(years),"_",2022,"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod,"_vary_q=",vary.q)
 if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",2022,"_qR_",qR)
 base.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,".Rds"))
 pred.base <- get_processes(base.mod)
@@ -477,7 +478,7 @@ base.trend <- base.trends[!is.na(base.trends$R),]
 # combine retro and base
 retro.base <- rbind(retro,base.trend)
 
-cols <- c(rep('#005BBB',4),rep('firebrick2',4),rep('darkgrey',4),rep('#FFD500',5))
+cols <- c(rep('#005BBB',4),rep('firebrick2',4),rep('darkgrey',4),rep('#FFD500',4),'black')
 points <- rep(21:24,5) 
 b.retro <- ggplot(data=retro.base %>% dplyr::filter(years < 2020),aes(x= years, y = B,group=retro.year,color=retro.year,shape = retro.year,fill = retro.year)) +
                                 geom_line(size=1) + 
@@ -544,5 +545,6 @@ mohns.rhos <- data.frame(mr.B = sum(bias$rel.B)/n.retro.years,
 
 saveRDS(mohns.rhos,paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_mohns_rose_",mod.select,"_",scenario.select,".Rds"))
 saveRDS(bias,paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_bias_",mod.select,"_",scenario.select,".Rds"))
+saveRDS(retro.base,paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_retro_",mod.select,"_",scenario.select,".Rds"))
 
 

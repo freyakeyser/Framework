@@ -106,12 +106,12 @@ NY <- length(years)
 R.size <- "75"
 FR.size <- "90"
 c_sys <- 32620
-qR <- 0.45# log recruit catchability making this the same are FR catchability.
+qR <- 0.33# log recruit catchability making this the same are FR catchability.
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 2, 0.8, and 0.4
 # Various explorations of the g models.
-#g.mod <- 'g_original'
+g.mod <- 'g_original'
 #g.mod <- 'alt_g'
-g.mod <- 'proper_g'
+#g.mod <- 'proper_g'
 # The survey biomass index for 1995 says there were 243 tonnes of recruits that year.
 #l.init.R <- log(100) # Going to test 100, 250, and 500.
 
@@ -380,7 +380,7 @@ catch.sf$Year <-  catch.sf$Year - (min(years)-1)
 #mod.input.sf$geometry <-  mod.input.sf$geometry/1000
 #st_crs(mod.input.sf) <- 32619
 
-Sab.mesh <- setup_mesh(mod.input.sf,model_bound = Sab.shape,nknot=num.knots, max.edge = c(8,20),cutoff=2.5,seed=34) 
+Sab.mesh <- setup_mesh(mod.input.sf,model_bound = Sab.shape,nknot=num.knots, max.edge = c(8,20),cutoff=2.5,seed=23) 
 Sab.mesh.sf <- inla.mesh2sf(Sab.mesh$mesh)
 Sab.mesh.sf$triangles$geometry <- Sab.mesh.sf$triangles$geometry*1000
 Sab.mesh.sf$vertices$geometry <- Sab.mesh.sf$vertices$geometry*1000
@@ -438,7 +438,7 @@ catch.tlm$catch[nrow(catch.tlm)] <- 0
 if(mod.select == "SEAM")
 {
   set_data<-data_setup(data=mod.input.sf,growths=data.frame(g = g$g,gR = g$gR),catch=as.data.frame(catchy$sum_catches),
-                       model="SEBDAM",mesh=Sab.mesh$mesh,obs_mort=T, prior=TRUE,prior_pars=c(10,12),
+                       model="SEBDAM",mesh=Sab.mesh$mesh,obs_mort=T, prior=TRUE,prior_pars=c(20,40),
                        mult_qI=T,spat_approach="spde",
                        knot_obj=Sab.mesh$knots,knot_area=pred.grid$area,separate_R_aniso =T,
                        all_se=T,weighted_mean_m = T)
@@ -529,19 +529,15 @@ if(mod.select == "TLM")
 ################################################### End the initial model runs ###########################################
 ################################################### End the initial model runs ###########################################
 
-
-
-
-
 ##################### Now load the model and make the figures! ##############################################
 
 atow<-800*2.4384/10^6 # area of standard tow in km2
-num.knots <- 10 # 4, 8, or 10
+num.knots <- 20 # 4, 8, or 10
 R.size <- 75
 FR.size <- 90
 #RO <- 100 # 100, 250, or 500
 init.m <- 0.2 # log(0.05) # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
-qR  <- 0.45
+qR  <- 0.33
 years <- 1994:2022
 NY <- length(years)
 c_sys <- 32620
@@ -637,11 +633,10 @@ nat.mat.plt$method <- factor(nat.mat.plt$method,levels = c("m.all","Raph.m","m.F
 gs <- mod.fit$obj$env$data$gI
 gRs <- mod.fit$obj$env$data$gR
 tmp <- NULL
-
+Bs.tot <- mod.fit$report$B*mod.fit$obj$env$data$area/1000
+Rs.tot <- mod.fit$report$R*mod.fit$obj$env$data$area/1000
 for(i in 1:(NY-1))
 {
-  Bs.tot <- mod.fit$report$B*mod.fit$obj$env$data$area/1000
-  Rs.tot <- mod.fit$report$R*mod.fit$obj$env$data$area/1000
   ms <- mod.fit$report$m
   Bst <- (exp(-ms[,i+1]))*gs[i]*(Bs.tot[,i]-catchy[,i]) 
   Rst <- (exp(-ms[,i+1]))*gRs[i]*(Rs.tot[,i]) 
@@ -668,8 +663,6 @@ Bdiff.comp.dat<-data.frame(B.diff=as.vector(B.diff.comp$B.diff),B.per.diff = as.
 Bdiff.comp.dat.plot<-left_join(knot.gis,Bdiff.comp.dat,by=c("knotID"))
 Bdiff.comp.dat.plot <- Bdiff.comp.dat.plot %>% dplyr::filter(Year != min(years))
 # Save this so I can compare the 'miss' across models...
-saveRDS(Bdiff.comp.dat.plot,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                                   mod.select,"_model_output_",scenario.select,"_B_differnce.Rds"))
 
 # Smaller text for spatial figures.
 theme_set(theme_few(base_size = 14))
@@ -920,6 +913,12 @@ if(mod.select == "TLM")
                             B.LCI = pred.proc$log_processes$totB.LCI, B.UCI = pred.proc$log_processes$totB.UCI)
 }
 ann.exploit$exploit <- ann.exploit$Catch/(ann.exploit$B+ann.exploit$Catch)
+ann.exploit$exploit.UCI <- ann.exploit$Catch/(ann.exploit$B.LCI+ann.exploit$Catch)
+ann.exploit$exploit.LCI <- ann.exploit$Catch/(ann.exploit$B.UCI+ann.exploit$Catch)
+ann.exploit$FM <- 1-exp(-ann.exploit$exploit)
+ann.exploit$FM.LCI <- 1-exp(-ann.exploit$exploit.LCI)
+ann.exploit$FM.UCI <- 1-exp(-ann.exploit$exploit.UCI)
+
 
 
 #pred.proc$log_processes <- pred.proc$log_processes %>% dplyr::filter(year < 2023)
@@ -927,7 +926,7 @@ ann.exploit$exploit <- ann.exploit$Catch/(ann.exploit$B+ann.exploit$Catch)
 
 # Biomass time series
 bm.ts.plot <- ggplot(pred.proc$log_processes) + geom_line(aes(year,exp(log_B)),color='firebrick2',linewidth=1.5) + 
-  geom_ribbon(aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + ylim(c(0,1.15e4)) + 
+  geom_ribbon(aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + ylim(c(0,1.5e4)) + 
   xlab("") + ylab("Fully Recruited Biomass (tonnes)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/Sab_Biomass_time_series.png"),bm.ts.plot,base_width = 11,base_height = 8.5)
 # Recruit time seris
@@ -938,11 +937,11 @@ save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,
 # Natural mortality time series...
 mort.ts.plot <- ggplot(pred.proc$log_processes) + geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) + 
   geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-  xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,1.4)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+  xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,1)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/Sab_nat_mort_time_series.png"),mort.ts.plot,base_width = 11,base_height = 8.5)
 # Explotation Rate Time Series
-exploit.plot <- ggplot(ann.exploit) + geom_line(aes(x=year,y=exploit),linewidth = 1.5) +
-  xlab("") + ylab("Exploitation Rate (Proportional)") + ylim(c(0,0.2)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+exploit.plot <- ggplot(ann.exploit) + geom_line(aes(x=year,y=exploit),linewidth = 1.5) + geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
+  xlab("") + ylab("Exploitation Rate (Proportional)") + ylim(c(0,0.1)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/Sab_exploit_time_series.png"),exploit.plot,base_width = 11,base_height = 8.5)
 
 # Same plots but removing missing survey years....
@@ -952,7 +951,7 @@ bm.ts.plot <- ggplot(pred.proc$log_processes %>% dplyr::filter(year < c(2015))) 
   geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
   geom_line(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(year,exp(log_B)),color='firebrick2',linewidth=1.5) +  
   geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(ymin=totB.LCI,ymax=totB.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-  ylim(c(0,1.15e4)) + xlab("") + ylab("Fully Recruited Biomass (tonnes)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
+  ylim(c(0,1.5e4)) + xlab("") + ylab("Fully Recruited Biomass (tonnes)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/Sab_Biomass_time_series_no_missing_surveys.png"),bm.ts.plot,base_width = 11,base_height = 8.5)
 # Recruit time series
 rec.ts.plot <- ggplot(pred.proc$log_processes %>% dplyr::filter(year < c(2015))) + 
@@ -970,13 +969,44 @@ mort.ts.plot <- ggplot(pred.proc$log_processes %>% dplyr::filter(year < c(2015))
   geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2016:2019), aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
   geom_line(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) +  
   geom_ribbon(data = pred.proc$log_processes %>% dplyr::filter(year %in% 2021:2022), aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-  xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,1.4)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+  xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,1)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/Sab_nat_mort_time_series_no_missing_surveys.png"),mort.ts.plot,base_width = 11,base_height = 8.5)
 
 
 # Explotation Rate Time Series
 exploit.plot <- ggplot(ann.exploit%>% dplyr::filter(year < c(2015))) + geom_line(aes(x=year,y=exploit),linewidth = 1.5) +
+  geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
   geom_line(data = ann.exploit%>% dplyr::filter(year %in% 2016:2019), aes(x=year,y=exploit),linewidth = 1.5) + 
+  geom_ribbon(data = ann.exploit%>% dplyr::filter(year %in% 2016:2019),aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
   geom_line(data= ann.exploit%>% dplyr::filter(year %in% 2021:2022),aes(x=year,y=exploit),linewidth = 1.5) +
-  xlab("") + ylab("Exploitation Rate (Proportional)") + ylim(c(0,0.2)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+  geom_ribbon(data= ann.exploit%>% dplyr::filter(year %in% 2021:2022),aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
+  xlab("") + ylab("Exploitation Rate (Proportional)") + ylim(c(0,0.1)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
 save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/Sab_exploit_time_series_no_missing_surveys.png"),exploit.plot,base_width = 11,base_height = 8.5)
+
+# Save out a bunch of objects...
+# The biomass difference
+saveRDS(Bdiff.comp.dat.plot,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+                                   mod.select,"_model_output_",scenario.select,"_B_differnce.Rds"))
+# Annual exploitation
+saveRDS(ann.exploit,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+                                   mod.select,"_model_output_",scenario.select,"_annual.exploit.Rds"))
+# The nicely summarized model object
+saveRDS(pred.proc,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+                           mod.select,"_model_output_",scenario.select,"_pred_proc.Rds"))
+# The summarized spatial bits.
+saveRDS(F.dat.plot,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+                         mod.select,"_model_output_",scenario.select,"_F_spatial.Rds"))
+# q spatial
+saveRDS(q.dat.plot,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+                          mod.select,"_model_output_",scenario.select,"_q_spatial.Rds"))
+# m spatial
+saveRDS(m.dat.plot,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+                          mod.select,"_model_output_",scenario.select,"_m_spatial.Rds"))
+# R spatial
+saveRDS(R.dat.plot,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+                          mod.select,"_model_output_",scenario.select,"_R_spatial.Rds"))
+# B spatial
+saveRDS(B.dat.plot,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+                          mod.select,"_model_output_",scenario.select,"_B_spatial.Rds"))
+
+
