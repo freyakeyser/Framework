@@ -1406,8 +1406,12 @@ fish.dat$sfa[fish.dat$bank %in% c("Ban", "Sab","Mid")] <- 25
 fish.dat$sfa[fish.dat$bank %in% c("BBn", "BBs", "Ger")] <- 26
 fish.dat$sfa[fish.dat$bank %in% c("GBb")] <- 27
 
-fish.dat$surv.year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26]+1
-fish.dat$surv.year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27]+1
+# fish.dat$surv.year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26]+1
+# fish.dat$surv.year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27]+1
+
+fish.dat$surv.year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26]-1
+fish.dat$surv.year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27]-1
+
 #tail(fish.dat[, c("fished", "month", "year", "surv.year")], 50)
 survey.yr <- fish.dat %>%
   group_by(surv.year, bank, sfa) %>%
@@ -1419,41 +1423,44 @@ fishing.yr <- fish.dat %>%
   summarize(mt = sum(pro.repwt)/1000) 
   
 
-banks <- c("Sab/Mid", "Ban", "BBn", "BBs", "Ger", "GBb")
+banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")
 relative.F <- NULL
 for(b in banks) {
-  if(b=="Sab/Mid"){
-    sab <- cbind(survey.obj[["Sab"]]$model.dat[, c("year", "I")], bank="Sab")
-    mid <- cbind(survey.obj[["Mid"]]$model.dat[, c("year", "I")], bank="Mid")
-    sabmid <- full_join(sab, mid) %>%
-      group_by(year) %>%
-      summarize(I=sum(I, na.rm=T)) #/0.35) # survey catchability (between 0.2 and 0.5), using this would mean "q-corrected", don't do this
-    fishing <- survey.yr %>%
-      filter(bank %in% c("Sab", "Mid")) %>%
-      group_by(year) %>%
-      summarize(mt=sum(mt)) %>%
-      mutate(bank="Sab/Mid")
-    compare <- full_join(sabmid, fishing[,c("year", "bank", "mt")])
-  }
+  # if(b=="Sab/Mid"){
+  #   sab <- cbind(survey.obj[["Sab"]]$model.dat[, c("year", "I")], bank="Sab")
+  #   mid <- cbind(survey.obj[["Mid"]]$model.dat[, c("year", "I")], bank="Mid")
+  #   sabmid <- full_join(sab, mid) %>%
+  #     group_by(year) %>%
+  #     summarize(I=sum(I, na.rm=T)) #/0.35) # survey catchability (between 0.2 and 0.5), using this would mean "q-corrected", don't do this
+  #   fishing <- survey.yr %>%
+  #     filter(bank %in% c("Sab", "Mid")) %>%
+  #     group_by(year) %>%
+  #     summarize(mt=sum(mt)) %>%
+  #     mutate(bank="Sab/Mid")
+  #   compare <- full_join(sabmid, fishing[,c("year", "bank", "mt")])
+  # }
 
-  if(!b=="Sab/Mid"){
+  #if(!b=="Sab/Mid"){
     if(b=="Ger") compare <- full_join(merged.survey.obj[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
     if(!b=="Ger") compare <- full_join(survey.obj[[b]]$model.dat[, c("year", "I")], survey.yr[survey.yr$bank==b &!is.na(survey.yr$bank),c("year", "bank", "mt")])
-  }
+ # }
   compare$relative.F <- compare$mt / (compare$I) #/0.35) # survey catchability? don't use this
   relative.F <- rbind(relative.F, compare)
 }
-relative.F <- relative.F[!is.na(relative.F$mt),]
-relative.F[relative.F$relative.F==Inf & !is.na(relative.F$relative.F),]$relative.F <- NA
+relFyrs <- expand.grid(year=min(relative.F$year, na.rm=T):max(relative.F$year, na.rm=T), bank=banks)
+relative.F <- left_join(relFyrs, relative.F)
+#relative.F <- relative.F[!is.na(relative.F$mt),]
+#relative.F[relative.F$relative.F==Inf & !is.na(relative.F$relative.F),]$relative.F <- NA
 relative.F$sfa[relative.F$bank %in% c("BBn", "BBs", "Ger", "BBn/BBs")] <- as.numeric(26)
-relative.F$sfa[relative.F$bank %in% c("Ban", "Ban/Sab/Mid", "Sab/Mid")] <- as.numeric(25)
+relative.F$sfa[relative.F$bank %in% c("Ban", "Ban/Sab/Mid", "Sab/Mid", "Sab", "Mid")] <- as.numeric(25)
 relative.F$sfa[relative.F$bank %in% c("GBb")] <- as.numeric(27)
 
 if(french==T) flab <- "Mortalité par pêche, relative"
 if(french==F) flab <- "Relative fishing mortality"
 
 relative.F$subarea[relative.F$bank=="Ban"] <- "25B"
-relative.F$subarea[relative.F$bank=="Sab/Mid"] <- "25A"
+relative.F$subarea[relative.F$bank=="Sab"] <- "25A-Sab"
+relative.F$subarea[relative.F$bank=="Mid"] <- "25A-Mid"
 relative.F$subarea[relative.F$bank=="BBn"] <- "26A"
 relative.F$subarea[relative.F$bank=="BBs"] <- "26B"
 relative.F$subarea[relative.F$bank=="Ger"] <- "26C"

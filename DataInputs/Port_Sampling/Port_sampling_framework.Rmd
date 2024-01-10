@@ -131,7 +131,7 @@ if(french==T) ylabel <- "Masse de la chair (médiane, g)"
 png(paste0(plotsGo, "medians_long_vert", fr, ".png"), width=6.5, height=8, units = "in", res=420)
 ggplot() +
   # geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
-  geom_segment(data=medians2[medians2$bank %in% c("BBn", "Sab"),],mapping=aes(x=monthyr, xend=xend,y=annual_med, yend=annual_med), colour="blue", size=1) +
+  geom_segment(data=medians2[medians2$bank %in% c("BBn", "Sab"),],mapping=aes(x=monthyr, xend=xend,y=annual_med, yend=annual_med), colour="blue", linewidth=1) +
   geom_errorbar(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)), width=0)+
   geom_point(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, monthly_med)) +
   geom_text(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr + months(6), 0, label=nsamples_yr), vjust=0.5, hjust=1.1, colour="blue")+
@@ -304,6 +304,83 @@ ggplot() +
   scale_x_continuous(limits=c(50,200), breaks=seq(50,200,10)) +
   scale_y_discrete(expand=c(0,0.9), limits=rev)
 dev.off()  
+
+
+
+# combine with survey SHF
+shf <- SHF.summary$BBn
+names(shf)[1] <- "years"
+shf <- shf %>% tidyr::pivot_longer(cols = starts_with("V"))
+shf$name <- gsub(x=shf$name, pattern="V", replacement="")
+if(!any(shf$name==200)) shf$name <- (as.numeric(shf$name)-1)*5
+
+shf <- shf[!is.na(shf$years),]
+shf <- shf[shf$name>65,]
+
+years <- shf %>%
+  dplyr::group_by(years) %>%
+  dplyr::summarize(total=sum(value))
+
+shf <- left_join(shf, years)
+shf$density <- shf$value/shf$total
+shf$name <- as.numeric(shf$name)
+
+bins <- data.frame(shf=rep(seq(65,199.9,0.1), length(unique(shf$years))), name=rep(rep(seq(70,200,5), each=50), length(unique(shf$years))), years=rep(unique(shf$years), each=1350))
+
+shf <- full_join(shf, bins)
+
+shf <- left_join(data.frame(years = min(shf$years, na.rm=T):max(shf$years, na.rm=T)), shf)
+shf$bank <- "BBn"
+
+shfps <- bbn.dat[!is.na(bbn.dat$sh),]
+shfps <- shfps[shfps$sh>65,]
+shfps <- shfps[shfps$month %in% c(5,6),]
+
+shfps.yr <- shfps %>%
+  dplyr::mutate(bin = cut(sh, breaks=seq(65,210,5))) %>%
+  dplyr::group_by(year) %>%
+  dplyr::summarize(total=n())
+
+shfps <- shfps %>%
+  dplyr::mutate(bin = cut(sh, breaks=seq(65,210,5))) %>%
+  dplyr::group_by(year, bin) %>%
+  dplyr::summarize(value=n())
+
+shfps <- left_join(shfps, shfps.yr)
+shfps$density <- shfps$value/shfps$total
+bins <- unlist(strsplit(x = as.character(shfps$bin), split=","))
+bins <- bins[grep(x=bins,pattern="]")]
+bins <- gsub(x=bins, pattern="]", replacement="")
+shfps$name <- bins
+#stringr::str_detect(shfps$bin, pattern = shfps$name) # just a check
+
+# bins <- data.frame(name=as.character(rep(seq(5,210,5), length(unique(shfps$year)))), year=rep(unique(shfps$year), each=42))
+bins <- data.frame(shf=rep(seq(65,209.9,0.1), length(unique(shfps$year))), name=rep(rep(seq(70,210,5), each=50), length(unique(shfps$year))), year=rep(unique(shfps$year), each=1450))
+shfps$name <- as.numeric(shfps$name)
+
+shfps <- full_join(shfps, bins)
+
+shfps <- left_join(data.frame(year = min(shfps$year, na.rm=T):max(shfps$year, na.rm=T)), shfps)
+shfps$bank <- "BBn"
+
+shfps <- dplyr::select(shfps, bank, year, name, shf, density)
+shfps$density[is.na(shfps$density)] <- 0
+names(shfps) <- c("bank", "years", "name", "shf", "density_ps")
+shfps$name <- as.numeric(shfps$name)
+
+shf <- unique(dplyr::select(shf, bank, years, name, shf, density))
+
+shf <- full_join(shf, shfps)
+shf <- shf[!is.na(shf$density_ps),]
+names(shf)[names(shf)=="name"] <- "bin"
+shf <- shf %>% tidyr::pivot_longer(cols = starts_with("d"))
+
+ggplot() + geom_line(data=shf, aes(shf, value, colour=name), linewidth=1) + 
+  facet_wrap(~years, ncol=1, strip.position="right") +
+  theme_bw() +
+  scale_colour_manual(name=NULL, labels=c("Survey", "Fishery"), values=c("blue", "black")) +
+  xlab("Shell height (5 mm bin)") +
+  ylab("Proportion of scallops >65 mm")
 
 # HERE IS THE MAIN ANALYSIS FOR the BBn Res doc, shows proportion below certain sizes
 n.bl.100 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 100) %>% dplyr::summarise(n = length(sh))
