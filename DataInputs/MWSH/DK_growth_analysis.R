@@ -103,7 +103,7 @@ qqplot.data <- function (dat,facet=F, ncol=NULL,...)
 # Start analysis
 
 
-banker <- "Sab"
+banker <- "BBn"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
@@ -628,7 +628,7 @@ y3 <- 2012:2022
 # SO I THINK WE WANT THESE THREE FIGURES FOR RES DOC
 # 1992-2001
 p1 <- ggplot(r.tow %>% dplyr::filter(year %in% y1)) +
-  geom_point(data=sub %>% dplyr::filter(year %in% y1),aes(x=sh,y=wmw),color=blues) +
+  geom_point(data=sub %>% dplyr::filter(year %in% y1),aes(x=sh,y=wmw),color=blues, alpha=0.5) +
   geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
   geom_line(data = f.mw %>% dplyr::filter(year %in% y1),aes(x=sh,y=mw),color='black',size=2) +
   scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
@@ -641,7 +641,7 @@ p1 <- ggplot(r.tow %>% dplyr::filter(year %in% y1)) +
 
 # 2002-2011
 p2 <- ggplot(r.tow %>% dplyr::filter(year %in% y2)) +
-  geom_point(data=sub %>% dplyr::filter(year %in% y2),aes(x=sh,y=wmw),color=blues) +
+  geom_point(data=sub %>% dplyr::filter(year %in% y2),aes(x=sh,y=wmw),color=blues, alpha=0.5) +
   geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
   geom_line(data = f.mw %>% dplyr::filter(year %in% y2),aes(x=sh,y=mw),color='black',size=2) +
   scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
@@ -654,7 +654,7 @@ p2 <- ggplot(r.tow %>% dplyr::filter(year %in% y2)) +
 
 # Now 2012-2022
 p3 <- ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
-  geom_point(data=sub %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues) +
+  geom_point(data=sub %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues, alpha=0.5) +
   geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
   geom_line(data = f.mw %>% dplyr::filter(year %in% y3),aes(x=sh,y=mw),color='black',size=2) +
   scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
@@ -666,7 +666,7 @@ p3 <- ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
   theme_bw()
 
 pall <- ggplot(r.tow %>% dplyr::filter(year %in% 1992:2022)) +
-  geom_point(data=sub %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=wmw),color=blues, size=0.5) +
+  geom_point(data=sub %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=wmw),color=blues, size=0.5, alpha=0.5) +
   geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=6) +
   geom_line(data = f.mw %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=mw),color='black',size=1) +
   scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
@@ -689,7 +689,7 @@ depth.effect$LCI <- depth.effect$effect - 1.96*depth.effect$se
 if(french==T) depthlab <- "Effet de profondeur"
 if(french==F) depthlab <- "Depth effect"
 p.depth <- ggplot(depth.effect,aes(x=year,y=effect)) +
-  geom_ribbon(aes(ymin=LCI,ymax=UCI,x=year),color=blues,fill=blues,alpha=0.5)+
+  geom_errorbar(aes(ymin=LCI,ymax=UCI,x=year), width=0.5)+
   geom_hline(yintercept = 0,color=yellows,linetype = 'dashed',size=1.5) +
   #geom_line(size=1.5) + geom_point(size=3) +
   geom_line() + geom_point() +
@@ -753,7 +753,7 @@ for (bank in banks){
   png(filename = paste0(plotsGo, "/MWSH_y3_", bank, nickname, ".png"), height=6, width=5, units="in", res=420)
   print(
     ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
-      geom_point(data=cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues) +
+      geom_point(data=cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues, alpha=0.5) +
       geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
       geom_line(data = f.mw %>% dplyr::filter(year %in% y3),aes(x=sh,y=mw),color='black',size=2) +
       scale_x_continuous(limits = c(65,cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year == max(y3)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),

@@ -335,6 +335,9 @@ bankpertow_all$subarea[bankpertow_all$bank=="BBs"] <- "26B"
 bankpertow_all$subarea[bankpertow_all$bank=="Ger"] <- "26C"
 bankpertow_all$subarea[bankpertow_all$bank=="GBb"] <- "27B"
 
+# only show proposed recsize
+bankpertow_all <- bankpertow_all[!bankpertow_all$recsize %in% "80-95",]
+
 sfa <- c(25,26)
 for(sfa in sfa){
   
@@ -517,8 +520,8 @@ if(french==T){
 
 cfts <- full_join(cfts, cfts_old)
 
-if(french==F) cflab <- expression(paste("Condition factor  ",bgroup("(",frac(g,dm^3)   ,")")))
-if(french==T) cflab <- expression(paste("Coefficient de condition  ",bgroup("(",frac(g,dm^3)   ,")")))
+if(french==F) cflab <- paste("Condition (g)")
+if(french==T) cflab <- paste("Coefficient de condition (g)")
 
 cfts$subarea[cfts$bank=="Mid"] <- "25A-Mid"
 cfts$subarea[cfts$bank=="Sab"] <- "25A-Sab"
@@ -657,7 +660,7 @@ for(sfa in sfa){
   clap <- ggplot() + geom_line(data=clappertow[clappertow$sfa==sfa,],
                             aes(years, index.val, colour=subarea)) +
     geom_point(data=clappertow[clappertow$sfa==sfa,],
-               aes(years, index.val, colour=subarea)) +
+               aes(years, index.val, colour=subarea, shape=subarea)) +
     theme_bw() +
     facet_wrap(~size2, ncol=1,
                scales="free_y",
@@ -665,7 +668,7 @@ for(sfa in sfa){
     theme(strip.background=element_blank()) +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
     scale_fill_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
-    #scale_y_log10() +
+    scale_shape_discrete(name=man.unit) +
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
     ylab(parse(text=xlabel))
 
@@ -727,8 +730,8 @@ for(sfa in sfa){
       xlab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) +
       scale_x_continuous(limits=c(0,200), breaks=seq(0,200,10)) +
       scale_y_discrete(expand=c(0,0.9), limits=rev) +
-      geom_vline(data=shf, aes(xintercept=RS)) +
-      geom_vline(data=shf, aes(xintercept=CS))
+      geom_vline(data=shf, aes(xintercept=RS), linetype="dashed") +
+      geom_vline(data=shf, aes(xintercept=CS), linetype="dashed")
     )
     dev.off()
     
@@ -741,8 +744,8 @@ for(sfa in sfa){
       xlab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) +
       scale_x_continuous(limits=c(75,200), breaks=seq(70,200,10)) +
       scale_y_discrete(expand=c(0,0.9), limits=rev) +
-      geom_vline(data=shf[shf$name>75 | is.na(shf$name),], aes(xintercept=RS)) +
-      geom_vline(data=shf[shf$name>75 | is.na(shf$name),], aes(xintercept=CS)) 
+      geom_vline(data=shf[shf$name>75 | is.na(shf$name),], aes(xintercept=RS), linetype="dashed") +
+      geom_vline(data=shf[shf$name>75 | is.na(shf$name),], aes(xintercept=CS), linetype="dashed") 
     )
     dev.off()
   }
@@ -784,8 +787,8 @@ if(french==T){
 
 png(filename=paste0(plotsGo, "/Survey/", nickname, "/growth_BBn.png"),width=6.5, height=4, units = "in", res=420)
 ggplot() + 
-  geom_line(data=growth, aes(year, value, colour=version)) +
-  geom_point(data=growth, aes(year, value, colour=version, shape=version)) +
+  geom_line(data=growth[!growth$version %in% c("vonB only"),], aes(year, value, colour=version)) +
+  geom_point(data=growth[!growth$version %in% c("vonB only"),], aes(year, value, colour=version, shape=version)) +
   theme_bw() + 
   scale_colour_manual(values=c("black", "darkorange", "blue"), name=NULL) +
   scale_shape_discrete(name=NULL) +
@@ -1499,29 +1502,29 @@ print(exp25 + exp26 + exp27 + plot_annotation(tag_levels=c("A", "B", "C")) + plo
 dev.off()
 
 
-load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Results/Final_model_results.RData")
-mod <- data.frame(mu=DD.out$BBn$median$mu, year=DD.dat$year)
-relative.F$mu <- -log(1-relative.F$relative.F)
-
-cols <- c("relative" = "black", "modelled"="blue")
-shps <- c("relative" = 16, "modelled"=17)
-
-if(french==F) explab <- "Exploitation rate"; labs <- c("modelled", "relative")
-if(french==T) explab <- "Taux d'exploitation"; labs <- c("prédit", "relative")
-
-png(filename=paste0(plotsGo, "/Fishery/exploit_BBn_", nickname, ".png"),width=6.5, height= 4, units = "in", res=420)
-ggplot() + geom_line(data=relative.F[relative.F$bank=="BBn",], aes(year, mu, colour="relative")) + 
-  geom_point(data=relative.F[relative.F$bank=="BBn",], aes(year, mu, colour="relative", shape="relative")) +
-  geom_line(data=mod, aes(year, mu, colour="modelled")) + 
-  geom_point(data=mod, aes(year, mu, colour="modelled", shape="modelled")) +
-  ylim(0,1) +
-  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
-  ylab(explab) +
-  theme_bw() +
-  scale_colour_manual(values=cols, name="", labels=labs)+
-  scale_shape_manual(values=shps, name="", labels=labs)+
-  theme(legend.position=c(0.9, 0.9), legend.background=element_rect(fill="transparent")) 
-dev.off()
+# load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Results/Final_model_results.RData")
+# mod <- data.frame(mu=DD.out$BBn$median$mu, year=DD.dat$year)
+# relative.F$mu <- -log(1-relative.F$relative.F)
+# 
+# cols <- c("relative" = "black", "modelled"="blue")
+# shps <- c("relative" = 16, "modelled"=17)
+# 
+# if(french==F) explab <- "Exploitation rate"; labs <- c("modelled", "relative")
+# if(french==T) explab <- "Taux d'exploitation"; labs <- c("prédit", "relative")
+# 
+# png(filename=paste0(plotsGo, "/Fishery/exploit_BBn_", nickname, ".png"),width=6.5, height= 4, units = "in", res=420)
+# ggplot() + geom_line(data=relative.F[relative.F$bank=="BBn",], aes(year, mu, colour="relative")) + 
+#   geom_point(data=relative.F[relative.F$bank=="BBn",], aes(year, mu, colour="relative", shape="relative")) +
+#   geom_line(data=mod, aes(year, mu, colour="modelled")) + 
+#   geom_point(data=mod, aes(year, mu, colour="modelled", shape="modelled")) +
+#   ylim(0,1) +
+#   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
+#   ylab(explab) +
+#   theme_bw() +
+#   scale_colour_manual(values=cols, name="", labels=labs)+
+#   scale_shape_manual(values=shps, name="", labels=labs)+
+#   theme(legend.position=c(0.9, 0.9), legend.background=element_rect(fill="transparent")) 
+# dev.off()
 
 # ggplot() + geom_line(data=relative.F[relative.F$bank=="BBn",], aes(year, mu)) + 
 #   geom_point(data=relative.F[relative.F$bank=="BBn",], aes(year, mu)) +

@@ -329,7 +329,7 @@ print(lvb.par)
 
 #which bank?
 ```{r}
-bank <- "BBn"
+bank <- "Sab"
 ```
 
 # NEW data set up BBn
@@ -1176,8 +1176,8 @@ ggplot() +
               aes(AGE, ymin=value-1.96*se, ymax=value+1.96*se, group=name), alpha=0.2, show.legend=F)+
   geom_ribbon(data=preds_long[preds_long$name == "vonB",], 
               aes(AGE, ymin=vonB_low, ymax=vonB_up, group=name), alpha=0.2, show.legend=F)+
-  geom_line(data=preds_long[preds_long$name == "vonB2",], 
-            aes(AGE, value, group=name), show.legend=F, linetype="dashed") + 
+  # geom_line(data=preds_long[preds_long$name == "vonB2",], 
+  #           aes(AGE, value, group=name), show.legend=F, linetype="dashed") + 
   geom_segment(aes(y=yheight, yend=yheight, x=min(preds_long$AGE)*0.75, xend=xage), colour="red", linetype="dashed") +
   annotate(geom="text", x=min(preds_long$AGE)*0.75, y=yheight, label=yheight, colour="red", hjust=-1, vjust=-0.1)+
   annotate(geom="text", x=xage, y=min(preds_long$value)*0.75, label=round(xage,2), colour="red", vjust=-1, hjust=-0.1)+
@@ -1195,10 +1195,10 @@ ggplot() +
   annotate(geom="text", x=7, y=80, label=Linf, parse=T, hjust=0) +
   annotate(geom="text", x=7, y=75, label=K, parse=T, hjust=0) + 
   annotate(geom="text", x=7, y=70, label=t_0, parse=T, hjust=0) +
-  annotate(geom="text", x=8.5, y=85, label=shell, parse=T, hjust=0) +
-  annotate(geom="text", x=8.5, y=80, label=Linf2, parse=T, hjust=0) +
-  annotate(geom="text", x=8.5, y=75, label=K2, parse=T, hjust=0) + 
-  annotate(geom="text", x=8.5, y=70, label=t_02, parse=T, hjust=0) +
+  # annotate(geom="text", x=8.5, y=85, label=shell, parse=T, hjust=0) +
+  # annotate(geom="text", x=8.5, y=80, label=Linf2, parse=T, hjust=0) +
+  # annotate(geom="text", x=8.5, y=75, label=K2, parse=T, hjust=0) + 
+  # annotate(geom="text", x=8.5, y=70, label=t_02, parse=T, hjust=0) +
   scale_x_continuous(expand=c(0,0), limits=c(min(preds_long$AGE)*0.75, max(preds_long$AGE)*1.05))+
   scale_y_continuous(expand=c(0,0), limits=c(min(preds_long$value)*0.75, (max(preds_long$value)+1.96*max(preds_long$se, na.rm=T))*1.1))
   # expand_limits(x=min(preds_long$AGE)*0.75, y=min(preds_long$value)*0.75)

@@ -184,11 +184,10 @@ For both Sable Bank and Browns Bank North, the AIC model selection statistic sug
 
 Fitting the single model (as proposed above) did not converge, so the model was applied to the full survey dataset for each year independently (Figures \@ref(fig:mwsh-sab-1), \@ref(fig:mwsh-sab-2), \@ref(fig:mwsh-sab-3), \@ref(fig:mwsh-bbn-1), \@ref(fig:mwsh-bbn-2), \@ref(fig:mwsh-bbn-3)). This annual modelling approach has been used in other scallop populations (INSHORE). This method also enables the estimation of uncertainty, which was not previously possible. Meat weight-shell height relationships for the other subareas were also developed using the proposed method (Figures \@ref(fig:mwsh-ban), \@ref(fig:mwsh-mid), \@ref(fig:mwsh-bbs), \@ref(fig:mwsh-ger), \@ref(fig:mwsh-gbb)).
 
-## Fully-recruited size
-
-Estimates of scallop age relative to shell height are used to understand growth rates. The stock assessment model uses a separate biomass estimate and growth rate for fully-recruited scallops (scallops that are landed by the fishery), and recruiting scallops (scallops that will be fully-recruited size in one year), thus there is a need to determine the minimum shell height of scallops landed by the fishery and the shell height of those scallops one year prior.
-
-The proposed meat weight-shell height relationships were used to estimate the shell heights of fully-recruited scallop landed by the fishery, based on port sampled meat weights. The shell heights of meats landed on Sable Bank were estimated to range between 65 and 195 mm (Figure \@ref(fig:sh-ps-sab)). Less than 5% of meats landed year-round (Figure \@ref(fig:prop-ps-sab)) and during the peak spring-summer fishing season (Figure \@ref(fig:propss-ps-sab)) corresponded to shell heights below 90mm. On Browns Bank north, the shell heights of landed meats were also estimated to range between 65 and 195 mm (Figure \@ref(fig:sh-ps-bbn)). Less than 5% of meats landed year-round (Figure \@ref(fig:prop-ps-bbn)) and during the peak spring-summer fishing season (Figure \@ref(fig:propss-ps-bbn)) corresponded to shell heights below 90mm. As such, for SFA 25 and 26, we estimate the minimum shell height of fully-recruited scallop to be 90mm.
+TALK ABOUT CONDITION TS HERE
+\@ref(fig:cfts-25)
+\@ref(fig:cfts-26)
+\@ref(fig:cfts-27)
 
 
 ## Ageing
@@ -204,6 +203,13 @@ For Sable Bank, the growth parameters based on increment measurements were L∞ 
 For Browns Bank north, the growth parameters based on increment measurements were L∞ = 164.4, K = 0.2, and t0 = -0.2  (Figure \@ref(fig:vb-bbn)). The parameters based on entire shell measurements differed, but the curves were visually similar. For a scallop with a 90 mm shell height (minimum fully-recruited size), the model estimated an age of 3.81 years. We estimated the minimum shell height of recruit scallop to be the shell height one year prior, which was determined to be 73.66 mm ((Figure \@ref(fig:vb-bbn)). Residuals of the proposed model were unbiased (Figure \@ref(fig:resid-bbn)). 
 
 
+## Fully-recruited size
+
+Estimates of scallop age relative to shell height are used to understand growth rates. The stock assessment model uses a separate biomass estimate and growth rate for fully-recruited scallops (scallops that are landed by the fishery), and recruiting scallops (scallops that will be fully-recruited size in one year), thus there is a need to determine the minimum shell height of scallops landed by the fishery and the shell height of those scallops one year prior.
+
+The proposed meat weight-shell height relationships were used to estimate the shell heights of fully-recruited scallop landed by the fishery, based on port sampled meat weights. The shell heights of meats landed on Sable Bank were estimated to range between 65 and 195 mm (Figure \@ref(fig:sh-ps-sab)). Less than 5% of meats landed year-round (Figure \@ref(fig:prop-ps-sab)) and during the peak spring-summer fishing season (Figure \@ref(fig:propss-ps-sab)) corresponded to shell heights below 90mm. On Browns Bank north, the shell heights of landed meats were also estimated to range between 65 and 195 mm (Figure \@ref(fig:sh-ps-bbn)). Less than 5% of meats landed year-round (Figure \@ref(fig:prop-ps-bbn)) and during the peak spring-summer fishing season (Figure \@ref(fig:propss-ps-bbn)) corresponded to shell heights below 90mm. As such, for SFA 25 and 26, we estimate the minimum shell height of fully-recruited scallop to be 90mm.
+
+
 ## Recuit size range
 
 Combining the estimates of minimum fully-recruited size derived from the port sampling data using the proposed meat weight-shell height model, and the estimates of minimum recruit size derived from the ageing estimates, we propose a recruit size range for SFA 25 and 26 of 75-90 mm. For evaluation purposes, recruit abundance and biomass estimates (per tow) were calculated using this proposed range, and comparable ranges. For SFA 25, the previously used range was 80-90 mm, and the alternate range chosen was 80-95 mm. The proposed range of 75-90 mm resulted in higher abundance and biomass estimates of recruits than would be estimated using the other options (Figure \@ref(fig:rec-comp-25)). For SFA 26A and 26B, the alternate ranges were 85-95 mm (the previously used range for Browns Bank north and south) and 80-95 mm. The previously used range for German Bank was 95-105 mm, and it is not recommended to adjust this range at this time. For SFA 26A and B, there was no clear pattern in the estimates of recruit abundance and biomass per tow from the proposed range of 75-90mm compared to the alternate size ranges (Figure \@ref(fig:rec-comp-26)).
@@ -212,8 +218,6 @@ Combining the estimates of minimum fully-recruited size derived from the port sa
 # Model inputs
 
 ## Survey indices
-
-Figures: 
 \@ref(fig:sts-25)
 \@ref(fig:sts-26)
 \@ref(fig:sts-27)
@@ -227,18 +231,17 @@ Figures:
 \@ref(fig:shf-bbs-75)
 \@ref(fig:shf-gbb)
 \@ref(fig:shf-gbb-75)
+
+## Growth
+\@ref(fig:growth-26)
+
+## Mortality
 \@ref(fig:cts-25)
 \@ref(fig:cts-26)
 \@ref(fig:cts-27)
-
-
-## Condition and growth
-Figures:
-\@ref(fig:cfts-25)
-\@ref(fig:cfts-26)
-\@ref(fig:cfts-27)
-\@ref(fig:growth-26)
-
-## Relative fishing mortality
 \@ref(fig:relf)
+
+# Summary
+High level recap and leading to Dave's WP; a lot of this section can then be copy pasted into abstract 
+
 

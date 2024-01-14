@@ -34,7 +34,7 @@ strata
 
 ps_tab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/ps_tab.csv")
 ps_tab <- dplyr::select(ps_tab, -X, -main)
-names(ps_tab) <- c("SFA", "Management unit", "Number of samples", "Number of years with PS data", "Most recent year with PS data", "Number of months with PS data", "Long term median (mc)", "Standard deviation (mc)", "Minimum (mc)", "Maximum (mc)")
+names(ps_tab) <- c("SFA", "Management unit", "Number of samples", "Number of years with PS data", "Most recent year with PS data", "Number of months with PS data", "Long term median (mw)", "Standard deviation (mw)", "Minimum (mw)", "Maximum (mw)")
 ps_tab$`Management unit`[ps_tab$`Management unit`=="Sab"] <- "25A-Sab"
 ps_tab$`Management unit`[ps_tab$`Management unit`=="Mid"] <- "25A-Mid"
 ps_tab$`Management unit`[ps_tab$`Management unit`=="Ban"] <- "25B-Ban"

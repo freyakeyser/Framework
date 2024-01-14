@@ -195,7 +195,7 @@ write.csv(ps_tab, paste0(plotsGo, "/ps_tab.csv"))
 
 # Single bank results
 ```{r}
-bank <- "BBn"
+bank <- "Sab"
 
 bbn.dat <- port.sampling[port.sampling$bank == bank,]
 
@@ -375,12 +375,15 @@ shf <- shf[!is.na(shf$density_ps),]
 names(shf)[names(shf)=="name"] <- "bin"
 shf <- shf %>% tidyr::pivot_longer(cols = starts_with("d"))
 
+png(paste0(plotsGo, bank, "/shf_selectivity", fr, ".png"), width=6, height=8, units = "in", res=420)
 ggplot() + geom_line(data=shf, aes(shf, value, colour=name), linewidth=1) + 
   facet_wrap(~years, ncol=1, strip.position="right") +
   theme_bw() +
   scale_colour_manual(name=NULL, labels=c("Survey", "Fishery"), values=c("blue", "black")) +
   xlab("Shell height (5 mm bin)") +
-  ylab("Proportion of scallops >65 mm")
+  ylab("Proportion of scallops >65 mm") +
+  scale_y_continuous(n.breaks = 3)
+dev.off()
 
 # HERE IS THE MAIN ANALYSIS FOR the BBn Res doc, shows proportion below certain sizes
 n.bl.100 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 100) %>% dplyr::summarise(n = length(sh))
