@@ -1,36 +1,112 @@
+---
+output:
+  officedown::rdocx_document:
+    reference_docx: templates/RES2021-eng-frontmatter.docx
+    tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      topcaption: true
+      tab.lp: 'tab:'
+      caption:
+        style: Table Caption
+        pre: 'Table '
+        sep: ': '
+        tnd: 0
+        tns: '-'
+        fp_text: !expr officer::fp_text_lite(bold = TRUE)
+      conditional:
+        first_row: true
+        first_column: false
+        last_row: false
+        last_column: false
+        no_hband: false
+        no_vband: true
+    plots:
+      style: Normal
+      align: center
+      fig.lp: 'fig:'
+      topcaption: false
+      caption:
+        style: Image Caption
+        pre: 'Figure A'
+        sep: '. '
+        tnd: 0
+        tns: '-'
+        fp_text: !expr officer::fp_text_lite(bold = TRUE)
+    reference_num: true
+---
 <!-- The following code should appear at the beginning of the first appendix.
 After that, all subsequent sections will be turned into appendices. -->
 
-`r if(knitr:::is_latex_output()) '\\Appendices'`
+<!-- `r if(knitr:::is_latex_output()) '\\Appendices'` -->
 
-`r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'`
+<!-- `r if(!knitr:::is_latex_output()) '# Appendix {-}'` -->
 
-# THE FIRST APPENDIX {#app:a}
+```{r setup, echo=FALSE, cache=FALSE, message=FALSE, results='hide', warning=FALSE}
+library(knitr)
+# if (is_latex_output()) {
+#   knitr_figs_dir <- "knitr-figs-pdf/"
+#   knitr_cache_dir <- "knitr-cache-pdf/"
+#   fig_out_type <- "png"
+# } else {
+#   knitr_figs_dir <- "knitr-figs-docx/"
+#   knitr_cache_dir <- "knitr-cache-docx/"
+#   fig_out_type <- "png"
+# }
+# fig_asp <- 0.618
+# fig_width <- 9
+# fig_out_width <- "6in"
+# fig_dpi <- 180
+# fig_align <- "center"
+# fig_pos <- "htb"
+opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  # fig.path = knitr_figs_dir,
+  # cache.path = knitr_cache_dir,
+  # fig.asp = fig_asp,
+  # fig.width = fig_width,
+  # out.width = fig_out_width,
+  echo = FALSE#,
+  # #  autodep = TRUE,
+  # #  cache = TRUE,
+  # cache.comments = FALSE,
+  # dev = fig_out_type,
+  # dpi = fig_dpi,
+  # fig.align = fig_align,
+  # fig.pos = fig_pos
+)
+```
 
-Content here.
+```{r, eval=TRUE, echo=FALSE}
+# First chunk to fetch the image size and calculate its aspect ratio
+img <- magick::image_read("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/framework5/shf_survey_75plus_Sab.png") # read the image using the magic library
 
-## a-1 {#app:a-1}
+img.asp <- magick::image_info(img)$height /  magick::image_info(img)$width # calculate the figures aspect ratio
+```
 
-Content here.
+# APPENDIX {#app:a}
 
-
-```{r shf-sab-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Sable Bank. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."}
+```{r shf-sab-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Sable Bank. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_75plus_Sab.png"))
 ```
 
-```{r shf-bbn-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Browns Bank North. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."}
+```{r shf-bbn-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Browns Bank North. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_75plus_BBn.png"))
 ```
 
-```{r shf-bbs-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Browns Bank South. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."}
+```{r shf-bbs-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Browns Bank South. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_BBs.png"))
 ```
 
-```{r shf-ger-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on German Bank (only surveys with lined gear are displayed). Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."}
+```{r shf-ger-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on German Bank (only surveys with lined gear are displayed). Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_Ger.png"))
 ```
 
-```{r shf-gbb-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Georges Bank 'b'. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."}
+```{r shf-gbb-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Georges Bank 'b'. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_GBb.png"))
 ```
 

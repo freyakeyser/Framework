@@ -12,3 +12,4 @@
 - Body text style
 - make olex, ageing & CF-ts plots 80% size
 - landscape page for strata table per https://www.abdn.ac.uk/toolkit/documents/uploads/msword_landscapeheadersfooters.pdf
+- delete extra space above Appendix section

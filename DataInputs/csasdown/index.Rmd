@@ -61,6 +61,7 @@ output:
    lot_lof: false
    draft_watermark: false
    include_section_nums: true
+   global_numbering: true
    # highlight is the theme to use for code output. Must be one of the list given by:
    # which are:
    # the csasdown library 'themes' directory, this directory on your machine:
@@ -131,7 +132,7 @@ fr <- ""
 #fr <- "_fr"
 if(fr=="") language <- "english"
 if(!fr=="") language <- "french"
-nickname <- "framework5"
+nickname <<- "framework5"
 
 if(nickname=="framework5") MWSH <- "_newMWSH"
 if(nickname=="framework2") MWSH <- "_oldMWSH"

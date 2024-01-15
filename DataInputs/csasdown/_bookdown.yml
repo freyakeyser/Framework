@@ -4,6 +4,6 @@ rmd_files: ["tmp-index.Rmd",
             "tmp-02-references.Rmd",
             "tmp-03-tables.Rmd",
             "tmp-04-figures.Rmd",
-            "tmp-05-appendix.Rmd",
+            #"tmp-05-appendix.Rmd",
             "tmp-06-formatting.Rmd"]
 delete_merged_file: true

@@ -24,6 +24,9 @@ fig:map-ger
 fig:sfoot-26
 fig:map-gbb
 fig:sfoot-27
+fig:mwsh-sab-1
+fig:mwsh-sab-2
+fig:mwsh-sab-3
 fig:mwsh-sab-rs-1
 fig:mwsh-sab-rs-2
 fig:mwsh-sab-rs-3
@@ -31,9 +34,9 @@ fig:mwsh-sab-rm-1
 fig:mwsh-sab-rm-2
 fig:mwsh-sab-rm-3
 fig:mwsh-sab-depth
-fig:mwsh-sab-1
-fig:mwsh-sab-2
-fig:mwsh-sab-3
+fig:mwsh-bbn-1
+fig:mwsh-bbn-2
+fig:mwsh-bbn-3
 fig:mwsh-bbn-rs-1
 fig:mwsh-bbn-rs-2
 fig:mwsh-bbn-rs-3
@@ -41,9 +44,6 @@ fig:mwsh-bbn-rm-1
 fig:mwsh-bbn-rm-2
 fig:mwsh-bbn-rm-3
 fig:mwsh-bbn-depth
-fig:mwsh-bbn-1
-fig:mwsh-bbn-2
-fig:mwsh-bbn-3
 fig:mwsh-ban
 fig:mwsh-mid
 fig:mwsh-bbs
@@ -81,11 +81,6 @@ fig:cts-25
 fig:cts-26
 fig:cts-27
 fig:relf
-fig:shf-sab-75
-fig:shf-bbn-75
-fig:shf-bbs-75
-fig:shf-ger-75
-fig:shf-gbb-75
 introduction
 species-biology
 framework-objectives
@@ -118,6 +113,4 @@ survey-indices
 growth
 mortality
 summary
-app:a
-app:a-1
 formatting-to-do
