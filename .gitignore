@@ -86,3 +86,5 @@ markdown/
 #cache
 .rdx
 .rdb
+*.rdb
+*.rdx
