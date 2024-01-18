@@ -335,7 +335,7 @@ bankpertow_all$subarea[bankpertow_all$bank=="BBs"] <- "26B"
 bankpertow_all$subarea[bankpertow_all$bank=="Ger"] <- "26C"
 bankpertow_all$subarea[bankpertow_all$bank=="GBb"] <- "27B"
 
-# only show proposed recsize
+# only show new recsize
 bankpertow_all <- bankpertow_all[!bankpertow_all$recsize %in% "80-95",]
 
 sfa <- c(25,26)
@@ -509,13 +509,13 @@ cfts_old$sfa[cfts_old$bank %in% c("GBb")] <- 27
 if(french==F){
   version <- "Model"
   cfts_old$version <- "original"
-  cfts$version<- "proposed"
+  cfts$version<- "new"
 }
 
 if(french==T){
   version <- "Modèle"
   cfts_old$version <- "original"
-  cfts$version<- "proposé"
+  cfts$version<- "nouveau"
 }
 
 cfts <- full_join(cfts, cfts_old)
@@ -678,6 +678,31 @@ for(sfa in sfa){
   dev.off()
 }
 
+# Long term median table
+tab_clap <- clappertow %>% group_by(subarea, liner, index) %>%
+  summarize(LTM=median(index.val, na.rm=T))
+tab_cf <- cfts %>% 
+  filter(version=="new") %>%
+  group_by(subarea, type) %>%
+  summarize(LTM=median(CF, na.rm=T)) %>%
+  mutate(index="CF", liner=type) %>%
+  select(-type)
+
+bankpertow_all_sub <- bankpertow_all[bankpertow_all$recsize=="75-90" | bankpertow_all$subarea=="27B",]
+
+tab_sts <- bankpertow_all_sub %>% 
+  group_by(subarea, liner, index, size) %>%
+  summarize(LTM=median(index.val, na.rm=T)) %>%
+  mutate(index =paste0(index, size)) %>%
+  select(-size)
+
+tab_sts <- full_join(tab_clap, tab_cf) %>% full_join(tab_sts) %>%
+  pivot_wider(names_from = index, values_from = LTM) %>%
+  arrange(subarea, liner) %>%
+  dplyr::relocate(subarea, liner, NPR, NR, NFR, IPR, IR, IFR, clapsPre, clapsRec, clapsCom, CF)
+write.csv(file = paste0(plotsGo, "/surveyIndices.csv"), tab_sts)
+
+
 sfa <- c(25, 26, 27)
 ### Shell height frequency
 for(sfa in sfa){
@@ -766,7 +791,7 @@ growth <- data.frame(bank="BBn", year=mod.dat$BBn$year, g2=mod.dat$BBn$g2, gR2 =
 
 load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input_framework_vonB_75-90RSCS_newMWSH.RData")
 growth <- rbind(growth, 
-                data.frame(bank="BBn", year=mod.dat$BBn$year, g2=mod.dat$BBn$g2, gR2 = mod.dat$BBn$gR2, version="proposed")
+                data.frame(bank="BBn", year=mod.dat$BBn$year, g2=mod.dat$BBn$g2, gR2 = mod.dat$BBn$gR2, version="new")
                 )
 load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input_framework_vonB_origRSCS_oldMWSH.RData")
 growth <- rbind(growth, 
@@ -776,12 +801,13 @@ growth <- pivot_longer(data = growth, cols = c("g2", "gR2"))
 
 growth$name <- gsub(x=growth$name, pattern="g2", replacement="Fully recruited")
 growth$name <- gsub(x=growth$name, pattern="gR2", replacement="Recruit")
+growth$name <- factor(growth$name, levels=c("Recruit", "Fully recruited"))
 
-growth$version <- factor(growth$version, levels=c("proposed", "vonB only", "original"))
+growth$version <- factor(growth$version, levels=c("new", "vonB only", "original"))
 
 if(french==T){
   growth$version <- gsub(x=growth$version, pattern="original", replacement="original")
-  growth$version <- gsub(x=growth$version, pattern="proposed", replacement="proposé")
+  growth$version <- gsub(x=growth$version, pattern="new", replacement="nouveau")
   growth$version <- gsub(x=growth$version, pattern="vonB only", replacement="vonB seulement")
 }
 

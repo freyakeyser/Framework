@@ -1,6 +1,8 @@
 ---
-output: html_document
-editor_options: 
+output:
+  word_document: default
+  html_document: default
+editor_options:
   chunk_output_type: console
 ---
 \clearpage
@@ -97,6 +99,36 @@ age_summary <- dplyr::select(age_summary, bank, year, tows, shells, increments, 
 age_summary$bank[age_summary$bank=="Sab"] <- "25A-Sab"
 age_summary$bank[age_summary$bank=="BBn"] <- "26A-BBn"
 names(age_summary) <- c("Management unit", "Year", "Number of tows", "Number of shells", "Number of increments")
+
+
+tab_sts <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/surveyIndices.csv")
+tab_sts <- tab_sts %>% mutate(across(c("NPR", "NR", "NFR", "IPR", "IR", "IFR", "clapsPre", "clapsRec", "clapsCom", "CF"), round, 2)) %>%
+  select(-X) %>%
+rename(Subarea = subarea,
+       Gear = liner,
+       `N per tow (PR)` = NPR,
+       `N per tow (R)` = NR,
+       `N per tow (FR)` = NFR,
+       `kg per tow (PR)` = IPR,
+       `kg per tow (R)` = IR,
+       `kg per tow (FR)` = IFR,
+       `% Clap per tow (PR)` = clapsPre,
+       `% Clap per tow (R)` = clapsRec,
+       `% Clap per tow (FR)` = clapsCom,
+       `Condition (100 mm SH)` = CF) %>%
+# rename(A = subarea,
+#        B = liner,
+#        C = NPR,
+#        D = NR,
+#        E = NFR,
+#        F = IPR,
+#        G = IR,
+#        H= IFR,
+#        I = clapsPre,
+#        J = clapsRec,
+#        K = clapsCom,
+#        L = CF) %>%
+  as_tibble()
 
 opts <- options(knitr.kable.NA = "")
 
@@ -206,3 +238,20 @@ csas_table(inc, caption ="Summary of age assignments and measurements by managem
 
 #<!---BLOCK_LANDSCAPE_START--->
 ```
+
+```{r tab-sts, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+csas_table(tab_sts, caption ="Long term medians (up to and including 2022 data, except for SFA 26C unlined gear) for survey indices.") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+
