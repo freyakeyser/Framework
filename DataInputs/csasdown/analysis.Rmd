@@ -342,16 +342,16 @@ sfa <- c(25,26)
 for(sfa in sfa){
   
   N <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
-                            aes(year, index.val, colour=bank, group=recsize)) +
+                            aes(year, index.val, colour=subarea, group=recsize)) +
     geom_point(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
-               aes(year, index.val, colour=bank, shape=recsize)) +
+               aes(year, index.val, colour=subarea, shape=recsize)) +
     #geom_errorbar(data=bankpertow_all, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
     geom_ribbon(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
-                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank, group=recsize), alpha=0.3)+
+                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=subarea, group=recsize), alpha=0.3)+
     theme_bw() +
     # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
     #            scales="free_y")
-    facet_wrap(~bank, ncol=1,
+    facet_wrap(~subarea, ncol=1,
                scales="free_y",
                strip.position="top") +
     theme(strip.background=element_blank()) +
@@ -364,16 +364,16 @@ for(sfa in sfa){
     ylab(parse(text=as.character(unique(bankpertow_all$index_rec[bankpertow_all$index=="N" & bankpertow_all$size=="R"]))))
   
   I <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
-                            aes(year, index.val, colour=bank, group=recsize)) +
+                            aes(year, index.val, colour=subarea, group=recsize)) +
     geom_point(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
-               aes(year, index.val, colour=bank, shape=recsize)) +
+               aes(year, index.val, colour=subarea, shape=recsize)) +
     #geom_errorbar(data=bankpertow_all, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
     geom_ribbon(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
-                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=bank, group=recsize), alpha=0.3)+
+                aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=subarea, group=recsize), alpha=0.3)+
     theme_bw() +
     # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
     #            scales="free_y")
-    facet_wrap(~bank, ncol=1,
+    facet_wrap(~subarea, ncol=1,
                scales="free_y",
                strip.position="top") +
     theme(strip.background=element_blank()) +

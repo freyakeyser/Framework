@@ -125,22 +125,34 @@ medians2$monthyr <- ymd(paste0(medians2$year, "-01-01"))
 medians2$ndaysyr <- as.numeric(strftime(ymd(paste0(medians2$year, "12-31")), "%j"))
 medians2$xend <- ymd(medians2$monthyr) + years(1)
 
-if(french==F) ylabel <- "Meat weight (median, g)"
-if(french==T) ylabel <- "Masse de la chair (médiane, g)"
+if(french==F) ylabel <- "Meat weight (g)"
+if(french==T) ylabel <- "Masse de la chair (g)"
+
+medians2$sfa <- medians2$bank
+medians2$sfa <- gsub(x=medians2$sfa, pattern="BBn", replacement = "26A")
+medians2$sfa <- gsub(x=medians2$sfa, pattern="Sab", replacement = "25A-Sab")
+medians$sfa <- medians$bank
+medians$sfa <- gsub(x=medians$sfa, pattern="BBn", replacement = "26A")
+medians$sfa <- gsub(x=medians$sfa, pattern="Sab", replacement = "25A-Sab")
+
+medians$monthnum <- as.numeric(medians$monthyr - min(medians$monthyr))
+medians2$monthnum <- as.numeric(medians2$monthyr - min(medians$monthyr))
+labs <- unique(medians2[,c("monthnum", "monthyr")])
+labs$monthnum <- -labs$monthnum
 
 png(paste0(plotsGo, "medians_long_vert", fr, ".png"), width=6.5, height=8, units = "in", res=420)
 ggplot() +
   # geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
-  geom_segment(data=medians2[medians2$bank %in% c("BBn", "Sab"),],mapping=aes(x=monthyr, xend=xend,y=annual_med, yend=annual_med), colour="blue", linewidth=1) +
-  geom_errorbar(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)), width=0)+
-  geom_point(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, monthly_med)) +
-  geom_text(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr + months(6), 0, label=nsamples_yr), vjust=0.5, hjust=1.1, colour="blue")+
+  geom_segment(data=medians2[medians2$bank %in% c("BBn", "Sab"),],mapping=aes(x=-monthnum, xend=-monthnum-365, y=annual_med, yend=annual_med), colour="blue", linewidth=1) +
+  geom_errorbar(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(x=-monthnum, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)), width=0)+
+  geom_point(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(-monthnum, monthly_med)) +
+  geom_text(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(-monthnum - (365/2), 0, label=nsamples_yr), vjust=0.5, hjust=1.1, colour="blue")+
   #geom_line(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med), group=1, size=1) +
-  facet_wrap(~bank, ncol=2) +
+  facet_wrap(~sfa, ncol=2) +
   ylab(ylabel) +
   xlab("Date")+
   theme_bw() +
-  scale_x_date(breaks="1 year", date_labels = "%m/%Y") + 
+  scale_x_continuous(breaks=labs$monthnum, labels=strftime(labs$monthyr, "%m/%Y"))+#, date_labels = "%m/%Y") + 
   scale_y_continuous(expand=c(0.25,0)) +
   coord_flip() 
 dev.off()
@@ -257,9 +269,15 @@ bbn.dat$year_month <- date(paste0(year(bbn.dat$date),"-",bbn.dat$month,'-01'))
 bbn.dat$mod.day <- as.numeric(bbn.dat$year_month - as.Date("2010-05-24"))/100
 bbn.dat$year <- year(bbn.dat$date)
 
+bbn.dat$surv.year <- bbn.dat$year
+bbn.dat$surv.year[bbn.dat$month %in% 1:5 & bbn.dat$sfa %in% 25:26 ] <- bbn.dat$year[bbn.dat$month %in% 1:5 & bbn.dat$sfa %in% 25:26]-1
+bbn.dat$surv.year[bbn.dat$month %in% 1:8 & bbn.dat$sfa %in% 27] <- bbn.dat$year[bbn.dat$month %in% 1:8 & bbn.dat$sfa %in% 27]-1
+
+years <- unique(bbn.dat$surv.year)
+
 for(i in 1:length(years))
 {
-  may.mws[[as.character(years[i])]] <-  na.omit(mw[[bank]][mw[[bank]]$year == years[i],]) # get BBn and chuck the na's
+  may.mws[[as.character(years[i])]] <-  na.omit(mw[[bank]][mw[[bank]]$surv.year == years[i],]) # get BBn and chuck the na's
   may.mws[[as.character(years[i])]]$sh_3 <- (may.mws[[as.character(years[i])]]$sh/100)^3 # cube the SH's
   may.mws[[as.character(years[i])]]$sh <- (may.mws[[as.character(years[i])]]$sh/100) # sh in decimeters
   # Run the model and save the results
@@ -269,7 +287,7 @@ for(i in 1:length(years))
   f.mws <- NULL
   fix.slope <- cf.data[[bank]]$CF.fit$mw.sh.coef[cf.data[[bank]]$CF.fit$mw.sh.coef$year==years[i],]$fix.slope[1]
   fix.int <- cf.data[[bank]]$CF.fit$mw.sh.coef[cf.data[[bank]]$CF.fit$mw.sh.coef$year==years[i],]$fix.int[1]
-  bbn.dat$sh[bbn.dat$year == years[i]] <- ((bbn.dat$meat_weight[bbn.dat$year == years[i]]/exp(fix.int))^ (1/fix.slope))*100
+  bbn.dat$sh[bbn.dat$surv.year == years[i]] <- ((bbn.dat$meat_weight[bbn.dat$surv.year == years[i]]/exp(fix.int))^ (1/fix.slope))*100
   # What is the shell height being targeted in may
   # old model
   # bbn.dat$sh[bbn.dat$year == years[i]] <- 100*(bbn.dat$meat_weight[bbn.dat$year == years[i]]/all.may$a[i])^(1/3)
@@ -285,9 +303,9 @@ sh.plt <- ggplot(bbn.dat,aes(date,sh)) +
   scale_y_continuous(breaks = seq(0,200,by=5)) +
   xlab("") + 
   ylab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) 
-png(paste0(plotsGo, bank, "/timeseries_sh", fr, ".png"), width=6.5, height=4, units = "in", res=420)
+#png(paste0(plotsGo, bank, "/timeseries_sh", fr, ".png"), width=6.5, height=4, units = "in", res=420)
 print(sh.plt)
-dev.off()
+#dev.off()
 
 # ggplot() + 
 #   geom_density_ridges_gradient(data=bbn.dat, aes(x=sh, y=as.factor(year), group=year), 
@@ -296,7 +314,7 @@ dev.off()
 #                                ) +
 png(paste0(plotsGo, bank, "/shf_ps", fr, "_new.png"), width=6.5, height=8, units = "in", res=420)
 ggplot() + 
-  geom_density_ridges(data=bbn.dat, aes(x = sh, y = as.factor(year), height = stat(density)),
+  geom_density_ridges(data=bbn.dat, aes(x = sh, y = as.factor(surv.year), height = stat(density)),
                       stat = "binline", bins = 40, scale = 0.9, draw_baseline = F) +
   theme_bw() +
   ylab(en2fr("Year",translate=french, custom_terms=rosetta_terms)) + 
@@ -308,7 +326,7 @@ dev.off()
 
 
 # combine with survey SHF
-shf <- SHF.summary$BBn
+shf <- SHF.summary[[bank]]
 names(shf)[1] <- "years"
 shf <- shf %>% tidyr::pivot_longer(cols = starts_with("V"))
 shf$name <- gsub(x=shf$name, pattern="V", replacement="")
@@ -330,7 +348,7 @@ bins <- data.frame(shf=rep(seq(65,199.9,0.1), length(unique(shf$years))), name=r
 shf <- full_join(shf, bins)
 
 shf <- left_join(data.frame(years = min(shf$years, na.rm=T):max(shf$years, na.rm=T)), shf)
-shf$bank <- "BBn"
+shf$bank <- bank
 
 shfps <- bbn.dat[!is.na(bbn.dat$sh),]
 shfps <- shfps[shfps$sh>65,]
@@ -338,12 +356,12 @@ shfps <- shfps[shfps$month %in% c(5,6),]
 
 shfps.yr <- shfps %>%
   dplyr::mutate(bin = cut(sh, breaks=seq(65,210,5))) %>%
-  dplyr::group_by(year) %>%
+  dplyr::group_by(surv.year) %>%
   dplyr::summarize(total=n())
 
 shfps <- shfps %>%
   dplyr::mutate(bin = cut(sh, breaks=seq(65,210,5))) %>%
-  dplyr::group_by(year, bin) %>%
+  dplyr::group_by(surv.year, bin) %>%
   dplyr::summarize(value=n())
 
 shfps <- left_join(shfps, shfps.yr)
@@ -355,15 +373,15 @@ shfps$name <- bins
 #stringr::str_detect(shfps$bin, pattern = shfps$name) # just a check
 
 # bins <- data.frame(name=as.character(rep(seq(5,210,5), length(unique(shfps$year)))), year=rep(unique(shfps$year), each=42))
-bins <- data.frame(shf=rep(seq(65,209.9,0.1), length(unique(shfps$year))), name=rep(rep(seq(70,210,5), each=50), length(unique(shfps$year))), year=rep(unique(shfps$year), each=1450))
+bins <- data.frame(shf=rep(seq(65,209.9,0.1), length(unique(shfps$surv.year))), name=rep(rep(seq(70,210,5), each=50), length(unique(shfps$surv.year))), surv.year=rep(unique(shfps$surv.year), each=1450))
 shfps$name <- as.numeric(shfps$name)
 
 shfps <- full_join(shfps, bins)
 
-shfps <- left_join(data.frame(year = min(shfps$year, na.rm=T):max(shfps$year, na.rm=T)), shfps)
-shfps$bank <- "BBn"
+shfps <- left_join(data.frame(surv.year = min(shfps$surv.year, na.rm=T):max(shfps$surv.year, na.rm=T)), shfps)
+shfps$bank <- bank
 
-shfps <- dplyr::select(shfps, bank, year, name, shf, density)
+shfps <- dplyr::select(shfps, bank, surv.year, name, shf, density)
 shfps$density[is.na(shfps$density)] <- 0
 names(shfps) <- c("bank", "years", "name", "shf", "density_ps")
 shfps$name <- as.numeric(shfps$name)
@@ -438,6 +456,9 @@ prop.bl.85$lim <- "<85"
 overall <- full_join(full_join(full_join(prop.bl.100, prop.bl.95), prop.bl.90), prop.bl.85)
 overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
 
+# for text:
+overall %>% group_by(lim) %>% summarize(median(prop))
+
 if(french==F) {
   ylabel <- "Proportion of meats"
 }
@@ -487,6 +508,9 @@ prop.bl.85.ss$lim <- "<85"
 
 overall <- full_join(full_join(full_join(prop.bl.100.ss, prop.bl.95.ss), prop.bl.90.ss), prop.bl.85.ss)
 overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
+
+# for text:
+overall %>% group_by(lim) %>% summarize(median(prop))
 
 # This is basically under 1%, which I think will be fine.
 ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +

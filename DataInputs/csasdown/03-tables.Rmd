@@ -20,7 +20,7 @@ require(dplyr)
 strata <- readxl::read_excel("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/survey_design.xlsx")
 strata$`Area (km^2)` <- round(x=as.numeric(strata$`Area (km^2)`), digits=2)
 strata <- strata[c(1:17, 25:29),] # to exclude GBa
-opts <- options(knitr.kable.NA = "")
+names(strata)[which(names(strata)=="Area (km^2)")] <- "Area (km^2^)"
 strata$`Management Unit`[strata$`Management Unit`=="Sab"] <- "25A-Sab"
 strata$`Management Unit`[strata$`Management Unit`=="Mid"] <- "25A-Mid"
 strata$`Management Unit`[strata$`Management Unit`=="Ban"] <- "25B-Ban"
@@ -28,7 +28,7 @@ strata$`Management Unit`[strata$`Management Unit`=="BBn"] <- "26A-BBn"
 strata$`Management Unit`[strata$`Management Unit`=="BBs"] <- "26B-BBs"
 strata$`Management Unit`[strata$`Management Unit`=="Ger"] <- "26C-Ger"
 strata$`Management Unit`[strata$`Management Unit`=="GBb"] <- "27B-GBb"
-strata
+strata$`Area (km^2^)`[is.na(strata$`Area (km^2^)`)] <- "NA"
 
 
 # strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
@@ -144,7 +144,7 @@ opts <- options(knitr.kable.NA = "")
 #   )
 # )
 
-csas_table(ps_tab, caption ="Port sampling data summary.") %>% 
+csas_table(ps_tab, caption ="Summary of port sampling data for SFAs 25, 26, and 27B from 2006—2022, describing sampling distribution and meat weights (mw) in grams (g).") %>% 
   kableExtra::row_spec(0,bold=TRUE) %>% 
   kableExtra::row_spec(0,bold=ifelse(ps_tab$`Management unit`%in% c("26A-BBn", "25A-Sab"), TRUE, FALSE))
 
@@ -162,7 +162,7 @@ csas_table(ps_tab, caption ="Port sampling data summary.") %>%
 #   )
 # )
 
-csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(strata, caption ="Current survey design and allocation information for SFAs 25, 26, and 27B. Stratum areas are provided in square kilometres (km^2^), and Universal Transverse Mercator Zones area in the northern hemisphere. Catch rates used for stratification are reported in kilograms per hour-metre (kg/hm). Some columns are not applicable (NA) for certain management units.") %>% kableExtra::row_spec(0,bold=TRUE)
 #qflextable(strata)
 
 #<!---BLOCK_LANDSCAPE_START--->
@@ -177,7 +177,7 @@ csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0
 #   )
 # )
 
-csas_table(mwsh, caption ="Meat weight-shell height model comparison results.") %>% 
+csas_table(mwsh, caption ="Meat weight-shell height model specifications for SFA 25A Sable Bank and SFA 26A Browns Bank North. The response variable in all models was wet meat weight (wmw). Explanatory variables tested include shell height (log-transformed and centred; log.sh.cen), year, and depth (centred; depth.cen). Comparisons were based on degrees of freedom (df) and the difference in Akaike’s Information Criterion (dAIC).") %>% 
   kableExtra::row_spec(0,bold=TRUE)
 
 #qflextable(strata)
@@ -217,7 +217,7 @@ csas_table(mwsh, caption ="Meat weight-shell height model comparison results.") 
 #   )
 # )
 
-csas_table(age_summary, caption ="Aged shells by management unit.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(age_summary, caption ="Tow, shell, and increment counts associated with age analysis for SFA 25A Sable Bank and SFA 26A Browns Bank North.") %>% kableExtra::row_spec(0,bold=TRUE)
 
 #qflextable(strata)
 
@@ -232,7 +232,7 @@ csas_table(age_summary, caption ="Aged shells by management unit.") %>% kableExt
 #     type="continuous"
 #   )
 # )
-csas_table(inc, caption ="Summary of age assignments and measurements by management unit. Increment height is measured in millimetres. Standard deviation in increment height is provided in parentheses.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(inc, caption ="Summary of age assignments and measurements for SFA 25A Sable Bank and SFA 26A Browns Bank North. Median increment height is measured in millimetres (mm). Standard deviation (SD) in increment height is provided in parentheses.") %>% kableExtra::row_spec(0,bold=TRUE)
 
 #qflextable(strata)
 
@@ -247,7 +247,7 @@ csas_table(inc, caption ="Summary of age assignments and measurements by managem
 #     type="continuous"
 #   )
 # )
-csas_table(tab_sts, caption ="Long term medians (up to and including 2022 data, except for SFA 26C unlined gear) for survey indices.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(tab_sts, caption =": Long term medians (up to and including 2022 data, except for SFA 26C unlined gear) for survey indices by SFA subarea (management unit). Abundance is represented by number (N) of scallops per tow, biomass is represented by kilograms (kg) of scallop per tow, natural mortality is represented by the percentage (%) of clappers out of the total number of scallops and clappers per tow, and condition is the weight in grams (g) predicted for a 100 millimetre (mm) shell height. Indices are categorized by size class: pre-recruit (PR), recruit (R), and fully-recruited (FR).") %>% kableExtra::row_spec(0,bold=TRUE)
 
 #qflextable(strata)
 
