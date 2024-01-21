@@ -26,8 +26,7 @@ cat_no: "Fs70-5/2022-006E-PDF"
 french_region: "Région des Maritimes"
 citation_other_language: "Keyser, F., Pearo Drew, T., Glass, A., et Keith, D. L'évaluation de petoncles dans les zones de pêche"
 abstract: |
-  Here is the abstract text. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-  Start new paragraphs after a blank line and with 2 spaces indent. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  This document presents the fishery and survey data used for the provision of stock assessment advice for offshore Scallop Fishing Areas 25 (Middle Bank, Sable Bank, and Banquereau Bank), 26 (Browns Bank North, Browns Bank South, and German Bank), and 27B (Georges Bank ‘b’). A new approach was developed for meat weight-shell height modelling, resulting in estimates of condition instead of condition factor. Age analysis of shell growth rings (increments) resulted in new von Bertalanffy growth curves for SFA 25A Sable Bank and SFA 26A Browns Bank North. Combining annual growth information from the Fisheries and Oceans Canada Maritimes Offshore Scallop Survey with commercial fishery port sampling data informed changes to the recruit size ranges for SFA 25A, 25B, 26A, and 26B. The survey indices of biomass, growth, and natural mortality provided here may be used in the observation equation of a state-space delay-difference population model.
 french_abstract: |
   Voici le texte du résumé. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
   
@@ -59,7 +58,7 @@ output:
    line_nums: true
    line_nums_mod: 1
    lot_lof: false
-   draft_watermark: false
+   draft_watermark: true
    include_section_nums: true
    global_numbering: true
    # highlight is the theme to use for code output. Must be one of the list given by:
@@ -110,7 +109,9 @@ opts_chunk$set(
   dev = fig_out_type,
   dpi = fig_dpi,
   fig.align = fig_align,
-  fig.pos = fig_pos
+  fig.pos = fig_pos,
+  fig.cap.sep = ". ",
+  tab.cap.sep = ". "
 )
 ```
 
@@ -125,7 +126,7 @@ params <- NULL
 params$bank <- c("Ban", "Mid", 
   "Sab", "Ger", "BBs", "BBn", "GBb")
 params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022, 2022)
-params$bankname <- c("Banquereau", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North", "Georges Bank 'b'")
+params$bankname <- c("Banquereau Bank", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North", "Georges Bank 'b'")
 params$banknum <- 1:length(params$bank)
 
 fr <- ""

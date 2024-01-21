@@ -58,13 +58,13 @@ fig:resid-sab
 fig:vb-bbn
 fig:resid-bbn
 fig:sh-ps-sab
-fig:sh-sel-sab
 fig:prop-ps-sab
 fig:propss-ps-sab
+fig:sh-sel-sab
 fig:sh-ps-bbn
-fig:sh-sel-bbn
 fig:prop-ps-bbn
 fig:propss-ps-bbn
+fig:sh-sel-bbn
 fig:rec-comp-25
 fig:rec-comp-26
 fig:sts-25

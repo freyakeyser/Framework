@@ -11,10 +11,10 @@ output:
       caption:
         style: Table Caption
         pre: 'Table '
-        sep: ': '
+        sep: '. '
         tnd: 0
         tns: '-'
-        fp_text: !expr officer::fp_text_lite(bold = TRUE)
+        fp_text: !expr officer::fp_text_lite(bold = FALSE)
       conditional:
         first_row: true
         first_column: false
@@ -33,7 +33,7 @@ output:
         sep: '. '
         tnd: 0
         tns: '-'
-        fp_text: !expr officer::fp_text_lite(bold = TRUE)
+        fp_text: !expr officer::fp_text_lite(bold = FALSE)
     reference_num: true
 ---
 <!-- The following code should appear at the beginning of the first appendix.
@@ -90,23 +90,23 @@ img.asp <- magick::image_info(img)$height /  magick::image_info(img)$width # cal
 
 # APPENDIX {#app:a}
 
-```{r shf-sab-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Sable Bank. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+```{r shf-sab-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 25A Sable Bank in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_75plus_Sab.png"))
 ```
 
-```{r shf-bbn-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Browns Bank North. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+```{r shf-bbn-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 26A Browns Bank North in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_75plus_BBn.png"))
 ```
 
-```{r shf-bbs-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Browns Bank South. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+```{r shf-bbs-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 26B Browns Bank South in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_BBs.png"))
 ```
 
-```{r shf-ger-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on German Bank (only surveys with lined gear are displayed). Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+```{r shf-ger-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 26C German Bank in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_Ger.png"))
 ```
 
-```{r shf-gbb-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Georges Bank 'b'. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+```{r shf-gbb-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 27B Georges Bank 'b' in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_GBb.png"))
 ```
 

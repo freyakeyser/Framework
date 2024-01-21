@@ -6,3 +6,10 @@ rmd_files: ["tmp-index.Rmd",
             "tmp-04-figures.Rmd",
             "tmp-06-formatting.Rmd"]
 delete_merged_file: true
+
+language:
+  label:
+    fig: !expr function(x) sprintf("Figure %s. ", x)
+
+
+

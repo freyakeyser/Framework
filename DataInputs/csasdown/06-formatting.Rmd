@@ -14,6 +14,6 @@
 - landscape page for strata table per https://www.abdn.ac.uk/toolkit/documents/uploads/msword_landscapeheadersfooters.pdf
 - delete extra space above Appendix section
 - equation citations (add #(N) to get number)
-- move references to reference section and make hanging
+- make references hanging
 
 

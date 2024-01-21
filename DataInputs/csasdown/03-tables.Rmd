@@ -247,7 +247,7 @@ csas_table(inc, caption ="Summary of age assignments and measurements for SFA 25
 #     type="continuous"
 #   )
 # )
-csas_table(tab_sts, caption =": Long term medians (up to and including 2022 data, except for SFA 26C unlined gear) for survey indices by SFA subarea (management unit). Abundance is represented by number (N) of scallops per tow, biomass is represented by kilograms (kg) of scallop per tow, natural mortality is represented by the percentage (%) of clappers out of the total number of scallops and clappers per tow, and condition is the weight in grams (g) predicted for a 100 millimetre (mm) shell height. Indices are categorized by size class: pre-recruit (PR), recruit (R), and fully-recruited (FR).") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(tab_sts, caption ="Long term medians (up to and including 2022 data, except for SFA 26C unlined gear) for survey indices by SFA subarea (management unit). Abundance is represented by number (N) of scallops per tow, biomass is represented by kilograms (kg) of scallop per tow, natural mortality is represented by the percentage (%) of clappers out of the total number of scallops and clappers per tow, and condition is the weight in grams (g) predicted for a 100 millimetre (mm) shell height. Indices are categorized by size class: pre-recruit (PR), recruit (R), and fully-recruited (FR).") %>% kableExtra::row_spec(0,bold=TRUE)
 
 #qflextable(strata)
 

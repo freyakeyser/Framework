@@ -35,8 +35,8 @@ yeartable <- summary_data$yeartable
 spatial.sum.stats <- summary_data$spatial.sum.stats
 
 bank <- data.frame(lab = c("Ban", "BanIce", "Mid", "Sab", "Ger", "BBn", "BBs", "GB", "GBa", "GBb"), name=NA)
-bank$name[bank$lab=="Ban"] <- "Banquereau (Sea scallop)"
-bank$name[bank$lab=="BanIce"] <- "Banquereau (Icelandic scallop)"
+bank$name[bank$lab=="Ban"] <- "Banquereau Bank (Sea scallop)"
+bank$name[bank$lab=="BanIce"] <- "Banquereau Bank (Icelandic scallop)"
 bank$name[bank$lab=="Mid"] <- "Middle Bank"
 bank$name[bank$lab=="Sab"] <- "Sable Bank"
 bank$name[bank$lab=="Ger"] <- "German Bank"
@@ -60,7 +60,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/2023/Updates/GBa/Figures_
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/tac", fr, ".png"))
 ```
 
-```{r fts-25, echo=F, fig.cap="Catch (commercial landings, tonnes), effort (hour-metre), and catch per unit effort (kilograms per hour-metre) for SFA 25 management units. SFA 25A Middle Bank is shown in black with points, SFA 25A Sable Bank is shown in orange with triangles, and SFA 25B Banquereau Bank is shown in blue with squares. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
+```{r fts-25, echo=F, fig.cap="Catch (commercial landings, tonnes, t), effort (hour-metre, hm), and catch per unit effort (kilograms per hour-metre, kg/hm) for SFA 25 management units. SFA 25A Middle Bank is shown in black with points, SFA 25A Sable Bank is shown in orange with triangles, and SFA 25B Banquereau Bank is shown in blue with squares. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_25", fr, ".png"))
 ```
 
@@ -68,15 +68,15 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/footprint_25", fr, ".png"))
 ```
 
-```{r fts-26, echo=F, fig.cap="Catch (commercial landings, tonnes), effort (hour-metre), and catch per unit effort (kilograms per hour-metre) for SFA 26 management units. SFA 26A Browns Bank North is shown in black with points, SFA 26B Browns Bank South is shown in orange with triangles, and SFA 26C German Bank is shown in blue with squares. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
+```{r fts-26, echo=F, fig.cap="Catch (commercial landings, tonnes, t), effort (hour-metre, hm), and catch per unit effort (kilograms per hour-metre, kg/hm) for SFA 26 management units. SFA 26A Browns Bank North is shown in black with points, SFA 26B Browns Bank South is shown in orange with triangles, and SFA 26C German Bank is shown in blue with squares. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_26", fr, ".png"))
 ```
 
-```{r foot-26, echo=F, fig.cap="The spatial distribution of commercial catch (tonnes,t) in 10km^2^ cells for SFA 26 management units derived from fishery logbooks from 1981--2022. The value of the colour is proportional to the tonnes of catch in each cell (darker colours indicate higher catch)."}
+```{r foot-26, echo=F, fig.cap="The spatial distribution of commercial catch (tonnes, t) in 10km^2^ cells for SFA 26 management units derived from fishery logbooks from 1981--2022. The value of the colour is proportional to the tonnes of catch in each cell (darker colours indicate higher catch)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/footprint_26", fr, ".png"))
 ```
 
-```{r fts-27, echo=F, fig.cap="Catch (commercial landings, tonnes), effort (hour-metre), and catch per unit effort (kilograms per hour-metre) for SFA 27B Georges Bank ‘b’. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
+```{r fts-27, echo=F, fig.cap="Catch (commercial landings, tonnes, t), effort (hour-metre, hm), and catch per unit effort (kilograms per hour-metre, kg/hm) for SFA 27B Georges Bank ‘b’. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_27", fr, ".png"))
 ```
 
@@ -250,7 +250,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_depth", fr, ".png"))
 ```
 
-```{r mwsh-ban, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25B Banquereau for surveys with detailed sampling since 1999. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
+```{r mwsh-ban, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25B Banquereau Bank for surveys with detailed sampling since 1999. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_Ban", fr, ".png"))
 ```
 
@@ -340,7 +340,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_selectivity", fr, ".png"))
 ```
 
-```{r rec-comp-25, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 25A Middle Bank, SFA 25A Sable Bank, and SFA 25B Banquereau using recruit size ranges of 75-90 millimetres (mm, points), and 80-90mm (triangles)."}
+```{r rec-comp-25, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 25A Middle Bank, SFA 25A Sable Bank, and SFA 25B Banquereau Bank using recruit size ranges of 75-90 millimetres (mm, points), and 80-90mm (triangles)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_25_compare", fr, MWSH, ".png"))
 ```
 
@@ -349,15 +349,15 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 
-```{r sts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 25 management units (black points for SFA 25A Middle Bank, orange triangles for SFA 25A Sable Bank and blue squares for SFA 25B Banquereau) by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom). Recruit size is 75-90mm."}
+```{r sts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 25 management units (black points for SFA 25A Middle Bank, orange triangles for SFA 25A Sable Bank and blue squares for SFA 25B Banquereau Bank) by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom). Pre-recruits are <75 mm, recruits are 75--90 mm, and fully-recruited scallops are >90 mm."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_25.png"))
 ```
 
-```{r sts-26, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 26 management units (black points for SFA 26A Browns Bank North, orange triangles for SFA 26B Browns Bank South and blue squares for SFA 26C German Bank) by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom). Recruit size is 75-90mm for SFA 26A Browns Bank North and SFA 26B Browns Bank South, and 95-105mm on SFA 26C German Bank. For SFA 26C German Bank, the unlined gear time series is shown separately using a dashed line."}
+```{r sts-26, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 26 management units (black points for SFA 26A Browns Bank North, orange triangles for SFA 26B Browns Bank South and blue squares for SFA 26C German Bank) by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom). Recruit size is 75--90 mm for SFA 26A Browns Bank North and SFA 26B Browns Bank South (pre-recruits are <75 mm, and fully-recruited scallops are >90 mm), and 95--105 mm on SFA 26C German Bank (pre-recruits are <95 mm, and fully-recruited scallops are >105 mm). For SFA 26C German Bank, the unlined gear time series is shown separately using a dashed line."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_26.png"))
 ```
 
-```{r sts-27, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 27B Georges Bank ‘b’ by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom). Recruit size is 85-95mm for SFA 27B Georges Bank ‘b’."}
+```{r sts-27, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 27B Georges Bank ‘b’ by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom). Pre-recruits are <85 mm, recruits are 85--95 mm, and fully-recruited scallops are >95 mm."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_27.png"))
 ```
 
@@ -401,15 +401,15 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/growth_BBn.png"))
 ```
 
-```{r cts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Percentage (%) of clappers (empty, paired and hinged scallop shells) per standardized tow for SFA 25 management units by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). Recruit size is 75-90mm. SFA 25A Middle Bank is shown with black points, SFA 25A Sable Bank is shown with orange triangles, and SFA 25B Banquereau is shown with blue squares."}
+```{r cts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Percentage (%) of clappers (empty, paired and hinged scallop shells) per standardized tow for SFA 25 management units by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). Pre-recruits are <75 mm, recruits are 75--90 mm, and fully-recruited scallops are >90 mm. SFA 25A Middle Bank is shown with black points, SFA 25A Sable Bank is shown with orange triangles, and SFA 25B Banquereau Bank is shown with blue squares."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/clap_prop_25.png"))
 ```
 
-```{r cts-26, echo=FALSE, message=F, fig.align="center", fig.cap="Percentage (%) of clappers (empty, paired and hinged scallop shells) per standardized tow for SFA 26 management units by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). SFA 26A Browns Bank North is shown with black points, SFA 26B Browns Bank South is shown with orange triangles, and SFA 26C German Bank is shown with blue squares. Recruit size is 75-90mm for SFA 26A Browns Bank North and SFA 26B Browns Bank South, and 95-105mm on SFA 26C German Bank. For SFA 26C German Bank, the unlined gear time series is not shown."}
+```{r cts-26, echo=FALSE, message=F, fig.align="center", fig.cap="Percentage (%) of clappers (empty, paired and hinged scallop shells) per standardized tow for SFA 26 management units by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). SFA 26A Browns Bank North is shown with black points, SFA 26B Browns Bank South is shown with orange triangles, and SFA 26C German Bank is shown with blue squares. Recruit size is 75--90 mm for SFA 26A Browns Bank North and SFA 26B Browns Bank South (pre-recruits are <75 mm, and fully-recruited scallops are >90 mm), and 95--105 mm on SFA 26C German Bank (pre-recruits are <95 mm, and fully-recruited scallops are >105 mm). For SFA 26C German Bank, the unlined gear time series is not shown."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/clap_prop_26.png"))
 ```
 
-```{r cts-27, echo=FALSE, message=F, fig.align="center", fig.cap="Percentage (%) of clappers (empty, paired and hinged scallop shells) per standardized tow for SFA 27B Georges Bank ‘b’ by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). Recruit size is 85-95 mm."}
+```{r cts-27, echo=FALSE, message=F, fig.align="center", fig.cap="Percentage (%) of clappers (empty, paired and hinged scallop shells) per standardized tow for SFA 27B Georges Bank ‘b’ by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). Pre-recruits are <85 mm, recruits are 85--95 mm, and fully-recruited scallops are >95 mm."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/clap_prop_27.png"))
 ```
 
@@ -417,6 +417,6 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/relF_", nickname, fr, ".png"))
 ```
 
-<!-- ```{r exp, echo=FALSE, message=F, fig.align="center", fig.cap="Estimates of exploitation rate (instantaneous fishing mortality) for Browns Bank north, calculated using survey biomass estimates and survey catchability of 0.35 (relative), and using the delay-difference model (modelled, Hubley et al. 2014)."} -->
+<!-- ```{r exp, echo=FALSE, message=F, fig.align="center", fig.cap="Estimates of exploitation rate (instantaneous fishing mortality) for Browns Bank North, calculated using survey biomass estimates and survey catchability of 0.35 (relative), and using the delay-difference model (modelled, Hubley et al. 2014)."} -->
 <!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/exploit_BBn_", nickname, fr, ".png")) -->
 <!-- ``` -->
