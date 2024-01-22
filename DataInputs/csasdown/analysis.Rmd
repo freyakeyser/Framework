@@ -11,17 +11,18 @@ require(patchwork)
 require(sf)
 
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_origRSCS_oldMWSH_GBb.RData")
-framework1 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname)
+#load("Y:/Offshore/Assessment/Data/Survey_data/2023/Survey_summary_output/Survey_all_results.Rdata")
+framework1 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname, survey.info=survey.info)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_80-95RSCS_oldMWSH_GBb.RData")
-framework3 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname)
+framework3 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname,survey.info=survey.info)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_origRSCS_newMWSH_GBb.RData")
-framework4 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname)
+framework4 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname,survey.info=survey.info)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_80-95RSCS_newMWSH_GBb.RData") 
-framework6 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname)
+framework6 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname, survey.info=survey.info)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_oldMWSH_GBb.RData") 
-framework2 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname)
+framework2 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname, survey.info=survey.info)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH_GBb.RData") 
-framework5 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname)
+framework5 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, survey.obj=survey.obj, cf.data=cf.data, surv.Clap.Rand, nickname=nickname, survey.info=survey.info)
 
 #### MAKE SURE CHOSEN RDATA IS READ IN LAST!
 
@@ -140,7 +141,7 @@ for (rdata in c("framework1", "framework2", "framework3", "framework4", "framewo
     get(rdata)$survey.obj$Sab[[1]],
     min(get(rdata)$survey.obj$Sab[[1]]$year, na.rm = T):yr,
     pdf = F,
-    areas = get(rdata)$surv.info$towable_area[surv.info$startyear==2018],
+    areas = get(rdata)$survey.info$towable_area[survey.info$label=="Sab" & survey.info$startyear==2018],
     se = T) %>%
     mutate(bank="Sab") %>%
     mutate(liner="lined")
@@ -148,7 +149,7 @@ for (rdata in c("framework1", "framework2", "framework3", "framework4", "framewo
     get(rdata)$survey.obj$Sab[[1]],
     min(get(rdata)$survey.obj$Sab[[1]]$year, na.rm = T):yr,
     pdf = F,
-    areas = get(rdata)$surv.info$towable_area[surv.info$startyear==2018],
+    areas = get(rdata)$survey.info$towable_area[survey.info$label=="Sab" & survey.info$startyear==2018],
     se = T,
     type="B") %>%
     mutate(bank="Sab") %>%
