@@ -312,6 +312,8 @@ save(DD.lst, DDpriors,DD.out,DD.dat,mod.out,mod.dat,cpue.dat,proj.dat,D.tab,proj
      URP,LRP,proj,TACi,yrs,
      file="D:/Framework/SFA_25_26_2024/Model/Results/Sab_SS_model/R_75_FR_90/Sable_SSmodel_results.RData")
 
+saveRDS(DD.out,file = "D:/Framework/SFA_25_26_2024/Model/Results/Sab_SS_model/R_75_FR_90/Sab_SS_mod_output.Rds")
+
 # Here we can grab the Fully recruited and recruit biomass for the last 2 years and the median of the time series.
 FR.bm <- DD.out$median$B
 # We exclude the current year from the median estimate
@@ -494,6 +496,62 @@ for(i in 1:num.param)
     }# end for(p in 1:num.reps)
   } # end if(is.vector(DD.out$sims.list[[names(DD.out$sims.list)[i]]])==F)
 }  # end for(i in 1:num.param)
+
+
+# Process error and residuals tidied up
+# Process error
+sab.PE <- as.data.frame(t(apply(data.frame(DD.out$sims.list$Presid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(sab.PE) <- c("LCI","median","UCI")
+sab.PE$year <- yrs
+sab.PE$fitted <- NA
+sab.PE$obs <- NA
+sab.PE$type <- "Raw process error (log)"
+# standardized
+sab.stan.PE <- as.data.frame(t(apply(data.frame(DD.out$sims.list$sPresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(sab.stan.PE) <- c("LCI","median","UCI")
+sab.stan.PE$year <- yrs
+sab.stan.PE$fitted <- NA
+sab.stan.PE$obs <- NA
+sab.stan.PE$type <- "Standardized process error"
+# I residuals...
+
+sab.I.resids <- as.data.frame(t(apply(data.frame(DD.out$sims.list$Iresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(sab.I.resids) <- c("LCI","median","UCI")
+sab.I.resids$year <- yrs
+sab.I.resids$fitted <- apply(data.frame(DD.out$sims.list$B),2,median)*median(DD.out$sims.list$q)
+sab.I.resids$obs <- DD.out$data$I
+sab.I.resids$type <- "Fully-recruited biomass residual (log)"
+# Standardized version
+sab.stan.I.resids <- as.data.frame(t(apply(data.frame(DD.out$sims.list$sIresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(sab.stan.I.resids) <- c("LCI","median","UCI")
+sab.stan.I.resids$year <- yrs
+sab.stan.I.resids$fitted <- apply(data.frame(DD.out$sims.list$B),2,median)*median(DD.out$sims.list$q)
+sab.stan.I.resids$obs <- DD.out$data$I
+sab.stan.I.resids$type <- "Standardized fully-recruited biomass residual"
+# IR resids
+sab.IR.resids <- as.data.frame(t(apply(data.frame(DD.out$sims.list$IRresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(sab.IR.resids) <- c("LCI","median","UCI")
+sab.IR.resids$year <- yrs
+sab.IR.resids$fitted <- apply(data.frame(DD.out$sims.list$R),2,median)*median(DD.out$sims.list$q)
+sab.IR.resids$obs <- DD.out$data$IR
+sab.IR.resids$type <- "Recruit biomass residual (log)"
+# Standardized version
+sab.stan.IR.resids <- as.data.frame(t(apply(data.frame(DD.out$sims.list$sIRresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(sab.stan.IR.resids) <- c("LCI","median","UCI")
+sab.stan.IR.resids$year <- yrs
+sab.stan.IR.resids$fitted <- apply(data.frame(DD.out$sims.list$R),2,median)*median(DD.out$sims.list$q)
+sab.stan.IR.resids$obs <- DD.out$data$IR
+sab.stan.IR.resids$type <- "Standardized recruited biomass residual"
+
+
+sab.pe.resids <- rbind(sab.PE,sab.stan.PE,
+                       sab.I.resids,sab.stan.I.resids,
+                       sab.IR.resids,sab.stan.IR.resids)
+
+saveRDS(sab.pe.resids,paste0(repo.loc,"Results/Sab_SS_model/R_75_FR_90/PE_and_resids.Rds"))
+
+
+
 
 # Finally we can put all the key data together into one object so we can use this to compare
 # across all of our different models.

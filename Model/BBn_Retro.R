@@ -52,6 +52,7 @@ num.knots <- 20 # Going to test 10, 15, and 20
 qR <- 0.33 # This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
 # Various explorations of the g models.
+#g.mod <- 'g_1'
 g.mod <- 'g_original'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
@@ -262,7 +263,8 @@ for(i in 1:n.mods)
   
   mod.input.sf <- mod.input.sf[order(mod.input.sf$year),]
  
-  bbn.fish$survey.year[bbn.fish$month %in% 1:5] <- bbn.fish$survey.year[bbn.fish$month %in% 1:5] -1
+  # Not necessary anymore, done in the bbn.fish RDS file.
+  #bbn.fish$survey.year[bbn.fish$month %in% 1:5] <- bbn.fish$survey.year[bbn.fish$month %in% 1:5] -1
   bbn.fish.sfs <- st_as_sf(bbn.fish,coords = c("lon","lat"),remove =F, crs = 4326)
   bbn.fish.sfs <- bbn.fish.sfs %>% st_transform(crs= 32619)
   # Now lets clip this to be data inside of our bbn boundary.
@@ -375,7 +377,8 @@ qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0
 init.m <- 0.2
 num.knots <- 20 # Going to test 10, 15, and 20
 #lqr <- 0.45_#This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
-g.mod <- 'g_original'
+g.mod <- 'g_1'
+#g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 vary.q <- TRUE

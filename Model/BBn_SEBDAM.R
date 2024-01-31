@@ -46,7 +46,7 @@ bbn.shape <- st_read("D:/Github/GIS_layers/survey_boundaries/BBn.shp", quiet=T)
 bbn.shape <- bbn.shape %>% st_transform(crs = 32619) # BBn is right on the 19/20 border so think they are basically equivalent options here
 # Bring in the survey data
 #load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90.Rdata")
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 #load("D:/Framework/SFA_25_26_2024/Model/Data/testing_results_framework3.Rdata")
 #load("D:/testing_folder/testing_results_framework_75-90.Rdata")
 #surv.dat <- surv.dat$BBn
@@ -54,7 +54,7 @@ load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing
 #surv.dat <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/BBn_surv.dat.RDS')
 surv.dat <- surv.dat$BBn
 mod.dat <- survey.obj$BBn$model.dat
-#mod.dat <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/BBn_model.dat.RDS')
+saveRDS(mod.dat,'D:/Framework/SFA_25_26_2024/Model/Data/BBn_BSSM_model.dat.RDS')
 # For now we need to get a 2022 growth term (once we run the BBn model I can update this with the latest data), just recycling the growth for 2021 for the moment
 #mod.dat <- rbind(mod.dat,mod.dat[nrow(mod.dat),])
 #mod.dat$year[nrow(mod.dat)] <- 2022
@@ -62,13 +62,34 @@ mod.dat <- survey.obj$BBn$model.dat
 # logs_and_fish(loc="offshore",year = 1991:2022,un=un.ID,pw=pwd.ID,db.con=db.con,direct="Y:/Offshore/Assessment/", get.marfis=F)
 # fish.dat<-merge(new.log.dat,old.log.dat,all=T)
 # fish.dat$ID<-1:nrow(fish.dat)
+# 
+# fish.dat <- fish.dat[!is.na(fish.dat$lon),]
+# fish.dat <- fish.dat[!is.na(fish.dat$lat),]
+# fish.dat <- fish.dat[!fish.dat$lon==0,]
+# fish.dat <- fish.dat[!fish.dat$lat==0,]
+# # 
+# 
 # # Now subset to BBn and add in the missing years of data
-# bbn.fish <- fish.dat %>% dplyr::filter(bank == "BBn")
+# #bbn.fish <- fish.dat %>% dplyr::filter(bank == "BBn")
+# bbn.fish <- fish.dat[fish.dat$bank == "BBn",]
+# bbn.fish <- bbn.fish[!is.na(bbn.fish$lon),]
 # # There are 12 data points at 0,0 that we remove, I'm not worried about accounting for these 12 points!
-# bbn.fish <- bbn.fish %>% dplyr::filter(lat !=0 | lon != 0)
+# #bbn.fish <- bbn.fish %>% dplyr::filter(lat !=0 | lon != 0)
 # bbn.fish$month <- lubridate::month(bbn.fish$date)
 # # Now I want to put a 'survey year' on these because that's what we're gonna need for our modelling... start by porting over the year
 # bbn.fish$survey.year <- bbn.fish$year
+# # DK NOTE: Now this is going to get confusing for us and we may want to tweak SEBDAM for this, but that's a down the road job, not a playing around with model job
+# # But based on the indexing in SEBDAM, I am going to change how we index the survey year data from what we have done with offshore traditionally.
+# # Historically anything from the last half of the year goes into the following years, eg. survey.year 2002 = June 2001- May 2002.
+# # But in SEBDAM we have (B(t-1) - C(t-1)), so let's say we have year 2002 survey biomass, this says we remove the 20002 catch from that
+# # we want that catch to be the catch from June 2002 to May 2003, i.e. we remove the catch before we allow the population to grow
+# # This is what we do in our current model, but we have a different index (C(t) on our model.
+# # Basically survey year 2002 = June 2002 - May 2003 now
+# #DK note: We probably should think more about the survey year fun and how exactly we want to handle removal of catch in our models.
+# # We don't have removals for 2009, we need something for that, so we're adding that in here...
+# # Note that in 2015 the survey was delayed until July, but there was no fishing on BBn in 2015 in June or July, so this system still works for the
+# # survey year despite that.... happily!
+# bbn.fish$survey.year[bbn.fish$month %in% 1:5] <- bbn.fish$survey.year[bbn.fish$month %in% 1:5] -1
 # # Need to add fake data for 2009
 # bbn.fish[nrow(bbn.fish)+1,] <- NA
 # 
@@ -87,7 +108,6 @@ bbn.fish$pro.repwt <- bbn.fish$pro.repwt/1000
 #### Finished Data prep and clean up!
 ###############################################################################################
 
-
 # Set parameters for the run...
 repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 mod.select <- "SEAM"
@@ -96,11 +116,11 @@ years <- 1994:2022
 NY <- length(years)
 R.size <- "75"
 FR.size <- "90"
-num.knots <- 10 # Going to test 10, 15, and 20
+num.knots <- 20 # Going to test 10, 15, and 20
 qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1. Can be used with SEAM too in place of the m and R initiailztion.
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.8,0.4, 0.15, and 0.05
 # Various explorations of the g models.
-g.mod <- 'g_original'
+g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 # I do we want to vary catchabilty spatially.
@@ -292,6 +312,7 @@ growth <- growth %>% dplyr::filter(year >= min(years))
 if(g.mod == 'g_original') g <- data.frame(g=growth$g,gR = growth$gR)
 if(g.mod == 'alt_g') g <- data.frame(g=growth$g.alt,gR = growth$gR.alt)
 if(g.mod == 'proper_g') g <- data.frame(g=growth$g.proper,gR = growth$gR.proper)
+if(g.mod == 'g_1') g <- data.frame(g=growth$g/growth$g,gR = growth$gR/growth$gR)
 
 # Now we can clip both of these to subset it to the data that I think we need for the analysis....
 # If we run with random == 1 then we need to fill in 2020...
@@ -306,20 +327,7 @@ mod.input.sf$L[nrow(mod.input.sf)] <- 0
 mod.input.sf$N[nrow(mod.input.sf)] <- 0
 
 mod.input.sf <- mod.input.sf[order(mod.input.sf$year),]
-# DK NOTE: Now this is going to get confusing for us and we may want to tweak SEBDAM for this, but that's a down the road job, not a playing around with model job
-# But based on the indexing in SEBDAM, I am going to change how we index the survey year data from what we have done with offshore traditionally.
-# Historically anything from the last half of the year goes into the following years, eg. survey.year 2002 = June 2001- May 2002.  
-# But in SEBDAM we have (B(t-1) - C(t-1)), so let's say we have year 2002 survey biomass, this says we remove the 20002 catch from that
-# we want that catch to be the catch from June 2002 to May 2003, i.e. we remove the catch before we allow the population to grow
-# This is what we do in our current model, but we have a different index (C(t) on our model.
-# Basically survey year 2002 = June 2002 - May 2003 now
-#DK note: We probably should think more about the survey year fun and how exactly we want to handle removal of catch in our models.
-# We don't have removals for 2009, we need something for that, so we're adding that in here...
-# Note that in 2015 the survey was delayed until July, but there was no fishing on BBn in 2015 in June or July, so this system still works for the
-# survey year despite that.... happily!
-bbn.fish$survey.year[bbn.fish$month %in% 1:5] <- bbn.fish$survey.year[bbn.fish$month %in% 1:5] -1
-# In 2015 the survey was delayed until July, so in that year and the previous year the surve.year is actually different...
-bbn.fish$survey.year[bbn.fish$month %in% c("June","July")] 
+
 bbn.fish.sf <- st_as_sf(bbn.fish,coords = c("lon","lat"),remove =F, crs = 4326)
 bbn.fish.sf <- bbn.fish.sf %>% st_transform(crs= 32619)
 
@@ -374,7 +382,7 @@ catch.tlm$Year[nrow(catch.tlm)] <- max(catch.tlm$Year) + 1
 catch.tlm$catch[nrow(catch.tlm)] <- 0
 
 # The SEBDAM set data.
-if(mod.select != "TLM")
+if(mod.select == "SEAM")
 {
   set_data<-data_setup(data=mod.input.sf,growths=data.frame(g = g$g,gR = g$gR),catch=as.data.frame(catchy$sum_catches),
                        model="SEBDAM",mesh=bbn.mesh$mesh,obs_mort=T,prior=T,prior_pars=c(20,40),#fix_m = 0.3,
@@ -387,8 +395,9 @@ if(mod.select != "TLM")
   set_data$par$log_m0 <- log(init.m)
   #set_data$par$log_R0 <- l.init.R 
   set_data$par$log_qR <- log(qR)
-  #set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA),log_qR = factor(NA))
+  # #set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA),log_qR = factor(NA))
   set_data$map <-list(log_m0=factor(NA),log_qR = factor(NA))
+  #set_data$map <-list(log_qR = factor(NA))
   #set_data$map <-list(log_m0=factor(NA))
 } # end if(mod.select != "TLM")
 
@@ -401,8 +410,8 @@ if(mod.select == "TLM")
                        catch=catch.tlm$catch, model="TLM",obs_mort=TRUE,prior=TRUE)
   # So this will fix the mean value of m0 to be whatever the initial value is set at in the data_setup step.  Let's see what happens!
   #set_data<-fix_param(obj=set_data, pars = list(log_q_R=lqr))
-  set_data$par$log_q_R <- log(qR) # 
-  set_data$map <-list(log_q_R=factor(NA))
+  #set_data$par$log_q_R <- log(qR) # 
+  #set_data$map <-list(log_q_R=factor(NA))
 } # end if(mod.select == "TLM")
 # Let's try setting some initial parameters 
 # set_data$par$log_B0 <- 20 # If you get an NA error in the model below, set log_B0 to a super high number
@@ -416,7 +425,7 @@ if(mod.select == "TLM")
 mod.fit<-fit_model(set_data,silent=F)
 
 # Now save the results appropriately
-if(mod.select != "TLM")
+if(mod.select == "SEAM")
 {
   #m0 <- signif(exp(set_data$par$log_m0),digits=2)
   #r0 <- signif(exp(set_data$par$log_R0),digits=2)
@@ -428,6 +437,8 @@ if(mod.select != "TLM")
   saveRDS(mod.fit,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,".Rds"))
   saveRDS(bbn.mesh,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_mesh.Rds"))
   saveRDS(pred.grid,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_predict_grid.Rds"))
+  saveRDS(mod.input.sf,paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_model_input.Rds"))
+  
 }
 
 if(mod.select == "TLM") 
@@ -450,12 +461,13 @@ if(mod.select == "TLM")
 ##################### Now load the model and make the figures! ##############################################
 
 atow<-800*2.4384/10^6 # area of standard tow in km2
-num.knots <- 10 # 10, 15, and 20
+num.knots <- 20 # 10, 15, and 20
 #RO <- 5 # Going to test 100, 250, and 500.
 init.m <- 0.2 # log(0.05) # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
 qR <- 0.33
 # The different growth models.
-g.mod <- 'g_original'
+g.mod <- 'g_1'
+#g.mod <- 'g_original'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 #qR  <- "0_5" # This is just for TLM models, 0_5, 0_3, and 0_1
@@ -472,7 +484,6 @@ mod.select <- "SEAM"
 ### Make the figures for the models
 
 
-
 if(mod.select != "TLM") scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod,"_vary_q=",vary.q)
 if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",g.mod)
 
@@ -483,7 +494,7 @@ mod.fit <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_
 if(mod.select != "TLM") catchy <- mod.fit$obj$env$data$C*mod.fit$obj$env$data$area # Get this into tonnes from catch density.
 if(mod.select == "TLM") catchy <- mod.fit$obj$env$data$C
 
-# This is only needed for SEAM.
+#This is only needed for SEAM.
 if(mod.select != "TLM")
 {
   pred.grid <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.select,"_predict_grid.Rds"))
@@ -522,13 +533,13 @@ if(mod.select != "TLM")
   #  mu[2017] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) 
   # TLM and SEAM don't calculate mu, so we do it manually here, to be analogous...
   # SEAM/TLM mu(t) <- C(t-1) / (B(t) + C(t-1)) because our model is B(t) <- B(t-1) - C(t-1) and C(2016) is now June 2016-Aug 2017.
-  # mu[2017] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) 
+  # mu[2016] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) # The fishing mortality associated with 2016-2017 fishing
   F.dat<-data.frame(B=as.vector(mod.fit$report$areaB[,-ncol(mod.fit$report$areaB)]/1000),
-                    C = c(rep(NA,num.knots),as.vector(as.matrix(catchy[,-c((ncol(catchy)-1),ncol(catchy))]))), Year=matYear1, knotID=knots1)
-  F.dat <- F.dat %>% dplyr::mutate(exploit = C/(B+C)) # Sticking with how offshore does this (C/(B+C)) C/B of some variant may be more realistic
+                    C = c(as.vector(as.matrix(catchy[,-c((ncol(catchy)-1),ncol(catchy))])),rep(NA,num.knots)), Year=matYear1, knotID=knots1)
+  F.dat <- F.dat %>% dplyr::mutate(exploit = C/(B+C)) # Sticking with how offshore does this (C/(B+C)) C/B or some variant may be more realistic
   F.dat.plot<-left_join(knot.gis,F.dat,by=c("knotID"))
-  # Remove the first year of data because it's not needed now.
-  F.dat.plot <- F.dat.plot %>% dplyr::filter(Year != years[1] )
+  
+  F.dat.plot <- F.dat.plot %>% dplyr::filter(Year != max(years) )
   # To get a weighted m time series combing the B, R, and the m data above, no longer necessary :-)
   # bmr <- data.frame(B=as.vector(mod.fit$report$areaB/1000),
   #                   m=as.vector(mod.fit$report$m),
@@ -605,24 +616,24 @@ if(mod.select != "TLM")
   b.lab <- signif(exp(b.brk),digits=2)
   spatial.B.plot<- ggplot() + geom_sf(data=B.dat.plot%>% dplyr::filter(!Year %in% c(2023)),aes(fill=log(B)),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_viridis_c(breaks = b.brk, labels=b.lab, name="Predicted Biomass \nDensity (kg\U2022km\U207B\U00B2)",option = "A",begin=0.2) + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_biomass.png"),spatial.B.plot,base_width = 10,base_height = 10)
   # Remove missing survey years
   spatial.B.plot<- ggplot() + geom_sf(data=B.dat.plot %>% dplyr::filter(!Year %in% c(2020,2023)),aes(fill=log(B)),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_viridis_c(breaks = b.brk, labels=b.lab, name="Predicted Biomass \nDensity (kg\U2022km\U207B\U00B2)",option = "A",begin=0.2) + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_biomass_no_missing_surveys.png"),spatial.B.plot,base_width = 10,base_height = 10)
   # Subest to 4 years
   spatial.B.plot<- ggplot() + geom_sf(data=B.dat.plot %>% dplyr::filter(Year %in% c(2001,2009,2014,2019)),aes(fill=log(B)),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_viridis_c(breaks = b.brk, labels=b.lab, name="Predicted Biomass \nDensity (kg\U2022km\U207B\U00B2)",option = "A",begin=0.2) + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_biomass_4_years.png"),spatial.B.plot,base_width = 10,base_height =7)
@@ -632,24 +643,24 @@ if(mod.select != "TLM")
   r.lab <- signif(exp(r.brk),digits=2)
   
   spatial.R.plot<-  ggplot() + geom_sf(data=R.dat.plot,aes(fill=log(R)),col='grey')+
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year)+ 
     scale_fill_viridis_c(breaks = r.brk, labels = r.lab,name="Predicted Recruit \nDensity (kg\U2022km\U207B\U00B2)",end=0.8)+ 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_recruits.png"),spatial.R.plot,base_width = 10,base_height = 10)
   # Remove missing survey years
   spatial.R.plot<-  ggplot() + geom_sf(data=R.dat.plot %>% dplyr::filter(!Year %in% c(2020,2023)),aes(fill=log(R)),col='grey')+
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year)+ 
     scale_fill_viridis_c(breaks = r.brk, labels = r.lab,name="Predicted Recruit \nDensity (kg\U2022km\U207B\U00B2)",end=0.8)+ 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_recruits_no_missing_surveys.png"),spatial.R.plot,base_width = 10,base_height = 10)
   # 4 years
   spatial.R.plot<-  ggplot() + geom_sf(data=R.dat.plot %>% dplyr::filter(Year %in% c(2001,2009,2014,2019)),aes(fill=log(R)),col='grey')+
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year)+ 
     scale_fill_viridis_c(breaks = r.brk, labels = r.lab,name="Predicted Recruit \nDensity (kg\U2022km\U207B\U00B2)",end=0.8)+ 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
@@ -661,24 +672,24 @@ if(mod.select != "TLM")
   m.lab <- signif(exp(m.brk),digits=2)
   
   spatial.m.plot <-  ggplot() + geom_sf(data=m.dat.plot %>% dplyr::filter(!Year %in% c(2023)),aes(fill=log(m)),color='grey')+
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year)+ 
     scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Predicted Natural \nMortality (Inst)",option = "B",direction =1,begin = 0.2,end=1) + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_mort.png"),spatial.m.plot,base_width = 10,base_height = 10)
   # Remove missing survey years
   spatial.m.plot <-  ggplot() + geom_sf(data=m.dat.plot %>% dplyr::filter(!Year %in% c(2020,2023)),aes(fill=log(m)),color='grey')+
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year)+ 
     scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Predicted Natural \nMortality (Inst)",option = "B",direction =1,begin = 0.2,end=1) + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_mort_no_missing_surveys.png"),spatial.m.plot,base_width = 10,base_height = 10)
   # 4 years
   spatial.m.plot <-  ggplot() + geom_sf(data=m.dat.plot %>% dplyr::filter(Year %in% c(2001,2009,2014,2019)),aes(fill=log(m)),color='grey')+
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year)+ 
     scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Predicted Natural \nMortality (Inst)",option = "B",direction =1,begin = 0.2,end=1) + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
@@ -686,8 +697,8 @@ if(mod.select != "TLM")
   
   # q 
   spatial.q.plot <- ggplot() + geom_sf(data=q.dat.plot,aes(fill=qI),col=NA)+
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_viridis_c(name="Predicted catchability (qI)",option = "C",begin = 0.2,end =0.8) + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_catchability.png"),spatial.q.plot,base_width = 10,base_height = 10)
@@ -705,24 +716,24 @@ if(mod.select != "TLM")
   
   
   spatial.exploit.plot<- ggplot() + geom_sf(data=F.dat.plot,aes(fill=log(exp.na)),color='grey') +
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year) + 
     scale_fill_viridis_c(breaks = e.brk,labels = e.lab,name="Exploitation (Prop)",option = "D") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/Spatial_exploit.png"),spatial.exploit.plot,base_width = 10,base_height = 10)
   # Remove missing survey years
   spatial.exploit.plot<- ggplot() + geom_sf(data=F.dat.plot %>% dplyr::filter(!Year %in% c(2020,2023)),aes(fill=log(exp.na)),color='grey') +
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year) + 
     scale_fill_viridis_c(breaks = e.brk,labels = e.lab,name="Exploitation (Prop)",option = "D") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/Spatial_exploit_no_missing_surveys.png"),spatial.exploit.plot,base_width = 10,base_height = 10)
   # 4 years
   spatial.exploit.plot<- ggplot() + geom_sf(data=F.dat.plot %>% dplyr::filter(Year %in% c(2001,2009,2014,2019)),aes(fill=log(exp.na)),color='grey') +
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     facet_wrap(~Year) + 
     scale_fill_viridis_c(breaks = e.brk,labels = e.lab,name="Exploitation (Prop)",option = "D") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
@@ -734,24 +745,24 @@ if(mod.select != "TLM")
   
   spatial.Bdiff.plot<- ggplot() + geom_sf(data=Bdiff.comp.dat.plot,aes(fill=B.diff),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_distiller(type = 'div',breaks = bd.brk, labels=bd.lab, name="Expected - Modeled \nBiomass (tonnes)",palette = "RdBu") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_BDiff.png"),spatial.Bdiff.plot,base_width = 10,base_height = 10)
   #Remove missing survey years
   spatial.Bdiff.plot<- ggplot() + geom_sf(data=Bdiff.comp.dat.plot %>% dplyr::filter(!Year %in% c(2020,2023)),aes(fill=B.diff),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_distiller(type = 'div',breaks = bd.brk, labels=bd.lab, name="Expected - Modeled \nBiomass (tonnes)",palette = "RdBu") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_BDiff_no_missing_surveys.png"),spatial.Bdiff.plot,base_width = 10,base_height = 10)
   # 4 years
   spatial.Bdiff.plot<- ggplot() + geom_sf(data=Bdiff.comp.dat.plot %>% dplyr::filter(Year %in% c(2001,2009,2014,2019)),aes(fill=B.diff),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_distiller(type = 'div',breaks = bd.brk, labels=bd.lab, name="Expected - Modeled \nBiomass (tonnes)",palette = "RdBu") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_BDiff_4_years.png"),spatial.Bdiff.plot,base_width = 10,base_height = 7)
@@ -761,24 +772,24 @@ if(mod.select != "TLM")
   pb.lab <- pb.brk#signif(exp(b.brk),digits=2)
   spatial.per.Bdiff.plot<- ggplot() + geom_sf(data=Bdiff.comp.dat.plot,aes(fill=B.per.diff),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_distiller(type = 'div',breaks = pb.brk, labels=pb.lab, name="Expected - Modeled \nBiomass (%)",palette = "RdBu") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_per_BDiff.png"),spatial.per.Bdiff.plot,base_width = 10,base_height = 10)
   # Remove missing survey years
   spatial.per.Bdiff.plot<- ggplot() + geom_sf(data=Bdiff.comp.dat.plot %>% dplyr::filter(!Year %in% c(2020,2023)),aes(fill=B.per.diff),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_distiller(type = 'div',breaks = pb.brk, labels=pb.lab, name="Expected - Modeled \nBiomass (%)",palette = "RdBu") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_per_BDiff_no_missing_surveys.png"),spatial.per.Bdiff.plot,base_width = 10,base_height = 10)
   # 4 years
   spatial.per.Bdiff.plot<- ggplot() + geom_sf(data=Bdiff.comp.dat.plot %>% dplyr::filter(Year %in% c(2001,2009,2014,2019)),aes(fill=B.per.diff),color='grey')+
     facet_wrap(~Year)+ 
-    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60°18'W","60°6'W","59°54'W")) +
-    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42°36'N","42°45'N","42°54'N")) +
+    scale_x_continuous(breaks = c(-60.3,-60.1,-59.9), labels = c("60B018'W","60B06'W","59B054'W")) +
+    scale_y_continuous(breaks = c(42.6, 42.75, 42.9),labels = c("42B036'N","42B045'N","42B054'N")) +
     scale_fill_distiller(type = 'div',breaks = pb.brk, labels=pb.lab, name="Expected - Modeled \nBiomass (%)",palette = "RdBu") + 
     theme(axis.text.x=element_text(angle=-45,hjust=0))
   save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.select,"/BBn_Spatial_per_BDiff_4_years.png"),spatial.per.Bdiff.plot,base_width = 10,base_height = 7)
@@ -847,20 +858,21 @@ pred.proc$log_processes <- pred.proc$log_processes %>% dplyr::filter(year < 2023
 # TLM and SEAM don't calculate mu, so we do it manually here, to be analogous...
 # SEAM/TLM mu(t) <- C(t-1) / (B(t) + C(t-1)) because our model is B(t) <- B(t-1) - C(t-1) and C(2016) is now June 2016-Aug 2017.
 # mu[2017] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) 
+
 if(mod.select != "TLM")
 {
-ann.exploit <- data.frame(year = years,B = exp(pred.proc$log_processes$log_B), Catch = c(NA,colSums(catchy[,-c((ncol(catchy)-1),ncol(catchy))])),
+ann.exploit <- data.frame(year = years,B = exp(pred.proc$log_processes$log_B), Catch = c(colSums(catchy[,-c((ncol(catchy)-1),ncol(catchy))]),NA),
                           B.LCI = pred.proc$log_processes$totB.LCI, B.UCI = pred.proc$log_processes$totB.UCI)
 }
 if(mod.select == "TLM")
 {
-  ann.exploit <- data.frame(year = years,B = exp(pred.proc$log_processes$log_B), Catch = c(NA,catchy[1:(length(catchy)-2)]),
+  ann.exploit <- data.frame(year = years,B = exp(pred.proc$log_processes$log_B), Catch = c(catchy[1:(length(catchy)-2)],NA),
                             B.LCI = pred.proc$log_processes$totB.LCI, B.UCI = pred.proc$log_processes$totB.UCI)
 }
 
-ann.exploit$exploit <- ann.exploit$Catch/(ann.exploit$B+ann.exploit$Catch)
-ann.exploit$exploit.UCI <- ann.exploit$Catch/(ann.exploit$B.LCI+ann.exploit$Catch)
-ann.exploit$exploit.LCI <- ann.exploit$Catch/(ann.exploit$B.UCI+ann.exploit$Catch)
+ann.exploit$exploit <- c(ann.exploit$Catch[1:(nrow(ann.exploit)-1)]/(ann.exploit$B[2:nrow(ann.exploit)]+ann.exploit$Catch[1:(nrow(ann.exploit)-1)]),NA)
+ann.exploit$exploit.UCI <- c(ann.exploit$Catch[1:(nrow(ann.exploit)-1)]/(ann.exploit$B.UCI[2:nrow(ann.exploit)]+ann.exploit$Catch[1:(nrow(ann.exploit)-1)]),NA)
+ann.exploit$exploit.LCI <- c(ann.exploit$Catch[1:(nrow(ann.exploit)-1)]/(ann.exploit$B.LCI[2:nrow(ann.exploit)]+ann.exploit$Catch[1:(nrow(ann.exploit)-1)]),NA)
 ann.exploit$FM <- 1-exp(-ann.exploit$exploit)
 ann.exploit$FM.LCI <- 1-exp(-ann.exploit$exploit.LCI)
 ann.exploit$FM.UCI <- 1-exp(-ann.exploit$exploit.UCI)

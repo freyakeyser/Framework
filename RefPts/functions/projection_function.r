@@ -26,11 +26,11 @@
 # for type I am adding in a 'sv' option in case you want to set something at a value. This is being done for growth for now, but could be useful for anything.  You need to specify what the
 # set.value is as well, default of set.value is NULL
 
-proj.mod <- function(mods = list(tlm.mod = tlm.mod,seam.mod = seam.mod), n_sim = 300,exp.scenario=seq(0,0.4,0.025),n_y = 100, LRP = 1000, HCR.sim = NULL, save.results = F,
+proj.mod <- function(mods = list(tlm.mod = NA,seam.mod = seam.mod), n_sim = 300,exp.scenario=seq(0,0.4,0.025),n_y = 100, LRP = 1000, HCR.sim = NULL, save.results = F,
                      ci.proj = data.frame(lci=0.25,uci=0.75),run = 'model_error', base.yrs = NULL, model.yrs = 1994:2022,
                      plot_url = "D:/Github/BBn_model/Results/Figures/BBn/",
                      res_url = "D:/Github/BBn_model/Results/Models/BBn/",
-                     model = "TLM", mod.run = NULL,max.SSB =NULL, 
+                     model = "SEAM", mod.run = NULL,max.SSB =NULL, 
                      # He we have our productivity models
                      g.mod =   list(type = 'bp',set.value = "off",bp.strategy = 'sample',bp= 0,mn.at.max = 1.00,sd.at.max = 0.05,ar1=0,ar2=0), 
                      rec.mod = list(type = 'bp',set.value = "off",bp.strategy = 'sample',bp= 0,mn.at.max = 0.01,sd.at.max = 0.01,rec.age = 5,
@@ -57,7 +57,7 @@ proj.mod <- function(mods = list(tlm.mod = tlm.mod,seam.mod = seam.mod), n_sim =
 if(!is.null(HCR.sim))  
 {
   sims = paste0(model,"_",mod.run,"/HCR/")
-  HCR <- paste0("TRP_",HCR.sim$TRP,"_",HCR.sim$TRP.exp,"_USR_",HCR.sim$USR,"_",HCR.sim$USR.exp,"_LRP_",HCR.sim$LRP,"_",HCR.sim$LRP.exp,"_",HCR.sim$exp.sd)
+  HCR <- paste0("T_",HCR.sim$TRP,"_",HCR.sim$TRP.exp,"_U_",HCR.sim$USR,"_",HCR.sim$USR.exp,"_L_",HCR.sim$LRP,"_",HCR.sim$LRP.exp)
 }
 
 # Names and locations of save objects
@@ -105,8 +105,10 @@ if(!is.null(HCR.sim))
   library(mgcv)
   
   if(model == "TLM") mod.fit <- mods$tlm.mod
-  if(model == "SEAM") mod.fit <- mods$seam.mod  
+    if(model == "SEAM") mod.fit <- mods$seam.mod  
   
+  
+    
   # If doing the process error run you need to do this, 
   #DK note: I've turned off the process error term in the model, it just results in the model producing biomass out of nothing, which I don't think is good behaviour for projections.
   if(run == 'model_error' & model == "TLM")
@@ -160,6 +162,8 @@ if(!is.null(HCR.sim))
                           #gR = as.vector(mod.fit$obj$env$data$gR),
                           year = model.yrs)
   
+  # Set this up so we can limit recruit biomass to not go into wild outlier land...
+  max.rec.obs <- max(prod.dat$R,na.rm=T)
   # If modelling just a few years trim the data here.
   if(!is.null(base.yrs)) prod.dat <- prod.dat %>% dplyr::filter(year %in% base.yrs)
   
@@ -195,8 +199,7 @@ if(!is.null(HCR.sim))
   if(g.mod$type %in% c('lm','glm','gam'))   g.res <- dens.function(dat = prod.dat,type = g.mod$type,min.cov.pred = min.SSB,max.cov.pred= max.SSB,step = 100,response = 'g',dd.term = "SSB",log.trans=T)
   #if(g.mod$type %in% c('lm','glm','gam'))   gr.res <- dens.function(dat = prod.dat,type = g.mod$type,min.cov.pred = min.SSB,max.cov.pred= max.SSB,step = 100,response = 'gR',dd.term = "SSB",log.trans=T)
   if(m.mod$type %in% c('lm','glm','gam'))   m.res <- dens.function(dat = prod.dat,type = m.mod$type,min.cov.pred = min.SSB,max.cov.pred= max.SSB,step = 100,response = 'm',dd.term = "SSB",log.trans=T)
-
-  
+ 
 
   for(i in 1:n.f.scen) 
   {
@@ -321,8 +324,9 @@ if(!is.null(HCR.sim))
         if(g.mod$type == 'bp') g[j,nn,i] <- bp.function(B = SSB.init,dat = prod.dat$g,type = g.mod$bp.strategy, bp = g.mod$bp,
                                                        max.B = max.SSB,mn.at.max = g.mod$mn.at.max,sd.at.max = g.mod$sd.at.max)
         
-        if(g.mod$type == 'sv') g[j,nn,i] <- g.mod$set.value
         
+        if(g.mod$type == 'sv') {g[j,nn,i] <- gR[j,nn,i] <- g.mod$set.value}
+        #if(g.mod$type == 'sv') gR[j,nn,i] <-  sample(prod.dat$gR,1)  
         
         
         if(g.mod$type == 'set') 
@@ -361,7 +365,7 @@ if(!is.null(HCR.sim))
              # And since we know gR is related to g, let's just make gR be X% larger than g, we can just sample from the observed data to get that ratio...
         # We can see that growth differences really doesn't vary too much and that recruit growth is always larger (basically between 10 and 25% larger)
         if(g.mod$type != 'sv') gR[j,nn,i] <-  sample(prod.dat$g.ratio,1) * g[j,nn,i] #sample(prod.dat$gR,1) # * g[j,nn,i]
-        if(g.mod$type == 'sv') gR[j,nn,i] <-  sample(prod.dat$gR,1) 
+        
          
         
         ################################# End Growth Section ##################################
@@ -371,7 +375,7 @@ if(!is.null(HCR.sim))
        ############################### Start recruitment Section #######################################
         ### Recruit section
         # For the recruits I need to get the right biomass year to get the offset from recruits to the biomass that produced those recruits.  Easiest to do up here 
-        if(j < (rec.mod$rec.age+1))  SSB.for.rec <- mod.fit$report$totB[length(mod.fit$report$totB)-rec.mod$rec.age] + mod.fit$report$totB[length(mod.fit$report$totB)-rec.mod$rec.age]
+        if(j < (rec.mod$rec.age+1))  SSB.for.rec <- mod.fit$report$totB[length(mod.fit$report$totB)-rec.mod$rec.age] + mod.fit$report$totR[length(mod.fit$report$totR)-rec.mod$rec.age]
         if(j >=(rec.mod$rec.age+1)) SSB.for.rec <- Bio[j-rec.mod$rec.age,nn,i] + Rec[j-rec.mod$rec.age,nn,i]
         # Now we can get our recruit estimate...
         # Using the predictions from our linear model above...
@@ -392,6 +396,7 @@ if(!is.null(HCR.sim))
           } # end if(SSB.for.rec >= min.SSB & SSB.for.rec <= max.SSB)
         } # end if(rec.mod$type %in% c("lm",'glm','gam'))
 
+        #browser()
         if(rec.mod$type %in% 'bp')
         {
           # DK been playing around with the best way too do this.
@@ -402,6 +407,12 @@ if(!is.null(HCR.sim))
              #if(SSB.for.rec >=min.SSB)  
             Rec[j,nn,i] <-SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,
                                                                             max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
+            # To avoid huge outlier problem, if the recruitment estimate is higher than ever has been observed we instead run a sample
+            # using the largest value and a nice normal distribution to avoid silliness
+            if(Rec[j,nn,i] > max.rec.obs) Rec[j,nn,i] <- rnorm(1,max.rec.obs,0.1*max.rec.obs) # The max ends up about 50% above maximum ever seen, so reasonble.
+            if(Rec[j,nn,i] < 0) Rec[j,nn,i] <- max.rec.obs # Just in case that trips and lands in negative land, very unlikely with our data (like < 1 in a billion)... but still...
+            
+            # If the recruit estimate is larger than we've ever observed then we downgra
             # # If below the minimum obsreved biomass than recruitment will be based on the RPS at low biomass levels.
             #if(SSB.for.rec < min.SSB)  Rec[j,nn,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,
             #                                                             max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
@@ -414,6 +425,9 @@ if(!is.null(HCR.sim))
             #if(SSB.for.rec >= min.SSB) 
               Rec[j,nn,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,sd = sigma_phi,
                                                                             max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
+              if(Rec[j,nn,i] > max.rec.obs) Rec[j,nn,i] <- rnorm(1,max.rec.obs,0.1*max.rec.obs) # The max ends up about 50% above maximum ever seen, so reasonble.
+              if(Rec[j,nn,i] < 0) Rec[j,nn,i] <- max.rec.obs # Just in case that trips and lands in negative land, very unlikely with our data (like < 1 in a billion)... but still...
+              
             # If below the minimum obsreved biomass than recruitment will be based on the RPS at low biomass levels.
             #if(SSB.for.rec < min.SSB)  Rec[j,nn,i] <- SSB.for.rec * bp.function(B = SSB.for.rec,dat = prod.dat$RPS,type = rec.mod$bp.strategy, bp = rec.mod$bp,sd = sigma_phi,
             #                                                                          max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
@@ -421,7 +435,7 @@ if(!is.null(HCR.sim))
            
          
         } # end if(rec.mod$type %in% 'bp')
-         
+     
          if(rec.mod$type == 'cor')
          {
            # If above the maximum SSB ever observed, set recruitment to vary around the lowest recruitment numbers ever observed
@@ -460,14 +474,14 @@ if(!is.null(HCR.sim))
             mort[j,nn,i] <- rlnorm(1,m.res$pred.dat$m.log[pick],m.res$pred.dat$se[pick]) 
           } # end if(SSB.for.rec >= min.SSB & SSB.for.rec <= max.SSB)
         } # end if(rec.mod$type %in% c("lm",'glm','gam'))
-        
+        #browser()
         if(m.mod$type %in% 'bp')
         {
           # 
-          if(run != 'model_error') mort[j,nn,i] <- bp.function(B = SSB.for.rec,dat = prod.dat$m, type = m.mod$bp.strategy, bp = m.mod$bp,
+          if(run != 'model_error') mort[j,nn,i] <- bp.function(B = B.init,dat = prod.dat$m, type = m.mod$bp.strategy, bp = m.mod$bp,
                                                                               max.B = max.SSB,mn.at.max = m.mod$mn.at.max,sd.at.max = m.mod$sd.at.max)
           
-          if(run == 'model_error') mort[j,nn,i] <- bp.function(B = SSB.for.rec,dat = prod.dat$m,type = m.mod$bp.strategy, bp = m.mod$bp,sd = sigma_m,
+          if(run == 'model_error') mort[j,nn,i] <- bp.function(B = B.init,dat = prod.dat$m,type = m.mod$bp.strategy, bp = m.mod$bp,sd = sigma_m,
                                                                               max.B = max.SSB,mn.at.max = m.mod$mn.at.max,sd.at.max = m.mod$sd.at.max)
         } # end if(rec.mod$type %in% 'bp')    
          
@@ -496,7 +510,8 @@ if(!is.null(HCR.sim))
         # Get our Catch based on the exp.scenario scenario and based on the previous years biomass
         # DK Note, when/how we remove the catch is slightly different from what we do in our projections, it's mostly about how we calculated F
         # In our current decision tables F would be calculated for the upcoming season using the Bio estimate, so I'm sticking in an 'F.table' for the 'F' we'd calculated in our decision tables.
-        
+         
+         
        
         if(j == 1)
         {
@@ -755,12 +770,13 @@ if(save.results == T)
   if(!is.null(HCR.sim))
   {
     # Summarize the data to make a nice time series plot.
+    # Note that I want the mean catch here, because that's really what people are interested in for this...
     HCR.summarized <- Exp.res %>% dplyr::group_by(year) %>% 
                                   dplyr::summarise(B.mn = median(B,na.rm=T),         B.U95 = quantile(B,probs=0.975,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
                                                                                    B.L95 = quantile(B,probs=0.025,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
                                                   Rec.mn = median(Rec,na.rm=T),      Rec.U95 = quantile(Rec,probs=0.975,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),
                                                                                    Rec.L95 = quantile(Rec,probs=0.025,na.rm=T),       Rec.L50 = quantile(Rec,probs=0.25,na.rm=T),
-                                                  Catch.mn = median(Catch,na.rm=T),  Catch.U95 = quantile(Catch,probs=0.975,na.rm=T),   Catch.U50 = quantile(Catch,probs=0.75,na.rm=T),
+                                                  Catch.mn = mean(Catch,na.rm=T),  Catch.U95 = quantile(Catch,probs=0.975,na.rm=T),   Catch.U50 = quantile(Catch,probs=0.75,na.rm=T),
                                                                                    Catch.L95 = quantile(Catch,probs=0.025,na.rm=T),   Catch.L50 = quantile(Catch,probs=0.25,na.rm=T),
                                                   M.mn = median(M,na.rm=T),          M.U95 = quantile(M,probs=0.975,na.rm=T),           M.U50 = quantile(M,probs=0.75,na.rm=T),
                                                                                    M.L95 = quantile(M,probs=0.025,na.rm=T),           M.L50 = quantile(M,probs=0.25,na.rm=T),

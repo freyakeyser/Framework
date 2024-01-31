@@ -53,37 +53,43 @@ Sab.shape <- st_read("D:/Github/GIS_layers/survey_boundaries/Sab.shp", quiet=T)
 # surv.dat <- surv.dat$Sab
 # saveRDS(surv.dat,'D:/Github/BBn_model/Results/Sab_surv.dat.RDS')
 # Bring in the survey data
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 #load("D:/Framework/SFA_25_26_2024/Model/Data/testing_results_framework3.Rdata")# Need to get condition factor out of here too
 #mod.dat <- survey.obj$Sab$model.dat
 #saveRDS(mod.dat,'D:/Github/BBn_model/Results/Sab_model.dat.RDS')
 surv.dat <- surv.dat$Sab
 mod.dat <- survey.obj$Sab$model.dat
+saveRDS(mod.dat,'D:/Framework/SFA_25_26_2024/Model/Data/Sab_BSSM_model.dat.RDS')
 
 #load("F:/NAS/Offshore/Assessment/Data/Model/2022/Sab/Model_input_midpoint.RData")
 # Bring in the fishery data
 # logs_and_fish(loc="offshore",year = 1986:2022,direct="Y:/Offshore/Assessment/", get.marfis=F)
-# fish.dat<-merge(new.log.dat,old.log.dat,all=T)
-# fish.dat$ID<-1:nrow(fish.dat)
-
-# Now we can clip both of these to subset it to the data that I think we need for the analysis....
-# First the fishery data
-
-# Sab.fish <- fish.dat %>% dplyr::filter(bank == "Sab")
-# # There are 12 data points at 0,0 that we remove, I'm not worried about accounting for these 12 points!
-# Sab.fish <- Sab.fish %>% dplyr::filter(lat !=0 | lon != 0)
-# # Now I want to put a 'survey year' on these because that's what we're gonna need for our modelling... start by porting over the year
-# Sab.fish$survey.year <- Sab.fish$year
-# # DK NOTE: Now this is going to get confusing for us and we may want to tweak SEBDAM for this, but that's a down the road job, not a playing around with model job
-# # But based on the indexing in SEBDAM, I am going to change how we index the survey year data from what we have done with offshore traditionally.
-# # Historically anything from the last half of the year goes into the following years, eg. survey.year 2002 = June 2001- May 2002.
-# # But in SEBDAM we have (B(t-1) - C(t-1)), so let's say we have year 2000 survey biomass, this says we remove the 2000 catch from that
-# # we want that catch to be the catch from June 2000 to May 2001, i.e. we remove the catch before we allow the population to grow
-# # This is what we do in our current model, but we have a different index (C(t) on our model.
-# # Basically survey year 2002 = June 2002 - May 2003 now
-# #DK note: We probably should think more about the survey year fun and how exactly we want to handle removal of catch in our models.
+#  fish.dat<-merge(new.log.dat,old.log.dat,all=T)
+#  fish.dat$ID<-1:nrow(fish.dat)
+# 
+# # Now we can clip both of these to subset it to the data that I think we need for the analysis....
+# # First the fishery data
+#  fish.dat <- fish.dat[!is.na(fish.dat$lon),]
+#  fish.dat <- fish.dat[!is.na(fish.dat$lat),]
+#  fish.dat <- fish.dat[!fish.dat$lon==0,]
+#  fish.dat <- fish.dat[!fish.dat$lat==0,]
+#  
+#  #Sab.fish1 <- fish.dat %>% dplyr::filter(bank == "Sab")
+#  Sab.fish <- fish.dat[fish.dat$bank == "Sab",]
+#  #Sab.fish2 <- Sab.fish2[!is.na(Sab.fish2$lon),]
+# 
+# # # Now I want to put a 'survey year' on these because that's what we're gonna need for our modelling... start by porting over the year
+#  Sab.fish$survey.year <- Sab.fish$year
+# # # DK NOTE: Now this is going to get confusing for us and we may want to tweak SEBDAM for this, but that's a down the road job, not a playing around with model job
+# # # But based on the indexing in SEBDAM, I am going to change how we index the survey year data from what we have done with offshore traditionally.
+# # # Historically anything from the last half of the year goes into the following years, eg. survey.year 2002 = June 2001- May 2002.
+# # # But in SEBDAM we have (B(t-1) - C(t-1)), so let's say we have year 2000 survey biomass, this says we remove the 2000 catch from that
+# # # we want that catch to be the catch from June 2000 to May 2001, i.e. we remove the catch before we allow the population to grow
+# # # This is what we do in our current model, but we have a different index (C(t) on our model.
+# # # Basically survey year 2002 = June 2002 - May 2003 now
+# # #DK note: We probably should think more about the survey year fun and how exactly we want to handle removal of catch in our models.
 # Sab.fish$month <- lubridate::month(Sab.fish$date)
-# Sab.fish$survey.year[Sab.fish$month %in% c("January","February","March","April","May")] <- Sab.fish$survey.year[Sab.fish$month %in% c("January","February","March","April","May")] -1
+# Sab.fish$survey.year[Sab.fish$month %in% 1:5] <- Sab.fish$survey.year[Sab.fish$month %in% 1:5] -1
 # # Add a fake 2022 data point as there were no removals in 2022
 # Sab.fish[nrow(Sab.fish)+1,] <- NA
 # Sab.fish$pro.repwt[nrow(Sab.fish)] <- 0
@@ -91,7 +97,7 @@ mod.dat <- survey.obj$Sab$model.dat
 # Sab.fish$survey.year[nrow(Sab.fish)] <-2022
 # Sab.fish$lon[nrow(Sab.fish)] <- -61.68767
 # Sab.fish$lat[nrow(Sab.fish)] <- 43.63017
-#saveRDS(Sab.fish,'D:/Github/BBn_model/Results/Fishery_data/Sab_fish.dat.RDS')
+#saveRDS(Sab.fish,'D:/Framework/SFA_25_26_2024/Model/Data/Sab_fish.dat.RDS')
 Sab.fish <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/Sab_fish.dat.RDS')
 Sab.fish$pro.repwt <- Sab.fish$pro.repwt/1000 # It looks like what I saved is already in tonnes.
 
@@ -109,7 +115,7 @@ c_sys <- 32620
 qR <- 0.33# log recruit catchability making this the same are FR catchability.
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 2, 0.8, and 0.4
 # Various explorations of the g models.
-g.mod <- 'g_original'
+g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 # The survey biomass index for 1995 says there were 243 tonnes of recruits that year.
@@ -336,10 +342,10 @@ growth <- growth %>% dplyr::filter(year >= min(years))
 if(g.mod == 'g_original') g <- data.frame(g=growth$g,gR = growth$gR)
 if(g.mod == 'alt_g') g <- data.frame(g=growth$g.alt,gR = growth$gR.alt)
 if(g.mod == 'proper_g') g <- data.frame(g=growth$g.proper,gR = growth$gR.proper)
+if(g.mod == 'g_1') g <- data.frame(g=growth$g/growth$g,gR = growth$gR/growth$gR)
 
-
-# And now we need to get the survey year right, note that same has the months in numbers not month names, soo...
-Sab.fish$survey.year[Sab.fish$month %in% 1:5] <- Sab.fish$survey.year[Sab.fish$month %in% 1:5]-1
+# And now we need to get the survey year right, note that same has the months in numbers not month names, this is already taken care of...
+#Sab.fish$survey.year[Sab.fish$month %in% 1:5] <- Sab.fish$survey.year[Sab.fish$month %in% 1:5]-1
 
 # Subset the fishery data to the correct years. We need to take on next year catch too..)
 Sab.fish <- Sab.fish %>% dplyr::filter(survey.year %in% years) # c(years,(max(years)+1))
@@ -443,11 +449,12 @@ if(mod.select == "SEAM")
                        knot_obj=Sab.mesh$knots,knot_area=pred.grid$area,separate_R_aniso =T,
                        all_se=T,weighted_mean_m = T)
   # So this will fix the mean value of m0 to be whatever the intial value is set at.  Let's see what happens!
-  set_data$par$log_m0 <- log(init.m) # 0 = 1, 
-  #set_data$par$log_R0 <- l.init.R # 5.3 = 200, 5 = 148, 4 = 55, 5.9915 = 400, 4.606 = 100
+   set_data$par$log_m0 <- log(init.m) # 0 = 1, 
+  # #set_data$par$log_R0 <- l.init.R # 5.3 = 200, 5 = 148, 4 = 55, 5.9915 = 400, 4.606 = 100
   set_data$par$log_qR <- log(qR)
-  #set_data$map <-list(log_m0=factor(NA))
+  # #set_data$map <-list(log_m0=factor(NA))
   set_data$map <-list(log_m0=factor(NA),log_qR = factor(NA))
+  #set_data$map <-list(log_qR = factor(NA))
 #set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA),log_qR = factor(NA))
 }
 #TLM version, Dude is this ever sensitive to the q priors! (5,12) actually looks solid in terms of results... maybe we can get so lucky with SEBDAM :-)
@@ -465,7 +472,7 @@ if(mod.select == "TLM")
   mod.fit<-fit_model(set_data,silent=F)
 
 # Now save the results appropriately
-if(mod.select != "TLM") 
+if(mod.select == "SEAM") 
 {
   # m0.par <- signif(exp(set_data$par$log_m0),digits=2)
   # qR.par <- signif(exp(set_data$par$log_qR),digits=2)
@@ -475,6 +482,8 @@ if(mod.select != "TLM")
   saveRDS(mod.fit,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
   saveRDS(Sab.mesh,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.select,"_mesh.Rds"))
   saveRDS(pred.grid,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.select,"_predict_grid.Rds"))
+  saveRDS(mod.input.sf,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.select,"_model_input.Rds"))
+  
 }
 
 if(mod.select == "TLM") 
@@ -545,6 +554,7 @@ theme_set(theme_few(base_size = 22))
 repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 mod.select <- "SEAM"
 g.mod <- 'g_original'
+#g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 ################################################### End the initial model runs ###########################################
@@ -552,7 +562,7 @@ g.mod <- 'g_original'
 
 
 
-if(mod.select != "TLM") scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+if(mod.select != "TLM") scenario.select <-   scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
 
 if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",g.mod)
 
@@ -597,11 +607,11 @@ q.dat.plot<-left_join(knot.gis,qI,by=c("knotID"))
 # Explotation
 # Now lets try and make a spatial exploitation rate plot. I'm not 1000% sure this is how I want to calculate this, but I think it is... sort it out :-)
 F.dat<-data.frame(B=as.vector(mod.fit$report$areaB[,-ncol(mod.fit$report$areaB)]/1000),
-                  C = c(rep(NA,num.knots),as.vector(as.matrix(catchy[,-c((ncol(catchy)-1),ncol(catchy))]))), Year=matYear1, knotID=knots1)
-F.dat <- F.dat %>% dplyr::mutate(exploit = C/(B+C)) # Sticking with how offshore does this (C/(B+C)) C/B of some variant may be more realistic
+                  C = c(as.vector(as.matrix(catchy[,-c((ncol(catchy)-1),ncol(catchy))])),rep(NA,num.knots)), Year=matYear1, knotID=knots1)
+F.dat <- F.dat %>% dplyr::mutate(exploit = C/(B+C)) # Sticking with how offshore does this (C/(B+C)) C/B or some variant may be more realistic
 F.dat.plot<-left_join(knot.gis,F.dat,by=c("knotID"))
-# Remove the first year of data because it's not needed now.
-F.dat.plot <- F.dat.plot %>% dplyr::filter(Year != years[1] )
+
+F.dat.plot <- F.dat.plot %>% dplyr::filter(Year != max(years) )
 # To get a weighted m time series combing the B, R, and the m data above
 bmr <- data.frame(B=as.vector(mod.fit$report$areaB/1000),
                   m=as.vector(mod.fit$report$m),
@@ -633,10 +643,11 @@ nat.mat.plt$method <- factor(nat.mat.plt$method,levels = c("m.all","Raph.m","m.F
 gs <- mod.fit$obj$env$data$gI
 gRs <- mod.fit$obj$env$data$gR
 tmp <- NULL
-Bs.tot <- mod.fit$report$B*mod.fit$obj$env$data$area/1000
-Rs.tot <- mod.fit$report$R*mod.fit$obj$env$data$area/1000
+
 for(i in 1:(NY-1))
 {
+  Bs.tot <- mod.fit$report$B*mod.fit$obj$env$data$area/1000
+  Rs.tot <- mod.fit$report$R*mod.fit$obj$env$data$area/1000
   ms <- mod.fit$report$m
   Bst <- (exp(-ms[,i+1]))*gs[i]*(Bs.tot[,i]-catchy[,i]) 
   Rst <- (exp(-ms[,i+1]))*gRs[i]*(Rs.tot[,i]) 
@@ -904,7 +915,7 @@ pred.proc$log_processes <- pred.proc$log_processes %>% dplyr::filter(year < 2023
 # Not 1000% sure this is correct at this point.  It is noteworth how different this is than the map though...
 if(mod.select != "TLM")
 {
-  ann.exploit <- data.frame(year = years,B = exp(pred.proc$log_processes$log_B), Catch = c(NA,colSums(catchy[,-c((ncol(catchy)-1),ncol(catchy))])),
+  ann.exploit <- data.frame(year = years,B = exp(pred.proc$log_processes$log_B), Catch = c(colSums(catchy[,-c((ncol(catchy)-1),ncol(catchy))]),NA),
                             B.LCI = pred.proc$log_processes$totB.LCI, B.UCI = pred.proc$log_processes$totB.UCI)
 }
 if(mod.select == "TLM")
@@ -912,9 +923,9 @@ if(mod.select == "TLM")
   ann.exploit <- data.frame(year = years,B = exp(pred.proc$log_processes$log_B), Catch = c(NA,catchy[1:(length(catchy)-2)]),
                             B.LCI = pred.proc$log_processes$totB.LCI, B.UCI = pred.proc$log_processes$totB.UCI)
 }
-ann.exploit$exploit <- ann.exploit$Catch/(ann.exploit$B+ann.exploit$Catch)
-ann.exploit$exploit.UCI <- ann.exploit$Catch/(ann.exploit$B.LCI+ann.exploit$Catch)
-ann.exploit$exploit.LCI <- ann.exploit$Catch/(ann.exploit$B.UCI+ann.exploit$Catch)
+ann.exploit$exploit <- c(ann.exploit$Catch[1:(nrow(ann.exploit)-1)]/(ann.exploit$B[2:nrow(ann.exploit)]+ann.exploit$Catch[1:(nrow(ann.exploit)-1)]),NA)
+ann.exploit$exploit.UCI <- c(ann.exploit$Catch[1:(nrow(ann.exploit)-1)]/(ann.exploit$B.UCI[2:nrow(ann.exploit)]+ann.exploit$Catch[1:(nrow(ann.exploit)-1)]),NA)
+ann.exploit$exploit.LCI <- c(ann.exploit$Catch[1:(nrow(ann.exploit)-1)]/(ann.exploit$B.LCI[2:nrow(ann.exploit)]+ann.exploit$Catch[1:(nrow(ann.exploit)-1)]),NA)
 ann.exploit$FM <- 1-exp(-ann.exploit$exploit)
 ann.exploit$FM.LCI <- 1-exp(-ann.exploit$exploit.LCI)
 ann.exploit$FM.UCI <- 1-exp(-ann.exploit$exploit.UCI)

@@ -4,6 +4,7 @@ editor_options:
   chunk_output_type: console
 ---
 \clearpage
+\newpage
 
 # Tables {-}
 
@@ -15,8 +16,49 @@ require(officedown)
 require(officer)
 require(flextable)
 
-# These are the 4 tables I want to make.
+
+
+# These are the tables I want to make.
 # clean things up...
+# Parameter tables 
+# First Sable and BSSM, here pulling this for parameters with only a single estimate
+extract.bssm <- which(rownames(sab.bssm.mod.out$summary) %in% c("sigma","S","q","ikappa.rho2","ikappa.tau2",'logK'))
+sab.bssm.parm.table <- data.frame(sab.bssm.mod.out$summary[extract.bssm,c("mean","sd")])
+names(sab.bssm.parm.table) <- c("Estimate","Standard Error")
+sab.bssm.parm.table$Estimate <- round(sab.bssm.parm.table$Estimate,digits=2)
+sab.bssm.parm.table$`Standard Error`<- round(sab.bssm.parm.table$`Standard Error`,digits=3)
+
+# SEAM...  get these from sdrep so we can get the standard errors reported as well.
+sab.10.parm.table <- summary(sab.10$sdrep)
+# Names we want to extract...
+extract <- rownames(sab.10.parm.table)[c(1:13,24)]
+sab.10.parm.table <- data.frame(sab.10.parm.table[extract,])
+names(sab.10.parm.table) <- c("Estimate","Standard Error")
+sab.10.parm.table$Estimate <- round(sab.10.parm.table$Estimate,digits=3)
+sab.10.parm.table$`Standard Error`<- round(sab.10.parm.table$`Standard Error`,digits=3)
+
+# Now BBn and BSSM, here pulling this for parameters with only a single estimate
+extract.bssm <- which(rownames(bbn.bssm.mod.out$summary) %in% c("sigma","S","q","ikappa.rho2","ikappa.tau2",'logK'))
+bbn.bssm.parm.table <- data.frame(bbn.bssm.mod.out$summary[extract.bssm,c("mean","sd")])
+names(bbn.bssm.parm.table) <- c("Estimate","Standard Error")
+bbn.bssm.parm.table$Estimate <- round(bbn.bssm.parm.table$Estimate,digits=2)
+bbn.bssm.parm.table$`Standard Error`<- round(bbn.bssm.parm.table$`Standard Error`,digits=3)
+
+
+# BBn
+bbn.20.parm.table <- summary(bbn.20$sdrep)
+# Names we want to extract...
+extract <- rownames(bbn.20.parm.table)[c(1:12,33)]
+bbn.20.parm.table <- data.frame(bbn.20.parm.table[extract,])
+names(bbn.20.parm.table) <- c("Estimate","Standard Error")
+bbn.20.parm.table$Estimate <- round(bbn.20.parm.table$Estimate,digits=3)
+bbn.20.parm.table$`Standard Error`<- round(bbn.20.parm.table$`Standard Error`,digits=3)
+
+
+
+
+# BSSM bias table...
+
 bias.sab.clean <- bias.sab[,-ncol(bias.sab)]
 bias.sab.clean[,c(2,4,5,6)] <- round(bias.sab.clean[,c(2,4,5,6)],digits=2)
 bias.sab.clean[,c(1,3)] <- round(bias.sab.clean[,c(1,3)],digits=0)
@@ -24,7 +66,16 @@ bias.sab.clean[,c(1,3)] <- round(bias.sab.clean[,c(1,3)],digits=0)
 names(bias.sab.clean) <- c("Biomass retro","Relative Biomass retro",
                            "Recruit retro","Relative Recruit retro",
                            "Natural Mortality retro","Relative Natural Mortality retro")
-                           
+
+bias.sab.bssm.clean <- bias.bssm.sab[,-ncol(bias.bssm.sab)]
+bias.sab.bssm.clean[,c(2,4,5,6)] <- round(bias.sab.bssm.clean[,c(2,4,5,6)],digits=2)
+bias.sab.bssm.clean[,c(1,3)] <- round(bias.sab.bssm.clean[,c(1,3)],digits=0)
+# Now get beter names
+names(bias.sab.bssm.clean) <- c("Biomass retro","Relative Biomass retro",
+                           "Recruit retro","Relative Recruit retro",
+                           "Natural Mortality retro","Relative Natural Mortality retro")     
+
+                      
 # Same for bbn....
 bias.bbn.clean <- bias.bbn[,-ncol(bias.bbn)]
 bias.bbn.clean[,c(2,4,5,6)] <- round(bias.bbn.clean[,c(2,4,5,6)],digits=2)
@@ -33,86 +84,66 @@ bias.bbn.clean[,c(1,3)] <- round(bias.bbn.clean[,c(1,3)],digits=0)
 names(bias.bbn.clean) <- c("Biomass retro","Relative Biomass retro",
                            "Recruit retro","Relative Recruit retro",
                            "Natural Mortality retro","Relative Natural Mortality retro")
-# Now transpose the model parameter table
-sab.10.parm.table <- data.frame(value = t(sab.10.parm.table))
 
-bbn.20.parm.table <-  data.frame(value = t(bbn.20.parm.table))
+bias.bbn.bssm.clean <- bias.bssm.bbn[,-ncol(bias.bssm.bbn)]
+bias.bbn.bssm.clean[,c(2,4,5,6)] <- round(bias.bbn.bssm.clean[,c(2,4,5,6)],digits=2)
+bias.bbn.bssm.clean[,c(1,3)] <- round(bias.bbn.bssm.clean[,c(1,3)],digits=0)
+# Now get beter names
+names(bias.bbn.bssm.clean) <- c("Biomass retro","Relative Biomass retro",
+                           "Recruit retro","Relative Recruit retro",
+                           "Natural Mortality retro","Relative Natural Mortality retro")     
 
 
-sab.bias.table <- csas_table(bias.sab.clean,
-                             caption ="Annual retrospecitve results for SFA 25a.  Positive values indicate the retrospective
-                              model estimates were higher than that base model. The Biomass retro and Recruit retro are in tonnes.
-                             The relative metrics are proportional differences between the retrospective model and the base model.
-                             The year represents the terminal year used to compare with the base model.")
-
-bbn.bias.table <- csas_table(bias.bbn.clean,
-                             caption ="Annual retrospecitve results for SFA 26a.  Positive values indicate the retrospective
-                              model estimates were higher than that base model. The Biomass retro and Recruit retro are in tonnes.
-                             The relative metrics are proportional differences between the retrospective model and the base model.
-                             The year represents the terminal year used to compare with the base model.")
-
-sab.param.table <- csas_table(sab.10.parm.table,caption="Selected parameter estimates from SEAM in SFA-25a")
-bbn.param.table <- csas_table(bbn.20.parm.table,caption="Selected parameter estimates from SEAM in SFA-26a")
-
-# sab.bias.table <- kableExtra::kbl(bias.sab.clean, booktabs = TRUE, escape =F, format = 'pipe',
-#                              caption ="Annual retrospecitve results for SFA 25a.  Positive values indicate the retrospective
-#                               model estimates were higher than that base model. The Biomass retro and Recruit retro are in tonnes. 
-#                              The relative metrics are proportional differences between the retrospective model and the base model.  
-#                              The year represents the terminal year used to compare with the base model.")
-# 
-# bbn.bias.table <- kableExtra::kbl(bias.bbn.clean, booktabs = TRUE, escape =F, format = 'pipe',
-#                              caption ="Annual retrospecitve results for SFA 26a.  Positive values indicate the retrospective
-#                               model estimates were higher than that base model. The Biomass retro and Recruit retro are in tonnes. 
-#                              The relative metrics are proportional differences between the retrospective model and the base model.  
-#                              The year represents the terminal year used to compare with the base model.")
-# 
-# sab.param.table <- kableExtra::kbl(sab.10.parm.table, booktabs = TRUE, escape =F, format = 'pipe',
-#                                    caption="Selected parameter estimates from SEAM in SFA-25a")
-# bbn.param.table <- kableExtra::kbl(bbn.20.parm.table, booktabs = TRUE, escape =F, format = 'pipe',
-#                                    caption="Selected parameter estimates from SEAM in SFA-26a")
-# strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
-#   kableExtra::collapse_rows(columns = 1:4, valign = "top")
-
-# ageing_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/summary_stats.csv")
-# ageing_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/summary_stats.csv")
-# ageing_bbn$`Management Unit` <- "Browns Bank North"
-# ageing_sab$`Management Unit` <- "Sable Bank"
-# ageing <- rbind(ageing_sab, ageing_bbn)
-# ageing <- dplyr::select(ageing, -X)
-# ageing <- data.frame(ageing$`Management Unit`, ageing[,1:(ncol(ageing)-1)])
-# names(ageing)[1:2] <- c("Management Unit", "Model")
-# ageing1 <- unique(dplyr::select(ageing, Model, Formula))
-# ageing2 <- dplyr::select(ageing, -Formula)
-# ageing2$AIC <- round(ageing2$AIC, 0)
-# ageing2$r.sq <- round(ageing2$r.sq, 3)
-# ageing2$scale.est <- round(ageing2$scale.est, 2)
-# ageing2[,c("H10", "H5", "H2", "K_maxR", "K_avgFR", "K_2_to_5")] <- round(ageing2[,c("H10", "H5", "H2", "K_maxR", "K_avgFR", "K_2_to_5")], 1)
-# ageing2$`Management Unit`[ageing2$`Management Unit`=="Sable Bank"] <- c("Sable Bank", NA, NA)
-# ageing2$`Management Unit`[ageing2$`Management Unit`=="Browns Bank North" & !is.na(ageing2$`Management Unit`)] <- c("Browns Bank North", NA, NA)
-# ageing3 <- ageing2[,c(1:2,9:7)]
-# ageing4 <- ageing2[,c(1:2,10:15)]
-# ageing2 <- ageing2[,c(1:6)]
+# Clean up the decision tables from SEBDAM
+bbn.dt$table$`Biomass change (%)` <- round(bbn.dt$table$`Biomass change (%)`,digits=1)
+bbn.dt$table$`Biomass change (tonnes)` <- round(bbn.dt$table$`Biomass change (tonnes)`,digits=0)
+sab.dt$table$`Biomass change (%)` <- round(sab.dt$table$`Biomass change (%)`,digits=1)
+sab.dt$table$`Probability of Decline` <- round(sab.dt$table$`Probability of Decline`,digits=2)
 
 opts <- options(knitr.kable.NA = "")
 
 ```
 
 
+\newpage
+```{r sfa-25-bssm-param-table,include=T,echo=F}
+csas_table(sab.bssm.parm.table,caption="Selected parameter estimates and their standard errors from BSSM in SFA-25a")
+```
 
-```{r sab-param-table,include=T,echo=F}
-csas_table(sab.10.parm.table,caption="Selected parameter estimates from SEAM in SFA-25a")
+
+
+\newpage
+```{r sfa-26-bssm-param-table,include=T,echo=F}
+csas_table(bbn.bssm.parm.table,caption="Selected parameter estimates and their standard errors from BSSM in SFA-26a")
+
 ```
 
 
 \newpage
-```{r bbn-param-table,include=T,echo=F}
-csas_table(bbn.20.parm.table,caption="Selected parameter estimates from SEAM in SFA-26a")
+```{r sfa-25-param-table,include=T,echo=F}
+csas_table(sab.10.parm.table,caption="Selected parameter estimates and their standard errors from SEAM in SFA-25a")
 ```
 
 
 \newpage
-```{r sab-bias-table,include=T,echo=F}
-csas_table(bias.sab.clean,caption ="Annual retrospecitve results for SFA 25a.  Positive values indicate the retrospective
+```{r sfa-26-param-table,include=T,echo=F}
+csas_table(bbn.20.parm.table,caption="Selected parameter estimates and their standard errors from SEAM in SFA-26a")
+```
+
+
+\newpage
+```{r sfa-25-bssm-bias-table,include=T,echo=F}
+csas_table(bias.sab.bssm.clean,caption ="Annual retrospecitve results from BSSM in SFA 25A.  Positive values indicate the retrospective
+                              model estimates were higher than that base model. The Biomass retro and Recruit retro are in tonnes.
+                             The relative metrics are proportional differences between the retrospective model and the base model.
+                             The year represents the terminal year used to compare with the base model.")
+
+```
+
+
+\newpage
+```{r sfa-25-bias-table,include=T,echo=F}
+csas_table(bias.sab.clean,caption ="Annual retrospecitve results from SEAM in SFA 25A.  Positive values indicate the retrospective
                               model estimates were higher than that base model. The Biomass retro and Recruit retro are in tonnes.
                              The relative metrics are proportional differences between the retrospective model and the base model.
                              The year represents the terminal year used to compare with the base model.")
@@ -120,12 +151,44 @@ csas_table(bias.sab.clean,caption ="Annual retrospecitve results for SFA 25a.  P
 
 
 \newpage
-```{r bbn-bias-table,include=T,echo=F}
-csas_table(bias.bbn.clean, caption ="Annual retrospecitve results for SFA 26a.  Positive values indicate the retrospective
+```{r sfa-26-bssm-bias-table,include=T,echo=F}
+csas_table(bias.bbn.bssm.clean,caption ="Annual retrospecitve results from BSSM in SFA 26A.  Positive values indicate the retrospective
+                              model estimates were higher than that base model. The Biomass retro and Recruit retro are in tonnes.
+                             The relative metrics are proportional differences between the retrospective model and the base model.
+                             The year represents the terminal year used to compare with the base model.")
+
+```
+
+
+\newpage
+```{r sfa-26-bias-table,include=T,echo=F}
+csas_table(bias.bbn.clean, caption ="Annual retrospecitve results from SEAM in SFA 26A.  Positive values indicate the retrospective
                               model estimates were higher than that base model. The Biomass retro and Recruit retro are in tonnes.
                              The relative metrics are proportional differences between the retrospective model and the base model.
                              The year represents the terminal year used to compare with the base model.")
 ```
 
 
+\newpage
+```{r sfa-25-bssm-dt,include=T,echo=F}
+csas_table(sab.bssm.dt, caption ="Decision table using the 2022 BSSM output for SFA 25A to estimate fully-recruited biomass in 2023 using the no growth scenario")
+```
 
+
+
+\newpage
+```{r sfa-25-seam-dt,include=T,echo=F}
+csas_table(sab.dt$table, caption ="Decision table using the 2022 SEAM output for SFA 25A to estimate fully-recruited biomass in 2023 using the no growth scenario")
+```
+
+
+\newpage
+```{r sfa-26-bssm-dt,include=T,echo=F}
+csas_table(bbn.bssm.dt, caption ="Decision table using the 2022 BSSM output for SFA 26A to estimate fully-recruited biomass in 2023 using the no growth scenario")
+```
+
+
+\newpage
+```{r sfa-26-seam-dt,include=T,echo=F}
+csas_table(bbn.dt$table, caption ="Decision table using the 2022 SEAM output for SFA 26A to estimate fully-recruited biomass in 2023 using the no growth scenario")
+```

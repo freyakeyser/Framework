@@ -1,0 +1,32 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r pe-, echo=F, include=F, paged.print=FALSE,cache=F}
+
+
+```
+
+
+
+```{r data-for-paper, echo=F, include=F, paged.print=FALSE,cache=F}
+# Numbers for the text...
+# For some stuff we need to drop the prediction year piece
+drops <- length(pred.proc.sab.10$totals$totB)
+
+
+```
+
+<!-- Make the figures -->
+
+```{r catch-prior, echo=F,include=F}
+
+prior <- data.frame(prior = dbeta(seq(0,1,by=0.01),20,40),x = seq(0,1,by=0.01))
+prior.fig <- ggplot(prior) + geom_line(aes(y=prior,x=x)) + xlab("Fully-recruited catchability")  + scale_y_continuous(name = "", labels=NULL,breaks = NULL)
+
+if(language == 'english') save_plot(filename = paste0(repo.loc,"Figures/Catchability_distribution.png"),prior.fig,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(filename = paste0(repo.loc,"Figures/Catchability_distribution_fr.png"),prior.fig,base_width = 8,base_height = 6)
+
+```

@@ -44,7 +44,7 @@ years <- 1994:2022
 R.size <- "75"
 FR.size <- "90"
 num.knots <- 20 # Going to test 10, 15, and 20
-qR <- 0.45# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
 # Various explorations of the g models.
 g.mod <- 'g_original'
@@ -53,21 +53,21 @@ g.mod <- 'g_original'
 
 
 #Loading the output from TLM BBN model
-tlm.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",g.mod)
-tlm.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_TLM_model_output_",tlm.select,".Rds"))
-pred.proc.tlm <- get_processes(tlm.mod)
-
-tlm.mod$report$totB <- tlm.mod$report$B
-tlm.mod$report$totR <- tlm.mod$report$R
-tlm.mod$report$mean_m <- tlm.mod$report$m
-
-#get_parameters(tlm.mod)
+# tlm.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",g.mod)
+# tlm.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_TLM_model_output_",tlm.select,".Rds"))
+# pred.proc.tlm <- get_processes(tlm.mod)
+# 
+# tlm.mod$report$totB <- tlm.mod$report$B
+# tlm.mod$report$totR <- tlm.mod$report$R
+# tlm.mod$report$mean_m <- tlm.mod$report$m
+# 
+# #get_parameters(tlm.mod)
 #tlm.mod$report$gI <- tlm.mod$report$g
 
 
 # # If running with SEBDAM this is what ya use.
 #seam.select <- "1994_2022_vary_m_m0_0.4_R0_1_15_knots"
-seam.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+seam.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod,"_vary_q=TRUE")
 
 #seam.select <- "1994_2022_vary_m_m0_2_qR_0.5_10_knots"
 seam.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",seam.select,".Rds"))
@@ -177,35 +177,35 @@ prod.dat[prod.dat$Year == 2020,-1] <- NA
 # Explore the differences between TLM and SEAM... Note that I'm arguing for the weighted mean for natural mortality and that's what I'm using here.
 
 # Comparing the TLM and SEAM results, as you change the number of knots is makes increasingly more sense.
-two.mods <- data.frame(years = rep(years,2),model = c(rep("SEAM",NY),rep("TLM",NY)),
-                       B = c(seam.mod$report$totB,tlm.mod$report$totB),
-                       R = c(seam.mod$report$totR,tlm.mod$report$totR),
-                       m = c(seam.mod$report$mean_m,tlm.mod$report$mean_m))
-
-p1 <- ggplot(two.mods,aes(x=years,y = B,group=model,color=model)) + geom_line(linewidth=1.5) + 
-                                                                    ylab("Biomass (tonnes)") + xlab("") +
-                                                                    scale_x_continuous(breaks = seq(1980,2025,by=5)) + 
-                                                                    scale_color_manual(values = c("blue","firebrick2"),guide = guide_legend(override.aes = list(alpha = 0) )) +
-                                                                    theme(legend.title = element_text(color = "transparent"),
-                                                                          legend.text = element_text(color = "transparent"))
-
-
-p2 <- ggplot(two.mods,aes(x=years,y = R,group=model,color=model)) + geom_line(linewidth=1.5) +  
-                                                                    ylab("Recruits (tonnes)") + xlab("")+
-                                                                    scale_x_continuous(breaks = seq(1980,2025,by=5)) + 
-                                                                    scale_color_manual(values = c("blue","firebrick2"))
-
-
-p3 <- ggplot(two.mods,aes(x=years,y = m,group=model,color=model)) + geom_line(linewidth=1.5) +  
-                                                                    ylab("Natural mortality (instantaneous)") + xlab("") +
-                                                                    scale_x_continuous(breaks = seq(1980,2025,by=5)) + 
-                                                                    scale_color_manual(values = c("blue","firebrick2"),guide = guide_legend(override.aes = list(alpha = 0) )) +
-                                                                    theme(legend.title = element_text(color = "transparent"),
-                                                                          legend.text = element_text(color = "transparent"))
-                                                                    
-
-p.tlm.seam <- cowplot::plot_grid(p1,p2,p3,nrow=3)
-save_plot(paste0(plot.url,"SEAM_vs_TLM.png"),p.tlm.seam,base_height = 18,base_width = 10)                                                                      
+# two.mods <- data.frame(years = rep(years,2),model = c(rep("SEAM",NY),rep("TLM",NY)),
+#                        B = c(seam.mod$report$totB,tlm.mod$report$totB),
+#                        R = c(seam.mod$report$totR,tlm.mod$report$totR),
+#                        m = c(seam.mod$report$mean_m,tlm.mod$report$mean_m))
+# 
+# p1 <- ggplot(two.mods,aes(x=years,y = B,group=model,color=model)) + geom_line(linewidth=1.5) + 
+#                                                                     ylab("Biomass (tonnes)") + xlab("") +
+#                                                                     scale_x_continuous(breaks = seq(1980,2025,by=5)) + 
+#                                                                     scale_color_manual(values = c("blue","firebrick2"),guide = guide_legend(override.aes = list(alpha = 0) )) +
+#                                                                     theme(legend.title = element_text(color = "transparent"),
+#                                                                           legend.text = element_text(color = "transparent"))
+# 
+# 
+# p2 <- ggplot(two.mods,aes(x=years,y = R,group=model,color=model)) + geom_line(linewidth=1.5) +  
+#                                                                     ylab("Recruits (tonnes)") + xlab("")+
+#                                                                     scale_x_continuous(breaks = seq(1980,2025,by=5)) + 
+#                                                                     scale_color_manual(values = c("blue","firebrick2"))
+# 
+# 
+# p3 <- ggplot(two.mods,aes(x=years,y = m,group=model,color=model)) + geom_line(linewidth=1.5) +  
+#                                                                     ylab("Natural mortality (instantaneous)") + xlab("") +
+#                                                                     scale_x_continuous(breaks = seq(1980,2025,by=5)) + 
+#                                                                     scale_color_manual(values = c("blue","firebrick2"),guide = guide_legend(override.aes = list(alpha = 0) )) +
+#                                                                     theme(legend.title = element_text(color = "transparent"),
+#                                                                           legend.text = element_text(color = "transparent"))
+#                                                                     
+# 
+# p.tlm.seam <- cowplot::plot_grid(p1,p2,p3,nrow=3)
+# save_plot(paste0(plot.url,"SEAM_vs_TLM.png"),p.tlm.seam,base_height = 18,base_width = 10)                                                                      
 
 
 
@@ -596,12 +596,12 @@ hi.B.exp <- sd(ann.exploit$exploit[ann.exploit$B >= 5000],na.rm=T)
 #g.strat <- data.frame(type = "cor",strat = 'dist', bp = 9000,mn.mx = 1, sd.mx = 0.05,ar1=0,ar2=0) # The g correlation method seems to get g a bit too  high.
 g.strat <- data.frame(type = "sv",set.value = 1,strat = 'dist', mn.mx = 1, sd.mx = 0.05)
 #g.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = 1, sd.mx = 0.05)
-r.strat <- data.frame(type = "bp",strat = 'dist', bp = 0.9e4,mn.mx = 0.1*signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=3,
+r.strat <- data.frame(type = "bp",strat = 'dist', bp = 1.15e4,mn.mx = 0.1*signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=3,
                               ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=signif(p.rps.pacf$data$Freq[2],digits=2),rps.m.cor = 0.75,rps.m.lag = 1) # Note lag is 1
 #r.strat <- data.frame(type = "bp",strat = 'dist', bp = 13500,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
 #                       ar1=0,ar2=0,rps.m.cor = 0,rps.m.lag = 0)
 #r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
-m.strat <- data.frame(type = "bp",strat = 'dist', bp = 1.0e4,mn.mx = 2*signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1, ar1=signif(p.m.pacf$data$Freq[1],digits=2),ar2=0) #
+m.strat <- data.frame(type = "bp",strat = 'dist', bp = 1.15e4,mn.mx = 2*signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1, ar1=signif(p.m.pacf$data$Freq[1],digits=2),ar2=0) #
 #m.strat <- data.frame(type = "bp",strat = 'dist', bp = 10000,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 #m.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 mod = "SEAM"
@@ -618,9 +618,10 @@ Res <- proj.mod(n_sim=500,n_y = 200,model=mod,plot_url = plot_url, run = 'no_mod
                                 ar1=r.strat$ar1,ar2=r.strat$ar2),
                  m.mod =   list(type = m.strat$type,bp.strategy = m.strat$strat,bp= m.strat$bp, mn.at.max = m.strat$mn.mx,sd.at.max = m.strat$sd.mx,
                                 ar1=m.strat$ar1,ar2=m.strat$ar2))
+Exp.res <- Res$Exp.res
 # End RUNME
 # Here are our reference point options
-Exp.res <- readRDS("D:/Framework/SFA_25_26_2024/RefPts/Results/BBn/R_75_FR_90/SEAM_1994_2022_vary_m_m0_0.2_qR_0.45_20_knots_g_original/RPs/SEAM_g_sv__1_dist_1_0.05_r_bp_dist_9000__0.00041_0.23_m_bp_dist_10000__0.194_0.1.Rds")
+# Exp.res <- readRDS("D:/Framework/SFA_25_26_2024/RefPts/Results/BBn/R_75_FR_90/SEAM_1994_2022_vary_m_m0_0.2_qR_0.33_20_knots_g_original_vary_q=TRUE/RPs/SEAM_g_sv__1_dist_1_0.05_r_bp_dist_11500__0.00041_0.23_m_bp_dist_11500__0.184_0.1.Rds")
 
 
 RPs <- Exp.res %>% dplyr::filter(year >= 175) %>% dplyr::group_by(F.scenario) %>% dplyr::summarise(med.B = median(B,na.rm=T),
@@ -702,18 +703,18 @@ T.trp <- res.T.trp %>% dplyr::group_by(scenario) %>% dplyr::summarise(T.trp = mi
 
 ```{r hcr-sims,include =F}
 
-hcr.strat <-data.frame(TRP = TRP.B.msy,TRP.exp = 0.13,
-                       USR = USR.B0, USR.exp = 0.05, 
-                       LRP = LRP.3.BMSY, LRP.exp = 0,exp.sd = 0.25)
+hcr.strat <-data.frame(TRP = round(TRP.B0),TRP.exp = 0.1,
+                       USR = round(USR.B0), USR.exp = 0.04, 
+                       LRP = round(LRP.B0), LRP.exp = 0,exp.sd = 0.25)
 #g.strat <- data.frame(type = "cor",strat = 'dist', bp = 9000,mn.mx = 1, sd.mx = 0.05,ar1=0,ar2=0) # The g correlation method seems to get g a bit too  high.
 g.strat <- data.frame(type = "sv",set.value = 1,strat = 'dist', mn.mx = 1, sd.mx = 0.05)
 #g.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = 1, sd.mx = 0.05)
-r.strat <- data.frame(type = "bp",strat = 'dist', bp = 0.9e4,mn.mx = 0.1*signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=3,
+r.strat <- data.frame(type = "bp",strat = 'dist', bp = 1.15e4,mn.mx = 0.1*signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=3,
                               ar1=signif(p.rps.pacf$data$Freq[1],digits=2),ar2=signif(p.rps.pacf$data$Freq[2],digits=2),rps.m.cor = 0.75,rps.m.lag = 1) # Note lag is 1
 #r.strat <- data.frame(type = "bp",strat = 'dist', bp = 13500,mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5,
 #                       ar1=0,ar2=0,rps.m.cor = 0,rps.m.lag = 0)
 #r.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(min(prod.dat$RPS3,na.rm=T),digits=2), sd.mx = 0.2,rec.age=5)
-m.strat <- data.frame(type = "bp",strat = 'dist', bp = 1e4,mn.mx = 2*signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1, ar1=signif(p.m.pacf$data$Freq[1],digits=2),ar2=-0) #
+m.strat <- data.frame(type = "bp",strat = 'dist', bp = 1.15e4,mn.mx = 2*signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1, ar1=signif(p.m.pacf$data$Freq[1],digits=2),ar2=-0) #
 #m.strat <- data.frame(type = "bp",strat = 'dist', bp = 10000,mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 #m.strat <- data.frame(type = "lm",strat = "Linear", bp = "Model",mn.mx = signif(max(prod.dat$m,na.rm=T),digits=2), sd.mx = 0.1)
 mod = "SEAM"
@@ -722,7 +723,7 @@ res_url = "D:/Framework/SFA_25_26_2024/RefPts/Results/BBn/R_75_FR_90/"
 
 
 # An HCR model
-hcr <- proj.mod(n_sim=5,n_y = 100,model=mod,plot_url = plot_url, run = 'model_error', res_url = res_url,save.results = T,mod.run = seam.select,
+hcr <- proj.mod(n_sim=500,n_y = 200,model=mod,plot_url = plot_url, run = 'no_model_error', res_url = res_url,save.results = T,mod.run = seam.select,
                  g.mod =   list(type = g.strat$type,set.value = g.strat$set.value,bp.strategy = g.strat$strat,bp= g.strat$bp, mn.at.max = g.strat$mn.mx,
                                 sd.at.max = g.strat$sd.mx,ar1=g.strat$ar1,ar2=g.strat$ar2),
                  rec.mod = list(type = r.strat$type,bp.strategy = r.strat$strat,bp= r.strat$bp, mn.at.max = r.strat$mn.mx,sd.at.max = r.strat$sd.mx,
@@ -737,7 +738,7 @@ summary(prod.dat$m)
 summary(hcr$g)
 summary(prod.dat$g)
 summary(hcr$Rec)
-summary(hcr$B)
+summary(hcr$B[,,1][200,])
 summary(hcr$rps)
 summary(prod.dat$RPS3)
 plot(hcr$rps[,4,1])

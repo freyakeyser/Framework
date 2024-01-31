@@ -307,6 +307,8 @@ write.csv(D.tab,"D:/Framework/SFA_25_26_2024/Model/Results/BBn_SS_model/R_75_FR_
 save(DD.lst, DDpriors,DD.out,DD.dat,mod.out,mod.dat,cpue.dat,proj.dat,D.tab,proj.catch,
      URP,LRP,proj,TACi,yrs,
      file="D:/Framework/SFA_25_26_2024/Model/Results/BBn_SS_model/R_75_FR_90/BBn_SSmodel_results.RData")
+saveRDS(DD.out,file = "D:/Framework/SFA_25_26_2024/Model/Results/BBn_SS_model/R_75_FR_90/BBn_SS_mod_output.Rds")
+
 
 # Here we can grab the Fully recruited and recruit biomass for the last 2 years and the median of the time series.
 FR.bm <- DD.out$median$B
@@ -357,6 +359,7 @@ q <- mod.out$BUGSoutput$sims.list$q
 save(mort,TACI,BM.proj.1yr,B.quantiles,percent.B.change,prob.below.USR,FR.bm,FR.ltm,rec.bm,rec.ltm,neff,rhat,q,
                            file="D:/Framework/SFA_25_26_2024/Model/Results/BBn_SS_model/R_75_FR_90/Model_results_and_diagnostics.RData")
 saveRDS(q,file = "D:/Framework/SFA_25_26_2024/Model/Results/BBn_SS_model/R_75_FR_90/q_posterior.Rds")
+
 
 # OK, so happy with model lets load up some stuff
 load("D:/Framework/SFA_25_26_2024/Model/Results/BBn_SS_model/R_75_FR_90/Model_results_and_diagnostics.RData")
@@ -499,6 +502,65 @@ for(i in 1:num.param)
 
 
 
+# get the residuals and Process Error
+
+
+# Process error
+bbn.PE <- as.data.frame(t(apply(data.frame(DD.out$sims.list$Presid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(bbn.PE) <- c("LCI","median","UCI")
+bbn.PE$year <- yrs
+bbn.PE$fitted <- NA
+bbn.PE$obs <- NA
+bbn.PE$type <- "Raw process error (log)"
+# standardized
+bbn.stan.PE <- as.data.frame(t(apply(data.frame(DD.out$sims.list$sPresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(bbn.stan.PE) <- c("LCI","median","UCI")
+bbn.stan.PE$year <- yrs
+bbn.stan.PE$fitted <- NA
+bbn.stan.PE$obs <- NA
+bbn.stan.PE$type <- "Standardized process error"
+# I residuals...
+
+bbn.I.resids <- as.data.frame(t(apply(data.frame(DD.out$sims.list$Iresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(bbn.I.resids) <- c("LCI","median","UCI")
+bbn.I.resids$year <- yrs
+bbn.I.resids$fitted <- apply(data.frame(DD.out$sims.list$B),2,median)*median(DD.out$sims.list$q)
+bbn.I.resids$obs <- DD.out$data$I
+bbn.I.resids$type <- "Fully-recruited biomass residual (log)"
+# Standardized version
+bbn.stan.I.resids <- as.data.frame(t(apply(data.frame(DD.out$sims.list$sIresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(bbn.stan.I.resids) <- c("LCI","median","UCI")
+bbn.stan.I.resids$year <- yrs
+bbn.stan.I.resids$fitted <- apply(data.frame(DD.out$sims.list$B),2,median)*median(DD.out$sims.list$q)
+bbn.stan.I.resids$obs <- DD.out$data$I
+bbn.stan.I.resids$type <- "Standardized fully-recruited biomass residual"
+# IR resids
+bbn.IR.resids <- as.data.frame(t(apply(data.frame(DD.out$sims.list$IRresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(bbn.IR.resids) <- c("LCI","median","UCI")
+bbn.IR.resids$year <- yrs
+bbn.IR.resids$fitted <- apply(data.frame(DD.out$sims.list$R),2,median)*median(DD.out$sims.list$q)
+bbn.IR.resids$obs <- DD.out$data$IR
+bbn.IR.resids$type <- "Recruit biomass residual (log)"
+# Standardized version
+bbn.stan.IR.resids <- as.data.frame(t(apply(data.frame(DD.out$sims.list$sIRresid),2,function(x){quantile(x,probs=c(0.025,0.5,0.975),na.rm=T)})))
+names(bbn.stan.IR.resids) <- c("LCI","median","UCI")
+bbn.stan.IR.resids$year <- yrs
+bbn.stan.IR.resids$fitted <- apply(data.frame(DD.out$sims.list$R),2,median)*median(DD.out$sims.list$q)
+bbn.stan.IR.resids$obs <- DD.out$data$IR
+bbn.stan.IR.resids$type <- "Standardized recruited biomass residual"
+
+
+bbn.pe.resids <- rbind(bbn.PE,bbn.stan.PE,
+                       bbn.I.resids,bbn.stan.I.resids,
+                       bbn.IR.resids,bbn.stan.IR.resids)
+
+saveRDS(bbn.pe.resids,"D:/Framework/SFA_25_26_2024/Model/Results/BBn_SS_model/R_75_FR_90/PE_and_resids.Rds")
+
+
+
+
+
+
 
 
 
@@ -621,5 +683,3 @@ p.ssmod.F <- ggplot(res.gg %>% dplyr::filter(term == "Fishing Mortality (instant
   ylab("Fishing Mortality (instantaneous)") + xlab("") + 
   scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.5))
 save_plot("D:/Framework/SFA_25_26_2024/Model/Figures/BBn/R_75_FR_90/SSModel/FR_F_no_missing_surveys.png",p.ssmod.F,base_height = 8.5,base_width = 11)
-
-

@@ -12,7 +12,7 @@
 
 #catch.scenarios  The catch removals you want to build the table for, a vector of numbers is what it needs
 
-#n.sims           The number of simulations to run, default is 1e6 which runs in seconds
+#n.sims           The number of simulations to run, default is 1e6 which runs in seconds 
 
 #TRP              The target reference point, if it exists
 
@@ -21,7 +21,7 @@
 #LRP              The Limit(lower) Reference Point, if it exists
 
 #RR               The Removal Reference Point, if it exists. In % so use 10 not 0.1!
-
+#RR.TRP           In case we decided we have a different removal reference above the TRP (i.e. we really use the harvest control rules)
 #PSL              The landings from the fishery after the survey and up to the end of the calendar year (e.g. BBN survey is in May, so catch from June - December)
 
 #r.adj            Do we want to reweight the recruitment estimate. The default of 1 uses current value, this is a multiplier, thus 0 = no recruit, 2 means twice as many.
@@ -37,7 +37,7 @@
 #gR.adj           Do we want to reweight the recruit growth estimate. Note that setting this one to 0 sets growth to 1 (i.e. 0 growth). Otherwise this is a multiplier, just be
 #                 careful because here as a growth of 1 = no growth, thus a small multiplier will result in a value < 1 which means 'negative growth', which you
 #                 don't want unless you are exploring a unique scenario. Setting to 'avg' will take the time series median
-dec.tab <- function(mod.select = "SEAM",data = NULL, catch.scenarios = seq(0,10000,by=50),n.sims = 1e6,TRP = NULL,USR = NULL,LRP = NULL, RR = NULL,PSL = 0,
+dec.tab <- function(mod.select = "SEAM",data = NULL, catch.scenarios = seq(0,10000,by=50),n.sims = 1e6,TRP = NULL,USR = NULL,LRP = NULL, RR = NULL,RR.TRP = NULL,PSL = 0,
                     r.adj =1,m.adj=1,g.adj=1,gR.adj=1)
 {
 library(SEBDAM)
@@ -60,8 +60,8 @@ if(gR.adj == 0) gRs <- gRs/gRs
 if(g.adj != 0 & g.adj != 'avg') gs <- gs*g.adj
 if(gR.adj != 0 & gR.adj != 'avg') gRs <- gRs*gR.adj
 # Final is just using the average
-if(g.adj == "avg")  gs <- median(gs,na.rm=T)
-if(gR.adj == "avg")  gRs <- median(gRs,na.rm=T) 
+if(g.adj == "avg")  gs <- median(data$obj$env$data$gI,na.rm=T)
+if(gR.adj == "avg")  gRs <- median(data$obj$env$data$gR,na.rm=T) 
 
 
 
@@ -108,6 +108,7 @@ decision.table <- data.frame(catch = rep(NA,n.catch.scenarios), exploit = rep(NA
 
 for(i in 1:n.catch.scenarios) 
 {
+  #browser()
   # So now sample from the log normals using the above data. I looked at doing the lognormal bias correction but it didn't seem helpful here (lead to a positive bias in the 
   # 0 surplus production scenario)
   Bs.tot <- rlnorm(n.sims,B.log,B.log.se)
@@ -149,14 +150,6 @@ for(i in 1:n.catch.scenarios)
     if(raw.USR < 0.00995) decision.table$prob.below.USR[i] <- "< 0.01"
     if(raw.USR >= 0.00995 & raw.USR < 0.0995) decision.table$prob.below.USR[i] <- signif(raw.USR, digits = 1)
   }
-  if(!is.null(TRP)) 
-  {
-    raw.TRP <- length(B2[B2 < TRP]) / n.sims
-    decision.table$prob.below.TRP[i] <- signif(raw.TRP, digits = 2)
-    if(raw.TRP > 0.995) decision.table$prob.below.TRP[i] <- "> 0.99"
-    if(raw.TRP < 0.00995) decision.table$prob.below.TRP[i] <- "< 0.01"
-    if(raw.TRP >= 0.00995 & raw.TRP < 0.0995) decision.table$prob.below.TRP[i] <- signif(raw.TRP, digits = 1)
-  }
   if(!is.null(RR)) 
   {
     # Now we need to define what the Removal Reference point is at different biomass levels, here I am
@@ -174,13 +167,42 @@ for(i in 1:n.catch.scenarios)
     if(raw.RR >= 0.00995 & raw.RR < 0.0995) decision.table$prob.below.RR[i] <- signif(raw.RR, digits = 1)
   }
   
+  if(!is.null(TRP)) 
+  {
+    raw.TRP <- length(B2[B2 < TRP]) / n.sims
+    decision.table$prob.below.TRP[i] <- signif(raw.TRP, digits = 2)
+    if(raw.TRP > 0.995) decision.table$prob.below.TRP[i] <- "> 0.99"
+    if(raw.TRP < 0.00995) decision.table$prob.below.TRP[i] <- "< 0.01"
+    if(raw.TRP >= 0.00995 & raw.TRP < 0.0995) decision.table$prob.below.TRP[i] <- signif(raw.TRP, digits = 1)
+  }
+
+  # If we have a RR TRP, which we will only add if the projected biomass in the 0 exploitation scenario is > TRP
+  #browser()
+  if(!is.null(RR.TRP)) 
+  {
+    if( decision.table$Biomass[1] > TRP)
+    {
+      # Add a TRP column when these crtieria are met...
+      raw.RR.TRP <- length(exploit[exploit < RR.TRP])/ n.sims
+      decision.table$prob.below.RR.TRP[i] <- signif(raw.RR.TRP, digits = 2)
+      decision.table$RR.TRP[i] <- round(RR.TRP, digits = 2)
+      if(raw.RR.TRP > 0.995) decision.table$prob.below.RR.TRP[i] <- "> 0.99"
+      if(raw.RR.TRP < 0.00995) decision.table$prob.below.RR.TRP[i] <- "< 0.01"
+      if(raw.RR.TRP >= 0.00995 & raw.RR < 0.0995) decision.table$prob.below.RR.TRP[i] <- signif(raw.RR.TRP, digits = 1)
+    }
+  }
   
 }  # End table loop
 ndt <- c("Catch (tonnes)", "Exploitation (%)", "Biomass (tonnes)","Biomass change (%)", "Biomass change (tonnes)", "Probability of Decline")
 if(!is.null(LRP)) ndt <- c(ndt,"Probability biomass is below LRP")
 if(!is.null(USR)) ndt <- c(ndt,"Probability biomass is below USR")
-if(!is.null(TRP)) ndt <- c(ndt,"Probability biomass is below TRP")
 if(!is.null(RR)) ndt <- c(ndt,"Probability exploitation is below RR","Removal Reference (%)")
+if(!is.null(TRP)) ndt <- c(ndt,"Probability biomass is below TRP")
+if(!is.null(RR.TRP))
+{
+ if(decision.table$Biomass[1] > TRP) ndt <- c(ndt,"Probability exploitation is below RR @ TRP","TRP Removal Reference (%)")
+}
+    
 
 names(decision.table) <- ndt
 

@@ -30,7 +30,7 @@ Sab.shape <- st_read("D:/Github/GIS_layers/survey_boundaries/Sab.shp", quiet=T)
 Sab.shape <- Sab.shape %>% st_transform(crs = 32620) # Sab is a solid 20
 # Bring in the survey data
 #load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90.Rdata")
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 
 #load("D:/Framework/SFA_25_26_2024/Model/Data/testing_results_framework3.Rdata")
 #surv.dat <- surv.dat$Sab
@@ -40,8 +40,6 @@ surv.dat <- surv.dat$Sab
 mod.dat <- survey.obj$Sab$model.dat
 Sab.fishs <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/Sab_fish.dat.RDS')
 Sab.fishs$pro.repwt <- Sab.fishs$pro.repwt/1000
-# And now we need to get the survey year right, note that same has the months in numbers not month names, soo...
-Sab.fishs$survey.year[Sab.fishs$month %in% 1:5] <- Sab.fishs$survey.year[Sab.fishs$month %in% 1:5]-1
 
 #### Finshed Data prep and clean up!
 
@@ -57,7 +55,8 @@ init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to te
 FR.size <- "90"
 R.size <- "75"
 # The different growth models.
-g.mod <- 'g_original'
+#g.mod <- 'g_original'
+g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 # models
@@ -331,6 +330,7 @@ for(i in 1:n.mods)
         set_data$par$log_qR <- log(qR)
         #set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA),log_qR = factor(NA))
         set_data$map <-list(log_m0=factor(NA),log_qR = factor(NA))
+        set_data$map <-list(log_qR = factor(NA))
         #set_data$map <-list(log_m0=factor(NA))
       } # end if(mod.select != "TLM")
 
@@ -379,7 +379,8 @@ FR.size <- "90"
 num.knots <- 10 # Going to test 10
 qR <- 0.33
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
-g.mod <- 'g_original'
+#g.mod <- 'g_original'
+g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 # The survey biomass index for 1994 says there were 249 tonnes of recruits that year.

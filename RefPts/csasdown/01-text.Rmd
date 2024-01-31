@@ -1,0 +1,303 @@
+# Introduction
+
+The last full assessment for the Offshore Scallop fishery occurred in 2013, and focused on Georges Bank 'a' (SFA 27a) and Browns Bank north (SFA 26a), which are part of SFA 27 and 26, respectively. Annual updates for these two stocks have occurred since. However, the offshore scallop fishery consists of 9 management units in total. SFA 26 also includes Browns Bank South and German Bank, SFA 27 includes Georges Bank 'b', and SFA 25, known as the Eastern Scotian Shelf, includes management units 25 (Sable and Middle Bank), and 25b (Banquereau Bank).
+
+A history of the survey and fishery in Scallop Fishing Area (SFA) 25 and SFA 26 can be found in Keyser et al. 2097(FIGURE OUT HOW TO CITE). The primary fishing area within SFA 26 is SFA 26a, while the Sable Bank portion of SFA 25a has been the most consistently fished area within SFA 25 (CITE FREYA AGAIN). A Bayesian State-Space Delay difference model (BSSM) has been used to assess the status of SFA 26a for over a decade [@jonsenGeorgesBankScallop2009; hubleyGeorgesBankBrowns2014], but no analytical models have ever been developed for SFA 25a.  
+
+This research document focuses on the development of new stock assessment methodologies for SFAs 25a and 26a. A modified version of the BSSM developed by @jonsenGeorgesBankScallop2009 has been developed for these two areas.  Advances in computing power and the availability of new statistical methods has enabled the development of a Spatially Explicit Assessment model (SEAM) that is also based on the same conceptual delay-difference modelling framework [@mcdonaldExplicitIncorporationSpatial2021]. The SEAM model has been shown to reduce the bias from non-spatial methods when fishing effort is distributed heterogeneously across the domain of a stock [@mcdonaldExplicitIncorporationSpatial2021], it also provides a more detailed understanding of historic and current patterns of biomass, exploitation, natural mortality, and recruitment throughout the assessed area. The results for both types of model will be shown for comparative purposes, while model diagnostics such as retrospective analyses and visualization of residual patterns will be shown for the SEAM models.
+
+## Framework objectives
+
+The objectives of this framework are:  
+
+-	Describe and document the history of the fisheries and surveys on SFAs 25a, 25b, 26a, 26b, 26c, and 27b (including survey design)
+-	Update fishery and survey indices for SFAs 25a, 25b, 26a, 26b, 26c, and 27b
+- Develop and evaluate stock assessment models for SFAs 25a and 26a
+-	Propose and adopt limit reference points for SFAs 25a, 26a, 26c, and 27b (Occurring during a second CSAS meeting the Spring of 2024)
+-	Provide guidance on Removal Reference (RR) and Upper Stock Reference (USR) Points where appropriate (Occurring during a second CSAS meeting the Spring of 2024)
+
+This Modelling document will:  
+
+- To develop new spatial models for SFA 26a, and within the survey domain for the primary fishing grounds on SFA 25a (Sable Bank) 
+- Compare these results to non-spatial Bayesian state space models for each of these areas
+- Evaluate the performance of the spatial models using diagnostics such as retrospective analyses 
+
+
+# Population Models
+
+## Delay-difference Model
+
+The underlying model for both the spatial and non-spatial models is a delay-difference model [@derisoHarvestingStrategiesParameter1980; @schnuteGeneralTheoryAnalysis1985].  These models have parameters for natural mortality, recruitment, and growth, the complexity of the population dynamics is intermediary between a fully age-structured model and a simple Surplus production model. The underlying model formulation of the Delay-difference model is
+
+
+\begin{align}
+B_{t} = e^{-m_{fr}} g_{fr} (B_{t-1} - C_{t-1}) + e^{-m_{r}} g_{r} R_{t-1}
+\end{align}
+
+
+In this formulation, the fully-recruited biomass is $B$, natural mortality is $m$, growth is $g$, landings are $C$, the recruits are $R$, and the $t$ index represents the annual time step.  Where applicable, fully-recruited scallop are given the subscript $fr$, while recruits have the subscript $r$. Based on the ageing and port sampling analyses the recruits are scallop that are 75-89 mm in size in the previous year, scallop that are 90 mm and larger are considered fully-recruited in these models (Cite Freya). 
+
+The landings used in the model are adjusted to align with the survey season.  Both the 25A and 26A surveys normally occur in mid-late May, thus the fishery data is summarized in terms of a survey year, from June to May.  For example, the removals from June 2010 to May 2011 are identified as fishing year 2010 removals, in the above model formulation, these removals are subtracted from the biomass estimated in the May 2010 survey. The assumption implicit in this formulation is that all removals happen immediately after the survey occurs. 
+
+## Non-spatial Model (BSSM)
+
+The Bayesian non-spatial state space model (BSSM) used here is based on @jonsenGeorgesBankScallop2009 with revisions to the framework shown in @hubleyGeorgesBankBrowns2014. The data inputs used for this model are fully-recruited biomass, recruit biomass, landings (meat weight), clapper (empty paired shells; representative of natural mortality) number, total number of scallop (clappers + live), fully-recruited growth, and recruit growth, all of which are calculated annually (cite FREYA).  The fully-recruited biomass, recruit biomass, clapper number, and total number of scallop are single stratified indices calculated for the whole bank (cite FREYA).
+
+Due to challenges with model convergence due the increasing efficiency of the fishery (Cite Freya), there was an undocumented change to the model that was implemented to the CPUE index component of the model (see original formulation in [@jonsenGeorgesBankScallop2009; @hubleyGeorgesBankBrowns2014]).  The CV of the CPUE term was inflated by a factor of 50, which effectively eliminated the influence of this term in the model.  Here we have removed the fishery index from the model entirely.  No other changes were made to the non-spatial model formulation.  
+
+Since the development of these models it has been observed that there are many more priors in these models that have not been fully documented [@yinIdentifiableStatespaceModels2019]. The undocumented priors are annual priors for both fully-recruit and recruit natural mortality, and recruit biomass. 
+
+\begin{align}
+r_{t} \sim lognormal(0,1) \\
+m_{fr,t} \sim lognormal(-2,2) \\
+m_{r,t} \sim lognormal(-2,2)
+\end{align}
+
+Where $r$ is a re-scaled recruit biomass estimate and $m$ is the instantaneous natural mortality of recruit ($r$) and fully-recruited ($fr$) scallop. This results in three additional priors being estimated each year. These annual priors result in a more highly parameterized model than previously documented. This is likely masking identifiability and estimability issues with the underlying model; it may also result in complex interactions between a series of weakly informative priors that results in a highly constrained model [@yinIdentifiableStatespaceModels2019].
+
+<!-- 
+Identifiability means you can't estimate a parameter given your data, no matter how much data you have.  Estimability is that you can't get a good estimate of a parameter given the amount of data you have, but if you had more 'years' (for example) of this data you may be able to estimate the parameter.
+!-->
+
+## Spatial Model (SEAM)
+
+
+The data inputs for SEAM include the same variables used in BSSM. However, SEAM uses the data obtained directly from the tows rather than creating a summarized index for the entire model area each year, the one exception is for the growth terms which are identical to the growth terms used in BSSM. As a result of this, SEAM also requires the spatial location of the tows and fishery activity. The fishery locations are based on the logbook entries and have been recorded every 6 hours since 2009, before this the logbook entries were recorded once every 24 hours. 
+
+The spatial model (SEAM) is also a SSM and is represented by two stochastic processes, $\pmb{X}_{s,t}, t= 1,...,T$ and $s = 1,...,S$, these represent an unobserved dynamic state process that represents the population dynamics in space (at locations '$s$') and time (time steps '$t$') and the observation process $\pmb{Y}_{s,t}$ which links the observations to the population dynamic process.  A p-vector $\theta \in \Theta \subseteq \mathbb{R}^p$ is used to combine the model parameters, with fixed covariates indicated by $\pmb{z}_{s,t}$.
+
+$\theta$ is vector of fixed effects while $\pmb{X}_{s,t}$ is a vector of random effects which are predicted from estimates of $\theta$. In years with data the underlying processes (fully-recruited biomass, recruit biomass, and natural mortality) are considered to be predicted, while years without data (e.g. 2020) are considered projections. In these projection years, the projections are obtained by moving the process equations forward one year and represent the predicted mean and uncertainty.  
+
+These variables are combined into a joint likelihood $L(\cdot)$ and marginal likelihood $\mathcal{L}(\cdot)$.
+
+\begin{align}
+L(\theta,\pmb{Y}_{1:T} , \pmb{X}_{1:T} = \prod_{s=1}^S p(\pmb{Y}_{s,1}| 
+    \pmb{X}_{s,1},\theta) \prod_{t=2}^T p(\pmb{Y}_{s,t}|\ \pmb{X}_{s,t},\theta) 
+    \times p(\pmb{X}_{s,t} | \pmb{X}_{s,t-1},\theta)
+\end{align}
+
+\begin{align}
+\mathcal{L}(\theta,\pmb{Y}_{1:S,1:T}) = log \int L(\theta,\pmb{Y}_{1:S,1:T},\pmb{X}_{1:S,1:T})d\pmb{X}_{1:S,1:T}
+\end{align}
+
+These high dimension integrals are solved using the Laplace approximation implemented within the TMB package in R, which has been shown to be computationally highly efficient without a loss of accuracy [@kristensenTMBAutomaticDifferentiation2016; @auger-methemSpatiotemporalModellingMarine2017].
+
+SEAM retains the delay-difference framework and is based on a non-Bayesian assessment model which required no priors [@yinIdentifiableStatespaceModels2019]. Additional research has shown that knowledge of the catchability parameter is necessary to provide realistic estimates of biomass in these models [@mcdonaldExplicitIncorporationSpatial2021].  Stimulation studies have provided evidence for a temporal bias in the biomass estimates when using a non-spatial delay difference model [@mcdonaldExplicitIncorporationSpatial2021]. The bias is related to the underlying model assumption that fishing is homogeneous across the spatial domain and is resolved when using a spatial model or when fishing activity is evenly distributed across the survey domain. Fishery removals from the Offshore Scallop fishery are not homogeneous as the fishery tends to target areas with higher scallop biomass densities [@keithEvaluatingSocioeconomicConservation2020].  Simulation studies have also indicated that natural mortality and recruitment estimates from these models can be confounded, but this has no impact on the overall biomass estimates and the models provide a good estimate of the overall productivity of the system if catchability is parameterized properly [@mcdonaldExplicitIncorporationSpatial2021].
+
+The spatial Delay difference model formulation is
+
+\begin{align}
+B_{s,t} = (e^{-m_{s,t}} g_{fr} (B_{s,t-1} - C_{s,t-1}) + e^{-m_{s,t}} g_{r} R_{s,t-1}) e^{\Omega{^{B}_{s,t}}}
+\end{align}
+
+Here $B_{s,t}$ are the commercial biomass densities, $m_{s,t}$ are the instantaneous natural mortalities, $C_{s,t-1}$ are the commercial landings densities, and $R_{s,t-1}$ are the recruit biomass densities. The spatial field for fully-recruited biomass is $\Omega{^{B}_{s,t}}$, this field is modelled as a Gaussian Markov Random Field (GMRF) which simplifies to a mean zero multivariate normal distribution using a Stochastic Partial Differential Equation (SPDE). The covariance matrix follows a Matérn distribution.
+
+\begin{align}
+Matérn(s,s') = \tau^2 \frac{1}{\Gamma(\nu)2^{\nu-1}}(\kappa d(s,s'))^\nu K_\nu(\kappa d(s,s'))
+\end{align}
+
+Where $\tau^2$ is the spatial variance, $\nu$ is the smoothness parameter and is set at 1, $\kappa$ is the range parameter and gives an estimate of the range at which two points become uncorrelated, $\Gamma$ is the gamma function, $K$ is a Bessel function of the second kind, and d(s,s') is the Euclidean distance between two points.
+
+Anisotropy is enabled though $H^B$, which is a linear transformation of the covariance function.
+
+\begin{align}
+\Sigma(s,s') = Matérn(\parallel H^B(s-s') \parallel)
+\end{align}
+
+The recruits and natural mortality are modeled as lognormal random walks that incorporate spatial autocorrelation via their error structures ($\Omega{^{R}_{s,t}}$ and $\Omega{^{m}_{s,t}}$) using GMRFs.
+
+\begin{align}
+R_{s,t} = R_{s,t-1}e^{\Omega{^{R}_{s,t}}}
+\end{align}
+
+\begin{align}
+m_{s,t} = m_{s,t-1}e^{\Omega{^{m}_{s,t}}}
+\end{align}
+
+The above process equations are linked to the observations through three equations.
+
+\begin{align}
+I_{i,s,t} = \frac{q_{I(s)}B_{s,t}}{p_{I}} \epsilon_{i,s,t} \;,\; \epsilon_{i,s,t} \stackrel{Ind}{\sim} u\ell N(\sigma^{2}_{\epsilon})
+\end{align}
+
+\begin{align}
+I^{R}_{i,s,t} = \frac{q_{R} R_{s,t}} {p^{R}_{I}} \nu_{i,s,t} \;,\; \nu_{i,s,t} \stackrel{Ind}{\sim} u\ell N(\sigma^{2}_{\nu})
+\end{align}
+
+\begin{align}
+L_{i,s,t} = Bin(n_{i,s,t} , m_{s,t}S)
+\end{align}
+
+The observed fully-recruited biomass ($I_{i,s,t}$) in tow $i$, knot $s$, and year $t$ is linked to the actual unobserved fully-recruited biomass density $B_{s,t}$ scaled by the fully-recruited catchability ($q_{I(s)}$) within a given knot and adjusted by the probability of capturing fully-recruited scallop ($p_I$). The error term ($\epsilon_{i,s,t}$) is lognormally distributed with a variance of $\sigma^{2}_{\epsilon}$.
+
+The observation equation for recruit scallop is analogous to the fully-recruited scallop observation equation, with recruit biomass represented by $I^{R}_{i,s,t}$, a non-spatial recruit catchability term $q_R$ and a probability of of capturing recruits ($p^{R}_{I}$) with an error term ($\nu_{i,s,t}$) that is lognormally distributed with a variance of $\sigma^{2}_{\nu}$
+
+The final observation equation links the number of clappers ($L_{i,s,t}$) to natural mortality ($m_{s,t}$) using a binomial model which is scaled by the catchability of the clappers ($S$). This clapper model is a simplification of clapper model used in BSSM. The natural mortality of fully recruited and recruit scallop was assumed to be the same (i.e. $M_{fr} = M_{r}$) for SEAM. Finally, the natural mortality in year one was set at 0.2. 
+
+### Knot placement and number
+
+The knot locations were determined using a $k$-means clustering algorithm [@mcdonaldExplicitIncorporationSpatial2021; @thorsonGeostatisticalDeltageneralizedLinear2015]. The clustering algorithm used the fishery data to identify the optimal clustering patterns. For SFA-26a 20 knots were chosen, while for SFA-25a 10 knots were chosen, for SFA-26a this would result with an average of five tows within each knot in recent years, while in SFA-25a this would be 10 tows on overage per knot (based on a 100 station survey). The number of knots used is a trade-off between spatial resolution and data availability [@mcdonaldExplicitIncorporationSpatial2021], the rationale for using fewer knots in SFA-25a was related to having fewer survey stations in the first few years of the time-series and the relatively low fishing effort in the area.   Models with different numbers of knots were tested in both areas (i.e. 10 and 20) and this choice can result in differences in productivity and biomass estimates which will be discussed in the results.
+
+## Catchability
+
+For both the spatial and non-spatial model, catchability needs to be informed, for the spatial model this helps to minimize bias in the biomass estimates [@mcdonaldExplicitIncorporationSpatial2021]. For the non-spatial model it is one of the many required priors. For all the models we used a beta distribution (20,40) which is the same as the prior currently being used for the 26A stock assessment model (Fig. \@ref(fig:catch-prior-fig)).
+
+For the spatial model the fully recruited catchability can vary at each knot or be fixed across the modelling domain. In the model used herein the fully-recruited catchability was allowed to vary at each knot.  The recruit recruit catchability is fixed across the model domain and was set to be 0.45 (the median of the beta distribution). A model in which fully-recruited catchability did not vary spatially was tested, this had an exceedingly minor impact on productivity parameters (natural mortality and recruitment) and overall biomass estimates, thus these models are not further discussed.
+
+# Retrospecitve Analyses
+
+Retrospective analyses were undertaken by sequentially removing one year of data, the retrospective analyses were undertaken using terminal years from 2005-2021.  The retrospective analysis for SFA 26A was based on the model using 20 knots, while the 10 knot model was used for the retrospective analysis in SFA 25A.  The retrospective metrics were calculated for fully-recruited biomass, recruit biomass, and natural mortality. For each retrospective model (e.g. the model run from 1994-2015 will be referred to as the *2015 retrospective model*) the estimates are compared to the model run to 2022 (referred to as the *base model*). The calculations for the retrospective metrics are similar for fully-recruited biomass, recruit biomass, and natural mortality, below are the equations used for the calculations using fully-recruited biomass as the example.
+
+\begin{align}
+BD_{t,retro} = B_{tot,t,retro} - B_{tot,t,base}
+\end{align}
+
+Here $BD_{t,retro}$ is the difference between the retrospective model biomass in year $t$ ($B_{tot,t,retro}$) and the base model biomass in the same year ($B_{tot,t,base}$).  There relative biomass difference $RBD_{t,retro}$ is calculated as  
+
+\begin{align}
+RBD_{t,retro} = (B_{tot,t,retro} - B_{tot,t,base}) /  B_{tot,t,base}
+\end{align}
+
+A simple measure of retrospective model bias ($MR_{ny}$, known as Mohn's rho) can be calculated from $RBD_{t,retro}$ using different numbers of years ($ny$).  Here we will calculate $MR_5$ using 5 years of data, and $MR_{all}$ using all the years [2005-2021; @mohnRetrospectiveProblemSequential1999]
+
+\begin{align}
+MR_{ny} =  \sum^{ny}_1 RBD_{t,retro} / ny 
+\end{align}
+
+
+
+# Residuals
+
+The spatial nature of SEAM does not facilitate the calculation of simple statistically robust residuals. In lieu of this, simple quasi-process residuals were developed for the fully-recruited biomass using the process equation, total biomass estimates, and productivity parameter estimates for each knot in each year.  The expected biomass ($EB_{tot,s,t}$) in each knot ($s$) at each time step ($t$) was calculated using the process equation without including the random field error and using the model estimated total biomass ($B_{tot,s,t}$, natural mortality ($m_{s,t}$), total landings ($C_{tot,s,t-1}$), total recruitment ($R_{tot, s,t-1}$), and the fully-recruited and recruit growth rates.
+
+\begin{align}
+EB_{tot,s,t} = (e^{-m_{s,t}} g_{fr} (B_{tot,s,t-1} - C_{tot,s,t-1}) + e^{-m_{s,t}} g_{r} R_{tot, s,t-1}) 
+\end{align}
+
+The $EB_{tot,s,t}$ was compared to the model estimated total biomass $B_{tot,s,t}$ in each knot and year to develop spatial residual biomass metrics for the absolute biomass difference ($Res_{s,t}$) and the percent biomass difference $PRes_{s,t}$.
+
+\begin{align}
+Res_{s,t} = EB_{tot,s,t} - B_{tot,s,t}
+\end{align}
+
+\begin{align}
+PRes_{s,t} = (EB_{tot,s,t} - B_{tot,s,t}) / B_{tot,s,t}
+\end{align}
+
+# Results
+
+## Spatially Explicit Asssessment Model (SEAM)
+
+### SFA-25a
+
+The fully-recruited biomass estimates from SEAM indicate that biomass was elevated throughout much of the first decade of the 2000s (Fig. \@ref(fig:sfa-25-bm-fig)). Fully-recruited biomass has been in decline since the maximum biomass was observed (`r max.b.sab` tonnes) in `r max.b.sab.y`, with the minimum biomass observed (`r min.b.sab` tonnes) in `r min.b.sab.y`, this occurred despite a general decline in fishing mortality (Fig. \@ref(fig:sfa-25-fm-fig)).  The southern and western portions of SFA-25a tended to have higher fully-recruited biomass densities than more northern areas until the early to mid-2010s, in more recent years this area has had the lower biomass densities than the northern areas, with the most southwestern knot frequently having the lowest biomass density observed (Fig. \@ref(fig:sfa-25-spat-bm-fig)). The estimated catchability for fully-recruited scallop was highly variable throughout SFA-25a, ranging from `r min.q.sab` in the southwest to `r max.q.sab` in the northeast (Fig. \@ref(fig:sfa-25-catchy-fig)). 
+
+The elevated fully-recruited biomass in the early 2000s was driven by a relatively large recruitment event which lasted from 2000 to 2006 (Fig. \@ref(fig:sfa-25-rec-fig)).  Since this period recruit biomass has never exceeded `r rec.sab.since.07` tonnes. Spatially, recruit biomass has tended to be higher in the the southwestern portion of the bank, this was most noticeable in the early 2000s and to a lesser extent since 2018 (Fig. \@ref(fig:sfa-25-spat-rec-fig)). While the elevated recruit biomass resulted in elevated full-recruited biomass in the early 2000s, this has not been the case since 2018.
+
+Natural mortality (proportional) in SFA-25a is highly variable, with several years experiencing natural mortality rates in excess of 20% (Fig. \@ref(fig:sfa-25-nm-fig)).  The years of high natural mortality are spasmodic without any discernible temporal pattern, though they do occasionally last for 2 years. The southern regions of SFA-25a tend to have a higher natural mortality than northern areas, especially in more recent years (Fig. \@ref(fig:sfa-25-spat-nm-fig)). The regions with the highest natural mortalities are generally the areas with the highest recruit biomass densities (Fig. \@ref(fig:sfa-25-spat-nm-fig) and Fig. \@ref(fig:sfa-25-spat-bm-fig)). These results align with the observed shell height frequency figures for this area, which indicates scallop are growing to recruit sizes in relatively large numbers, but are disappearing before reaching fully-recruited size (Cite Freya, Fig SH)
+
+Fishing mortality (instantaneous) in SFA-25a has been relatively low throughout the history of the fishery, ranging between `r min.f.sab` and `r max.f.sab`
+ (Fig. \@ref(fig:sfa-25-fm-fig)). Fishing mortality was generally higher in the late 1990s and early 2000s, since this time fishing mortality has generally been in decline and  fishing mortality in the last 2 years has been near 0 (Fig. \@ref(fig:sfa-25-spat-fm-fig)). The fishing mortality in the northwest portion of the bank has been relatively consistent until the late 2010s, while the number of un-fished knots has increased starting in the early 2010s (grey knots, Fig. \@ref(fig:sfa-25-spat-fm-fig)).
+
+The number of knots has a minimal impact the fully-recruited biomass estimates in SFA-25a, with an average annual biomass difference of `r abs(mn.b.knot.diff.sab)` tonnes (`r abs(mn.b.per.knot.diff.sab)`%) (Fig. \@ref(fig:sfa-25-bm-20-fig)). The overall recruit biomass estimates are also very similar between the 10 knot and 20 knot models with an average annual biomass difference of `r mn.r.knot.diff.sab` tonnes (`r mn.r.per.knot.diff.sab`%) (Fig. \@ref(fig:sfa-25-rec-20-fig)). However, the natural mortality estimates do differ substantially between the 10 and 20 knot models, with the natural mortality in the 10 knot model being higher than the 20 knot model; the natural mortality of the 10 knot model is on average `r mn.m.knot.diff.sab` (`r mn.m.per.knot.diff.sab`%) higher than the 20 knot model model (Fig. \@ref(fig:sfa-25-nm-20-fig)). The catchabilities were similar between the models, with the range of catchabilities of 20 knot model (`r min.q.sab.20` - `r max.q.sab.20`) being slightly wider than the 10 knot model (`r min.q.sab` - `r max.q.sab`).
+
+### SFA 26a
+
+The fully-recruited biomass estimates from SEAM indicate a 5 year period in the late 1990s and early 2000s in which the biomass for the area was elevated (Fig. \@ref(fig:sfa-26-bm-fig)). Fully-recruited biomass has generally declined since the maximum biomass observed (`r max.b.bbn` tonnes) in `r max.b.bbn.y` with the lowest biomass observed in `r min.b.bbn.y` (`r min.b.bbn` tonnes), there has been a slight increase in biomass since this time (Fig. \@ref(fig:sfa-26-bm-fig)). Spatially, since the late 1990s the highest biomass densities are consistently observed in the northern portion of the bank, with high biomass densities also observed in the south-central portion of the bank (Fig. \@ref(fig:sfa-26-spat-bm-fig)). The lowest catchabilities were observed in a band across the north-central portion of the bank, with catchabilities ranging between `r min.q.bbn` and  `r max.q.bbn` throughout the model area (Fig. \@ref(fig:sfa-26-catchy-fig)).
+
+The elevated fully-recruited biomass in the late 1990s was driven by a largest recruitment event observed in SFA-26a between 1999-2002 (Fig. \@ref(fig:sfa-26-rec-fig)). Approximately a decade later there was a relatively large recruitment event which is associated with a less pronounced increase in fully-recruited biomass starting in 2010. Recruit biomass has been consistently low for the last 10 years.  The knots with the highest recruit biomass densities align both in time and space with the knots with high fully-recruited biomass, high recruit biomass densities were observed throughout the bank between 2000 and 2002 and again from 2009-2011 (Fig. \@ref(fig:sfa-26-spat-rec-fig)).  Between 2014 and 2016 more localized recruitment events were observed in the northern portion of the bank, these recruitment events have likely contributed to the relatively high biomass density in these cells in recent years, despite relatively high exploitation rates in these knots (Fig. \@ref(fig:sfa-26-spat-rec-fig) and Fig. \@ref(fig:sfa-26-spat-fm-fig)).
+
+Natural mortality has been relatively low and stable in SFA-26a, with natural mortality varying between `r min.m.bbn` and `r max.m.bbn` (Fig. \@ref(fig:sfa-26-nm-fig)).  Natural mortality was somewhat higher between 1994 and 2002 and there was a small increase in natural mortality observed in the early and mid 2010s, but since 2018 natural mortality has been below average (Fig. \@ref(fig:sfa-26-nm-fig)).  No areas have consistently higher rates of natural mortality, in years in which natural mortality is elevated it tends to be higher throughout most of the model domain (Fig. \@ref(fig:sfa-26-spat-nm-fig)). 
+
+Fishing mortality has varied between `r min.f.bbn` and `r max.f.bbn` in SFA-26a (Fig. \@ref(fig:sfa-26-fm-fig)). Fishing mortality has been below average since the highest observed fishing mortality in 2017, with the 2022 fishing mortality the lowest observed in over a decade. Spatially, fishing mortality tended to be somewhat higher in the northern most central portion of the bank with some knots in this area generally seeing some fishing (Fig. \@ref(fig:sfa-26-spat-fm-fig)).  Other areas tend to be fished more sporadically, with periods in which there is little to no fishing activity in a knot for 1-2 years (Fig. \@ref(fig:sfa-26-spat-fm-fig)).
+
+The number of knots does impact the fully-recruited biomass estimates in SFA-26a, with the 10 knot model having a higher annual biomass estimate, on average the 10 knot model biomass is `r mn.b.knot.diff.bbn` tonnes (`r mn.b.per.knot.diff.bbn`%) higher than the 20 knot model (Fig. \@ref(fig:sfa-26-bm-10-fig)). The overall recruit biomass estimates are also higher in the 10 knot model, with recruit biomass `r mn.r.knot.diff.bbn` tonnes (`r mn.r.per.knot.diff.bbn`%) higher in the 10 knot model (Fig. \@ref(fig:sfa-26-rec-10-fig)). The natural mortality estimates  in the 10 knot model are higher than the 20 knot model; the natural mortality of the 10 knot model is on average `r mn.m.knot.diff.bbn` (`r mn.m.per.knot.diff.bbn`%) higher than the 20 knot model model (Fig. \@ref(fig:sfa-26-nm-10-fig)). The catchabilities are similar between the models, with the range of catchabilities of 20 knot model (`r min.q.bbn` - `r max.q.bbn`) being slightly wider than the 10 knot model (`r min.q.bbn.10` - `r max.q.bbn.10`).
+
+## Bayesian State Space Model (BSSM)
+
+### SFA 25a
+
+For the non-spatial BSSM, the biomass was elevated throughout much of the first decade of the 2000s, it peaked at `r max.b.sab.bssm` tonnes in `r max.b.sab.bssm.y` and has been in decline since 2008 with the lowest biomass observed (`r min.b.sab.bssm` tonnes) in `r min.b.sab.bssm.y` (Fig. \@ref(fig:sfa-25-bssm-bm-fig)).  Recruit biomass was elevated throughout the early 2000s and also since approximately 2017, it peaked in `r max.r.sab.bssm.y` at `r max.r.sab.bssm` tonnes, no temporal trend in recruit biomass is evident in BSSM (Fig. \@ref(fig:sfa-25-bssm-rec-fig)). Natural mortality in SFA-25a is highly variable, with several years experiencing natural mortality rates in excess of 20% (Fig. \@ref(fig:sfa-25-bssm-fr-nm-fig) and Fig. \@ref(fig:sfa-25-bssm-rec-nm-fig)).  The years of high natural mortality are spasmodic without any discernible temporal pattern for fully-recruited scallop, while recruit natural mortality has been estimated to be low for over a decade (Fig. \@ref(fig:sfa-25-bssm-fr-nm-fig) and Fig. \@ref(fig:sfa-25-bssm-rec-nm-fig)). The catchability for the area is very similar to the catchability prior (median = `r sab.med.q`), indicating there is little information in the data to inform the catchability in BSSM (Fig. \@ref(fig:sfa-25-bssm-q-fig)).
+
+### SFA 26a
+
+For BSSM there is also a five year period in the late 1990s and early 2000s in which the biomass for the area was elevated (Fig. \@ref(fig:sfa-26-bssm-bm-fig)). Fully-recruited biomass has generally declined since the maximum biomass observed (`r max.b.bbn.bssm` tonnes) in `r max.b.bbn.bssm.y` with the lowest biomass observed in `r min.b.bbn.bssm.y` (`r min.b.bbn.bssm` tonnes; Fig. \@ref(fig:sfa-26-bssm-bm-fig)). Two large recruitment pulses are evident using BSSM, one in the late 1990s and early 2000s, and a second similarly sized recruitment event was observed around 2010 (Fig. \@ref(fig:sfa-26-bssm-rec-fig)). The natural mortality (instantaneous) estimates in SFA-26a tend to be relatively high, with several years experiencing natural mortality rates in excess of 20%, although the natural mortality estimates have been low since 2018 (Fig. \@ref(fig:sfa-26-bssm-fr-nm-fig) and Fig. \@ref(fig:sfa-26-bssm-rec-nm-fig)). The catchability estimate was `r bbn.med.q`, which is above the mean of catchability prior (Fig. \@ref(fig:sfa-26-bssm-q-fig)).
+
+## SEAM vs BSSM
+
+### SFA 25a
+
+In SFA 25a the median fully-recruited biomass estimates in SEAM were approximately `-r med.per.b.sab.seam.bssm`% higher than that estimated by BSSM.  This is primarily due to SEAM fully-recruited biomass estimates being substantially higher for most of the first 20 years, this trend has reversed in recent years (Fig. \@ref(fig:sfa-25-bm-fig) and Fig. \@ref(fig:sfa-25-bssm-bm-fig)). The is in part due to recruitment in the early 2000s being much higher in SEAM than BSSM, whereas recruitment in BSSM has been estimated to be higher for the last 6 years (Fig. \@ref(fig:sfa-25-rec-fig) and Fig. \@ref(fig:sfa-25-bssm-rec-fig)). Both models indicate that recruitment was relatively strong in recent years, but this has not translated into fully-recruited biomass in either model. The higher fully-recruited biomass in SEAM leads to lower fishing mortality than observed in BSSM, especially in the early part of the time series (Fig. \@ref(fig:sfa-25-fm-fig) and Fig. \@ref(fig:sfa-25-bssm-fm-fig)). Natural mortality estimates were somewhat higher in SEAM, the median natural mortality for SEAM was `r med.m.sab.seam`, while it was `r med.m.fr.sab.bssm` for fully-recruited scallop in BSSM (Fig. \@ref(fig:sfa-25-nm-fig), Fig. \@ref(fig:sfa-25-bssm-fr-nm-fig) and Fig. \@ref(fig:sfa-25-bssm-rec-nm-fig)), though this would be somewhat offset by the higher recruit natural mortality estimates in BSSM (`r med.m.r.sab.bssm`).
+
+### SFA 26a
+
+In SFA 26a the median fully-recruited biomass estimates in SEAM were approximately `r med.b.bbn.seam.bssm`% higher than that estimated by BSSM (Fig. \@ref(fig:sfa-26-bm-fig) andand Fig. \@ref(fig:sfa-26-bssm-bm-fig)). The largest differences between the models were observed in the first 5 years of the model, with the smallest differences observed during the early 2000s when the biomass was at or near the maximum observed (Fig. \@ref(fig:sfa-26-bm-fig) andand Fig. \@ref(fig:sfa-26-bssm-bm-fig)).  Similarly, the recruit biomass estimates were approximately `r med.per.r.bbn.seam.bssm`% higher in SEAM ((Fig. \@ref(fig:sfa-26-rec-fig) andand Fig. \@ref(fig:sfa-26-bssm-rec-fig)).  The difference in the recruit biomass estimates between SEAM and BSSM are most noticeable in 2009 and 2010, with the SEAM model estimates approximately twice as large as the estimates from BSSM. The median natural mortality estimates in SEAM were substantially lower (`r med.m.bbn.seam`; Fig. \@ref(fig:sfa-26-nm-fig)) than the fully-recruited natural mortality estimates in BSSM (`r med.m.fr.bbn.bssm`; Fig. \@ref(fig:sfa-26-bssm-fr-nm-fig)).
+
+## Other Model Output
+
+### SFA 25a
+
+The error structure indicates areas in which the estimates for fully-recruited biomass, recruit biomass, or natural mortality are higher or lower than expected based on the observations and the process equation.  For fully-recruited biomass the error tends to be lower in the southeastern portion of the bank, especially in recent years, while the northeast and southwest tend to to be higher (Fig. \@ref(fig:sfa-25-rf-bm-fig)). In any given year these patterns can be substantially different from these general trends (Fig. \@ref(fig:sfa-25-rf-bm-fig)). The error trends for recruit biomass tends to be slightly higher in the southeastern portion of the bank in recent years, as with the fully-recruited error structure, there is substantial inter-annual variability in these patterns (Fig. \@ref(fig:sfa-25-rf-rec-fig)).  Similarly for natural mortality, the is a great deal of inter-annual variability in the patterns, but the southeastern portion of the bank often has higher values than other areas on the bank (Fig. \@ref(fig:sfa-25-rf-nm-fig)).
+
+The correlation distance for the fully-recruited biomass field is `r sab.10.B.range` km, for the recruit biomass the range is `r sab.10.R.range` km, and for natural mortality the range is `r sab.10.m.range` km.  Other model parameters can be found in Table \@ref(tab:sab-param-table).
+
+
+### SFA 26a
+
+For fully-recruited biomass the error structure inter-annual variability results no obvious spatial patterns in the field (Fig. \@ref(fig:sfa-26-rf-bm-fig)). The lack of any clear spatial structure in the error field is also evident in the recruit biomass (Fig. \@ref(fig:sfa-26-rf-rec-fig)). For the natural mortality error field does have more defined structure than the biomass fields, with the central portion of the bank tending to have more inter-annual variability than the edges (Fig. \@ref(fig:sfa-26-rf-nm-fig)).
+
+The correlation distance for the fully-recruited biomass field is `r bbn.20.B.range` km, for the recruit biomass the range is `r bbn.20.R.range` km, and for natural mortality the range is `r bbn.20.m.range` km.  Other model parameters can be found in Table \@ref(tab:bbn-param-table).
+
+## Residuals
+
+### SFA 25a
+
+The fully-recruited biomass residuals are highly variable from year to year, the absolute residual varying between `r min.sab.10.res` and `r max.sab.10.res` tonnes, with a median absolute difference of `r` med.sab.10.res` tonnes (Fig. \@ref(fig:sfa-25-res-ts-fig)).  In terms of percentages, the median absolute residual was `r med.sab.10.per.res`% (Fig. \@ref(fig:sfa-25-res-ts-fig)). Spatially the residuals are quiet variable over time and the residual percentage differences generally agree with the patterns observed in the fully-recruited biomass error structure (Fig. \@ref(fig:sfa-25-res-spat-fig) and Fig. \@ref(fig:sfa-25-res-per-spat-fig)); years in which the fully-recruited error is high in a region tend to align with years in which the residuals are more negative in those knots (compare Fig. \@ref(fig:sfa-25-res-per-spat-fig) with Fig. \@ref(fig:sfa-25-rf-bm-fig), especially for years 1995, 2000,2003, 2006, and 2017). 
+
+### SFA 26a
+
+Similarly, in SFA 26a, the fully-recruited biomass residuals are highly variable from year to year, the absolute residual varying between `r min.bbn.20.res` and `r max.bbn.20.res` tonnes, with a median absolute difference of `r` med.bbn.20.res` tonnes (Fig. \@ref(fig:sfa-26-res-ts-fig)).  In terms of percentages, the median absolute residual was `r med.bbn.20.per.res`% (Fig. \@ref(fig:sfa-26-res-ts-fig)). Again in SFA 26a, the spatial patterns in the residual percentage differences generally agree with the fully-recruited biomass error structure (Fig. \@ref(fig:sfa-26-res-spat-fig) and Fig. \@ref(fig:sfa-26-res-per-spat-fig)), knots (and years) having positive residuals aligning with regions in which the fully-recruited biomass error structure is lower (compare Fig. \@ref(fig:sfa-26-res-per-spat-fig) with Fig. \@ref(fig:sfa-26-rf-bm-fig), especially for years 1996, 2010, 2012, 2016, and 2019)
+
+## Retrospective Analyses
+
+### SFA 25a
+
+The retrospective analysis indicated relatively low bias in the fully-recruited biomass estimates, the 5 year Mohn's rho ($MR_5$) was `r mr.b.sab.5`, while the overall Mohn's rho ($MR_{all}$) was `r mr.b.sab.all` (Fig. \@ref(fig:sfa-25-retro-bm-fig)).  This biomass difference is negative in most years, indicating that the biomass estimates in the base model are higher than the terminal year biomass estimates for models with fewer years of data (Table \@ref(tab:sab-bias-table)).
+
+For recruit biomass $MR_5$ (`r mr.r.sab.5`) and $MR_{all}$ (`r mr.r.sab.all`) are higher than for fully-recruited biomass.  In the majority of years the biomass estimates from the base model are higher than the terminal year biomass estimates for models with fewer years of data (Table \@ref(tab:sab-bias-table)).  In addition, since 2003 the recruit biomass estimates from the base model are among the lowest observed of any of the models used in the retrospective analysis (Fig. \@ref(fig:sfa-25-retro-rec-fig)).
+
+The natural mortality retrospective patterns are more variable than either of the biomass's, while the $MR_5$ (`r mr.m.sab.5`) is higher than the $MR_5$ for either of the biomass's the $MR_{all}$ (`r mr.m.sab.all`) is the lowest.  This is, in large part, due to the variability of the metric with relatively large variability in both the positive and negative direction in any given year (Table \@ref(tab:sab-bias-table) and Fig. \@ref(fig:sfa-25-retro-nm-fig)).
+
+### SFA 26a
+
+The retrospective analysis indicated relatively low bias in the fully-recruited biomass estimates, the 5 year Mohn's rho ($MR_5$) was `r mr.b.bbn.5`, while the overall Mohn's rho ($MR_{all}$) was `r mr.b.bbn.all` (Fig. \@ref(fig:sfa-26-retro-bm-fig)).  This biomass difference has generally been positive since 2010, indicating that the biomass estimates in the base model are lower than the terminal year biomass estimates for models with fewer years of data during this period.
+
+For recruit biomass $MR_5$ (`r mr.r.bbn.5`) and $MR_{all}$ (`r mr.r.bbn.all`) are higher than for fully-recruited biomass.  In the majority of years the biomass estimates from the base model are higher than the terminal year biomass estimates for models with fewer years of data (Table \@ref(tab:bbn-bias-table)).  In addition, the recruit biomass estimates from the base model are among the lowest observed of any of the models used in the retrospective analysis, with a trend towards lower recruit biomass estimates evident in the retrospective models since 2010 (Fig. \@ref(fig:sfa-26-retro-rec-fig)). The natural mortality retrospective patterns are similar to those observed with the recruit biomass, the $MR_5$ was `r mr.m.bbn.5`, while the $MR_{all}$ was `r mr.m.bbn.all` , the natural mortality estimates from the base model area also among the lowest observed, with a general trend towards lower natural mortality estimates recently (Fig. \@ref(fig:sfa-26-retro-nm-fig)).  The similarity of the recruit biomass and natural mortality retrospective results is likely related to the difficulty of separating these two components of productivity [@mcdonaldExplicitIncorporationSpatial2021; @mcdonaldIncorporatingIntraannualVariability2022].
+
+# Challenges
+
+There is uncertainty in the exact location of the fishing effort as the vessels have the potential to move significant distances. In addition, the change in frequency of reporting in 2009 will result in a loss of precision in our understanding of the fishing locations before 2009. The use of knots helps to ameliorate these challenges as the size of the knots is much larger than a typical scallop bed, and the fishery tends to stay in areas with relatively high catch rates for a prolonged periods of time. The change in the frequency of reporting did not have a describable impact on the retrospective patterns in the models nor the relative size of the residuals within the knots, but undoubtedly there is some fishing activity that is allocated to incorrect locations.  The use of VMS data, which has a polling frequency of 1 hour, could be incorporated to refine the location of fishing activity, but the ongoing availability of these data along with challenges of linking removals to VMS polling precluded using these data at this time. ADD SOMETHING about VMS and GPS and ability to better know where we are in the world.
+
+While there is far less 'prior' information required for SEAM, some 'expert' opinion is required for these models.  The most obvious is the need to inform the average catchability in the SEAM model....
+
+In addition setting an initial condition is also necessary for these models.  Here we have decided to set the initial natural mortality estimate to be 0.2 for both models, this decision will influence the overall mortality for the model.  In addition, the recruit catchability was set to 0.33, which is approximately the mean of the catchability prior used for the fully-recruited scallop.  Fixing recruit catchability will influence the overall estimate of both recruit biomass and natural mortality (given the potential confounding between these variables).
+
+The first year spatial fields are challenging to interpret as the spatial fields are influenced by the initial conditions in the model [@mcdonaldExplicitIncorporationSpatial2021; @mcdonaldIncorporatingIntraannualVariability2022].  Given the length of the time series and the interest of these models in understanding current conditions, the initial year estimates are not particularly salient to the results here.  If the initial year results were of interest, they should be interpreted with care. 
+
+Others?
+
+# Conclusions
+
+The spatial models (SEAM) provide fully-recruited biomass estimates with very small retrospective patterns.  The relative biomass change over time is similar when model parameters are varied (e.g. the number of knots, catchabilities, initial conditions).  The productivity parameters (natural mortality and recruitment) are influenced by changes in the model parameterization, which is to be expected given the likely confounding between these parameters [@mcdonaldExplicitIncorporationSpatial2021; @mcdonaldIncorporatingIntraannualVariability2022]. This suggests that the models do capture the population dynamics appropriately, but, as with any model of this type, the input parameterization of the model will have a substantial impact on our understanding of absolute estimates and system productivity. For example, changing the catchability 'prior' will lead to different estimates of the total fully-recruited biomass, recruit biomass, and natural mortality (and recruitment biomass and natural mortality estimates), but the relative changes over time will be similar as long as reasonably informed decisions are made.
+
+The biomass estimates for SEAM tend to be higher than observed for BSSM, these differences are related to both differences in catchability and the effects of accounting for spatial patterns in the data. The relative changes in biomass over time were similar between the model frameworks.
+
+The natural mortality estimates for the 10 knot models are higher than the natural mortality estimates for the 20 knot models, the 10 knot natural mortalities are generally closer to the BSSM natural mortality estimates than the 20 knot models.  Further exploration of the relationship between the number of knots and natural mortality would be beneficial.
+
+For SFA-25a the natural mortality in the southern flank has been elevated in recent years... sable is a sandy bank and this area is most exposed to storms... entirely possible we are seeing storm induced mortality due to storm driven events, also this area would be more exposed to high temps from Gulf Stream which could result in higher mortality rates from environmental conditions driven by warm water rings (Cite Dave Brickman Paper, check if Dvora has anything on this)
+
+The retrospective analyses indicates that the fully-recruited biomass estimates generally are declining as more data are included in the analysis.  While this effect has been relatively small (< 5% in any given year)
+
+
+
+
