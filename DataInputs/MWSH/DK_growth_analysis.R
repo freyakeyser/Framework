@@ -103,7 +103,7 @@ qqplot.data <- function (dat,facet=F, ncol=NULL,...)
 # Start analysis
 
 
-banker <- "BBn"
+banker <- "Ban"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
@@ -137,6 +137,18 @@ sub$new_ID[sub$tow != "0"] <- sub$tow[sub$tow != "0"]
 # start in 1994 as that's the first year of the model.
 yrs <-sort(unique(sub$year))
 yrs <- yrs[yrs > 1991]
+# only 1 tow sampled in 1992 and 2007 on Mid, so no models for those years?
+# only 1 tow sampled in 1992, 93, 94, and 2005 on GBb, so no models for those years?
+# only 1 tow sampled in 2000 on Ban, so no models for those years?
+# only 1 tow sampled in 2010 on BBs, so no models for those years?
+# only 1 tow sampled in 1993,94 on Ger, so no models for those years?
+if(banker=="Mid") yrs <- yrs[!yrs %in% c(1992, 2007)]
+if(banker=="GBb") yrs <- yrs[!yrs %in% c(1992, 1993, 1994, 2005)]
+if(banker=="Ban") yrs <- yrs[!yrs %in% c(2000)]
+if(banker=="BBs") yrs <- yrs[!yrs %in% c(2010)]
+if(banker=="Ger") yrs <- yrs[!yrs %in% c(1993, 1994)]
+
+
 n.yrs <- length(yrs)
 sub <- sub %>% dplyr::filter(year %in% yrs)
 # Color scheme...
@@ -387,7 +399,7 @@ for(y in 1:length(ys)){
     ylim(-1,1) +
     xlim(floor(depthrange[1]),ceiling(depthrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-    geom_smooth(method = 'loess',color=yellows) +
+    #geom_smooth(method = 'loess',color=yellows) +
     xlab(paste0(en2fr("Depth",  custom_terms=rosetta_terms, translate=french), " (m)")) +
     ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
 
@@ -396,7 +408,7 @@ for(y in 1:length(ys)){
     ylim(-1,1) +
     xlim(floor(shrange[1]),ceiling(shrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed')+
-    geom_smooth(method = 'gam',color=yellows) +
+    #geom_smooth(method = 'gam',color=yellows) +
     xlab(paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)")) +
     ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
 
@@ -405,7 +417,7 @@ for(y in 1:length(ys)){
     ylim(-1,1) +
     xlim(floor(mwrange[1]),ceiling(mwrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-    geom_smooth(method = 'gam',color=yellows) +
+    #geom_smooth(method = 'gam',color=yellows) +
     xlab(paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)")) +
     ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()#+
     #scale_x_continuous(expand=c(0.075,0.075))
@@ -429,34 +441,37 @@ p.res.d <- ggplot() +
   geom_point(data=resid,aes(x=depth,y=residuals), size=0.5) +
   facet_wrap(~year, ncol=6) +
   geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-  geom_smooth(method = 'loess',color=yellows) +
+  #geom_smooth(method = 'loess',color=yellows) +
   xlab(paste0(en2fr("Depth",  custom_terms=rosetta_terms, translate=french), " (m)")) +
   ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
 
 p.res.sh <- ggplot(resid,aes(x=sh,y=residuals)) + geom_point(size=0.5) +
   facet_wrap(~year, ncol=6) +
   geom_hline(yintercept = 0,color=blues,linetype='dashed')+
-  geom_smooth(method = 'gam',color=yellows) +
+  #geom_smooth(method = 'gam',color=yellows) +
   xlab(paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)")) +
   ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
 
 p.res.mw <- ggplot(resid,aes(x=wmw,y=residuals)) + geom_point(size=0.5) +
   facet_wrap(~year, ncol=6) +
   geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-  geom_smooth(method = 'gam',color=yellows) +
+  #geom_smooth(method = 'gam',color=yellows) +
   xlab(paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)")) +
   ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()+
   scale_x_continuous(expand=c(0.075,0.075))
 
-png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_depth_landscape", nickname, ".png"), height=6, width=10, units="in", res=420)
+height_fac <- 6
+if(banker=="Ban") height_fac <- 3
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_depth_landscape", nickname, ".png"), height=height_fac, width=10, units="in", res=420)
 print(p.res.d)
 dev.off()
 
-png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_sh_landscape", nickname, ".png"), height=6, width=10, units="in", res=420)
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_sh_landscape", nickname, ".png"), height=height_fac, width=10, units="in", res=420)
 print(p.res.sh)
 dev.off()
 
-png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_mw_landscape", nickname, ".png"), height=6, width=10, units="in", res=420)
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_mw_landscape", nickname, ".png"), height=height_fac, width=10, units="in", res=420)
 print(p.res.mw)
 dev.off()
 
@@ -692,7 +707,8 @@ p.depth <- ggplot(depth.effect,aes(x=year,y=effect)) +
   geom_errorbar(aes(ymin=LCI,ymax=UCI,x=year), width=0.5)+
   geom_hline(yintercept = 0,color=yellows,linetype = 'dashed',size=1.5) +
   #geom_line(size=1.5) + geom_point(size=3) +
-  geom_line() + geom_point() +
+  #geom_line() +
+  geom_point() +
   #ylim(c(min(condition.ts$cond.inter.LCI),max(condition.ts$cond.inter.UCI)))+
   xlab("") +
   ylab(depthlab) +
@@ -714,7 +730,10 @@ png(filename = paste0(plotsGo, "/", banker, "/MWSH_depth", nickname, ".png"), he
 print(p.depth)
 dev.off()
 
-png(filename = paste0(plotsGo, "/", banker, "/MWSH_yall", nickname, ".png"), height=6, width=10, units="in", res=420)
+height_fac <- 6
+if(banker=="Ban") height_fac <- 3
+
+png(filename = paste0(plotsGo, "/", banker, "/MWSH_yall", nickname, ".png"), height=height_fac, width=10, units="in", res=420)
 print(pall)
 dev.off()
 

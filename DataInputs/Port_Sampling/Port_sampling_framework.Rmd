@@ -128,34 +128,57 @@ medians2$xend <- ymd(medians2$monthyr) + years(1)
 if(french==F) ylabel <- "Meat weight (g)"
 if(french==T) ylabel <- "Masse de la chair (g)"
 
-medians2$sfa <- medians2$bank
-medians2$sfa <- gsub(x=medians2$sfa, pattern="BBn", replacement = "26A")
-medians2$sfa <- gsub(x=medians2$sfa, pattern="Sab", replacement = "25A-Sab")
-medians$sfa <- medians$bank
-medians$sfa <- gsub(x=medians$sfa, pattern="BBn", replacement = "26A")
-medians$sfa <- gsub(x=medians$sfa, pattern="Sab", replacement = "25A-Sab")
+medians2$bank <- gsub(x=medians2$bank, pattern="BBn", replacement = "26A-BBn")
+medians2$bank <- gsub(x=medians2$bank, pattern="BBs", replacement = "26B-BBs")
+medians2$bank <- gsub(x=medians2$bank, pattern="Ger", replacement = "26C-Ger")
+medians2$bank <- gsub(x=medians2$bank, pattern="Sab", replacement = "25A-Sab")
+medians2$bank <- gsub(x=medians2$bank, pattern="Mid", replacement = "25A-Mid")
+medians2$bank <- gsub(x=medians2$bank, pattern="Ban", replacement = "25B-Ban")
+medians2$bank <- gsub(x=medians2$bank, pattern="GBb", replacement = "27B-GBb")
+medians2$sfa <- substr(x = medians2$bank, start = 1, stop = 2)
+
+medians$bank <- gsub(x=medians$bank, pattern="BBn", replacement = "26A-BBn")
+medians$bank <- gsub(x=medians$bank, pattern="BBs", replacement = "26B-BBs")
+medians$bank <- gsub(x=medians$bank, pattern="Ger", replacement = "26C-Ger")
+medians$bank <- gsub(x=medians$bank, pattern="Sab", replacement = "25A-Sab")
+medians$bank <- gsub(x=medians$bank, pattern="Mid", replacement = "25A-Mid")
+medians$bank <- gsub(x=medians$bank, pattern="Ban", replacement = "25B-Ban")
+medians$bank <- gsub(x=medians$bank, pattern="GBb", replacement = "27B-GBb")
+medians$sfa <- substr(x = medians$bank, start = 1, stop = 2)
 
 medians$monthnum <- as.numeric(medians$monthyr - min(medians$monthyr))
 medians2$monthnum <- as.numeric(medians2$monthyr - min(medians$monthyr))
 labs <- unique(medians2[,c("monthnum", "monthyr")])
 labs$monthnum <- -labs$monthnum
 
-png(paste0(plotsGo, "medians_long_vert", fr, ".png"), width=6.5, height=8, units = "in", res=420)
-ggplot() +
-  # geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
-  geom_segment(data=medians2[medians2$bank %in% c("BBn", "Sab"),],mapping=aes(x=-monthnum, xend=-monthnum-365, y=annual_med, yend=annual_med), colour="blue", linewidth=1) +
-  geom_errorbar(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(x=-monthnum, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)), width=0)+
-  geom_point(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(-monthnum, monthly_med)) +
-  geom_text(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(-monthnum - (365/2), 0, label=nsamples_yr), vjust=0.5, hjust=1.1, colour="blue")+
-  #geom_line(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med), group=1, size=1) +
-  facet_wrap(~sfa, ncol=2) +
-  ylab(ylabel) +
-  xlab("Date")+
-  theme_bw() +
-  scale_x_continuous(breaks=labs$monthnum, labels=strftime(labs$monthyr, "%m/%Y"))+#, date_labels = "%m/%Y") + 
-  scale_y_continuous(expand=c(0.25,0)) +
-  coord_flip() 
-dev.off()
+
+sfa <- c(25, 26, 27)
+for(i in sfa){
+  margin <- margin(0,0,0,0, "cm")
+  if(i %in% c(27)) margin <- margin(0,3,0,3, "cm")
+  if(i ==26) yn=-20
+  if(i == 25) yn=-60
+  if(i==27) yn=-10
+  png(paste0(plotsGo, "medians_long_vert", fr, "_", i, ".png"), width=6, height=7, units = "in", res=420)
+  print(
+    ggplot() +
+      # geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
+      geom_segment(data=medians2[medians2$sfa==i,],mapping=aes(x=-monthnum, xend=-monthnum-365, y=annual_med, yend=annual_med), colour="blue", linewidth=1) +
+      geom_errorbar(data=medians[medians$sfa==i,], aes(x=-monthnum, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)), width=0)+
+      geom_point(data=medians[medians$sfa==i,], aes(-monthnum, monthly_med)) +
+      geom_text(data=medians2[medians2$sfa==i,], aes(-monthnum - (365/2), yn, label=nsamples_yr), vjust=0.5, hjust=0, colour="blue")+
+      #geom_line(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med), group=1, size=1) +
+      facet_wrap(~bank, ncol=3) +
+      ylab(ylabel) +
+      xlab("Date")+
+      theme_bw() +
+      scale_x_continuous(breaks=labs$monthnum, labels=strftime(labs$monthyr, "%m/%Y"))+#, date_labels = "%m/%Y") + 
+      #scale_y_continuous(expand=c(0.25,10)) +
+      coord_flip() +
+      theme(plot.margin=margin)
+  )
+  dev.off()
+}
 
 # anomaly (seasonal)
 
@@ -165,20 +188,20 @@ months <- medians %>%
   dplyr::summarize(nsamples = sum(nsamples),
                    bottom = boxplot(anom)$stats[1])
 
-if(french==F) ylabel <- "Meat weight anomaly (g)"
-if(french==T) ylabel <- "Anomalie en masse de la chair (g)"
-png(paste0(plotsGo, "medians_anom", fr, ".png"), width=6.5, height=8, units = "in", res=420)
-ggplot() +
-  geom_hline(data=medians[medians$bank %in% c("Sab", "BBn"),], aes(yintercept=0), linetype="dashed")+
-  geom_boxplot(data=medians[medians$bank %in% c("Sab", "BBn"),], aes(month, anom, group=month)) +
-  geom_text(data=months[months$bank %in% c("Sab", "BBn"),], aes(month, bottom, label=nsamples), vjust=1.5)+
-  facet_wrap(~bank, ncol=1, scales="free_y") +
-  ylab(ylabel) +
-  xlab(en2fr("Month", translate=french, custom_terms=rosetta_terms)) +
-  theme_bw() +
-  scale_x_continuous(breaks=1:12) +
-  scale_y_continuous(expand=c(0,3))
-dev.off()
+# if(french==F) ylabel <- "Meat weight anomaly (g)"
+# if(french==T) ylabel <- "Anomalie en masse de la chair (g)"
+# png(paste0(plotsGo, "medians_anom", fr, ".png"), width=6.5, height=8, units = "in", res=420)
+# ggplot() +
+#   geom_hline(data=medians[medians$bank %in% c("Sab", "BBn"),], aes(yintercept=0), linetype="dashed")+
+#   geom_boxplot(data=medians[medians$bank %in% c("Sab", "BBn"),], aes(month, anom, group=month)) +
+#   geom_text(data=months[months$bank %in% c("Sab", "BBn"),], aes(month, bottom, label=nsamples), vjust=1.5)+
+#   facet_wrap(~bank, ncol=1, scales="free_y") +
+#   ylab(ylabel) +
+#   xlab(en2fr("Month", translate=french, custom_terms=rosetta_terms)) +
+#   theme_bw() +
+#   scale_x_continuous(breaks=1:12) +
+#   scale_y_continuous(expand=c(0,3))
+# dev.off()
 
 port.sampling$sfa <- NA
 port.sampling$sfa[port.sampling$bank %in% c("BBn", "BBs", "Ger")] <- 26
@@ -186,9 +209,9 @@ port.sampling$sfa[port.sampling$bank %in% c("Sab", "Mid", "Ban")] <- 25
 port.sampling$sfa[port.sampling$bank %in% "GBb"] <- 27
 
 ps_tab <- port.sampling %>% 
-  filter(!bank %in% c("GBa", "SPB")) %>%
-  group_by(sfa,bank) %>%
-  summarize(total=length(unique(ID)),
+  dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
+  dplyr::group_by(sfa,bank) %>%
+  dplyr::summarize(total=length(unique(ID)),
             years=length(unique(year)),
             recent=max(year),
             months = length(unique(month)),
@@ -207,7 +230,7 @@ write.csv(ps_tab, paste0(plotsGo, "/ps_tab.csv"))
 
 # Single bank results
 ```{r}
-bank <- "Sab"
+bank <- "BBs"
 
 bbn.dat <- port.sampling[port.sampling$bank == bank,]
 
@@ -255,8 +278,9 @@ bbn.dat$mod.day <- as.numeric(bbn.dat$ps.fished - as.Date(min(bbn.dat$ps.fished)
 # OK, so I want to see what propotion of the port sampling data might have a SH of < 95 mm, based on the MW-SH data.
 # This is similar to above, but I'm going to have to use the raw data, so this is gonna be slow....
 
-if(bank=="BBn") years <- c(2006:2019,2021:2022)
-if(bank=="Sab") years <-  c(2006:2014, 2016:2019,2021:2022)
+#if(bank=="BBn", "BBs", "Ger", "GBb") 
+years <- 2006:2022
+#if(bank=="Sab") years <-  c(2006:2014, 2016:2019,2021:2022)
 may.mws <- NULL
 bbn.dat$sh <- NA
 all.may <- data.frame(a = rep(NA,length(years)), year = years)
@@ -270,8 +294,8 @@ bbn.dat$mod.day <- as.numeric(bbn.dat$year_month - as.Date("2010-05-24"))/100
 bbn.dat$year <- year(bbn.dat$date)
 
 bbn.dat$surv.year <- bbn.dat$year
-bbn.dat$surv.year[bbn.dat$month %in% 1:5 & bbn.dat$sfa %in% 25:26 ] <- bbn.dat$year[bbn.dat$month %in% 1:5 & bbn.dat$sfa %in% 25:26]-1
-bbn.dat$surv.year[bbn.dat$month %in% 1:8 & bbn.dat$sfa %in% 27] <- bbn.dat$year[bbn.dat$month %in% 1:8 & bbn.dat$sfa %in% 27]-1
+#bbn.dat$surv.year[bbn.dat$month %in% 1:5 & bbn.dat$sfa %in% 25:26 ] <- bbn.dat$year[bbn.dat$month %in% 1:5 & bbn.dat$sfa %in% 25:26]-1
+#bbn.dat$surv.year[bbn.dat$month %in% 1:8 & bbn.dat$sfa %in% 27] <- bbn.dat$year[bbn.dat$month %in% 1:8 & bbn.dat$sfa %in% 27]-1
 
 years <- unique(bbn.dat$surv.year)
 
@@ -312,10 +336,14 @@ print(sh.plt)
 #                                scale=0.7, #, # you may wish to adjust this
 #                                bandwidth=5 # you may wish to adjust this
 #                                ) +
+
+if(length(unique(bbn.dat$surv.year))<6) scale_fac = 0.55
+if(length(unique(bbn.dat$surv.year))>5) scale_fac = 0.9
+
 png(paste0(plotsGo, bank, "/shf_ps", fr, "_new.png"), width=6.5, height=8, units = "in", res=420)
 ggplot() + 
   geom_density_ridges(data=bbn.dat, aes(x = sh, y = as.factor(surv.year), height = stat(density)),
-                      stat = "binline", bins = 40, scale = 0.9, draw_baseline = F) +
+                      stat = "binline", bins = 40, scale = scale_fac, draw_baseline = F) +
   theme_bw() +
   ylab(en2fr("Year",translate=french, custom_terms=rosetta_terms)) + 
   xlab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) +
@@ -324,16 +352,21 @@ ggplot() +
 dev.off()  
 
 
-
 # combine with survey SHF
 shf <- SHF.summary[[bank]]
 names(shf)[1] <- "years"
-shf <- shf %>% tidyr::pivot_longer(cols = starts_with("V"))
-shf$name <- gsub(x=shf$name, pattern="V", replacement="")
+if(bank %in% c("Sab", "BBn", "BBs", "GBb")) {
+  shf <- shf %>% tidyr::pivot_longer(cols = starts_with("V"))
+  shf$name <- gsub(x=shf$name, pattern="V", replacement="")
+}
+if(bank %in% c("Mid", "Ban", "Ger")) shf <- shf %>% tidyr::pivot_longer(cols = as.character(seq(5,200,5)))
+
 if(!any(shf$name==200)) shf$name <- (as.numeric(shf$name)-1)*5
+if(!any(shf$name==0)) shf$name <- as.numeric(shf$name)-5
+# bins go from 0-5mm to 195-200mm, labelled as 0 and 195 respectively
 
 shf <- shf[!is.na(shf$years),]
-shf <- shf[shf$name>65,]
+shf <- shf[shf$name>65,] # keep bins 70-75 mm and up (GREATER than bin 65, which is 65-70)
 
 years <- shf %>%
   dplyr::group_by(years) %>%
@@ -343,57 +376,84 @@ shf <- left_join(shf, years)
 shf$density <- shf$value/shf$total
 shf$name <- as.numeric(shf$name)
 
-bins <- data.frame(shf=rep(seq(65,199.9,0.1), length(unique(shf$years))), name=rep(rep(seq(70,200,5), each=50), length(unique(shf$years))), years=rep(unique(shf$years), each=1350))
+# bins <- data.frame(shf=rep(seq(65,199.9,0.1), length(unique(shf$years))), 
+#                    name=rep(rep(seq(70,200,5), each=50), length(unique(shf$years))), 
+#                    years=rep(unique(shf$years), each=1350))
+
+# need these wonky bins to get the "steps" for the plot
+bins <- data.frame(shf=seq(70,204.9,0.1),
+                   name=rep(seq(70,200,5), each=50))
+yearsbins <- data.frame(years=rep(unique(shf$years), each=length(seq(70,200,5))), 
+                        name=rep(seq(70,200,5), length(unique(shf$years))))
+bins <- full_join(bins, yearsbins, relationship="many-to-many")
 
 shf <- full_join(shf, bins)
 
+# get the range of years with data, blanks in missing years
 shf <- left_join(data.frame(years = min(shf$years, na.rm=T):max(shf$years, na.rm=T)), shf)
 shf$bank <- bank
 
+# do the same for the PS data
 shfps <- bbn.dat[!is.na(bbn.dat$sh),]
-shfps <- shfps[shfps$sh>65,]
-shfps <- shfps[shfps$month %in% c(5,6),]
+shfps <- shfps[shfps$sh>70 | shfps$sh==70,] # keep everything greater than or equal to 70 
+shfps <- shfps[shfps$month %in% c(4:8),]
 
 shfps.yr <- shfps %>%
-  dplyr::mutate(bin = cut(sh, breaks=seq(65,210,5))) %>%
   dplyr::group_by(surv.year) %>%
   dplyr::summarize(total=n())
 
 shfps <- shfps %>%
-  dplyr::mutate(bin = cut(sh, breaks=seq(65,210,5))) %>%
+  dplyr::mutate(bin = cut(sh, breaks=seq(70,210,5), right=F)) %>% # gotta go above 200 since these are estimates (not 5mm bins)
   dplyr::group_by(surv.year, bin) %>%
   dplyr::summarize(value=n())
 
 shfps <- left_join(shfps, shfps.yr)
 shfps$density <- shfps$value/shfps$total
+# tidy up the brackets
 bins <- unlist(strsplit(x = as.character(shfps$bin), split=","))
-bins <- bins[grep(x=bins,pattern="]")]
-bins <- gsub(x=bins, pattern="]", replacement="")
-shfps$name <- bins
+bins <- bins[grep(x=bins,pattern="[", fixed=T)]
+bins <- gsub(x=bins, pattern="[", replacement="", fixed=T)
+shfps$name <- bins # named for lower bound
 #stringr::str_detect(shfps$bin, pattern = shfps$name) # just a check
 
 # bins <- data.frame(name=as.character(rep(seq(5,210,5), length(unique(shfps$year)))), year=rep(unique(shfps$year), each=42))
-bins <- data.frame(shf=rep(seq(65,209.9,0.1), length(unique(shfps$surv.year))), name=rep(rep(seq(70,210,5), each=50), length(unique(shfps$surv.year))), surv.year=rep(unique(shfps$surv.year), each=1450))
+# bins <- data.frame(shf=rep(seq(65,209.9,0.1), length(unique(shfps$surv.year))), name=rep(rep(seq(70,210,5), each=50), length(unique(shfps$surv.year))), surv.year=rep(unique(shfps$surv.year), each=1450))
+bins <- data.frame(shf=seq(70,214.9,0.1),
+                   name=rep(seq(70,210,5), each=50))
+yearsbins <- data.frame(years=rep(unique(shfps$surv.year), each=length(seq(70,210,5))), 
+                        name=rep(seq(70,210,5), length(unique(shfps$surv.year))))
+bins <- full_join(bins, yearsbins, relationship="many-to-many")
+
 shfps$name <- as.numeric(shfps$name)
+names(shfps)[names(shfps)=="surv.year"] <- "years"
+shfps <- full_join(shfps, bins) # has NAs
 
-shfps <- full_join(shfps, bins)
-
-shfps <- left_join(data.frame(surv.year = min(shfps$surv.year, na.rm=T):max(shfps$surv.year, na.rm=T)), shfps)
+shfps <- left_join(data.frame(years = min(shfps$years, na.rm=T):max(shfps$years, na.rm=T)), shfps) # should not be removing NAs for these years
 shfps$bank <- bank
 
-shfps <- dplyr::select(shfps, bank, surv.year, name, shf, density)
+shfps <- dplyr::select(shfps, bank, years, name, shf, density)
 shfps$density[is.na(shfps$density)] <- 0
 names(shfps) <- c("bank", "years", "name", "shf", "density_ps")
 shfps$name <- as.numeric(shfps$name)
 
+# getting ready to join survey with fishery
 shf <- unique(dplyr::select(shf, bank, years, name, shf, density))
 
+# years with port sampling data
+#shfps.yr$surv.year # this is NOT survey year any more, just labelled as such
+
 shf <- full_join(shf, shfps)
-shf <- shf[!is.na(shf$density_ps),]
+shf <- shf[shf$years %in% shfps.yr$surv.year,]
 names(shf)[names(shf)=="name"] <- "bin"
 shf <- shf %>% tidyr::pivot_longer(cols = starts_with("d"))
 
-png(paste0(plotsGo, bank, "/shf_selectivity", fr, ".png"), width=6, height=8, units = "in", res=420)
+height <- length(unique(shf$years)) * 2
+if(height>8) height <- 8
+if(height<4) height <- 4
+
+if(bank=="Ger") shf <- shf[shf$years>2007,]
+
+png(paste0(plotsGo, bank, "/shf_selectivity", fr, ".png"), width=6, height=height, units = "in", res=420)
 ggplot() + geom_line(data=shf, aes(shf, value, colour=name), linewidth=1) + 
   facet_wrap(~years, ncol=1, strip.position="right") +
   theme_bw() +

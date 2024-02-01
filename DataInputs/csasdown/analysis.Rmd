@@ -339,15 +339,15 @@ bankpertow_all$subarea[bankpertow_all$bank=="GBb"] <- "27B"
 # only show new recsize
 bankpertow_all <- bankpertow_all[!bankpertow_all$recsize %in% "80-95",]
 
-sfa <- c(25,26)
-for(sfa in sfa){
+banks <- c("Sab", "BBn")
+for(b in banks){
   
-  N <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
+  N <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                             aes(year, index.val, colour=subarea, group=recsize)) +
-    geom_point(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
+    geom_point(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                aes(year, index.val, colour=subarea, shape=recsize)) +
     #geom_errorbar(data=bankpertow_all, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
-    geom_ribbon(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
+    geom_ribbon(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="N" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                 aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=subarea, group=recsize), alpha=0.3)+
     theme_bw() +
     # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
@@ -364,12 +364,12 @@ for(sfa in sfa){
     guides(colour = "none", fill="none") +
     ylab(parse(text=as.character(unique(bankpertow_all$index_rec[bankpertow_all$index=="N" & bankpertow_all$size=="R"]))))
   
-  I <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
+  I <- ggplot() + geom_line(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                             aes(year, index.val, colour=subarea, group=recsize)) +
-    geom_point(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
+    geom_point(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                aes(year, index.val, colour=subarea, shape=recsize)) +
     #geom_errorbar(data=bankpertow_all, aes(year, ymax=NPR+(NPR*NPR.cv), ymin=NPR-(NPR*NPR.cv), colour=bank), width=0) +
-    geom_ribbon(data=bankpertow_all[bankpertow_all$sfa==sfa & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
+    geom_ribbon(data=bankpertow_all[bankpertow_all$bank==b & bankpertow_all$index=="I" & bankpertow_all$size=="R"& !is.na(bankpertow_all$recsize) & !bankpertow_all$bank=="Ger",],
                 aes(year, ymax=index.val+cv.val, ymin=index.val-cv.val, fill=subarea, group=recsize), alpha=0.3)+
     theme_bw() +
     # facet_grid(factor(index, levels=c("N", "I"))~factor(size, levels=c("PR", "R", "FR")),
@@ -387,8 +387,8 @@ for(sfa in sfa){
     ylab(parse(text=as.character(unique(bankpertow_all$index_rec[bankpertow_all$index=="I" & bankpertow_all$size=="R"]))))
   
   require(patchwork)
-  if(french==F) png(filename=paste0(plotsGo, "/Survey/", nickname, "/timeseries_", sfa, "_compare_", MWSH, ".png"),width=6.5*1.25, height=6.5*1.25, units = "in", res=420)
-  if(french==T) png(filename=paste0(plotsGo, "/Survey/", nickname, "/timeseries_", sfa, "_compare_fr_", MWSH, ".png"),width=6.5*1.25, height=6.5*1.25, units = "in", res=420)
+  if(french==F) png(filename=paste0(plotsGo, "/Survey/", nickname, "/timeseries_", b, "_compare_", MWSH, ".png"),width=6.5*1.25, height=4*1.25, units = "in", res=420)
+  if(french==T) png(filename=paste0(plotsGo, "/Survey/", nickname, "/timeseries_", b, "_compare_fr_", MWSH, ".png"),width=6.5*1.25, height=4*1.25, units = "in", res=420)
   print(N+I + plot_layout(guides="collect") & theme(legend.position="bottom"))
   dev.off()
 }
@@ -509,13 +509,13 @@ cfts_old$sfa[cfts_old$bank %in% c("GBb")] <- 27
 
 if(french==F){
   version <- "Model"
-  cfts_old$version <- "original"
+  cfts_old$version <- "old"
   cfts$version<- "new"
 }
 
 if(french==T){
   version <- "Modèle"
-  cfts_old$version <- "original"
+  cfts_old$version <- "ancien"
   cfts$version<- "nouveau"
 }
 
@@ -788,7 +788,7 @@ for(sfa in sfa){
 
 ```{r growth, echo=F, include=F}
 load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input.RData")
-growth <- data.frame(bank="BBn", year=mod.dat$BBn$year, g2=mod.dat$BBn$g2, gR2 = mod.dat$BBn$gR2, version="original")
+growth <- data.frame(bank="BBn", year=mod.dat$BBn$year, g2=mod.dat$BBn$g2, gR2 = mod.dat$BBn$gR2, version="old")
 
 load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input_framework_vonB_75-90RSCS_newMWSH.RData")
 growth <- rbind(growth, 
@@ -804,10 +804,10 @@ growth$name <- gsub(x=growth$name, pattern="g2", replacement="Fully recruited")
 growth$name <- gsub(x=growth$name, pattern="gR2", replacement="Recruit")
 growth$name <- factor(growth$name, levels=c("Recruit", "Fully recruited"))
 
-growth$version <- factor(growth$version, levels=c("new", "vonB only", "original"))
+growth$version <- factor(growth$version, levels=c("new", "vonB only", "old"))
 
 if(french==T){
-  growth$version <- gsub(x=growth$version, pattern="original", replacement="original")
+  growth$version <- gsub(x=growth$version, pattern="old", replacement="ancien")
   growth$version <- gsub(x=growth$version, pattern="new", replacement="nouveau")
   growth$version <- gsub(x=growth$version, pattern="vonB only", replacement="vonB seulement")
 }
@@ -920,8 +920,6 @@ for(b in c("BBn", "BBs", "Sab", "GBb")){
   dev.off()
 }
   
-  
-  
 for(b in c("Mid", "Ban", "Ger")){
   
   if(b %in% c("Mid", "Ban")) shpf <- boundaries[boundaries$ID==b,]
@@ -960,21 +958,40 @@ for(b in c("Mid", "Ban", "Ger")){
     legend.loc <- c(0.4, 0.15)
     #manual adjustment to scalebar text size
     p$layers[[5]]$geom_params$text_cex <- 1.5
-  }  
+   }  
   
-  png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
-  print(
-    p + 
-      geom_sf(data=shpf, colour=NA, alpha=0.7) +
-      geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
-      scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
-                         guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
-      scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
-      coord_sf(expand=F) +
-      theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
-      annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
-  )
-  dev.off()
+  
+  if(b %in% c("Ban", "Mid")){
+    png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+    print(
+      p + 
+        #geom_sf(data=shpf, colour=NA, alpha=0.7) +
+        geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+        scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                           guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+        scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+        coord_sf(expand=F) +
+        theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
+        annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
+    )
+    dev.off()
+  }
+  if(b %in% c("Ger")){
+    png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+    print(
+      p + 
+        geom_sf(data=shpf, colour=NA, alpha=0.7) +
+        geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+        scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                           guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+        scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+        coord_sf(expand=F) +
+        theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
+        annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
+    )
+    dev.off()
+  }
+  
 }
 
 

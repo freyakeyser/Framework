@@ -37,14 +37,33 @@ strata$`Area (km^2^)`[is.na(strata$`Area (km^2^)`)] <- "NA"
 ps_tab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/ps_tab.csv")
 ps_tab <- dplyr::select(ps_tab, -X, -main)
 names(ps_tab) <- c("SFA", "Management unit", "Number of samples", "Number of years with PS data", "Most recent year with PS data", "Number of months with PS data", "Long term median (mw)", "Standard deviation (mw)", "Minimum (mw)", "Maximum (mw)")
-ps_tab$`Management unit`[ps_tab$`Management unit`=="Sab"] <- "25A-Sab"
-ps_tab$`Management unit`[ps_tab$`Management unit`=="Mid"] <- "25A-Mid"
-ps_tab$`Management unit`[ps_tab$`Management unit`=="Ban"] <- "25B-Ban"
-ps_tab$`Management unit`[ps_tab$`Management unit`=="BBn"] <- "26A-BBn"
-ps_tab$`Management unit`[ps_tab$`Management unit`=="BBs"] <- "26B-BBs"
-ps_tab$`Management unit`[ps_tab$`Management unit`=="Ger"] <- "26C-Ger"
-ps_tab$`Management unit`[ps_tab$`Management unit`=="GBb"] <- "27B-GBb"
 
+ps_tab$`Bank`[ps_tab$`Management unit`=="Sab"] <- "Sable Bank"
+ps_tab$`Bank`[ps_tab$`Management unit`=="Mid"] <- "Middle Bank"
+ps_tab$`Bank`[ps_tab$`Management unit`=="Ban"] <- "Banquereau Bank"
+ps_tab$`Bank`[ps_tab$`Management unit`=="BBn"] <- "Browns Bank North"
+ps_tab$`Bank`[ps_tab$`Management unit`=="BBs"] <- "Browns Bank South"
+ps_tab$`Bank`[ps_tab$`Management unit`=="Ger"] <- "German Bank"
+ps_tab$`Bank`[ps_tab$`Management unit`=="GBb"] <- "Georges Bank 'b'"
+
+ps_tab$`Label`[ps_tab$`Management unit`=="Sab"] <- "25A-Sab"
+ps_tab$`Label`[ps_tab$`Management unit`=="Mid"] <- "25A-Mid"
+ps_tab$`Label`[ps_tab$`Management unit`=="Ban"] <- "25B"
+ps_tab$`Label`[ps_tab$`Management unit`=="BBn"] <- "26A"
+ps_tab$`Label`[ps_tab$`Management unit`=="BBs"] <- "26B"
+ps_tab$`Label`[ps_tab$`Management unit`=="Ger"] <- "26C"
+ps_tab$`Label`[ps_tab$`Management unit`=="GBb"] <- "27B"
+
+ps_tab$`Management unit`[ps_tab$`Management unit`=="Sab"] <- "25A"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="Mid"] <- "25A"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="Ban"] <- "25B"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="BBn"] <- "26A"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="BBs"] <- "26B"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="Ger"] <- "26C"
+ps_tab$`Management unit`[ps_tab$`Management unit`=="GBb"] <- "27B"
+
+ps_tab <- dplyr::select(ps_tab, SFA, `Management unit`, Bank, Label, 3:10)
+ps_tab <- arrange(ps_tab, Label)
 
 mwsh_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/AICtable.csv")
 mwsh_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/AICtable.csv")
@@ -103,8 +122,8 @@ names(age_summary) <- c("Management unit", "Year", "Number of tows", "Number of 
 
 tab_sts <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/surveyIndices.csv")
 tab_sts <- tab_sts %>% mutate(across(c("NPR", "NR", "NFR", "IPR", "IR", "IFR", "clapsPre", "clapsRec", "clapsCom", "CF"), round, 2)) %>%
-  select(-X) %>%
-rename(Subarea = subarea,
+  dplyr::select(-X) %>%
+dplyr::rename(Subarea = subarea,
        Gear = liner,
        `N per tow (PR)` = NPR,
        `N per tow (R)` = NR,
@@ -177,8 +196,8 @@ csas_table(strata, caption ="Current survey design and allocation information fo
 #   )
 # )
 
-csas_table(mwsh, caption ="Meat weight-shell height model specifications for SFA 25A Sable Bank and SFA 26A Browns Bank North. The response variable in all models was wet meat weight (wmw). Explanatory variables tested include shell height (log-transformed and centred; log.sh.cen), year, and depth (centred; depth.cen). Comparisons were based on degrees of freedom (df) and the difference in Akaike’s Information Criterion (dAIC).") %>% 
-  kableExtra::row_spec(0,bold=TRUE)
+# csas_table(mwsh, caption ="Meat weight-shell height model specifications for SFA 25A Sable Bank and SFA 26A Browns Bank North. The response variable in all models was wet meat weight (wmw). Explanatory variables tested include shell height (log-transformed and centred; log.sh.cen), year, and depth (centred; depth.cen). Comparisons were based on degrees of freedom (df) and the difference in Akaike’s Information Criterion (dAIC).") %>% 
+#   kableExtra::row_spec(0,bold=TRUE)
 
 #qflextable(strata)
 

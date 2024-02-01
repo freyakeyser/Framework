@@ -1,5 +1,6 @@
 ---
 output:
+  word_document: default
   pdf_document:
     fig_caption: yes
     extra_dependencies: float
@@ -46,6 +47,10 @@ bank$name[bank$lab=="GB"] <- "Georges Bank (monitoring stations)"
 bank$name[bank$lab=="GBa"] <- "Georges Bank 'a'"
 bank$name[bank$lab=="GBb"] <- "Georges Bank 'b'"
 
+# if(!exists("language")) language <- "english"
+# if(!exists("fr")) fr<- ""
+# if(!exists("nickname")) nickname <- "framework5"
+
 ```
 
 \clearpage
@@ -68,6 +73,10 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/footprint_25", fr, ".png"))
 ```
 
+```{r mw-annual-25, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams, g) collected from the port sampling program for SFA 25A Sable Bank (25A-Sab), SFA 25A Middle Bank (25A-Mid), and SFA 25B Banquereau Bank (25A-Ban). Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. The blue vertical line segments represent annual median meat weights, with the number of samples collected each year labelled to the left in blue."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, "_25.png"))
+```
+
 ```{r fts-26, echo=F, fig.cap="Catch (commercial landings, tonnes, t), effort (hour-metre, hm), and catch per unit effort (kilograms per hour-metre, kg/hm) for SFA 26 management units. SFA 26A Browns Bank North is shown in black with points, SFA 26B Browns Bank South is shown in orange with triangles, and SFA 26C German Bank is shown in blue with squares. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_26", fr, ".png"))
 ```
@@ -76,7 +85,11 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/footprint_26", fr, ".png"))
 ```
 
-```{r fts-27, echo=F, fig.cap="Catch (commercial landings, tonnes, t), effort (hour-metre, hm), and catch per unit effort (kilograms per hour-metre, kg/hm) for SFA 27B Georges Bank ‘b’. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
+```{r mw-annual-26, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams, g) collected from the port sampling program for SFA 26A Browns Bank North (26A-BBn), SFA 26B Browns Bank South (26B-BBs), and SFA 26C German Bank (26C-Ger). Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. The blue vertical line segments represent annual median meat weights, with the number of samples collected each year labelled to the left in blue."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, "_26.png"))
+```
+
+```{r fts-27, echo=F, fig.cap="Catch (commercial landings, tonnes, t), effort (hour-metre, hm), and catch per unit effort (kilograms per hour-metre, kg/hm) for SFA 27B Georges Bank 'b'. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/fishery_27", fr, ".png"))
 ```
 
@@ -84,8 +97,8 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/footprint_27", fr, ".png"))
 ```
 
-```{r mw-annual, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams, g) collected from the port sampling program for SFA 25A Sable Bank (25A-Sab, left) and SFA 26A Browns Bank North (26A, right). Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. The blue vertical line segments represent annual median meat weights, with the number of samples collected each year labelled to the left in blue."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, ".png"))
+```{r mw-annual-27, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams, g) collected from the port sampling program for SFA 27B Georges Bank 'b'. Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. The blue vertical line segments represent annual median meat weights, with the number of samples collected each year labelled to the left in blue."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, "_27.png"))
 ```
 
 <!-- ```{r mw-monthly, echo=FALSE, message=F, fig.align="center", fig.cap="Anomalies (the difference between the annual median and same-year monthly median) in meat weights (grams) collected from the port sampling program for Browns Bank North (BBn) and Sable Bank (Sab). The horizontal dashed line represents no difference between the annual and monthly medians. The number of samples collected in each month (across all years) are provided under each boxplot."} -->
@@ -100,10 +113,21 @@ knitr::include_graphics("Y:/Offshore/Assessment/2023/Supporting_tasks/Olex_trans
 knitr::include_graphics("Y:/Offshore/Assessment/2023/Supporting_tasks/Olex_transition_boxplot.png")
 ```
 
+```{r sfoot-25, echo=F, message=F, fig.cap="The spatial distribution of survey tows in 10km^2^ cells for SFA 25 from 1984—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_25", fr, ".png"))
 
+```
 
+```{r sfoot-26, echo=F, message=F, fig.cap="The spatial distribution of survey tows in 10km^2^ cells for SFA 26 from 1984—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_26", fr, ".png"))
 
-```{r map-ban, echo=F, message=F, fig.cap="The survey design for SFA 25B Banquereau Bank in 2019. Points represent repeat stations sampled during the previous survey (2012), while triangles represent exploratory stations. Grey shading represents the survey domain. Bathymetry contours are shown in light blue"}
+```
+
+```{r sfoot-27, echo=F, message=F, fig.cap="The spatial distribution of survey tows in 10km^2^ cells for SFA 27B from 1981—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_27", fr, ".png"))
+```
+
+```{r map-ban, echo=F, message=F, fig.cap="The survey design for SFA 25B Banquereau Bank in 2019. Points represent repeat stations sampled during the previous survey (2012), while triangles represent exploratory stations. Grey shading represents the survey domain. Bathymetry contours are shown in light blue."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr,  "/surveymap_", params$bank[1], ".png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
@@ -117,12 +141,6 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr,  "/surveymap_", params$bank[3], ".png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
-
-```{r sfoot-25, echo=F, message=F, fig.cap="The spatial distribution of survey tows in 10km^2^ cells for SFA 25 from 1984—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_25", fr, ".png"))
-
-```
-
 
 ```{r map-bbn, echo=F, message=F, fig.cap="The survey design for SFA 26A Browns Bank North in 2022. Stratification is based on catch rate (kilograms per hour-metre, kg/hm), with the Very Low, Low, Medium, High, and Very High stratum represented by different shades of yellow and blue. Points represent survey stations allocated within the stratified design. Triangles represent exploratory tows. Bathymetry contours are shown in light blue."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr,  "/surveymap_", params$bank[6], ".png"))
@@ -139,19 +157,11 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
-```{r sfoot-26, echo=F, message=F, fig.cap="The spatial distribution of survey tows in 10km^2^ cells for SFA 26 from 1984—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_26", fr, ".png"))
-
-```
-
 ```{r map-gbb, echo=F, message=F, fig.cap="The survey design for SFA 27B Georges Bank ‘b’ in 2022. Stratification is based on scallop abundance, with the Very Low, Low, Medium, High, and Very High stratum represented by different shades of green or red. Points represent survey stations allocated within the stratified design. Bathymetry contours are shown in light blue."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr,  "/surveymap_", params$bank[7], ".png"))
 # print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
 ```
 
-```{r sfoot-27, echo=F, message=F, fig.cap="The spatial distribution of survey tows in 10km^2^ cells for SFA 27B from 1981—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_27", fr, ".png"))
-```
 
 <!-- ```{r mwsh-sab-qq, echo=F, message=F, fig.cap="QQ-plot of meat weight-shell height model predictions (points) for Sable Bank from 1992-2022. The 1:1 line represents the expectation if the data were normally distributed."} -->
 <!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_qq",fr, ".png")) -->
@@ -161,44 +171,205 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 <!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_depth",fr, ".png")) -->
 <!-- ``` -->
 
-```{r mwsh-sab-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Sable Bank from 1992--2001. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line.   "}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_y1", fr, ".png"))
+```{r mwsh-sab-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Sable Bank from 1992--2001. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_yall", fr, ".png"))
 ```
 
-```{r mwsh-sab-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Sable Bank from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_y2", fr, ".png"))
+<!-- ```{r mwsh-sab-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Sable Bank from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_y2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-sab-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Sable Bank from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_y3", fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-mid-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Middle Bank from 1994--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_yall", fr, ".png"))
 ```
 
-```{r mwsh-sab-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Sable Bank from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_y3", fr, ".png"))
+<!-- ```{r mwsh-mid-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Middle Bank from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_y2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-mid-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Middle Bank from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_y3", fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-ban-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25B Banquereau Bank from 1999--2019. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_yall", fr, ".png"))
 ```
 
-```{r mwsh-sab-rs-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Sable Bank from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_1", fr, ".png"))
+<!-- ```{r mwsh-ban-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25B Banquereau Bank from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_y2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-ban-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25B Banquereau Bank from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_y3", fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-bbn-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26A Browns Bank North from 1992--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_yall", fr, ".png"))
 ```
 
-```{r mwsh-sab-rs-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Sable Bank from 2002--2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_2", fr, ".png"))
+<!-- ```{r mwsh-bbn-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26A Browns Bank North from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-bbn-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26A Browns Bank North from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y3", fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-bbs-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26B Browns Bank South from 2001--2021 Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_yall", fr, ".png"))
 ```
 
-```{r mwsh-sab-rs-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Sable Bank from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_3", fr, ".png"))
+<!-- ```{r mwsh-bbs-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26B Browns Bank South from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_y2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-bbs-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26B Browns Bank South from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_y3", fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-ger-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26C German Bank from 1995--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_yall", fr, ".png"))
 ```
 
-```{r mwsh-sab-rm-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Sable Bank from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_1", fr, ".png"))
+<!-- ```{r mwsh-ger-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26C German Bank from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_y2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-ger-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26C German Bank from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_y3", fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-gbb-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 27B Georges Bank 'b' from 1995--2022 Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_yall", fr, ".png"))
 ```
 
-```{r mwsh-sab-rm-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Sable Bank from 2002--2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_2", fr, ".png"))
+<!-- ```{r mwsh-gbb-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 27B Georges Bank 'b' from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_y2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-gbb-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 27B Georges Bank 'b' from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line. Only years with samples from at least two tows are shown."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_y3", fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-sab-rs, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Sable Bank from 1992--2022 The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_", fr, "landscape.png"))
 ```
 
-```{r mwsh-sab-rm-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Sable Bank from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_3", fr, ".png"))
+```{r mwsh-sab-rm, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Sable Bank from 1992--2022 The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_", fr, "landscape.png"))
 ```
 
-```{r mwsh-sab-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA25A Sable Bank (black points connected with a black line). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
+```{r mwsh-mid-rs, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Middle Bank from 1994--2022. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_sh_", fr, "landscape.png"))
+```
+
+```{r mwsh-mid-rm, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Middle Bank from 1994--2022. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_mw_", fr, "landscape.png"))
+```
+
+```{r mwsh-ban-rs, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25B Banquereau Bank from 1999--2019. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_resid_sh_", fr, "landscape.png"))
+```
+
+```{r mwsh-ban-rm, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25B Banquereau Bank from 1999--2019. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_resid_mw_", fr, "landscape.png"))
+```
+
+```{r mwsh-bbn-rs, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A Browns Bank North from 1992--2022. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_", fr, "landscape.png"))
+```
+
+```{r mwsh-bbn-rm, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A Browns Bank North from 1992--2022. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_", fr, "landscape.png"))
+```
+
+```{r mwsh-bbs-rs, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26B Browns Bank South from 2001--2021. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_resid_sh_", fr, "landscape.png"))
+```
+
+```{r mwsh-bbs-rm, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26B Browns Bank South from 2001--2021. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_resid_mw_", fr, "landscape.png"))
+```
+
+```{r mwsh-ger-rs, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26C German Bank from 1995--2022. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_resid_sh_", fr, "landscape.png"))
+```
+
+```{r mwsh-ger-rm, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26C German Bank from 1995--2022. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_resid_mw_", fr, "landscape.png"))
+```
+
+```{r mwsh-gbb-rs, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 27B Georges Bank 'b' from 1995--2022. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_resid_sh_", fr, "landscape.png"))
+```
+
+```{r mwsh-gbb-rm, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 27B Georges Bank 'b' from 1995--2022. The dashed blue line represents a residual value of 0. Only years with samples from at least two tows are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_resid_mw_", fr, "landscape.png"))
+```
+
+<!-- ```{r mwsh-sab-rs-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Sable Bank from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_1", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-sab-rs-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Sable Bank from 2002--2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-sab-rs-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Sable Bank from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_3", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-sab-rm-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Sable Bank from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_1", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-sab-rm-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Sable Bank from 2002--2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-sab-rm-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Sable Bank from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_3", fr, ".png")) -->
+<!-- ``` -->
+
+
+<!-- ```{r mwsh-mid-rs-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Middle Bank from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_sh_1", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-mid-rs-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Middle Bank from 2002--2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_sh_2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-mid-rs-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A Middle Bank from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_sh_3", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-mid-rm-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Middle Bank from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_mw_1", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-mid-rm-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Middle Bank from 2002--2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_mw_2", fr, ".png")) -->
+<!-- ``` -->
+
+<!-- ```{r mwsh-mid-rm-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A Middle Bank from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_mw_3", fr, ".png")) -->
+<!-- ``` -->
+
+```{r mwsh-sab-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA25A Sable Bank (black points). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_depth", fr, ".png"))
+```
+
+```{r mwsh-mid-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA25A Middle Bank (black points). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_depth", fr, ".png"))
+```
+
+```{r mwsh-ban-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA25B Banquereau Bank (black points). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_depth", fr, ".png"))
 ```
 
 <!-- ```{r mwsh-bbn-qq, echo=F, message=F, fig.cap="QQ-plot of meat weight-shell height model predictions (points) for Browns Bank north from 1992-2022. The 1:1 line represents the expectation if the data were normally distributed."} -->
@@ -209,65 +380,45 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 <!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_depth",fr, ".png")) -->
 <!-- ``` -->
 
-```{r mwsh-bbn-1, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26A Browns Bank North from 1992--2001. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y1", fr, ".png"))
-```
 
-```{r mwsh-bbn-2, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26A Browns Bank North from 2002--2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y2", fr, ".png"))
-```
+<!-- ```{r mwsh-bbn-rs-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A Browns Bank North from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_1", fr, ".png")) -->
+<!-- ``` -->
 
-```{r mwsh-bbn-3, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26A Browns Bank North from 2012--2022. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_y3", fr, ".png"))
-```
+<!-- ```{r mwsh-bbn-rs-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A Browns Bank North from 2002--2012. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_2", fr, ".png")) -->
+<!-- ``` -->
 
+<!-- ```{r mwsh-bbn-rs-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A Browns Bank North from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_3", fr, ".png")) -->
+<!-- ``` -->
 
-```{r mwsh-bbn-rs-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A Browns Bank North from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_1", fr, ".png"))
-```
+<!-- ```{r mwsh-bbn-rm-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26A Browns Bank North from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions.."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_1", fr, ".png")) -->
+<!-- ``` -->
 
-```{r mwsh-bbn-rs-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A Browns Bank North from 2002--2012. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_2", fr, ".png"))
-```
+<!-- ```{r mwsh-bbn-rm-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26A Browns Bank North from 2002--2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_2", fr, ".png")) -->
+<!-- ``` -->
 
-```{r mwsh-bbn-rs-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A Browns Bank North from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_3", fr, ".png"))
-```
+<!-- ```{r mwsh-bbn-rm-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26A Browns Bank North from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_3", fr, ".png")) -->
+<!-- ``` -->
 
-```{r mwsh-bbn-rm-1, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26A Browns Bank North from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions.."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_1", fr, ".png"))
-```
-
-```{r mwsh-bbn-rm-2, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26A Browns Bank North from 2002--2011. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_2", fr, ".png"))
-```
-
-```{r mwsh-bbn-rm-3, echo=F, message=F, fig.cap="Residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26A Browns Bank North from 2012--2022. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_3", fr, ".png"))
-```
-
-```{r mwsh-bbn-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA26A Browns Bank North (black points connected with a black line). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
+```{r mwsh-bbn-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA26A Browns Bank North (black points). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_depth", fr, ".png"))
 ```
 
-```{r mwsh-ban, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25B Banquereau Bank for surveys with detailed sampling since 1999. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_Ban", fr, ".png"))
+```{r mwsh-bbs-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA26B Browns Bank South (black points). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_depth", fr, ".png"))
 ```
 
-```{r mwsh-mid, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 25A Middle Bank for surveys with detailed sampling since 2011. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line"}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_Mid", fr, ".png"))
+```{r mwsh-ger-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA26C German Bank (black points). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_depth", fr, ".png"))
 ```
 
-```{r mwsh-bbs, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26B Browns Bank South for surveys with detailed sampling since 2005. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_BBs", fr, ".png"))
-```
-
-```{r mwsh-ger, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 26C German Bank for surveys with detailed sampling since 2012. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_Ger", fr, ".png"))
-```
-
-```{r mwsh-gbb, echo=F, message=F, fig.cap="Meat weight-shell height model predictions by year for SFA 27B Georges Bank ‘b’ for surveys with detailed sampling since 2013. Measurements of meat weight (grams, g) and shell height (millimetres, mm) collected during the survey are shown in blue. Predictions for each sampled tow are shown by the yellow lines, and the annual prediction is shown by the thick black line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/MWSH_y3_GBb", fr, ".png"))
+```{r mwsh-gbb-depth, echo=F, message=F, fig.cap="The effect of depth on meat weight-shell height model predictions over time for SFA27B Georges Bank 'b' (black points). Error bars represent the 95% confidence interval for each depth effect, and the dashed yellow line highlights an effect of 0 (no effect)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_depth", fr, ".png"))
 ```
 
 ```{r cfts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Time series of condition (in grams, g)  estimated for a 100 millimetre (mm) shell height scallop for SFA 25 management units. Condition estimates from the new meat weight-shell height model are shown in orange with points, while condition factor estimates (also standardized for a 100 mm shell height) are shown in black with triangles."}
@@ -306,7 +457,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 
-```{r sh-ps-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 25A Sable Bank collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 25A Sable Bank survey data. Shell heights are shown in 5mm bins for consistency with the survey data. Year is survey year (June to May)."}
+```{r sh-ps-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 25A Sable Bank collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 25A Sable Bank survey data. Shell heights are shown in 5 mm bins for consistency with the survey data."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/shf_ps", fr, "_new.png"))
 ```
 
@@ -318,12 +469,44 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
-
-```{r sh-sel-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 25A Sable Bank collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25A Sable Bank survey data. Shell heights are shown in 5mm bins for consistency between the two datasets. Year is survey year (June to May)."}
+```{r sh-sel-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 25A Sable Bank collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25A Sable Bank survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/shf_selectivity", fr, ".png"))
 ```
 
-```{r sh-ps-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 26A Browns Bank North collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 26A Browns Bank North survey data. Shell heights are shown in 5mm bins for consistency with the survey data. Year is survey year (June to May)."}
+```{r sh-ps-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 25A Middle Bank collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 25A Middle Bank survey data. Shell heights are shown in 5 mm bins for consistency with the survey data."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/shf_ps", fr, "_new.png"))
+```
+
+```{r prop-ps-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25A Middle Bank fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/proportion_boxplot", fr, "_new.png"))
+```
+
+```{r propss-ps-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25A Middle Bank fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/proportion_boxplot_ss", fr, "_new.png"))
+```
+
+```{r sh-sel-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 25A Middle Bank collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25A Middle Bank survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/shf_selectivity", fr, ".png"))
+```
+
+
+```{r sh-ps-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 25B Banquereau Bank collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 25B Banquereau Bank survey data. Shell heights are shown in 5 mm bins for consistency with the survey data."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/shf_ps", fr, "_new.png"))
+```
+
+```{r prop-ps-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25B Banquereau Bank fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/proportion_boxplot", fr, "_new.png"))
+```
+
+```{r propss-ps-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25B Banquereau Bank fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/proportion_boxplot_ss", fr, "_new.png"))
+```
+
+```{r sh-sel-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 25B Banquereau Bank collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25B Banquereau Bank survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/shf_selectivity", fr, ".png"))
+```
+
+```{r sh-ps-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 26A Browns Bank North collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 26A Browns Bank North survey data. Shell heights are shown in 5 mm bins for consistency with the survey data."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_ps", fr, "_new.png"))
 ```
 
@@ -335,17 +518,66 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
-
-```{r sh-sel-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 26A Browns Bank North collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26A Browns Bank North survey data. Shell heights are shown in 5mm bins for consistency between the two datasets. Year is survey year (June to May)."}
+```{r sh-sel-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 26A Browns Bank North collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26A Browns Bank North survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_selectivity", fr, ".png"))
 ```
 
-```{r rec-comp-25, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 25A Middle Bank, SFA 25A Sable Bank, and SFA 25B Banquereau Bank using recruit size ranges of 75-90 millimetres (mm, points), and 80-90mm (triangles)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_25_compare", fr, MWSH, ".png"))
+
+```{r sh-ps-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 26B Browns Bank South collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 26B Browns Bank South survey data. Shell heights are shown in 5 mm bins for consistency with the survey data."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/shf_ps", fr, "_new.png"))
 ```
 
-```{r rec-comp-26, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 26A Browns Bank North and SFA 26B Browns Bank South using recruit size ranges of 75-90 millimetres (mm, points), and 85-95mm (triangles)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_26_compare", fr, MWSH, ".png"))
+```{r prop-ps-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26B Browns Bank South fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/proportion_boxplot", fr, "_new.png"))
+```
+
+```{r propss-ps-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26B Browns Bank South fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/proportion_boxplot_ss", fr, "_new.png"))
+```
+
+```{r sh-sel-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 26B Browns Bank South collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26B Browns Bank South survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/shf_selectivity", fr, ".png"))
+```
+
+```{r sh-ps-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 26C German Bank collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 26C German Bank survey data. Shell heights are shown in 5 mm bins for consistency with the survey data."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/shf_ps", fr, "_new.png"))
+```
+
+```{r prop-ps-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26C German Bank fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/proportion_boxplot", fr, "_new.png"))
+```
+
+```{r propss-ps-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26C German Bank fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/proportion_boxplot_ss", fr, "_new.png"))
+```
+
+```{r sh-sel-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 26C German Bank collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26C German Bank survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/shf_selectivity", fr, ".png"))
+```
+
+
+```{r sh-ps-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 27B Georges Bank 'b' collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 27B Georges Bank 'b' survey data. Shell heights are shown in 5 mm bins for consistency with the survey data."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/shf_ps", fr, "_new.png"))
+```
+
+```{r prop-ps-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 27B Georges Bank 'b' fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/proportion_boxplot", fr, "_new.png"))
+```
+
+```{r propss-ps-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 27B Georges Bank 'b' fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/proportion_boxplot_ss", fr, "_new.png"))
+```
+
+```{r sh-sel-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 27B Georges Bank 'b' collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 27B Georges Bank 'b' survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/shf_selectivity", fr, ".png"))
+```
+
+```{r rec-comp-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 25A Sable Bank using recruit size ranges of 75--90 millimetres (mm, points), and 80--90 mm (triangles)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_Sab_compare", fr, MWSH, ".png"))
+```
+
+```{r rec-comp-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 26A Browns Bank North using recruit size ranges of 75--90 millimetres (mm, points), and 85--95 mm (triangles)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_BBn_compare", fr, MWSH, ".png"))
 ```
 
 
@@ -365,7 +597,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_Ban.png"))
 ```
 
-<!-- # ```{r shf-ban-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Banquereau Bank. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."} -->
+<!-- # ```{r shf-ban-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200 mm collected during DFO surveys on Banquereau Bank. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."} -->
 <!-- # knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_75plus_Ban.png")) -->
 <!-- # ``` -->
 
@@ -373,7 +605,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_Mid.png"))
 ```
 
-<!-- ```{r shf-mid-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200mm collected during DFO surveys on Middle Bank. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."} -->
+<!-- ```{r shf-mid-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200 mm collected during DFO surveys on Middle Bank. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."} -->
 <!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_Mid.png")) -->
 <!-- ``` -->
 
