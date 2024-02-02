@@ -19,7 +19,7 @@ library(arm)
 
 
 # hydration data
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_oldMWSH.RData")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_oldMWSH_GBb.RData")
 # used for mw data, to develop new MWSH model
 #load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90_newareas_issue120.RData")
 
@@ -102,8 +102,7 @@ qqplot.data <- function (dat,facet=F, ncol=NULL,...)
 
 # Start analysis
 
-
-banker <- "Ban"
+banker <- "Sab"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
@@ -381,6 +380,43 @@ for(i in 1:n.yrs)
 # 1991 doesn't converge and we don't need it for the models, so I suggest we only use 1992 onwards for this.
 resid <- do.call('rbind',resids)
 
+# evaluating resid bias (chose 140mm from looking at the plots below)
+resid_summary <- resid[resid$sh>140,] %>%
+  dplyr::group_by(year) %>%
+  dplyr::summarize(bank=banker,`med.resid.140+`=median(residuals, na.rm=T))
+
+rs_range <- read.csv("Y:/Offshore/Assessment/Data/Size_categories_by_bank_75-90.csv")
+minFR <- rs_range$CS[rs_range$Bank==banker] + 5 # column in n.yst for FRs
+if(200 %in% names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst)) & "years" %in% names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst))){
+  colnum <- which(names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst))==minFR)
+  FRs <- rowSums(survey.obj[[banker]]$shf.dat$n.yst[,colnum:ncol(survey.obj[[banker]]$shf.dat$n.yst)])
+  colnum2 <- which(names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst))==145)
+  forties <- rowSums(survey.obj[[banker]]$shf.dat$n.yst[,colnum2:ncol(survey.obj[[banker]]$shf.dat$n.yst)])
+  props <- data.frame(bank=banker, year=survey.obj[[banker]]$shf.dat$n.yst[,1], prop = forties/FRs)
+}
+if(banker=="Ger"){
+  colnum <- which(names(as.data.frame(lined.survey.obj$shf.dat$n.yst))==minFR)
+  FRs <- rowSums(lined.survey.obj$shf.dat$n.yst[,colnum:ncol(lined.survey.obj$shf.dat$n.yst)])
+  colnum2 <- which(names(as.data.frame(lined.survey.obj$shf.dat$n.yst))==145)
+  forties <- rowSums(lined.survey.obj$shf.dat$n.yst[,colnum2:ncol(lined.survey.obj$shf.dat$n.yst)])
+  props2 <- data.frame(bank=banker, year=lined.survey.obj$shf.dat$n.yst[,1], prop = forties/FRs)
+  props <- full_join(props, props2)
+}
+if(!200 %in% names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst)) & !"years" %in% names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst))){
+  n.yst <- as.data.frame(survey.obj[[banker]]$shf.dat$n.yst)
+  names(n.yst) <- seq(5,200,5)
+  colnum <- which(names(n.yst)==minFR)
+  FRs <- rowSums(n.yst[,colnum:ncol(n.yst)])
+  colnum2 <- which(names(n.yst)==145)
+  forties <- rowSums(n.yst[,colnum2:ncol(n.yst)])
+  props <- data.frame(bank=banker, year=survey.obj[[banker]]$model.dat$year, prop = forties/FRs)
+}
+
+resid_summary <- left_join(resid_summary, props)
+resid_summary[resid_summary$`med.resid.140+`>0.01,]
+write.csv(x = resid_summary, paste0(plotsGo, "/", banker, "/resid_summary.csv"))
+
+
 # Here are the residual plots which I think we should show, not sure if we want the smooth on there or not?
 
 ys <- c(1992, 2002, 2012)
@@ -396,7 +432,7 @@ for(y in 1:length(ys)){
   p.res.d <- ggplot() +
     geom_point(data=resid[resid$year %in% yrange,],aes(x=depth,y=residuals), size=0.5) +
     facet_wrap(~year, ncol=2) +
-    ylim(-1,1) +
+    #ylim(-1,1) +
     xlim(floor(depthrange[1]),ceiling(depthrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed') +
     #geom_smooth(method = 'loess',color=yellows) +
@@ -405,7 +441,7 @@ for(y in 1:length(ys)){
 
   p.res.sh <- ggplot(resid[resid$year %in% yrange,],aes(x=sh,y=residuals)) + geom_point(size=0.5) +
     facet_wrap(~year, ncol=2) +
-    ylim(-1,1) +
+    #ylim(-1,1) +
     xlim(floor(shrange[1]),ceiling(shrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed')+
     #geom_smooth(method = 'gam',color=yellows) +
@@ -414,7 +450,7 @@ for(y in 1:length(ys)){
 
   p.res.mw <- ggplot(resid[resid$year %in% yrange,],aes(x=wmw,y=residuals)) + geom_point(size=0.5) +
     facet_wrap(~year, ncol=2) +
-    ylim(-1,1) +
+    #ylim(-1,1) +
     xlim(floor(mwrange[1]),ceiling(mwrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed') +
     #geom_smooth(method = 'gam',color=yellows) +
@@ -474,8 +510,6 @@ dev.off()
 png(filename = paste0(plotsGo, "/", banker, "/MWSH_resid_mw_landscape", nickname, ".png"), height=height_fac, width=10, units="in", res=420)
 print(p.res.mw)
 dev.off()
-
-
 
 # And here's a facet qqplot. They aren't brilliant, but I think they are reasonable
 p.qqs <- qqplot.data(data.frame(var=resid$residuals,facet = resid$year),facet = T, ncol=5)
@@ -682,9 +716,10 @@ p3 <- ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
 
 pall <- ggplot(r.tow %>% dplyr::filter(year %in% 1992:2022)) +
   geom_point(data=sub %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=wmw),color=blues, size=0.5, alpha=0.5) +
-  geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=6) +
+  geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+
+  facet_wrap(~year, ncol=6) +
   geom_line(data = f.mw %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=mw),color='black',size=1) +
-  scale_x_continuous(limits = c(65,mw.dat %>% dplyr::filter(year == max(yrs)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
+  scale_x_continuous(limits = c(65,sub %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
                      name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
                      breaks = seq(0,200,by=25), expand = c(0.01,0.01)) +
   scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
@@ -737,52 +772,64 @@ png(filename = paste0(plotsGo, "/", banker, "/MWSH_yall", nickname, ".png"), hei
 print(pall)
 dev.off()
 
-### for the other banks after running in survey summary
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
-nickname <- nickname2
-banks <- c("Mid", "Ban", "Ger", "BBs", "GBb")
-for (bank in banks){
-  sh <- 65:200/100
-  y3 <- rev(rev(sort(unique(cf.data[[bank]]$HtWt.fit$resid$year)))[1:10])
-  y3 <- y3[!is.na(y3)]
-
-  dat <- mw.dat.all[[bank]]
-  # with depth across all years (random effect is ID)
-  sub <- dat[complete.cases(dat),]
-
-  r.tows <- NULL
-  f.mws <- NULL
-  n.yrs <- length(y3)
-  mw.sh.coef <- cf.data[[bank]]$CF.fit$mw.sh.coef
-  for(j in 1:n.yrs)
-  {
-    rt <- NULL
-    slope <- mw.sh.coef %>% dplyr::filter(year == y3[j]) %>% dplyr::pull(fix.slope); slope <- slope[1]
-    int <- mw.sh.coef %>% dplyr::filter(year == y3[j]) %>% dplyr::pull(fix.int); int <- int[1]
-    rand.int <- mw.sh.coef[mw.sh.coef$year==y3[j] & !is.na(mw.sh.coef$ran.int.act),] %>% dplyr::pull(ran.int.act,tow)
-    for(i in 1:length(rand.int)) rt[[i]] <- data.frame(sh = 100*sh,mw = exp(rand.int)[i] * sh^slope,tow = names(rand.int)[i])
-    rts <- do.call("rbind",rt)
-    r.tows[[j]] <- data.frame(rts,year = y3[j])
-    f.mws[[j]] <- data.frame(sh = 100* sh, mw = exp(int) * sh^slope,year = y3[j])
-  }
-
-  r.tow <- do.call('rbind',r.tows)
-  f.mw <- do.call('rbind',f.mws)
-
-  png(filename = paste0(plotsGo, "/MWSH_y3_", bank, nickname, ".png"), height=6, width=5, units="in", res=420)
-  print(
-    ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
-      geom_point(data=cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues, alpha=0.5) +
-      geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
-      geom_line(data = f.mw %>% dplyr::filter(year %in% y3),aes(x=sh,y=mw),color='black',size=2) +
-      scale_x_continuous(limits = c(65,cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year == max(y3)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
-                         name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
-                         breaks = seq(0,200,by=20), expand = c(0.01,0.01)) +
-      scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
-                         name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
-                         breaks = seq(0,100,by=20)) +
-      theme_bw()
-  )
-  dev.off()
-}
-
+# ### for the other banks after running in survey summary
+# load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
+# # nickname <- nickname2
+# # banks <- c("Mid", "Ban", "Ger", "BBs", "GBb")
+# # for (bank in banks){
+# #   sh <- 65:200/100
+# #   y3 <- rev(rev(sort(unique(cf.data[[bank]]$HtWt.fit$resid$year)))[1:10])
+# #   y3 <- y3[!is.na(y3)]
+# #
+# #   dat <- mw.dat.all[[bank]]
+# #   # with depth across all years (random effect is ID)
+# #   sub <- dat[complete.cases(dat),]
+# #
+# #   r.tows <- NULL
+# #   f.mws <- NULL
+# #   n.yrs <- length(y3)
+# #   mw.sh.coef <- cf.data[[bank]]$CF.fit$mw.sh.coef
+# #   for(j in 1:n.yrs)
+# #   {
+# #     rt <- NULL
+# #     slope <- mw.sh.coef %>% dplyr::filter(year == y3[j]) %>% dplyr::pull(fix.slope); slope <- slope[1]
+# #     int <- mw.sh.coef %>% dplyr::filter(year == y3[j]) %>% dplyr::pull(fix.int); int <- int[1]
+# #     rand.int <- mw.sh.coef[mw.sh.coef$year==y3[j] & !is.na(mw.sh.coef$ran.int.act),] %>% dplyr::pull(ran.int.act,tow)
+# #     for(i in 1:length(rand.int)) rt[[i]] <- data.frame(sh = 100*sh,mw = exp(rand.int)[i] * sh^slope,tow = names(rand.int)[i])
+# #     rts <- do.call("rbind",rt)
+# #     r.tows[[j]] <- data.frame(rts,year = y3[j])
+# #     f.mws[[j]] <- data.frame(sh = 100* sh, mw = exp(int) * sh^slope,year = y3[j])
+# #   }
+# #
+# #   r.tow <- do.call('rbind',r.tows)
+# #   f.mw <- do.call('rbind',f.mws)
+# #
+# #   png(filename = paste0(plotsGo, "/MWSH_y3_", bank, nickname, ".png"), height=6, width=5, units="in", res=420)
+# #   print(
+# #     ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
+# #       geom_point(data=cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year %in% y3),aes(x=sh,y=wmw),color=blues, alpha=0.5) +
+# #       geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+ facet_wrap(~year, ncol=2) +
+# #       geom_line(data = f.mw %>% dplyr::filter(year %in% y3),aes(x=sh,y=mw),color='black',size=2) +
+# #       scale_x_continuous(limits = c(65,cf.data[[bank]]$HtWt.fit$resid %>% dplyr::filter(year == max(y3)) %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
+# #                          name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
+# #                          breaks = seq(0,200,by=20), expand = c(0.01,0.01)) +
+# #       scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
+# #                          name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
+# #                          breaks = seq(0,100,by=20)) +
+# #       theme_bw()
+# #   )
+# #   dev.off()
+# # }
+# #
+# I'd SUGGEST GETTING THE TIME SERIES MEDIAN PROPORTION OF THE FR SCALLOP FOR EACH
+# BANK THAT ARE OVER 140 MM, ASSUMING THOSE MEDIANS ARE ALL SMALL (LIKE < 5%) JUST
+# TAKE THE MEDIAN OF THOSE VALUES AND REPORT THAT NUMBER
+# banks <- c("Sab", "Mid", "Ban", "BBn", "BBs","Ger","GBb")
+#
+# overall.prop <- NULL
+# for(bnk in banks) {
+#   prop <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/", bnk, "/resid_summary.csv"))
+#   overall.prop <- rbind(overall.prop, prop)
+# }
+#
+# summary(overall.prop[abs(overall.prop$med.resid.140.)>0.02,]$prop)

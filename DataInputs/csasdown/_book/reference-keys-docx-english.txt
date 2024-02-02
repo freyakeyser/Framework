@@ -122,8 +122,8 @@ german-bank-sfa-26c
 sfa-27b
 georges-bank-b-sfa-27b
 sfa-25
-sable-bank-sfa-25a
-middle-bank-sfa-25a
+sable-bank-sfa-25a-sab
+middle-bank-sfa-25a-mid
 banquereau-bank-sfa-25b
 estimation-methods
 meat-weight-shell-height-relationship

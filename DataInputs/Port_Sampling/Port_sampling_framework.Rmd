@@ -517,7 +517,9 @@ overall <- full_join(full_join(full_join(prop.bl.100, prop.bl.95), prop.bl.90), 
 overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
 
 # for text:
-overall %>% group_by(lim) %>% summarize(median(prop))
+yearround <- overall %>% group_by(lim) %>% summarize(median(prop))
+
+
 
 if(french==F) {
   ylabel <- "Proportion of meats"
@@ -569,8 +571,6 @@ prop.bl.85.ss$lim <- "<85"
 overall <- full_join(full_join(full_join(prop.bl.100.ss, prop.bl.95.ss), prop.bl.90.ss), prop.bl.85.ss)
 overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
 
-# for text:
-overall %>% group_by(lim) %>% summarize(median(prop))
 
 # This is basically under 1%, which I think will be fine.
 ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
@@ -584,6 +584,12 @@ ggplot() +
   xlab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)"))
 dev.off()
 
+# for text:
+ss <- overall %>% group_by(lim) %>% summarize(median(prop))
+yearround$type <- "yearround"
+ss$type <- "ss"
+overall <- full_join(yearround, ss)
+write.csv(overall, paste0(plotsGo, bank, "/boxplot_vals.csv"))
 
 # Based on the ageing work, if we go with 90 mm as our end of recruitment bin, the recruits should be 75-90 mm in size.
 ```
