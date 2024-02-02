@@ -821,15 +821,56 @@ dev.off()
 # #   dev.off()
 # # }
 # #
-# I'd SUGGEST GETTING THE TIME SERIES MEDIAN PROPORTION OF THE FR SCALLOP FOR EACH
-# BANK THAT ARE OVER 140 MM, ASSUMING THOSE MEDIANS ARE ALL SMALL (LIKE < 5%) JUST
-# TAKE THE MEDIAN OF THOSE VALUES AND REPORT THAT NUMBER
-# banks <- c("Sab", "Mid", "Ban", "BBn", "BBs","Ger","GBb")
+# Residual analysis thanks to Dave:
 #
-# overall.prop <- NULL
-# for(bnk in banks) {
-#   prop <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/", bnk, "/resid_summary.csv"))
-#   overall.prop <- rbind(overall.prop, prop)
-# }
+banks <- c("Sab", "Mid", "Ban", "BBn", "BBs","Ger","GBb")
+
+overall.prop <- NULL
+for(bnk in banks) {
+  prop <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/", bnk, "/resid_summary.csv"))
+  overall.prop <- rbind(overall.prop, prop)
+}
+
+overall.prop[overall.prop$med.resid.140. < -0.05,]
+
+by.bank <- overall.prop |> collapse::fsubset(abs(med.resid.140.) > 0.1) |>collapse::fgroup_by(bank) |> collapse::fsummarise(med = median(prop))
+by.bank
+
+n.years <- overall.prop |> collapse::fsubset(abs(med.resid.140.) > 0.1) |>collapse::fgroup_by(bank) |> collapse::fcount()
+# Sable
+sab.years <- n.years$N[n.years$bank =="Sab"]
+sab.med <- round(by.bank$med[by.bank$bank =="Sab"],digits=2)
 #
-# summary(overall.prop[abs(overall.prop$med.resid.140.)>0.02,]$prop)
+mid.years <- n.years$N[n.years$bank =="Mid"]
+mid.med <- round(by.bank$med[by.bank$bank =="Mid"],digits=2)
+#
+ban.years <- n.years$N[n.years$bank =="Ban"]
+ban.med <- round(by.bank$med[by.bank$bank =="Ban"],digits=2)
+#
+bbn.years <- n.years$N[n.years$bank =="BBn"]
+bbn.med <- round(by.bank$med[by.bank$bank =="BBn"],digits=2)
+#
+ger.years <- n.years$N[n.years$bank =="Ger"]
+ger.med <- round(by.bank$med[by.bank$bank =="Ger"],digits=2)
+
+#
+gbb.years <- n.years$N[n.years$bank =="GBb"]
+gbb.med <- round(by.bank$med[by.bank$bank =="GBb"],digits=3)
+
+# I'd go with this paragraph
+# For scallop over 140 mm in size there can be a slight bias in the meat weight estimates from the MWSH model.
+# For most of the stocks this residual bias is either minimal (residual < 0.05 on the log scale) or the proportion of the population affected is small (usually < 3% of fully-recruited scallop).
+# Thus, this small bias would have little impact on the biomass estimates for the stocks in most years. However, for SFA 26C the bias is somewhat larger than
+# for the other stocks, in 4 years the median of the residuals for scallop with a SH above 140 is below -0.1.  In these years the median proportion of scallop with a
+# SH greater than 140 mm is `0.15, so the overall fully-recruited biomass estimates in these years may be slightly underestimated (< 5%) in SFA 26C.
+
+# The overkill version would be something like this...
+
+For SFA 25A-Sab the absolute value of the residual bias was greater than 0.05 in `r sab.years` years, but the median proportion of scallop above 140 mm was `r sab.med` in these years,
+so this would have minimal impact on the biomass estimates.
+
+For SFA 25A-Mid the absolute value of the residual bias was greater than 0.05 in `r mid.years` years, the median proportion of scallop above 140 mm was `r mid.med` in these years, in
+these years the biomass estimates in SFA 25A-Mid could be somewhat effected by this bias.
+
+For SFA 25B the absolute value of the residual bias was greater than 0.05 in `r ban.years` year, but proportion of scallop above 140 mm was `r bbn.med` in this years,
+so this would could result in a small underestimate of fully-recruited biomass.

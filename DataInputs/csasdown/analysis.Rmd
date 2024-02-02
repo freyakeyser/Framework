@@ -881,50 +881,83 @@ dev.off()
 ```
 
 # Growth
-- No modelled and realized, just realized
-
--	Use 2023 csas update model growth compare to framework5 (new MWSH/75-90/new VB)
-
--	Add one panel for recruit growth too
 
 ```{r growth, echo=F, include=F}
+# from dave
+library(tidyverse)
+repo.loc <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/Model/" #VERY SLOW!!
+num.knots <- 20 
+init.m <- 0.2 
+qR <- 0.33
+g.mod <- 'g_original'
+vary.q <- T
+R.size <- "75"
+FR.size <- "90"
+years <- 1994:2022
+mod.select <- "SEAM"
+
+scenario.10 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",10,"_knots_",'g_original')
+scenario.20 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",20,"_knots_",'g_original')
+
+# SEAM results
+sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
+bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
+
+# Extract growth
+
+sab.gs <- data.frame(g = c(sab.10$obj$env$data$gI[-length(sab.10$obj$env$data$gI)]),
+                     gR = c(sab.10$obj$env$data$gR[-length(sab.10$obj$env$data$gR)]),
+                     year = years) %>%
+  pivot_longer(cols=c("g", "gR"))
+sab.gs$name <- gsub(x=sab.gs$name, pattern="gR", replacement="Recruit")
+sab.gs$name <- gsub(x=sab.gs$name, pattern="g", replacement="Fully recruited")
+sab.gs$name <- factor(sab.gs$name, levels=c("Recruit", "Fully recruited"))
+
+bbn.gs <- data.frame(g = c(bbn.20$obj$env$data$gI[-length(bbn.20$obj$env$data$gI)]),
+                     gR = c(bbn.20$obj$env$data$gR[-length(bbn.20$obj$env$data$gR)]),
+                     year = years,
+                     version = "new")
+
+# old way for bbn
 load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input.RData")
-growth <- data.frame(bank="BBn", year=mod.dat$BBn$year, g2=mod.dat$BBn$g2, gR2 = mod.dat$BBn$gR2, version="old")
+growth <- data.frame(bank="BBn", year=mod.dat$BBn$year, g=mod.dat$BBn$g, gR = mod.dat$BBn$gR, version="previous")
 
-load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input_framework_vonB_75-90RSCS_newMWSH.RData")
-growth <- rbind(growth, 
-                data.frame(bank="BBn", year=mod.dat$BBn$year, g2=mod.dat$BBn$g2, gR2 = mod.dat$BBn$gR2, version="new")
-                )
-load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input_framework_vonB_origRSCS_oldMWSH.RData")
-growth <- rbind(growth, 
-                data.frame(bank="BBn", year=mod.dat$BBn$year, g2=mod.dat$BBn$g2, gR2 = mod.dat$BBn$gR2, version="vonB only")
-                )
-growth <- pivot_longer(data = growth, cols = c("g2", "gR2"))
+growth <- full_join(bbn.gs, growth) %>%
+  pivot_longer(cols = c("g", "gR"))
 
-growth$name <- gsub(x=growth$name, pattern="g2", replacement="Fully recruited")
-growth$name <- gsub(x=growth$name, pattern="gR2", replacement="Recruit")
+growth$name <- gsub(x=growth$name, pattern="gR", replacement="Recruit")
+growth$name <- gsub(x=growth$name, pattern="g", replacement="Fully recruited")
 growth$name <- factor(growth$name, levels=c("Recruit", "Fully recruited"))
 
-growth$version <- factor(growth$version, levels=c("new", "vonB only", "old"))
-
 if(french==T){
-  growth$version <- gsub(x=growth$version, pattern="old", replacement="ancien")
+  growth$version <- gsub(x=growth$version, pattern="previous", replacement="ancien")
   growth$version <- gsub(x=growth$version, pattern="new", replacement="nouveau")
-  growth$version <- gsub(x=growth$version, pattern="vonB only", replacement="vonB seulement")
+  #growth$version <- gsub(x=growth$version, pattern="vonB only", replacement="vonB seulement")
 }
 
 png(filename=paste0(plotsGo, "/Survey/", nickname, "/growth_BBn.png"),width=6.5, height=4, units = "in", res=420)
 ggplot() + 
-  geom_line(data=growth[!growth$version %in% c("vonB only"),], aes(year, value, colour=version)) +
-  geom_point(data=growth[!growth$version %in% c("vonB only"),], aes(year, value, colour=version, shape=version)) +
+  geom_line(data=growth, aes(year, value, colour=version)) +
+  geom_point(data=growth, aes(year, value, colour=version, shape=version)) +
   theme_bw() + 
-  scale_colour_manual(values=c("black", "darkorange", "blue"), name=NULL) +
+  scale_colour_manual(values=c("black", "darkorange"), name=NULL) +
   scale_shape_discrete(name=NULL) +
   ylab(en2fr("Growth", translate=french, custom_terms=rosetta_terms)) +
   xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
   facet_wrap(~en2fr(name, translate=french, custom_terms=rosetta_terms), scales="free_y")
 dev.off()
-   
+
+png(filename=paste0(plotsGo, "/Survey/", nickname, "/growth_Sab.png"),width=6.5, height=4, units = "in", res=420)
+ggplot() + 
+  geom_line(data=sab.gs, aes(year, value)) +
+  geom_point(data=sab.gs, aes(year, value)) +
+  theme_bw() + 
+  scale_colour_manual(values=c("black"), name=NULL) +
+  scale_shape_discrete(name=NULL) +
+  ylab(en2fr("Growth", translate=french, custom_terms=rosetta_terms)) +
+  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
+  facet_wrap(~en2fr(name, translate=french, custom_terms=rosetta_terms), scales="free_y")
+dev.off()
 
 ```
 

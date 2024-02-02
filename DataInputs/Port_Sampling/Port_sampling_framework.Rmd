@@ -230,7 +230,7 @@ write.csv(ps_tab, paste0(plotsGo, "/ps_tab.csv"))
 
 # Single bank results
 ```{r}
-bank <- "BBs"
+bank <- "BBn"
 
 bbn.dat <- port.sampling[port.sampling$bank == bank,]
 
