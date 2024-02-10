@@ -115,7 +115,8 @@ c_sys <- 32620
 qR <- 0.33# log recruit catchability making this the same are FR catchability.
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 2, 0.8, and 0.4
 # Various explorations of the g models.
-g.mod <- 'g_1'
+g.mod <- "g_original"
+#g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 # The survey biomass index for 1995 says there were 243 tonnes of recruits that year.
@@ -541,7 +542,7 @@ if(mod.select == "TLM")
 ##################### Now load the model and make the figures! ##############################################
 
 atow<-800*2.4384/10^6 # area of standard tow in km2
-num.knots <- 20 # 4, 8, or 10
+num.knots <- 10 # 4, 8, or 10
 R.size <- 75
 FR.size <- 90
 #RO <- 100 # 100, 250, or 500

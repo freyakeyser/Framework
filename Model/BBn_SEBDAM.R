@@ -67,7 +67,7 @@ saveRDS(mod.dat,'D:/Framework/SFA_25_26_2024/Model/Data/BBn_BSSM_model.dat.RDS')
 # fish.dat <- fish.dat[!is.na(fish.dat$lat),]
 # fish.dat <- fish.dat[!fish.dat$lon==0,]
 # fish.dat <- fish.dat[!fish.dat$lat==0,]
-# # 
+# #
 # 
 # # Now subset to BBn and add in the missing years of data
 # #bbn.fish <- fish.dat %>% dplyr::filter(bank == "BBn")
@@ -102,7 +102,7 @@ saveRDS(mod.dat,'D:/Framework/SFA_25_26_2024/Model/Data/BBn_BSSM_model.dat.RDS')
 # bbn.fish$lat[nrow(bbn.fish)] <- 42.85600
 # bbn.fish$lon[nrow(bbn.fish)]  <- -65.90183
 # saveRDS(bbn.fish,'D:/Framework/SFA_25_26_2024/Model/Data/BBn_fish.dat.RDS')
-
+# 
 bbn.fish <- readRDS('D:/Framework/SFA_25_26_2024/Model/Data/BBn_fish.dat.RDS')
 bbn.fish$pro.repwt <- bbn.fish$pro.repwt/1000
 #### Finished Data prep and clean up!
@@ -344,14 +344,14 @@ bbn.fish.by.survey.year <- bbn.fish.sf %>% dplyr::group_by(survey.year,.drop=F) 
 #tail(bbn.fish.by.survey.year)
 
 # Subset the fishery data as necessary
-bbn.fish <- bbn.fish %>% dplyr::filter(survey.year %in% years)
-bbn.fish.sf <- bbn.fish.sf %>% dplyr::filter(survey.year %in% years)
+bbn.fish <- bbn.fish |>collapse::fsubset(survey.year %in% years)
+bbn.fish.sf <- bbn.fish.sf |> collapse::fsubset(survey.year %in% years)
 # OK, so now let's see if we can use the catch knot thing Raph made to split this up withing the BBn domain
 #We just need 3 columns for this
 catch.sf <- bbn.fish.sf %>% dplyr::select(pro.repwt,survey.year)
 names(catch.sf) <- c("Catch","Year","geometry")
 #catch.sf$geometry <- catch.sf$geometry/1000
-
+#catch.sf |> data.frame() |> collapse::fgroup_by(Year) |> collapse::fsummarize(sum = sum(Catch))
 # Set up the mesh
 
 bbn.mesh <- setup_mesh(mod.input.sf,model_bound = bbn.shape,nknot=num.knots, max.edge = c(3,10),cutoff=2,seed=66) # Seeds 20 and 66 work

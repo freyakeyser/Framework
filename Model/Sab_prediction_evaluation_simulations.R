@@ -14,7 +14,7 @@ u.colors <- c("#FFD500","#005BBB")
 
 # Here's where I'm sticking the figures
 mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
-fun.loc <-"D:/Github/Framework/RefPts/functions/"
+fun.loc <-"D:/Github/Framework/Model/functions/"
 rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
 
 # Functions we need to source for this to all work
@@ -26,6 +26,7 @@ FR.size <- 90
 qR <- 0.33
 init.m <- 0.2
 g.mod <- 'g_original'
+#g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 num.knots <- 10

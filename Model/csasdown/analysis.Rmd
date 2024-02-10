@@ -155,26 +155,30 @@ sab.bssm.rec <- sab.bssm %>% dplyr::filter(term == "Recruit Biomass (tonnes)")
 sab.bssm.nm.fr <- sab.bssm %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)")
 sab.bssm.nm.rec <- sab.bssm %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)")
 sab.bssm.fm <- sab.bssm %>% dplyr::filter(term == "Fishing Mortality (instantaneous)")
+sab.bssm.fm$exp <- 1-exp(-sab.bssm.fm$med)
+# To align with SEAM and have 2014 FM be 2014-2015 we need to drop the first year and make the year = year-1
+sab.bssm.fm$year <- sab.bssm.fm$year-1
+sab.bssm.fm <- sab.bssm.fm[sab.bssm.fm$year >=1994,]
 
 # biomass
-max.b.sab.bssm <- round(max(sab.bssm.bm$med,na.rm=T),digits=0)
+max.b.sab.bssm <- prettyNum(round(max(sab.bssm.bm$med,na.rm=T),digits=0),big.mark = ',')
 max.b.sab.bssm.y <- sab.bssm.bm$year[sab.bssm.bm$med == max(sab.bssm.bm$med,na.rm=T)]
-min.b.sab.bssm <- round(min(sab.bssm.bm$med,na.rm=T),digits=0)
+min.b.sab.bssm <- prettyNum(round(min(sab.bssm.bm$med,na.rm=T),digits=0),big.mark = ',')
 min.b.sab.bssm.y <- sab.bssm.bm$year[sab.bssm.bm$med == min(sab.bssm.bm$med,na.rm=T)]
 # Recruits
-max.r.sab.bssm <- round(max(sab.bssm.rec$med,na.rm=T),digits=0)
+max.r.sab.bssm <- prettyNum(round(max(sab.bssm.rec$med,na.rm=T),digits=0),big.mark = ',')
 max.r.sab.bssm.y <- sab.bssm.rec$year[sab.bssm.rec$med == max(sab.bssm.rec$med,na.rm=T)]
-min.r.sab.bssm <- round(min(sab.bssm.rec$med,na.rm=T),digits=0)
+min.r.sab.bssm <- prettyNum(round(min(sab.bssm.rec$med,na.rm=T),digits=0),big.mark = ',')
 min.r.sab.bssm.y <- sab.bssm.rec$year[sab.bssm.rec$med == min(sab.bssm.rec$med,na.rm=T)]
 #fishing mortality...
 max.sab.fm <- round(max(sab.bssm.fm$med),digits=3)
-max.recent.sab.fm <- round(max(sab.bssm.fm$med[sab.bssm.fm$year >= 2007]),digits=3)
+max.recent.sab.fm <- round(max(sab.bssm.fm$med[sab.bssm.fm$year >= 2006]),digits=3)
 
 # maximum rhat value
 sab.rhat <- round(max(sab.bssm.mod.out$summary[,8]),digits=3)
 bbn.rhat <- round(max(bbn.bssm.mod.out$summary[,8]),digits=3)
-sab.neff <- round(min(sab.bssm.mod.out$summary[,9]),digits=0)
-bbn.neff <- round(min(bbn.bssm.mod.out$summary[,9]),digits=0)
+sab.neff <- prettyNum(round(min(sab.bssm.mod.out$summary[,9]),digits=0),big.mark = ',')
+bbn.neff <- prettyNum(round(min(bbn.bssm.mod.out$summary[,9]),digits=0),big.mark = ',')
 
 
 # BBN
@@ -183,15 +187,20 @@ bbn.bssm.rec <- bbn.bssm %>% dplyr::filter(term == "Recruit Biomass (tonnes)")
 bbn.bssm.nm.fr <- bbn.bssm %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)")
 bbn.bssm.nm.rec <- bbn.bssm %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)")
 bbn.bssm.fm <- bbn.bssm %>% dplyr::filter(term == "Fishing Mortality (instantaneous)")
+bbn.bssm.fm$exp <- 1-exp(-bbn.bssm.fm$med)
+# To align with SEAM and have 2014 FM be 2014-2015 we need to drop the first year and make the year = year-1
+bbn.bssm.fm$year <- bbn.bssm.fm$year-1
+bbn.bssm.fm <- bbn.bssm.fm[bbn.bssm.fm$year >=1994,]
+
 # biomass
-max.b.bbn.bssm <- round(max(bbn.bssm.bm$med,na.rm=T),digits=0)
+max.b.bbn.bssm <- prettyNum(round(max(bbn.bssm.bm$med,na.rm=T),digits=0),big.mark = ',')
 max.b.bbn.bssm.y <- bbn.bssm.bm$year[bbn.bssm.bm$med == max(bbn.bssm.bm$med,na.rm=T)]
-min.b.bbn.bssm <- round(min(bbn.bssm.bm$med,na.rm=T),digits=0)
+min.b.bbn.bssm <- prettyNum(round(min(bbn.bssm.bm$med,na.rm=T),digits=0),big.mark = ',')
 min.b.bbn.bssm.y <- bbn.bssm.bm$year[bbn.bssm.bm$med == min(bbn.bssm.bm$med,na.rm=T)]
 # Recruits
-max.r.bbn.bssm <- round(max(bbn.bssm.rec$med,na.rm=T),digits=0)
+max.r.bbn.bssm <- prettyNum(round(max(bbn.bssm.rec$med,na.rm=T),digits=0),big.mark = ',')
 max.r.bbn.bssm.y <- bbn.bssm.rec$year[bbn.bssm.rec$med == max(bbn.bssm.rec$med,na.rm=T)]
-min.r.bbn.bssm <- round(min(bbn.bssm.rec$med,na.rm=T),digits=0)
+min.r.bbn.bssm <- prettyNum(round(min(bbn.bssm.rec$med,na.rm=T),digits=0),big.mark = ',')
 min.r.bbn.bssm.y <- bbn.bssm.rec$year[bbn.bssm.rec$med == min(bbn.bssm.rec$med,na.rm=T)]
 
 max.bbn.fm <- round(max(bbn.bssm.fm$med),digits=2)
@@ -209,14 +218,14 @@ bbn.last.5.rec.nm <- round(median(bbn.bssm.nm.rec$med[bbn.bssm.nm.rec$year >= 20
 
 
 # Maximum and min biomasses and years for sable
-max.b.sab <- round(max(pred.proc.sab.10$totals$totB))
+max.b.sab <- prettyNum(round(max(pred.proc.sab.10$totals$totB)),big.mark = ',')
 max.b.sab.y <- years[which(pred.proc.sab.10$totals$totB == max(pred.proc.sab.10$totals$totB))]
-min.b.sab <- round(min(pred.proc.sab.10$totals$totB))
+min.b.sab <- prettyNum(round(min(pred.proc.sab.10$totals$totB)),big.mark = ',')
 min.b.sab.y <- years[which(pred.proc.sab.10$totals$totB == min(pred.proc.sab.10$totals$totB))]
 # for bbn
-max.b.bbn <- round(max(pred.proc.bbn.20$totals$totB))
+max.b.bbn <- prettyNum(round(max(pred.proc.bbn.20$totals$totB)),big.mark = ',')
 max.b.bbn.y <- years[which(pred.proc.bbn.20$totals$totB == max(pred.proc.bbn.20$totals$totB))]
-min.b.bbn <- round(min(pred.proc.bbn.20$totals$totB))
+min.b.bbn <- prettyNum(round(min(pred.proc.bbn.20$totals$totB)),big.mark = ',')
 min.b.bbn.y <- years[which(pred.proc.bbn.20$totals$totB == min(pred.proc.bbn.20$totals$totB))]
 
 # Max and min catchabilities
@@ -470,11 +479,11 @@ sab.10.IR.resids$per.resid <- 100*(sab.10.IR.resids$residual)/log(sab.10.IR.resi
 # SFA 25a
 # biomass differences...
 sab.b.seam.bssm <- sab.bssm.bm$med - pred.proc.sab.10$totals$totB[-drops]
-med.b.sab.seam.bssm <- round(median(sab.b.seam.bssm,na.rm=T),digits=0)
+med.b.sab.seam.bssm <- prettyNum(round(median(sab.b.seam.bssm,na.rm=T),digits=0),big.mark = ',')
 med.per.b.sab.seam.bssm <- round(median(100* (sab.b.seam.bssm / pred.proc.sab.10$totals$totB[-drops]),digits=0))
 # recruit differences...
 sab.r.seam.bssm <- sab.bssm.rec$med - pred.proc.sab.10$totals$totR[-drops]
-med.r.sab.seam.bssm <- round(median(sab.r.seam.bssm,na.rm=T),digits=0)
+med.r.sab.seam.bssm <- prettyNum(round(median(sab.r.seam.bssm,na.rm=T),digits=0),big.mark = ',')
 med.per.r.sab.seam.bssm <- round(median(100* (sab.r.seam.bssm / pred.proc.sab.10$totals$totR[-drops]),digits=0))
 # average natural mortality...
 med.m.sab.seam <- round(median(1-exp(-pred.proc.sab.10$totals$mean_m)),digits=2)
@@ -483,11 +492,11 @@ med.m.r.sab.bssm <- round(median(sab.bssm.nm.rec$med),digits=2)
 # BBn
 # biomass differences...
 bbn.b.seam.bssm <- bbn.bssm.bm$med - pred.proc.bbn.20$totals$totB[-drops]
-med.b.bbn.seam.bssm <- round(median(bbn.b.seam.bssm,na.rm=T),digits=0)
+med.b.bbn.seam.bssm <- prettyNum(round(median(bbn.b.seam.bssm,na.rm=T),digits=0),big.mark = ',')
 med.per.b.bbn.seam.bssm <- round(median(100* (bbn.b.seam.bssm / pred.proc.bbn.20$totals$totB[-drops]),digits=0))
 # recruit differences...
 bbn.r.seam.bssm <- bbn.bssm.rec$med - pred.proc.bbn.20$totals$totR[-drops]
-med.r.bbn.seam.bssm <- round(median(bbn.r.seam.bssm,na.rm=T),digits=0)
+med.r.bbn.seam.bssm <- prettyNum(round(median(bbn.r.seam.bssm,na.rm=T),digits=0),big.mark = ',')
 med.per.r.bbn.seam.bssm <- round(median(100* (bbn.r.seam.bssm / pred.proc.bbn.20$totals$totR[-drops]),digits=0))
 # average natural mortality...
 med.m.bbn.seam <- round(median(1-exp(-pred.proc.bbn.20$totals$mean_m)),digits=2)
@@ -511,7 +520,7 @@ bbn.20.rel.f$rel.f <- bbn.20.rel.f$Catch/bbn.20.rel.f$I
 
 #saveRDS(sab.10.rel.f,"D:/Framework/SFA_25_26_2024/Model/Results/sable_rel_f_share.Rds")
 # Now we want to get the model exploitation rate and the relative explotation rate in the same object to make plotting easy..
-bbn.20.rel.f$mod.exploit <- c(F.bbn.20$exploit[F.bbn.10$year %in% 1994:2021],NA)
+bbn.20.rel.f$mod.exploit <- c(F.bbn.20$exploit[F.bbn.20$year %in% 1994:2021],NA)
 sab.10.rel.f$mod.exploit <- c(F.sab.10$exploit[F.sab.10$year %in% 1994:2021],NA)
 # The correlation...
 sab.rf.cor.test <- cor.test(x = sab.10.rel.f$rel.f,sab.10.rel.f$mod.exploit)
@@ -542,16 +551,16 @@ F.sab.10$delta.B.per <- F.bbn.20$delta.B.per <- NA
 F.sab.10$SP <- F.bbn.20$SP <- NA
 for(i in 2:(length(years)-1)) 
 {
-  F.sab.10$delta.B[i] <- F.sab.10$B[i] - F.sab.10$B[i-1]
-  F.sab.10$delta.B.per[i] <- (F.sab.10$B[i] - F.sab.10$B[i-1])/ F.sab.10$B[i-1] * 100
-  F.sab.10$SP[i] <-   F.sab.10$B[i] -  F.sab.10$B[i-1] +  F.sab.10$C[i-1]
+  F.sab.10$delta.B[i-1] <- F.sab.10$B[i] - F.sab.10$B[i-1]
+  F.sab.10$delta.B.per[i-1] <- (F.sab.10$B[i] - F.sab.10$B[i-1])/ F.sab.10$B[i-1] * 100
+  F.sab.10$SP[i-1] <-   F.sab.10$B[i] -  F.sab.10$B[i-1] +  F.sab.10$C[i-1]
 }
 
-for(i in 2:(length(years)-1)) 
+for(i in 2:(length(years))) 
 {
-  F.bbn.20$delta.B[i] <- F.bbn.20$B[i] - F.bbn.20$B[i-1]
-  F.bbn.20$delta.B.per[i] <- (F.bbn.20$B[i] - F.bbn.20$B[i-1])/ F.bbn.20$B[i-1] * 100
-  F.bbn.20$SP[i] <-   F.bbn.20$B[i] -  F.bbn.20$B[i-1] +  F.bbn.20$C[i-1]
+  F.bbn.20$delta.B[i-1] <- F.bbn.20$B[i] - F.bbn.20$B[i-1]
+  F.bbn.20$delta.B.per[i-1] <- (F.bbn.20$B[i] - F.bbn.20$B[i-1])/ F.bbn.20$B[i-1] * 100
+  F.bbn.20$SP[i-1] <-   F.bbn.20$B[i] -  F.bbn.20$B[i-1] +  F.bbn.20$C[i-1]
 }
 
 # Fishery data comparisons...
@@ -575,11 +584,11 @@ bbn.per.catch <- round(median(bbn.catch$prop.in.survey,na.rm=T),digits=1)
 # Decision Tables.
 # BSSM
 sab.bssm.dt.delta.b <- round(sab.bssm.dt$`Biomass change (%)`[1],digits=0)
-bbn.bssm.dt.delta.b <- round(bbn.bssm.dt$`Biomass change (%)`[bbn.dt$table$`Catch (tonnes)` == 0],digits=1)
+bbn.bssm.dt.delta.b <- round(bbn.bssm.dt$`Biomass change (%)`[bbn.dt$table$`Catch (tonnes)` == 225],digits=1)
 
 # SEAM
 sab.dt.delta.b <- round(sab.dt$table$`Biomass change (%)`[1],digits=0)
-bbn.dt.delta.b <- round(bbn.dt$table$`Biomass change (%)`[bbn.dt$table$`Catch (tonnes)` == 0],digits=1)
+bbn.dt.delta.b <- round(bbn.dt$table$`Biomass change (%)`[bbn.dt$table$`Catch (tonnes)` == 225],digits=1)
 
 
 ```
@@ -606,7 +615,7 @@ bbn.dt.delta.b <- round(bbn.dt$table$`Biomass change (%)`[bbn.dt$table$`Catch (t
   knot.gis <- aggregate(grid.gis, list(grid.gis$knotID), function(x) x[1])
   # Here's bbn...
   bbn.knot.plt <- ggplot(knot.gis) + geom_sf(aes(fill=as.factor(knotID))) + geom_sf_text(aes(label = knotID),size=10) + 
-                                     scale_fill_viridis_d(begin = 0.3,end=0.8) + theme(legend.position = 'none')
+                                     scale_fill_viridis_d(begin = 0.3,end=0.8) + theme(legend.position = 'none') + xlab("") + ylab("")
   
   if(language == 'english') save_plot(filename = paste0(repo.loc,"Figures/BBn_knots_fig_20_knots.png"),bbn.knot.plt,base_width = 8,base_height = 6)
   if(language == 'french') save_plot(filename = paste0(repo.loc,"Figures/BBn_knots_fig_20_knots.png"),bbn.knot.plt,base_width = 8,base_height = 6)
@@ -626,7 +635,7 @@ bbn.dt.delta.b <- round(bbn.dt$table$`Biomass change (%)`[bbn.dt$table$`Catch (t
 
   
   sab.knot.plt <- ggplot(knot.gis) + geom_sf(aes(fill=as.factor(knotID))) + geom_sf_text(aes(label = knotID),size=10) + 
-                                     scale_fill_viridis_d(begin = 0.3,end=0.8) + theme(legend.position = 'none')
+                                     scale_fill_viridis_d(begin = 0.3,end=0.8) + theme(legend.position = 'none') + xlab("") + ylab("")
   
   if(language == 'english') save_plot(filename = paste0(repo.loc,"Figures/Sab_knots_fig_10_knots.png"),sab.knot.plt,base_width = 8,base_height = 6)
   if(language == 'french') save_plot(filename = paste0(repo.loc,"Figures/Dab_knots_fig_10_knots.png"),sab.knot.plt,base_width = 8,base_height = 6)
@@ -645,7 +654,7 @@ bbn.dt.delta.b <- round(bbn.dt$table$`Biomass change (%)`[bbn.dt$table$`Catch (t
   knot.gis <- aggregate(grid.gis, list(grid.gis$knotID), function(x) x[1])
   # Here's bbn...
   bbn.knot.10.plt <- ggplot(knot.gis) + geom_sf(aes(fill=as.factor(knotID))) + geom_sf_text(aes(label = knotID),size=10) + 
-                                     scale_fill_viridis_d(begin = 0.3,end=0.8) + theme(legend.position = 'none')
+                                     scale_fill_viridis_d(begin = 0.3,end=0.8) + theme(legend.position = 'none') + xlab("") + ylab("")
   
   if(language == 'english') save_plot(filename = paste0(repo.loc,"Figures/BBn_knots_fig_10_knots.png"),bbn.knot.10.plt,base_width = 8,base_height = 6)
   if(language == 'french') save_plot(filename = paste0(repo.loc,"Figures/BBn_knots_fig_10_knots.png"),bbn.knot.10.plt,base_width = 8,base_height = 6)
@@ -666,7 +675,7 @@ bbn.dt.delta.b <- round(bbn.dt$table$`Biomass change (%)`[bbn.dt$table$`Catch (t
 
   
   sab.knot.20.plt <- ggplot(knot.gis) + geom_sf(aes(fill=as.factor(knotID))) + geom_sf_text(aes(label = knotID),size=10) + 
-                                     scale_fill_viridis_d(begin = 0.3,end=0.8) + theme(legend.position = 'none')
+                                     scale_fill_viridis_d(begin = 0.3,end=0.8) + theme(legend.position = 'none') + xlab("") + ylab("")
   
   if(language == 'english') save_plot(filename = paste0(repo.loc,"Figures/Sab_knots_fig_20_knots.png"),sab.knot.20.plt,base_width = 8,base_height = 6)
   if(language == 'french') save_plot(filename = paste0(repo.loc,"Figures/Dab_knots_fig_20_knots.png"),sab.knot.20.plt,base_width = 8,base_height = 6)
@@ -716,7 +725,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 spatial.q.plot <- ggplot() + geom_sf(data=q.spat.sab.10,aes(fill=qI),col=NA)+
                              #scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
                              #scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
-                             scale_fill_viridis_c(name="Ccatchability (qI)",option = "C",begin = 0.2,end =0.8) + 
+                             scale_fill_viridis_c(name="Catchability (qI)",option = "C",begin = 0.2,end =0.8) + 
                              theme(axis.text.x=element_text(angle=-45,hjust=0))
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_catchability.png"),spatial.q.plot,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_catchability.png"),spatial.q.plot,base_width = 8,base_height = 6)
@@ -831,7 +840,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 # Biomass
 bm.ts.plot <- ggplot(pred.proc.bbn.20$log_processes) + geom_line(aes(year,exp(log_B)/1000),color='firebrick2',linewidth=1.5) + 
-                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + ylim(c(0,31)) + 
+                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + ylim(c(0,25)) + 
                                 xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Biomass_time_series.png"),bm.ts.plot,base_width = 8,base_height = 6)
@@ -857,7 +866,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 spatial.q.plot <- ggplot() + geom_sf(data=q.spat.bbn.20,aes(fill=qI),col=NA)+
                              #scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
                              #scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
-                             scale_fill_viridis_c(name="Ccatchability (qI)",option = "C",begin = 0.2,end =0.8) + 
+                             scale_fill_viridis_c(name="Catchability (qI)",option = "C",begin = 0.2,end =0.8) + 
                              theme(axis.text.x=element_text(angle=-45,hjust=0))
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_catchability.png"),spatial.q.plot,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_catchability.png"),spatial.q.plot,base_width = 8,base_height = 6)
@@ -1127,8 +1136,8 @@ sab.seam.pe<- ggplot(data=sab.med.pe.seam, aes(x=year,y=med)) +
                                     ylab("Median Process Error")
                                   
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_seam_median_pe.png"),sab.seam.pe,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_seam_median_pe.png"),sab.seam.pe,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_seam_median_pe.png"),sab.seam.pe,base_width = 8,base_height = 8)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_seam_median_pe.png"),sab.seam.pe,base_width = 8,base_height = 8)
 
 
 ```
@@ -1181,8 +1190,8 @@ bbn.seam.pe<- ggplot(data=bbn.med.pe.seam, aes(x=year,y=med)) +
                                     scale_x_continuous(breaks = seq(1990,2030,by=3)) + xlab("") + 
                                     ylab("Median Process Error")
                                   
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_seam_median_pe.png"),bbn.seam.pe,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_seam_median_pe.png"),bbn.seam.pe,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_seam_median_pe.png"),bbn.seam.pe,base_width = 8,base_height = 8)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_seam_median_pe.png"),bbn.seam.pe,base_width = 8,base_height = 8)
 
 ```
 
@@ -1385,22 +1394,37 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 ```{r rel-f-comp,echo=F,include=F}
 
+sab.bssm.rel.f <- data.frame(sab.10.rel.f[1:4],mod.exploit = c(sab.bssm.fm$exp,NA))
+bbn.bssm.rel.f <- data.frame(bbn.20.rel.f[1:4],mod.exploit = c(bbn.bssm.fm$exp,NA))
 
-sab.10.f.vs.rel.f <- ggplot(sab.10.rel.f,aes(x=mod.exploit,y=rel.f,label=substr(year,3,4))) + 
-                            geom_text() + xlab("Modelled exploitation rate (proprotional)") + ylab("Relative F")
+
+sab.bssm.f.vs.rel.f <- ggplot(sab.bssm.rel.f,aes(x=mod.exploit,y=rel.f,label=substr(year,3,4))) + geom_smooth(method='lm',formula = y ~ x)+
+                            geom_text() + xlab("") + ylab("Relative F") + theme(axis.text.x = element_blank())
+
+sab.10.f.vs.rel.f <- ggplot(sab.10.rel.f,aes(x=mod.exploit,y=rel.f,label=substr(year,3,4))) + geom_smooth(method='lm',formula = y ~ x)+
+                            geom_text() + xlab("Modelled exploitation rate (proportional)") + ylab("Relative F")
+
+sab.f.vs.rel.f <- plot_grid(sab.bssm.f.vs.rel.f,sab.10.f.vs.rel.f,nrow=2)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_rel_vs_mod_F.png"),
-                                    sab.10.f.vs.rel.f,base_width = 8,base_height = 6)
+                                    sab.f.vs.rel.f,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_rel_vs_mod_F.png"),
-                                   sab.10.f.vs.rel.f,base_width = 8,base_height = 6)
+                                   sab.f.vs.rel.f,base_width = 8,base_height = 6)
 
-bbn.20.f.vs.rel.f <- ggplot(bbn.20.rel.f,aes(x=mod.exploit,y=rel.f,label=substr(year,3,4))) + 
-                            geom_text() + xlab("Modelled exploitation rate (proprotional)") + ylab("Relative F")
+bbn.bssm.f.vs.rel.f <- ggplot(bbn.bssm.rel.f,aes(x=mod.exploit,y=rel.f,label=substr(year,3,4))) + geom_smooth(method='lm',formula = y ~ x)+
+                            geom_text() + xlab("") + ylab("Relative F") + theme(axis.text.x = element_blank()) 
+
+bbn.20.f.vs.rel.f <- ggplot(bbn.20.rel.f,aes(x=mod.exploit,y=rel.f,label=substr(year,3,4))) + geom_smooth(method='lm',formula = y ~ x)+
+                            geom_text() + xlab("Modelled exploitation rate (proportional)") + ylab("Relative F")
+
+bbn.f.vs.rel.f <- plot_grid(bbn.bssm.f.vs.rel.f,bbn.20.f.vs.rel.f,nrow=2)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_rel_vs_mod_F.png"),
-                                    bbn.20.f.vs.rel.f,base_width = 8,base_height = 6)
+                                    bbn.f.vs.rel.f,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_rel_vs_mod_F.png"),
-                                   bbn.20.f.vs.rel.f,base_width = 8,base_height = 6)
+                                   bbn.f.vs.rel.f,base_width = 8,base_height = 6)
+
+
 
 
 ```
@@ -1410,9 +1434,10 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 ```{r resids-sfa25a,echo=F,include=F}
 
 sab.I.resids.plt <- ggplot(sab.10.I.resids) + geom_point(aes(x=I.mod,y=residual)) + 
-                                              facet_wrap(~knotID,scales='free_x') + 
-                                               ylab("Raw resdiual") +
-                                               scale_x_log10(name="Fitted Values (kg/sqkm)")
+                                              facet_wrap(~knotID,ncol=3) + 
+                                               ylab("Resdiual") +
+                                               geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
+                                               scale_x_log10(name="Fitted Values (Fully-recruited biomass density; (kg\U2022km\U00B2))")
 
 
 # sab.I.stan.resids.plt <- ggplot(sab.10.I.resids) + geom_point(aes(x=I.mod,y=stan.resid)) + 
@@ -1430,9 +1455,10 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 #Recruits
 sab.IR.resids.plt <- ggplot(sab.10.IR.resids) + geom_point(aes(x=IR.mod,y=residual)) + 
-                                               facet_wrap(~knotID,scales='free_x') + 
-                                               ylab("Raw residual") +
-                                               scale_x_log10(name="Fitted Values (kg/sqkm)")
+                                               facet_wrap(~knotID,ncol=3) + 
+                                               ylab("Residual") +
+                                               geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
+                                               scale_x_log10(name="Fitted Values (Recruit Biomass density; (kg\U2022km\U00B2))")
 
 
 # sab.IR.stan.resids.plt <- ggplot(sab.10.IR.resids) + geom_point(aes(x=IR.mod,y=stan.resid)) + 
@@ -1462,9 +1488,9 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 # and for recruits
 
-sab.IR.qq <- ggplot(sab.10.I.resids,aes(sample = residual)) + geom_qq() + geom_qq_line() + xlab("Theoretical") + ylab("Sample")
-sab.IR.dens <- ggplot(sab.10.I.resids,aes(x= I)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey recruit biomass (tonnes")
-sab.IR.qq.dens <- plot_grid(sab.I.qq,sab.I.dens,nrow=2)
+sab.IR.qq <- ggplot(sab.10.IR.resids,aes(sample = residual)) + geom_qq() + geom_qq_line() + xlab("Theoretical") + ylab("Sample")
+sab.IR.dens <- ggplot(sab.10.IR.resids,aes(x= IR)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey recruit biomass (tonnes")
+sab.IR.qq.dens <- plot_grid(sab.IR.qq,sab.IR.dens,nrow=2)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_IR_qq.png"),
                                     sab.IR.qq.dens,base_width = 8,base_height = 8)
@@ -1507,9 +1533,10 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 
 bbn.I.resids.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=residual)) + 
-                                              facet_wrap(~knotID,scales = 'free_x') + 
-                                               ylab("Raw residuals") +
-                                                scale_x_log10(name="Fitted Values (kg/sqkm)")
+                                              facet_wrap(~knotID,ncol=3) + 
+                                               ylab("Residual") +
+                                                geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
+                                                scale_x_log10(name="Fitted Values (Fully-recruited biomass density; (kg\U2022km\U00B2))")
 
 # bbn.I.stan.resids.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=stan.resid)) + 
 #                                               #facet_wrap(~knotID,scales = 'free_x') + 
@@ -1519,20 +1546,20 @@ bbn.I.resids.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=residual)
 # bbn.I.resids <- plot_grid(bbn.I.resids.plt,bbn.I.stan.resids.plt,nrow=2)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids.png"),
-                                    bbn.I.resids.plt,base_width = 8,base_height = 8)
+                                    bbn.I.resids.plt,base_width = 8,base_height = 10)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids.png"),
-                                   bbn.I.resids.plt,base_width = 8,base_height = 8)
+                                   bbn.I.resids.plt,base_width = 8,base_height = 10)
 
 
 
 
 
 bbn.IR.resids.plt <- ggplot(bbn.20.IR.resids) + geom_point(aes(x=IR.mod,y=residual)) + 
-                                              facet_wrap(~knotID)+#,scales = 'free_x') + 
-                                               ylab("Raw residuals") +
-                                                scale_x_log10(name="Fitted Values (kg/sqkm)")
+                                              facet_wrap(~knotID,ncol=3) + 
+                                               ylab("Residual") +
+                                                geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
+                                                scale_x_log10(name="Fitted Values (Recruit Biomass density; (kg\U2022km\U00B2))")
 
-bbn.20.IR.resids$residual[which(bbn.20.IR.resids$IR.mod== min(bbn.20.IR.resids$IR.mod))]
 # 
 # bbn.IR.stan.resids.plt <- ggplot(bbn.20.IR.resids) + geom_point(aes(x=IR.mod,y=stan.resid)) + 
 #                                               #facet_wrap(~knotID,scales = 'free_x') + 
@@ -1544,9 +1571,9 @@ bbn.20.IR.resids$residual[which(bbn.20.IR.resids$IR.mod== min(bbn.20.IR.resids$I
 # bbn.IR.resids <- plot_grid(bbn.IR.resids.plt,bbn.IR.stan.resids.plt,nrow=2)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids.png"),
-                                    bbn.IR.resids.plt,base_width = 8,base_height = 8)
+                                    bbn.IR.resids.plt,base_width = 8,base_height = 10)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids.png"),
-                                   bbn.IR.resids.plt,base_width = 8,base_height = 8)
+                                   bbn.IR.resids.plt,base_width = 8,base_height = 10)
 
 # QQ plots...
 
@@ -1562,10 +1589,10 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 # and for recruits
 
-bbn.IR.qq <- ggplot(bbn.20.I.resids,aes(sample = residual)) + geom_qq() + geom_qq_line() + xlab("Theoretical") + ylab("Sample")
-bbn.IR.dens <- ggplot(bbn.20.I.resids,aes(x= I)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey recruit biomass (tonnes")
+bbn.IR.qq <- ggplot(bbn.20.IR.resids,aes(sample = residual)) + geom_qq() + geom_qq_line() + xlab("Theoretical") + ylab("Sample")
+bbn.IR.dens <- ggplot(bbn.20.IR.resids,aes(x= IR)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey recruit biomass (tonnes")
 
-bbn.IR.qq.dens <- plot_grid(bbn.I.qq,bbn.I.dens,nrow=2)
+bbn.IR.qq.dens <- plot_grid(bbn.IR.qq,bbn.IR.dens,nrow=2)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_qq.png"),
                                     bbn.IR.qq.dens,base_width = 8,base_height = 8)
@@ -1598,77 +1625,118 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 
 ```{r kobe-and-jem,echo=F,include=F}
+# Get the % difference into the bm data...
+sab.bssm.bm.diff <- sab.bssm.bm
+sab.bssm.bm.diff$delta.B.per <- NA
+for(i in 2:nrow(sab.bssm.bm.diff)) sab.bssm.bm.diff$delta.B.per[i-1] <- 100*((sab.bssm.bm.diff$med[i] - sab.bssm.bm.diff$med[i-1])/sab.bssm.bm.diff$med[i-1])
+# Drop the last year to aling with fishery data..
+sab.bssm.bm.diff <- sab.bssm.bm.diff[-nrow(sab.bssm.bm.diff),]
+# Now the same for bbn
+# Get the % difference into the bm data...
+bbn.bssm.bm.diff <- bbn.bssm.bm
+bbn.bssm.bm.diff$delta.B.per <- NA
+for(i in 2:nrow(bbn.bssm.bm.diff)) bbn.bssm.bm.diff$delta.B.per[i-1] <- 100*((bbn.bssm.bm.diff$med[i] - bbn.bssm.bm.diff$med[i-1])/bbn.bssm.bm.diff$med[i-1])
+# Drop the first year to aling with fishery data, not the year differential here, using the 
+bbn.bssm.bm.diff <- bbn.bssm.bm.diff[-(nrow(bbn.bssm.bm.diff)),]
+
+
+
 
 # So here 2014 means the 2014-2015 explotation rate and the change in biomass from 2014-2015
-sab.10.kobe.plt <- ggplot(F.sab.10,aes(x=B,y=exploit)) + geom_text(aes(label=substr(year-1,3,4))) +  xlim(c(0,NA)) +  ylim(c(0,NA)) +
+sab.10.kobe.plt <- ggplot(F.sab.10,aes(x=B,y=exploit)) + geom_text(aes(label=substr(year,3,4))) +  ylim(c(0,0.06)) +  xlim(c(0,10000)) +
                                     #annotate(geom="rect",xmin=0,xmax=5500,ymin=0.02,ymax=Inf, fill = "red", alpha=0.5)+
                                     #annotate(geom="rect",xmin=5500,xmax=Inf,ymin=0,ymax=0.02, fill="green", alpha = 0.5) +
                                     #annotate(geom="rect",xmin=0,xmax=5500,ymin=0,ymax=0.02, fill="gold1", alpha = 0.6) +
                                     #annotate(geom="rect",xmin=5500,xmax=Inf,ymin=0.02,ymax=Inf, fill="gold1", alpha = 0.6) +
                                     geom_path(aes(y= exploit, x= B )) + 
-                                    xlab("Biomass (tonnes)") + ylab("Exploitation Rate (Proportional)") 
+                                    ylab("Exploitation Rate (Proportional)") + xlab("Biomass (tonnes)") 
+                                    
                                     #geom_hline(yintercept = 0.03,linetype='dashed') + geom_vline(xintercept = 4000,linetype='dashed')
+sab.bssm.kobe.plt <- ggplot(sab.bssm.fm) + geom_text(aes(x = sab.bssm.bm.diff$med,y=exp,label = substr(year,3,4))) +  ylim(c(0,0.06)) + xlim(c(0,10000)) + 
+                                           geom_path(aes(x = sab.bssm.bm.diff$med,y=exp)) + xlab("") + 
+                                            ylab("Exploitation Rate (Proportional)") + theme(axis.text.x=element_blank())
 
+sab.kobe.plt <- plot_grid(sab.bssm.kobe.plt,sab.10.kobe.plt,nrow=2)
+  
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_kobe.png"),
-                                    sab.10.kobe.plt,base_width = 8,base_height = 8)
+                                    sab.kobe.plt,base_width = 8,base_height = 10)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_kobe.png"),
-                                   sab.10.kobe.plt,base_width = 8,base_height = 8)
+                                   sab.kobe.plt,base_width = 8,base_height = 10)
 
 
 # So here 2014 means the 2014-2015 explotation rate and the change in biomass from 2014-2015
-sab.10.jem.plt <- ggplot(F.sab.10,aes(y=delta.B.per,x=exploit)) + geom_text(aes(label=substr(year-1,3,4))) + geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
+sab.10.jem.plt <- ggplot(F.sab.10,aes(y=delta.B.per,x=exploit)) + geom_text(aes(label=substr(year,3,4))) + geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
+                                                              geom_hline(yintercept = 0,linetype='dashed')    + xlim(0,0.055) + ylim(-50,80)+
+                                                              xlab("Exploitation Rate (Proportional)") + ylab("Biomass Change (%)")  
+
+sab.bssm.jem.plt <- ggplot(sab.bssm.bm.diff,aes(y=delta.B.per,x=sab.bssm.fm$exp)) + geom_text(aes(label=substr(year,3,4))) + xlim(0,0.055) + ylim(-50,80)+
+                                                              geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
                                                               geom_hline(yintercept = 0,linetype='dashed')   +  
-                                                              xlab("Exploitation Rate (Proportional)") + ylab("Biomass Change (%)")    
+                                                              xlab("") + ylab("Biomass Change (%)")    +
+                                                              theme(axis.text.x=element_blank()) 
+                                                              
+sab.jem.plt <- plot_grid(sab.bssm.jem.plt,sab.10.jem.plt,nrow=2)
+
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_jem.png"),
-                                    sab.10.jem.plt,base_width = 8,base_height = 8)
+                                    sab.jem.plt,base_width = 8,base_height = 8)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_jem.png"),
-                                   sab.10.jem.plt,base_width = 8,base_height = 8)
+                                   sab.jem.plt,base_width = 8,base_height = 8)
 
+  
 
 
 # So here 2014 means the 2014-2015 explotation rate and the change in biomass from 2014-2015
-bbn.20.kobe.plt <- ggplot(F.bbn.20,aes(x=B,y=exploit)) + geom_text(aes(label=substr(year-1,3,4))) +  xlim(c(0,NA)) + ylim(c(0,NA)) +
+bbn.20.kobe.plt <- ggplot(F.bbn.20,aes(x=B,y=exploit)) + geom_text(aes(label=substr(year,3,4))) +  xlim(c(0,17000)) + ylim(c(0,0.27)) +
                                     #annotate(geom="rect",xmin=0,xmax=5500,ymin=0.02,ymax=Inf, fill = "red", alpha=0.5)+
                                     #annotate(geom="rect",xmin=5500,xmax=Inf,ymin=0,ymax=0.02, fill="green", alpha = 0.5) +
                                     #annotate(geom="rect",xmin=0,xmax=5500,ymin=0,ymax=0.02, fill="gold1", alpha = 0.6) +
                                     #annotate(geom="rect",xmin=5500,xmax=Inf,ymin=0.02,ymax=Inf, fill="gold1", alpha = 0.6) +
-                                    geom_path(aes(y= exploit, x= B )) + 
-                                    xlab("Biomass (tonnes)") + ylab("Exploitation Rate (Proportional)") 
+                                    geom_path(aes(y= exploit, x= B )) + xlab("Biomass (tonnes)") + ylab("Exploitation Rate (Proportional)") 
+                                    
                                     #geom_hline(yintercept = 0.03,linetype='dashed') + geom_vline(xintercept = 4000,linetype='dashed')
 
+bbn.bssm.kobe.plt <- ggplot(bbn.bssm.fm) + geom_text(aes(x = bbn.bssm.bm.diff$med,y=exp,label = substr(year,3,4))) + xlim(c(0,17000)) + ylim(c(0,0.27)) +
+                                           geom_path(aes(x = bbn.bssm.bm.diff$med,y=exp)) + 
+                                           ylab("Exploitation Rate (Proportional)") + xlab("")+
+                                           theme(axis.text.x=element_blank())
+                                           
+
+bbn.kobe.plt <- plot_grid(bbn.bssm.kobe.plt,bbn.20.kobe.plt,nrow=2)
+
+
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_kobe.png"),
-                                    bbn.20.kobe.plt,base_width = 8,base_height = 8)
+                                    bbn.kobe.plt,base_width = 8,base_height = 8)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_kobe.png"),
-                                   bbn.20.kobe.plt,base_width = 8,base_height = 8)
+                                   bbn.kobe.plt,base_width = 8,base_height = 8)
 
 # So here 2014 means the 2014-2015 explotation rate and the change in biomass from 2014-2015
-bbn.20.jem.plt <- ggplot(F.bbn.20,aes(y=delta.B.per,x=exploit)) + geom_text(aes(label=substr(year-1,3,4))) + geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
-                                                              geom_hline(yintercept = 0,linetype='dashed')   +  
-                                                              xlab("Exploitation Rate (Proportional)") + ylab("Biomass Change (%)")   
+bbn.20.jem.plt <- ggplot(F.bbn.20,aes(y=delta.B.per,x=exploit)) + geom_text(aes(label=substr(year,3,4))) + geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
+                                                              geom_hline(yintercept = 0,linetype='dashed')   + xlim(c(0,0.27)) + ylim(c(-70,75)) +
+                                                              xlab("Exploitation Rate (Proportional)") + ylab("Biomass Change (%)")    
+
+bbn.bssm.jem.plt <- ggplot(bbn.bssm.fm,aes(y=bbn.bssm.bm.diff$delta.B.per,x=exp)) + geom_text(aes(label=substr(year,3,4)))  + xlim(c(0,0.27)) + ylim(c(-70,75)) + 
+                                                              geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
+                                                              geom_hline(yintercept = 0,linetype='dashed')   +
+                                                              xlab("") + ylab("Biomass Change (%)")  +
+                                                              theme(axis.text.x=element_blank())
+                                                              
+
+bbn.jem.plt <- plot_grid(bbn.bssm.jem.plt,bbn.20.jem.plt,nrow=2)
+
+
+
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_jem.png"),
-                                    bbn.20.jem.plt,base_width = 8,base_height = 8)
+                                    bbn.jem.plt,base_width = 8,base_height = 10)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_jem.png"),
-                                   bbn.20.jem.plt,base_width = 8,base_height = 8)
+                                   bbn.jem.plt,base_width = 8,base_height = 10)
 
 
 ```
 
+
+
 ```{r bssm-vs-seam,echo=F,include=F}
-
-sab.bssm.bm <- sab.bssm %>% dplyr::filter(term == "Biomass (tonnes)")
-sab.bssm.rec <- sab.bssm %>% dplyr::filter(term == "Recruit Biomass (tonnes)")
-sab.bssm.nm.fr <- sab.bssm %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)")
-sab.bssm.nm.rec <- sab.bssm %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)")
-sab.bssm.fm <- sab.bssm %>% dplyr::filter(term == "Fishing Mortality (instantaneous)")
-
-
-
-bbn.bssm.bm <- bbn.bssm %>% dplyr::filter(term == "Biomass (tonnes)")
-bbn.bssm.rec <- bbn.bssm %>% dplyr::filter(term == "Recruit Biomass (tonnes)")
-bbn.bssm.nm.fr <- bbn.bssm %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)")
-bbn.bssm.nm.rec <- bbn.bssm %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)")
-bbn.bssm.fm <- bbn.bssm %>% dplyr::filter(term == "Fishing Mortality (instantaneous)")
 
 sab.seam <- pred.proc.sab.10$log_processes
 bbn.seam <- pred.proc.bbn.20$log_processes
@@ -1760,25 +1828,25 @@ sab.bssm.pred.eval$Method[sab.bssm.pred.eval$Method =='no fully-recruited growth
 sab.bssm.pred.eval$Method[sab.bssm.pred.eval$Method =='no growth'] <- "No Growth"
 sab.bssm.pred.eval <- sab.bssm.pred.eval |> fsubset(!year %in% c(2015,2016,2020,2021))
 
-pe.tonnes.ts <- ggplot() + geom_line(data = sab.bssm.pred.eval |> fsubset(year < 2015), aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.25) +                            #geom_line(data = sab.bssm.pred.eval %>% dplyr::filter(year %in% 2017:2019), 
+pe.tonnes.ts <- ggplot() + geom_line(data = sab.bssm.pred.eval |> fsubset(year < 2015), aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.5) +                            #geom_line(data = sab.bssm.pred.eval %>% dplyr::filter(year %in% 2017:2019), 
                            #           aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.25) + 
-                           geom_point(data = sab.bssm.pred.eval,aes(x=year,y=B.diff/1000,group = Method,color=Method,fill=Method,shape =Method),size=2) + 
+                           geom_point(data = sab.bssm.pred.eval,aes(x=year,y=B.diff/1000,group = Method,color=Method,fill=Method,shape =Method),size=3) + 
                            geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                            scale_color_viridis_d() + scale_fill_viridis_d() + 
                            scale_shape_manual(values = shaper) + scale_linetype_manual(values=liner) + 
                            scale_x_continuous(breaks = seq(1990,2024,by=2),labels=NULL) +
-                           theme(plot.margin = margin(0,0.5,0,0.5, "cm"),legend.position = 'top') +
+                           theme(plot.margin = margin(0,0.5,0,0.5, "cm"),legend.position = 'top',text = element_text(size=22)) +
                            xlab("") + ylab("Predicted - Realized Biomass (tonnes x 1000)")
 
-
-pe.per.ts <- ggplot() + geom_line(data = sab.bssm.pred.eval|> fsubset(year < 2015), aes(x=year,y=PB.diff,group = Method,color=Method,linetype=Method),size=1.25) +
+1.5
+pe.per.ts <- ggplot() + geom_line(data = sab.bssm.pred.eval|> fsubset(year < 2015), aes(x=year,y=PB.diff,group = Method,color=Method,linetype=Method),size=1.5) +
                         # geom_line(data = sab.bssm.pred.eval %>% dplyr::filter(year %in% 2017:2019), 
                         #           aes(x=year,y=PB.diff,group = Method,color=Method,linetype=Method),size=1.25) + 
-                        geom_point(data = sab.bssm.pred.eval ,aes(x=year,y=PB.diff,group = Method,color=Method,fill=Method,shape=Method),size=2) + 
+                        geom_point(data = sab.bssm.pred.eval ,aes(x=year,y=PB.diff,group = Method,color=Method,fill=Method,shape=Method),size=3) + 
                         geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                         scale_shape_manual(values = shaper) + scale_linetype_manual(values=liner) + 
                         scale_color_viridis_d() + scale_fill_viridis_d() + scale_x_continuous(breaks = seq(1990,2024,by=2)) +
-                        theme(legend.position = 'none') +
+                        theme(legend.position = 'none',text = element_text(size=22)) +
                         xlab("") + ylab("Predicted - Realized Biomass (%)")
 
 sab.pe.ts <- plot_grid(pe.tonnes.ts,pe.per.ts,ncol=1)
@@ -1795,14 +1863,14 @@ pe.biomass.abs <- ggplot(sab.bssm.pred.eval) + geom_violin(aes(x=Method,y=abs(B.
                                           ylab("|Biomass difference| (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_x_discrete(labels=NULL,name='') +
                                           theme(plot.margin = margin(0,0.5,0,1, "cm"))+
-                                          scale_y_continuous(breaks=c(seq(0,10,by=2)))
+                                          scale_y_continuous(breaks=c(seq(0,10,by=1)))
 
 
 pe.biomass.diff <- ggplot(sab.bssm.pred.eval) + geom_violin(aes(x=Method,y=B.diff/1000),draw_quantiles = c(0.5)) + 
                                             ylab("Biomass difference (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                             scale_x_discrete(labels=NULL,name='') +
                                             theme(plot.margin = margin(0,0.5,0,1, "cm"))+
-                                            scale_y_continuous(breaks=c(seq(-6,10,by=2)))
+                                            scale_y_continuous(breaks=c(seq(-6,10,by=1)))
 
 
 pe.biomass.per <- ggplot(sab.bssm.pred.eval) + geom_violin(aes(x=Method,y=PB.diff),draw_quantiles = c(0.5)) + 
@@ -1812,9 +1880,9 @@ pe.biomass.per <- ggplot(sab.bssm.pred.eval) + geom_violin(aes(x=Method,y=PB.dif
 sab.pe.violin <- plot_grid(pe.biomass.abs,pe.biomass.diff,pe.biomass.per,ncol=1)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/English/Sab_bssm_PE_biomass_violin.png"),
-                                    sab.pe.violin,base_width = 15,base_height = 20)
+                                    sab.pe.violin,base_width = 12,base_height = 12)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/French/Sab_bssm_PE_biomass_violin.png"),
-                                   sab.pe.violin,base_width = 15,base_height = 20)
+                                   sab.pe.violin,base_width = 12,base_height = 12)
 
 ```
 
@@ -1825,26 +1893,26 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 liner <- c(1,2,1,1,2,1,2,2)
 shaper <- rep(c(21,23,22,24),2)
 sab.pred.eval$Method <- sab.pred.eval$Scenario
-pe.tonnes.ts <- ggplot() + geom_line(data = sab.pred.eval |> fsubset(year < 2015) , aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.25) + 
+pe.tonnes.ts <- ggplot() + geom_line(data = sab.pred.eval |> fsubset(year < 2015) , aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.5) + 
                            # geom_line(data = sab.pred.eval %>% dplyr::filter(year %in% 2017:2019), 
                            #           aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.25) + 
-                           geom_point(data = sab.pred.eval,aes(x=year,y=B.diff/1000,group = Method,color=Method,fill=Method,shape =Method),size=2) + 
+                           geom_point(data = sab.pred.eval,aes(x=year,y=B.diff/1000,group = Method,color=Method,fill=Method,shape =Method),size=3) + 
                            geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                            scale_color_viridis_d() + scale_fill_viridis_d() + 
                            scale_shape_manual(values = shaper) + scale_linetype_manual(values=liner) + 
                            scale_x_continuous(breaks = seq(1990,2024,by=2),labels=NULL) +
-                           theme(plot.margin = margin(0,0.5,0,0.5, "cm"),legend.position = 'top') +
+                           theme(plot.margin = margin(0,0.5,0,0.5, "cm"),legend.position = 'top',text = element_text(size=22)) +
                            xlab("") + ylab("Predicted - Realized Biomass (tonnes x 1000)")
 
 
-pe.per.ts <- ggplot() + geom_line(data = sab.pred.eval|> fsubset(year < 2015),aes(x=year,y=Per.B.diff,group = Method,color=Method,linetype=Method),size=1.25) +
+pe.per.ts <- ggplot() + geom_line(data = sab.pred.eval|> fsubset(year < 2015),aes(x=year,y=Per.B.diff,group = Method,color=Method,linetype=Method),size=1.5) +
                         # geom_line(data = sab.pred.eval %>% dplyr::filter(year %in% 2017:2019), 
                         #           aes(x=year,y=Per.B.diff,group = Method,color=Method,linetype=Method),size=1.25) + 
-                        geom_point(data = sab.pred.eval ,aes(x=year,y=Per.B.diff,group = Method,color=Method,fill=Method,shape=Method),size=2) + 
+                        geom_point(data = sab.pred.eval ,aes(x=year,y=Per.B.diff,group = Method,color=Method,fill=Method,shape=Method),size=3) + 
                         geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                         scale_shape_manual(values = shaper) + scale_linetype_manual(values=liner) + 
                         scale_color_viridis_d() + scale_fill_viridis_d() + scale_x_continuous(breaks = seq(1990,2024,by=2)) +
-                        theme(legend.position = 'none') +
+                        theme(legend.position = 'none',text = element_text(size=22)) +
                         xlab("") + ylab("Predicted - Realized Biomass (%)")
 
 sab.pe.ts <- plot_grid(pe.tonnes.ts,pe.per.ts,ncol=1)
@@ -1861,14 +1929,14 @@ pe.biomass.abs <- ggplot(sab.pred.eval) + geom_violin(aes(x=Method,y=B.diff.abs/
                                           ylab("|Biomass difference| (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_x_discrete(labels=NULL,name='') +
                                           theme(plot.margin = margin(0,0.5,0,1, "cm"))+
-                                          scale_y_continuous(breaks=c(seq(0,10,by=2)))
+                                          scale_y_continuous(breaks=c(seq(0,10,by=1)))
 
 
 pe.biomass.diff <- ggplot(sab.pred.eval) + geom_violin(aes(x=Method,y=B.diff/1000),draw_quantiles = c(0.5)) + 
                                             ylab("Biomass difference (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                             scale_x_discrete(labels=NULL,name='') +
                                             theme(plot.margin = margin(0,0.5,0,1, "cm"))+
-                                            scale_y_continuous(breaks=c(seq(-6,10,by=2)))
+                                            scale_y_continuous(breaks=c(seq(-6,10,by=1)))
 
 
 pe.biomass.per <- ggplot(sab.pred.eval) + geom_violin(aes(x=Method,y=Per.B.diff),draw_quantiles = c(0.5)) + 
@@ -1878,9 +1946,9 @@ pe.biomass.per <- ggplot(sab.pred.eval) + geom_violin(aes(x=Method,y=Per.B.diff)
 sab.pe.violin <- plot_grid(pe.biomass.abs,pe.biomass.diff,pe.biomass.per,ncol=1)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.10,"/English/Sab_PE_biomass_violin.png"),
-                                    sab.pe.violin,base_width = 15,base_height = 20)
+                                    sab.pe.violin,base_width = 12,base_height = 12)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.10,"/French/Sab_PE_biomass_violin.png"),
-                                   sab.pe.violin,base_width = 15,base_height = 20)
+                                   sab.pe.violin,base_width = 12,base_height = 12)
 
 ```
 
@@ -1899,22 +1967,22 @@ bbn.bssm.pred.eval$Method[bbn.bssm.pred.eval$Method =='no growth'] <- "No Growth
 bbn.bssm.pred.eval <- bbn.bssm.pred.eval |> fsubset(!year %in% c(2020,2021))
 
 pe.tonnes.ts <- ggplot() + geom_line(data = bbn.bssm.pred.eval|> fsubset(year < 2020),
-                                     aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.25) +
+                                     aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),linewidth=1.5) +
                                      geom_point(data = bbn.bssm.pred.eval,aes(x=year,y=B.diff/1000,
-                                                                              group = Method,color=Method,fill=Method,shape =Method),size=2) + 
-                                     geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
+                                                                              group = Method,color=Method,fill=Method,shape =Method),size=3) + 
+                                     geom_hline(yintercept=0,color='#005BBB',linetype='dashed',linewidth=1.5) +
                                      scale_color_viridis_d() + scale_fill_viridis_d() + 
                                      scale_shape_manual(values = shaper) + scale_linetype_manual(values=liner) + 
                                      scale_x_continuous(breaks = seq(1990,2024,by=2),labels=NULL) +
-                                     theme(plot.margin = margin(0,0.5,0,0.75, "cm"),legend.position = 'top') +
+                                     theme(plot.margin = margin(0,0.5,0,0.75, "cm"),legend.position = 'top',text = element_text(size=22)) +
                                      xlab("") + ylab("Predicted - Realized Biomass (tonnes x 1000)")
 
-pe.per.ts <- ggplot() + geom_line(data = bbn.bssm.pred.eval|> fsubset(year < 2020),aes(x=year,y=PB.diff,group = Method,color=Method,linetype=Method),size=1.25) +
-                                  geom_point(data = bbn.bssm.pred.eval ,aes(x=year,y=PB.diff,group = Method,color=Method,fill=Method,shape=Method),size=2) + 
-                                  geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
+pe.per.ts <- ggplot() + geom_line(data = bbn.bssm.pred.eval|> fsubset(year < 2020),aes(x=year,y=PB.diff,group = Method,color=Method,linetype=Method),linewidth=1.5) +
+                                  geom_point(data = bbn.bssm.pred.eval ,aes(x=year,y=PB.diff,group = Method,color=Method,fill=Method,shape=Method),size=3) + 
+                                  geom_hline(yintercept=0,color='#005BBB',linetype='dashed',linewidth=1.5) +
                                   scale_shape_manual(values = shaper) + scale_linetype_manual(values=liner) + 
                                   scale_color_viridis_d() + scale_fill_viridis_d() + scale_x_continuous(breaks = seq(1990,2024,by=2)) +
-                                  theme(legend.position = 'none') +
+                                  theme(legend.position = 'none',text = element_text(size=22)) +
                                   xlab("") + ylab("Predicted - Realized Biomass (%)")
 
 bbn.pe.ts <- plot_grid(pe.tonnes.ts,pe.per.ts,ncol=1)
@@ -1932,14 +2000,14 @@ pe.biomass.abs <- ggplot(bbn.bssm.pred.eval) + geom_violin(aes(x=Method,y=abs(B.
                                           ylab("|Biomass difference| (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_x_discrete(labels=NULL,name='') +
                                           theme(plot.margin = margin(0,0.5,0,0.9, "cm"))+
-                                          scale_y_continuous(breaks=c(seq(0,10,by=2)))
+                                          scale_y_continuous(breaks=c(seq(0,10,by=1)))
 
 
 pe.biomass.diff <- ggplot(bbn.bssm.pred.eval) + geom_violin(aes(x=Method,y=B.diff/1000),draw_quantiles = c(0.5)) + 
                                             ylab("Biomass difference (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                             scale_x_discrete(labels=NULL,name='') +
                                             theme(plot.margin = margin(0,0.5,0,0.8, "cm"))+
-                                            scale_y_continuous(breaks=c(seq(-6,10,by=2)))
+                                            scale_y_continuous(breaks=c(seq(-6,10,by=1)))
 
 
 pe.biomass.per <- ggplot(bbn.bssm.pred.eval) + geom_violin(aes(x=Method,y=PB.diff),draw_quantiles = c(0.5)) + 
@@ -1951,10 +2019,10 @@ bbn.pe.violin <- plot_grid(pe.biomass.abs,pe.biomass.diff,pe.biomass.per,ncol=1)
 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/English/BBn_bssm_PE_biomass_violin.png"),
-                                     bbn.pe.violin,base_width = 15,base_height = 20)
+                                     bbn.pe.violin,base_width = 12,base_height = 12)
 
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/French/BBn_bssm_PE_biomass_violin.png"),
-                                   bbn.pe.violin,base_width = 15,base_height = 20)
+                                   bbn.pe.violin,base_width = 12,base_height = 12)
 
 ```
 
@@ -1967,21 +2035,21 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 liner <- c(1,2,1,1,2,1,2,2)
 shaper <- rep(c(21,23,22,24),2)
 bbn.pred.eval$Method <- bbn.pred.eval$Scenario
-pe.tonnes.ts <- ggplot() + geom_line(data = bbn.pred.eval|> fsubset(year < 2020), aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.25) + 
-                                     geom_point(data = bbn.pred.eval,aes(x=year,y=B.diff/1000,group = Method,color=Method,fill=Method,shape =Method),size=2) + 
+pe.tonnes.ts <- ggplot() + geom_line(data = bbn.pred.eval|> fsubset(year < 2020), aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.5) + 
+                                     geom_point(data = bbn.pred.eval,aes(x=year,y=B.diff/1000,group = Method,color=Method,fill=Method,shape =Method),size=3) + 
                                      geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                      scale_color_viridis_d() + scale_fill_viridis_d() + 
                                      scale_shape_manual(values = shaper) + scale_linetype_manual(values=liner) + 
                                      scale_x_continuous(breaks = seq(1990,2024,by=2),labels=NULL) +
-                                     theme(plot.margin = margin(0,0.5,0,0.75, "cm"),legend.position = 'top') +
+                                     theme(plot.margin = margin(0,0.5,0,0.75, "cm"),legend.position = 'top',text = element_text(size=22)) +
                                      xlab("") + ylab("Predicted - Realized Biomass (tonnes x 1000)")
 
-pe.per.ts <- ggplot() + geom_line(data = bbn.pred.eval|> fsubset(year < 2020),aes(x=year,y=Per.B.diff,group = Method,color=Method,linetype=Method),size=1.25) +
-                                  geom_point(data = bbn.pred.eval ,aes(x=year,y=Per.B.diff,group = Method,color=Method,fill=Method,shape=Method),size=2) + 
+pe.per.ts <- ggplot() + geom_line(data = bbn.pred.eval|> fsubset(year < 2020),aes(x=year,y=Per.B.diff,group = Method,color=Method,linetype=Method),size=1.5) +
+                                  geom_point(data = bbn.pred.eval ,aes(x=year,y=Per.B.diff,group = Method,color=Method,fill=Method,shape=Method),size=3) + 
                                   geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                   scale_shape_manual(values = shaper) + scale_linetype_manual(values=liner) + 
                                   scale_color_viridis_d() + scale_fill_viridis_d() + scale_x_continuous(breaks = seq(1990,2024,by=2)) +
-                                  theme(legend.position = 'none') +
+                                  theme(legend.position = 'none',text = element_text(size=22)) +
                                   xlab("") + ylab("Predicted - Realized Biomass (%)")
 
 bbn.pe.ts <- plot_grid(pe.tonnes.ts,pe.per.ts,ncol=1)
@@ -1999,14 +2067,14 @@ pe.biomass.abs <- ggplot(bbn.pred.eval) + geom_violin(aes(x=Method,y=B.diff.abs/
                                           ylab("|Biomass difference| (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_x_discrete(labels=NULL,name='') +
                                           theme(plot.margin = margin(0,0.5,0,0.9, "cm"))+
-                                          scale_y_continuous(breaks=c(seq(0,10,by=2)))
+                                          scale_y_continuous(breaks=c(seq(0,10,by=1)))
 
 
 pe.biomass.diff <- ggplot(bbn.pred.eval) + geom_violin(aes(x=Method,y=B.diff/1000),draw_quantiles = c(0.5)) + 
                                             ylab("Biomass difference (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                             scale_x_discrete(labels=NULL,name='') +
                                             theme(plot.margin = margin(0,0.5,0,0.8, "cm"))+
-                                            scale_y_continuous(breaks=c(seq(-6,10,by=2)))
+                                            scale_y_continuous(breaks=c(seq(-6,10,by=1)))
 
 
 pe.biomass.per <- ggplot(bbn.pred.eval) + geom_violin(aes(x=Method,y=Per.B.diff),draw_quantiles = c(0.5)) + 
@@ -2018,10 +2086,10 @@ bbn.pe.violin <- plot_grid(pe.biomass.abs,pe.biomass.diff,pe.biomass.per,ncol=1)
 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"_vary_q=TRUE/English/BBn_PE_biomass_violin.png"),
-                                     bbn.pe.violin,base_width = 15,base_height = 20)
+                                     bbn.pe.violin,base_width = 12,base_height = 12)
 
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"_vary_q=TRUE/French/BBn_PE_biomass_violin.png"),
-                                   bbn.pe.violin,base_width = 15,base_height = 20)
+                                   bbn.pe.violin,base_width = 12,base_height = 12)
 
 ```
 
@@ -2046,7 +2114,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 pe.I.res <- ggplot(sab.I.res) + geom_point(aes(x=fitted,y=median)) +  geom_errorbar(aes(x=fitted,ymax=UCI,ymin=LCI),width=0) +
                                facet_wrap(~type,ncol=1,scales='free_y') + geom_hline(yintercept = 0,linetype='dashed',color = 'darkblue',linewidth=1) + ylab("Residual") + 
-                                 scale_x_log10(name='Fitted values') 
+                                 scale_x_log10(name='Fitted values (Fully-recruited Biomass; tonnes)') 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSmodel/English/Sab_bssm_FR_resids.png"),
                                      pe.I.res,base_width = 6,base_height = 8)
@@ -2057,7 +2125,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 pe.IR.res <- ggplot(sab.IR.res) + geom_point(aes(x=fitted,y=median)) +  geom_errorbar(aes(x=fitted,ymax=UCI,ymin=LCI),width=0) +
                                facet_wrap(~type,ncol=1,scales='free_y') + geom_hline(yintercept = 0,linetype='dashed',color = 'darkblue',linewidth=1) + ylab("Residual") + 
-                                scale_x_log10(name='Fitted values') 
+                                scale_x_log10(name='Fitted values (Recruit biomass; tonnes)') 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSmodel/English/Sab_bssm_rec_resids.png"),
                                      pe.IR.res,base_width = 6,base_height = 8)
@@ -2086,7 +2154,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 pe.I.res <- ggplot(bbn.I.res) + geom_point(aes(x=fitted,y=median)) +  geom_errorbar(aes(x=fitted,ymax=UCI,ymin=LCI),width=0) +
                                facet_wrap(~type,ncol=1,scales='free_y') + geom_hline(yintercept = 0,linetype='dashed',color = 'darkblue',linewidth=1) + ylab("Residual") + 
-                                 scale_x_log10(name='Fitted values') 
+                                 scale_x_log10(name='Fitted values (Fully-recruited biomass; tonnes)') 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSmodel/English/BBn_bssm_FR_resids.png"),
                                      pe.I.res,base_width = 6,base_height = 8)
@@ -2097,7 +2165,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 pe.IR.res <- ggplot(bbn.IR.res) + geom_point(aes(x=fitted,y=median)) +  geom_errorbar(aes(x=fitted,ymax=UCI,ymin=LCI),width=0) +
                                facet_wrap(~type,ncol=1,scales='free_y') + geom_hline(yintercept = 0,linetype='dashed',color = 'darkblue',linewidth=1) + ylab("Residual") + 
-                                scale_x_log10(name='Fitted values') 
+                                scale_x_log10(name='Fitted values (Recruit biomass; tonnes)') 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSmodel/English/BBn_bssm_rec_resids.png"),
                                      pe.IR.res,base_width = 6,base_height = 8)

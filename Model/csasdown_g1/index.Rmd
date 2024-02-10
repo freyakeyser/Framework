@@ -185,8 +185,8 @@ repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 num.knots <- 20 
 init.m <- 0.2 
 qR <- 0.33
-g.mod <- 'g_original'
-#g.mod <- 'g_1'
+#g.mod <- 'g_original'
+g.mod <- 'g_1'
 vary.q <- T
 R.size <- "75"
 FR.size <- "90"
@@ -198,8 +198,8 @@ scenario.20 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"
 
 # SEAM results
 sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
-sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
-bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE.Rds"))
+#sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
+#bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE.Rds"))
 bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
 # SEAM processed results...
 
@@ -230,59 +230,59 @@ r.spat.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,
 b.spat.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
                                mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_B_spatial.Rds"))
 
-# BBn 10 knots....
-Bdiff.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_B_differnce.Rds"))
-# Annual exploitation
-F.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_annual.exploit.Rds"))
-# The nicely summarized model object
-pred.proc.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_pred_proc.Rds"))
-# The summarized spatial bits.
-F.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_F_spatial.Rds"))
-F.spat.bbn.10$F.na <- -log(1-F.spat.bbn.10$exp.na)
-
-# q spatial
-q.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_q_spatial.Rds"))
-# m spatial
-m.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_m_spatial.Rds"))
-# R spatial
-r.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_R_spatial.Rds"))
-# B spatial
-b.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_B_spatial.Rds"))
+# # BBn 10 knots....
+# Bdiff.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
+#                                mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_B_differnce.Rds"))
+# # Annual exploitation
+# F.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
+#                                mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_annual.exploit.Rds"))
+# # The nicely summarized model object
+# pred.proc.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
+#                                mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_pred_proc.Rds"))
+# # The summarized spatial bits.
+# F.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
+#                                mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_F_spatial.Rds"))
+# F.spat.bbn.10$F.na <- -log(1-F.spat.bbn.10$exp.na)
+# 
+# # q spatial
+# q.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
+#                                mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_q_spatial.Rds"))
+# # m spatial
+# m.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
+#                                mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_m_spatial.Rds"))
+# # R spatial
+# r.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
+#                                mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_R_spatial.Rds"))
+# # B spatial
+# b.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
+#                                mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_B_spatial.Rds"))
 
 ##########Sab Processes SEAM 
-# Sab 20
-Bdiff.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                               mod.select,"_model_output_",scenario.20,"_B_differnce.Rds"))
-# Annual exploitation
-F.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                               mod.select,"_model_output_",scenario.20,"_annual.exploit.Rds"))
-# The nicely summarized model object
-pred.proc.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                               mod.select,"_model_output_",scenario.20,"_pred_proc.Rds"))
-# The summarized spatial bits.
-F.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                               mod.select,"_model_output_",scenario.20,"_F_spatial.Rds"))
-F.spat.sab.20$F.na <- -log(1-F.spat.sab.20$exp.na)
-# q spatial
-q.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                               mod.select,"_model_output_",scenario.20,"_q_spatial.Rds"))
-# m spatial
-m.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                               mod.select,"_model_output_",scenario.20,"_m_spatial.Rds"))
-# R spatial
-r.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                               mod.select,"_model_output_",scenario.20,"_R_spatial.Rds"))
-# B spatial
-b.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
-                               mod.select,"_model_output_",scenario.20,"_B_spatial.Rds"))
+# # Sab 20
+# Bdiff.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+#                                mod.select,"_model_output_",scenario.20,"_B_differnce.Rds"))
+# # Annual exploitation
+# F.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+#                                mod.select,"_model_output_",scenario.20,"_annual.exploit.Rds"))
+# # The nicely summarized model object
+# pred.proc.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+#                                mod.select,"_model_output_",scenario.20,"_pred_proc.Rds"))
+# # The summarized spatial bits.
+# F.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+#                                mod.select,"_model_output_",scenario.20,"_F_spatial.Rds"))
+# F.spat.sab.20$F.na <- -log(1-F.spat.sab.20$exp.na)
+# # q spatial
+# q.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+#                                mod.select,"_model_output_",scenario.20,"_q_spatial.Rds"))
+# # m spatial
+# m.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+#                                mod.select,"_model_output_",scenario.20,"_m_spatial.Rds"))
+# # R spatial
+# r.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+#                                mod.select,"_model_output_",scenario.20,"_R_spatial.Rds"))
+# # B spatial
+# b.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
+#                                mod.select,"_model_output_",scenario.20,"_B_spatial.Rds"))
 
 #Sab 10
 Bdiff.sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
@@ -350,15 +350,15 @@ retro.bbn$retro.year[retro.bbn$retro.year == 'Base model'] <- "Full model"
 
 # Bring in the mesh and prediction grids...
 
-bbn.mesh.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_mesh.Rds"))
-bbn.grid.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_predict_grid.Rds"))
+#bbn.mesh.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_mesh.Rds"))
+#bbn.grid.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_predict_grid.Rds"))
 bbn.mesh.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_mesh.Rds"))
 bbn.grid.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_predict_grid.Rds"))
 
 sab.mesh.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,"_mesh.Rds"))
 sab.grid.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,"_predict_grid.Rds"))
-sab.mesh.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.20,"_mesh.Rds"))
-sab.grid.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.20,"_predict_grid.Rds"))
+#sab.mesh.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.20,"_mesh.Rds"))
+#ab.grid.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.20,"_predict_grid.Rds"))
 
 # The model inputs...
 sab.10.mod.input <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,"_model_input.Rds"))

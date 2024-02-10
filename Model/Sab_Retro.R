@@ -55,8 +55,8 @@ init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to te
 FR.size <- "90"
 R.size <- "75"
 # The different growth models.
-#g.mod <- 'g_original'
-g.mod <- 'g_1'
+g.mod <- 'g_original'
+#g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 # models
@@ -379,8 +379,8 @@ FR.size <- "90"
 num.knots <- 10 # Going to test 10
 qR <- 0.33
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
-#g.mod <- 'g_original'
-g.mod <- 'g_1'
+g.mod <- 'g_original'
+#g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 # The survey biomass index for 1994 says there were 249 tonnes of recruits that year.

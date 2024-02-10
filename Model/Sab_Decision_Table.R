@@ -17,6 +17,7 @@ FR.size <- 90
 qR <- 0.33
 init.m <- 0.2
 g.mod <- 'g_original'
+#g.mod <- "g_1"
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 num.knots <- 10
