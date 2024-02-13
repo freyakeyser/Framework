@@ -8,6 +8,7 @@
 # •	Predict for 100mm
 # •	Growth input for model
 
+
 #### packages and data ########
 
 require(ggplot2)
@@ -102,10 +103,11 @@ qqplot.data <- function (dat,facet=F, ncol=NULL,...)
 
 # Start analysis
 
-banker <- "BBs"
+banker <- "Mid"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
+dat <- dat[!dat$year==2020,]
 sub <- dat[complete.cases(dat),]
 
 # let's only model sh >= 65 mm here, that gets rid of just 150 shells (going to 70 drops us by 750 which seems like too much)
@@ -121,6 +123,7 @@ sub$log.sh.cen <- log(sub$sh) - log(sh.cond)
 med.depth <- sub %>% dplyr::filter(year %in% 2010:2022) %>% dplyr::summarise(med = median(depth,na.rm=T)) %>% signif(digits=2)
 sub$depth.cen <- sub$depth - med.depth$med
 # Also need to update the survey data.
+all.surv.dat <- all.surv.dat[!all.surv.dat$year %in% 2020,]
 all.surv.dat$depth.cen <- all.surv.dat$depth - med.depth$med
 
 # We need tow to be unique by year, ooh, so we have the 0 tow problem here, need
@@ -184,174 +187,174 @@ yellows <- "#FFDD00"
 # So here I'm deviating from ZUUR who suggests making a highly complex fixed effect structure before exploring the
 # random effects, but from a understanding what we are doing perspective I find this much more intuitive
 # So we have million options, clearly the model we have has some issues.  We know we have a random tow effect, so let's move to lmer...
-mod.lmer <- lmer(log(wmw) ~ log.sh.cen + (1|new_ID),data=sub, na.action = na.omit)
-# or glmer, more statistically correct
-mod.glmer <- glmer(wmw ~ log.sh.cen + (1|new_ID),data=sub, na.action = na.omit,family = gaussian(link=log))
-# Get data to compare
-diag.lmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.lmer))
-diag.glmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.glmer))
-# Normality remains a fail
-qqplot.data(diag.lmer$residuals)
-qqplot.data(diag.glmer$residuals)
-# That year effect gets swallowed up with the tow effect, more variability later, but I think that's due to increased sampling.
-ggplot(data=diag.glmer,aes(group=year,y=residuals)) + geom_boxplot() + geom_hline(yintercept=0,linetype='dashed',color= blues)
-# This is an improvement, but I'd much rather not see the variance blowing up like this at the higher MWs
-ggplot(data=diag.glmer,aes(x=log(wmw),y=residuals)) + geom_point() + geom_smooth(method='lm')
-ggplot(data=diag.glmer,aes(x=log(sh),y=residuals)) + geom_point() + geom_smooth(method='lm')
-
-# What about depth effects? Again it seems like the tow random term is helping here.
-ggplot(data=diag.glmer,aes(depth,y=residuals)) +  geom_boxplot(aes(group = cut_width(depth, 5)))
-# What about tow effects. can see that these are way better now, some tows are really highly variable.
-ggplot(data=diag.glmer,aes(x=tow,y=residuals)) + geom_point()
-# The wmw v residual plot is the problem left with our fits, perhaps the Gamma will help us here.
-mod.gamma.glmer <- glmer(wmw ~ log.sh.cen + (1|new_ID),data=sub, na.action = na.omit,family = Gamma(link=log))
-summary(mod.gamma.glmer)
-diag.gamma.glmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.gamma.glmer))
-# Again not very good, but it's a Gamma so I start to worry less
-qqplot.data(diag.gamma.glmer$residuals)
-# That year effect gets swallowed up with the tow effect, more variability later, but I think that's due to increased sampling.
-ggplot(data=diag.gamma.glmer,aes(group=year,y=residuals)) + geom_boxplot() + geom_hline(yintercept=0,linetype='dashed',color= blues)
-# This may be an improvement, not perfect as there is still a trend, but without going to a GAM the log-log power relationship probably isn't gonna do much better
-ggplot(data=diag.gamma.glmer,aes(x=log(wmw),y=residuals)) + geom_point() + geom_smooth(method='lm')
-ggplot(data=diag.gamma.glmer,aes(x=log(sh),y=residuals)) + geom_point() + geom_smooth(method='lm')
-# What about depth effects? Again it seems like the tow random term is helping here.
-ggplot(data=diag.gamma.glmer,aes(depth,y=residuals)) +  geom_boxplot(aes(group = cut_width(depth, 5)))
-# What about tow effects. can see that these are way better now, some tows are really highly variable.
-ggplot(data=diag.gamma.glmer,aes(x=tow,y=residuals)) + geom_point()
-# Now we could make the random effect more complex and fit the MW-SH relationship for each tow like this.
-mod.gamma.re.slope.glmer <- glmer(wmw ~ log.sh.cen + (1+ log.sh.cen|new_ID),data=sub, na.action = na.omit,family = Gamma(link=log))
-summary(mod.gamma.re.slope.glmer)
-
-
-diag.gamma.re.slope.glmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.gamma.re.slope.glmer))
-# Again not very good, but it's a Gamma so I start to worry less
-qqplot.data(diag.gamma.re.slope.glmer$residuals)
-# That year effect gets swallowed up with the tow effect, more variability later, but I think that's due to increased sampling.
-ggplot(data=diag.gamma.re.slope.glmer,aes(group=year,y=residuals)) + geom_boxplot() + geom_hline(yintercept=0,linetype='dashed',color= blues)
-# Really no different from previous model, mostly I think because the issue is the power relationship breaks down for large SH scallop
-ggplot(data=diag.gamma.re.slope.glmer,aes(x=log(wmw),y=residuals)) + geom_point() + geom_smooth(method='lm')
-ggplot(data=diag.gamma.re.slope.glmer,aes(x=log(sh),y=residuals)) + geom_point() + geom_smooth(method='lm')
-# What about depth effects? Again it seems like the tow random term is helping here.
-ggplot(data=diag.gamma.re.slope.glmer,aes(depth,y=residuals)) +  geom_boxplot(aes(group = cut_width(depth, 5)))
-# What about tow effects. can see that these are way better now, some tows are really highly variable.
-ggplot(data=diag.gamma.re.slope.glmer,aes(x=tow,y=residuals)) + geom_point()
-
-# We probably aren't going to improve much on this model, but our trouble is we can't predict on tow, so as formulated our
-# model is kinda ok for fitting existing data, but not very helpful for prediction at unknown locations in a given year
-# The logic of using this model is fairly simple... We want to allow each tow to have it's own MW-SH relationship
-# the belief being that growth will differ across the area.
-# We can easily argue the converse that this is chasing noise in the data and we can't estimate a MW-SH relationship for each tow, thus
-# we assume a 'global' slope of the MW-SH relationship and just allow the intercept to change for each tow.
-# The results are very similar.
-# From an applied perspective I think either option is reasonable, thus I'll suggest we go for the more simple model
-# it also looks like we have convergence issues with a full model.
-
-# Now we can follow the Zuur approach, which starts with the most complex model that makes sense which I think
-# is a model in which the slope and intercept of the MW-SH relationship can change each year and the effect of depth can
-# change each year.
-
-# BUT THESE MODELS aren't able to converge... so the full models are out the window!!
-# mod.gamma.full.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year) + depth.cen* as.factor(year)  + (1|new_ID),data=sub,
-#                               na.action = na.omit,family = Gamma(link=log))
-# # Now there are 4 models we can compare here, drop the depth changing by year
-# mod.gamma.dep.static.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year) + depth.cen  + (1|new_ID),data=sub,
-#                                     na.action = na.omit,family = Gamma(link=log))
-# # Or drop the slope changing by year
-# mod.gamma.slope.static.glmer <- glmer(wmw ~ log.sh.cen + depth.cen* as.factor(year)  + (1|new_ID),data=sub,
-#                                       na.action = na.omit,family = Gamma(link=log))
-# # We could get rid of the depth term altogether but keep slope of MW-SH varying by year
-# mod.gamma.no.depth.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year)  + (1|new_ID),data=sub,
-#                                   na.action = na.omit,family = Gamma(link=log))
-# # We could get rid of the depth term altogether and just allow year to influence intercept of MW-SH
-# mod.gamma.no.depth.no.slope.vary.glmer <- glmer(wmw ~ log.sh.cen+ as.factor(year)  + (1|new_ID),data=sub,
-#                                                 na.action = na.omit,family = Gamma(link=log))
-
-
-# So as fun as that exploration was, the answer is full models are too complex
-
-
-
-################### This is Section 2 the simple generalized linear models ################################
-# First, let's compare Gamma and Gaussian models here to see if obvious choice from above holds
-mod.glm.gamma <- glm(wmw ~ log.sh.cen ,data=sub, na.action = na.omit,family = Gamma(link=log))
-mod.glm.gauss <- glm(wmw ~ log.sh.cen ,data=sub, na.action = na.omit,family = gaussian(link=log))
-
-# How about res vs potential covariates
-diag.glm <- data.frame(wmw = rep(sub$wmw,2),sh = rep(sub$sh,2),year = rep(sub$year,2),
-                       depth=rep(sub$depth,2),tow = paste(rep(sub$new_ID,2),rep(sub$year,2)),
-                       mod = sort(rep(c("Gamma","Gaussian"),length(mod.glm.gamma$residuals))),
-                       residuals = c(mod.glm.gamma$residuals,mod.glm.gauss$residuals))
-# Now are either of these better than the other?
-# How about the normality...
-# Compare the qq plots
-qqplot.data(diag.glm[,c(7,6)],facet=T) # Not in love but not terrible and shockingly similar compared to the random effects variants of the same model, weird!
-# They both are not good...
-ggplot(diag.glm) + geom_point(aes(x=wmw,y=residuals)) + facet_wrap(~mod)
-# Very similar, no real issue here.
-ggplot(diag.glm) + geom_point(aes(x=sh,y=residuals)) + facet_wrap(~mod)
-# Tows remain an issue that need dealt with (i.e. random effects)
-ggplot(diag.glm) + geom_point(aes(x=tow,y=residuals)) + facet_wrap(~mod)
-
-# What about linear model log transformed... it really sucks...
-mod.lm <- lm(log(wmw) ~ log.sh.cen ,data=sub, na.action = na.omit)
-# Now look at model diagnostics.
-# Combine the residuals into the sub data to compare against
-diag.lm <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = mod.lm$residuals)
-# Normality is a big fail for a straight linear model, interesting how much worse it is than the Gaussian glm eh!
-qqplot.data(diag.lm$residuals)
-# So there is a year effect
-ggplot(data=diag.lm,aes(group=year,y=residuals)) + geom_boxplot() + geom_hline(yintercept=0,linetype='dashed',color= blues)
-# Clear residual trends in those residuals, so that's not good.
-ggplot(data=diag.lm,aes(x=log(wmw),y=residuals)) + geom_point()
-ggplot(data=diag.lm,aes(x=log(sh),y=residuals)) + geom_point() + geom_smooth(method='lm') # This is not terrible TBH
-
-# What about depth effects? Something going on, see the shallow depths are all biased positive and deeper are mostly negatives.
-ggplot(data=diag.lm,aes(depth,residuals)) + geom_boxplot(aes(group = cut_width(depth, 5)))
-# What about tow effects. clearly there is vaiability with the tows, could be a year effect or depth effect, or something else.
-ggplot(data=diag.lm,aes(x=tow,y=residuals)) + geom_point()
-
-
-
-
-# So the takeaway from the above is we should use a glm
-# Since the glms are clearly better than the lm models, lets compare the glm's with Gamma
-mod.full.glm <- glm(wmw ~ log.sh.cen*as.factor(year) + depth.cen*as.factor(year),data=sub, na.action = na.omit,family=Gamma(link="log"))
-mod.2.glm<- glm(wmw ~ log.sh.cen*as.factor(year) + depth.cen,data=sub, na.action = na.omit,family=Gamma(link="log"))
-mod.3.glm <- glm(wmw ~ log.sh.cen+as.factor(year) + depth.cen*as.factor(year),data=sub, na.action = na.omit,family=Gamma(link="log"))
-mod.4.glm <- glm(wmw ~ log.sh.cen*as.factor(year) ,data=sub, na.action = na.omit,family=Gamma(link="log"))
-mod.5.glm <- glm(wmw ~ log.sh.cen+as.factor(year) ,data=sub, na.action = na.omit,family=Gamma(link="log"))
-mod.6.glm <- glm(wmw ~ log.sh.cen + depth.cen,data=sub, na.action = na.omit,family=Gamma(link="log"))
-
-
-#########################
-# So from all of this in section 2, I think the only thing we need to show as a result is this AIC Table
-# Wow is that not even close, the full model kills it, suggesting both depth and sh slope should be allowed to vary by year
-# I did this with the lm models and effectively got the same result as this, which is reassuring!
-AIC.comp <- as.data.frame(AICtab(mod.full.glm,mod.glm.gamma,mod.2.glm,mod.3.glm,mod.4.glm,mod.5.glm,mod.6.glm))
-AIC.comp$Model <- row.names(AIC.comp)
-AIC.comp$formula <- NA
-for(i in 1:nrow(AIC.comp)){
-  AIC.comp$formula[i] <- deparse1(formula(get(AIC.comp$Model[i])))
-}
-
-write.csv(x = AIC.comp, paste0(plotsGo, "/", banker, "/AICtable.csv"))
-
-#########################
-
-# Lets see what the full model diagnostics look like, might be ok...
-diag.full.glm <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = paste(sub$new_ID,sub$year),residuals = mod.full.glm$residuals)
-# Normality is still a fail, but also not a total disaster
-qqplot.data(diag.full.glm$residuals)
-# This ain't awful
-ggplot(data=diag.full.glm,aes(group=year,y=residuals)) + geom_boxplot(aes(group = cut_width(year, 1))) + geom_hline(yintercept=0,linetype='dashed',color= blues)
-# the WMW vs residuals remain awful, but better than they've been
-ggplot(data=diag.full.glm,aes(x=log(wmw),y=residuals)) + geom_point()
-ggplot(data=diag.full.glm,aes(x=sh,y=residuals)) + geom_point() + geom_smooth(method='lm') # This is not terrible TBH
-# Better I think, but the deep stuff seems biased high, but once we bring tow in we'll see things are ok
-ggplot(data=diag.full.glm,aes(depth,residuals)) + geom_boxplot(aes(group = cut_width(depth, 5)))
-# What about tow effects. clearly even our full model isn't able to deal well with these.
-ggplot(data=diag.full.glm,aes(x=tow,y=residuals)) + geom_point()
-### End point 2 ####
+# mod.lmer <- lmer(log(wmw) ~ log.sh.cen + (1|new_ID),data=sub, na.action = na.omit)
+# # or glmer, more statistically correct
+# mod.glmer <- glmer(wmw ~ log.sh.cen + (1|new_ID),data=sub, na.action = na.omit,family = gaussian(link=log))
+# # Get data to compare
+# diag.lmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.lmer))
+# diag.glmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.glmer))
+# # Normality remains a fail
+# qqplot.data(diag.lmer$residuals)
+# qqplot.data(diag.glmer$residuals)
+# # That year effect gets swallowed up with the tow effect, more variability later, but I think that's due to increased sampling.
+# ggplot(data=diag.glmer,aes(group=year,y=residuals)) + geom_boxplot() + geom_hline(yintercept=0,linetype='dashed',color= blues)
+# # This is an improvement, but I'd much rather not see the variance blowing up like this at the higher MWs
+# ggplot(data=diag.glmer,aes(x=log(wmw),y=residuals)) + geom_point() + geom_smooth(method='lm')
+# ggplot(data=diag.glmer,aes(x=log(sh),y=residuals)) + geom_point() + geom_smooth(method='lm')
+#
+# # What about depth effects? Again it seems like the tow random term is helping here.
+# ggplot(data=diag.glmer,aes(depth,y=residuals)) +  geom_boxplot(aes(group = cut_width(depth, 5)))
+# # What about tow effects. can see that these are way better now, some tows are really highly variable.
+# ggplot(data=diag.glmer,aes(x=tow,y=residuals)) + geom_point()
+# # The wmw v residual plot is the problem left with our fits, perhaps the Gamma will help us here.
+# mod.gamma.glmer <- glmer(wmw ~ log.sh.cen + (1|new_ID),data=sub, na.action = na.omit,family = Gamma(link=log))
+# summary(mod.gamma.glmer)
+# diag.gamma.glmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.gamma.glmer))
+# # Again not very good, but it's a Gamma so I start to worry less
+# qqplot.data(diag.gamma.glmer$residuals)
+# # That year effect gets swallowed up with the tow effect, more variability later, but I think that's due to increased sampling.
+# ggplot(data=diag.gamma.glmer,aes(group=year,y=residuals)) + geom_boxplot() + geom_hline(yintercept=0,linetype='dashed',color= blues)
+# # This may be an improvement, not perfect as there is still a trend, but without going to a GAM the log-log power relationship probably isn't gonna do much better
+# ggplot(data=diag.gamma.glmer,aes(x=log(wmw),y=residuals)) + geom_point() + geom_smooth(method='lm')
+# ggplot(data=diag.gamma.glmer,aes(x=log(sh),y=residuals)) + geom_point() + geom_smooth(method='lm')
+# # What about depth effects? Again it seems like the tow random term is helping here.
+# ggplot(data=diag.gamma.glmer,aes(depth,y=residuals)) +  geom_boxplot(aes(group = cut_width(depth, 5)))
+# # What about tow effects. can see that these are way better now, some tows are really highly variable.
+# ggplot(data=diag.gamma.glmer,aes(x=tow,y=residuals)) + geom_point()
+# # Now we could make the random effect more complex and fit the MW-SH relationship for each tow like this.
+# mod.gamma.re.slope.glmer <- glmer(wmw ~ log.sh.cen + (1+ log.sh.cen|new_ID),data=sub, na.action = na.omit,family = Gamma(link=log))
+# summary(mod.gamma.re.slope.glmer)
+#
+#
+# diag.gamma.re.slope.glmer <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = residuals(mod.gamma.re.slope.glmer))
+# # Again not very good, but it's a Gamma so I start to worry less
+# qqplot.data(diag.gamma.re.slope.glmer$residuals)
+# # That year effect gets swallowed up with the tow effect, more variability later, but I think that's due to increased sampling.
+# ggplot(data=diag.gamma.re.slope.glmer,aes(group=year,y=residuals)) + geom_boxplot() + geom_hline(yintercept=0,linetype='dashed',color= blues)
+# # Really no different from previous model, mostly I think because the issue is the power relationship breaks down for large SH scallop
+# ggplot(data=diag.gamma.re.slope.glmer,aes(x=log(wmw),y=residuals)) + geom_point() + geom_smooth(method='lm')
+# ggplot(data=diag.gamma.re.slope.glmer,aes(x=log(sh),y=residuals)) + geom_point() + geom_smooth(method='lm')
+# # What about depth effects? Again it seems like the tow random term is helping here.
+# ggplot(data=diag.gamma.re.slope.glmer,aes(depth,y=residuals)) +  geom_boxplot(aes(group = cut_width(depth, 5)))
+# # What about tow effects. can see that these are way better now, some tows are really highly variable.
+# ggplot(data=diag.gamma.re.slope.glmer,aes(x=tow,y=residuals)) + geom_point()
+#
+# # We probably aren't going to improve much on this model, but our trouble is we can't predict on tow, so as formulated our
+# # model is kinda ok for fitting existing data, but not very helpful for prediction at unknown locations in a given year
+# # The logic of using this model is fairly simple... We want to allow each tow to have it's own MW-SH relationship
+# # the belief being that growth will differ across the area.
+# # We can easily argue the converse that this is chasing noise in the data and we can't estimate a MW-SH relationship for each tow, thus
+# # we assume a 'global' slope of the MW-SH relationship and just allow the intercept to change for each tow.
+# # The results are very similar.
+# # From an applied perspective I think either option is reasonable, thus I'll suggest we go for the more simple model
+# # it also looks like we have convergence issues with a full model.
+#
+# # Now we can follow the Zuur approach, which starts with the most complex model that makes sense which I think
+# # is a model in which the slope and intercept of the MW-SH relationship can change each year and the effect of depth can
+# # change each year.
+#
+# # BUT THESE MODELS aren't able to converge... so the full models are out the window!!
+# # mod.gamma.full.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year) + depth.cen* as.factor(year)  + (1|new_ID),data=sub,
+# #                               na.action = na.omit,family = Gamma(link=log))
+# # # Now there are 4 models we can compare here, drop the depth changing by year
+# # mod.gamma.dep.static.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year) + depth.cen  + (1|new_ID),data=sub,
+# #                                     na.action = na.omit,family = Gamma(link=log))
+# # # Or drop the slope changing by year
+# # mod.gamma.slope.static.glmer <- glmer(wmw ~ log.sh.cen + depth.cen* as.factor(year)  + (1|new_ID),data=sub,
+# #                                       na.action = na.omit,family = Gamma(link=log))
+# # # We could get rid of the depth term altogether but keep slope of MW-SH varying by year
+# # mod.gamma.no.depth.glmer <- glmer(wmw ~ log.sh.cen* as.factor(year)  + (1|new_ID),data=sub,
+# #                                   na.action = na.omit,family = Gamma(link=log))
+# # # We could get rid of the depth term altogether and just allow year to influence intercept of MW-SH
+# # mod.gamma.no.depth.no.slope.vary.glmer <- glmer(wmw ~ log.sh.cen+ as.factor(year)  + (1|new_ID),data=sub,
+# #                                                 na.action = na.omit,family = Gamma(link=log))
+#
+#
+# # So as fun as that exploration was, the answer is full models are too complex
+#
+#
+#
+# ################### This is Section 2 the simple generalized linear models ################################
+# # First, let's compare Gamma and Gaussian models here to see if obvious choice from above holds
+# mod.glm.gamma <- glm(wmw ~ log.sh.cen ,data=sub, na.action = na.omit,family = Gamma(link=log))
+# mod.glm.gauss <- glm(wmw ~ log.sh.cen ,data=sub, na.action = na.omit,family = gaussian(link=log))
+#
+# # How about res vs potential covariates
+# diag.glm <- data.frame(wmw = rep(sub$wmw,2),sh = rep(sub$sh,2),year = rep(sub$year,2),
+#                        depth=rep(sub$depth,2),tow = paste(rep(sub$new_ID,2),rep(sub$year,2)),
+#                        mod = sort(rep(c("Gamma","Gaussian"),length(mod.glm.gamma$residuals))),
+#                        residuals = c(mod.glm.gamma$residuals,mod.glm.gauss$residuals))
+# # Now are either of these better than the other?
+# # How about the normality...
+# # Compare the qq plots
+# qqplot.data(diag.glm[,c(7,6)],facet=T) # Not in love but not terrible and shockingly similar compared to the random effects variants of the same model, weird!
+# # They both are not good...
+# ggplot(diag.glm) + geom_point(aes(x=wmw,y=residuals)) + facet_wrap(~mod)
+# # Very similar, no real issue here.
+# ggplot(diag.glm) + geom_point(aes(x=sh,y=residuals)) + facet_wrap(~mod)
+# # Tows remain an issue that need dealt with (i.e. random effects)
+# ggplot(diag.glm) + geom_point(aes(x=tow,y=residuals)) + facet_wrap(~mod)
+#
+# # What about linear model log transformed... it really sucks...
+# mod.lm <- lm(log(wmw) ~ log.sh.cen ,data=sub, na.action = na.omit)
+# # Now look at model diagnostics.
+# # Combine the residuals into the sub data to compare against
+# diag.lm <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = sub$new_ID,residuals = mod.lm$residuals)
+# # Normality is a big fail for a straight linear model, interesting how much worse it is than the Gaussian glm eh!
+# qqplot.data(diag.lm$residuals)
+# # So there is a year effect
+# ggplot(data=diag.lm,aes(group=year,y=residuals)) + geom_boxplot() + geom_hline(yintercept=0,linetype='dashed',color= blues)
+# # Clear residual trends in those residuals, so that's not good.
+# ggplot(data=diag.lm,aes(x=log(wmw),y=residuals)) + geom_point()
+# ggplot(data=diag.lm,aes(x=log(sh),y=residuals)) + geom_point() + geom_smooth(method='lm') # This is not terrible TBH
+#
+# # What about depth effects? Something going on, see the shallow depths are all biased positive and deeper are mostly negatives.
+# ggplot(data=diag.lm,aes(depth,residuals)) + geom_boxplot(aes(group = cut_width(depth, 5)))
+# # What about tow effects. clearly there is vaiability with the tows, could be a year effect or depth effect, or something else.
+# ggplot(data=diag.lm,aes(x=tow,y=residuals)) + geom_point()
+#
+#
+#
+#
+# # So the takeaway from the above is we should use a glm
+# # Since the glms are clearly better than the lm models, lets compare the glm's with Gamma
+# mod.full.glm <- glm(wmw ~ log.sh.cen*as.factor(year) + depth.cen*as.factor(year),data=sub, na.action = na.omit,family=Gamma(link="log"))
+# mod.2.glm<- glm(wmw ~ log.sh.cen*as.factor(year) + depth.cen,data=sub, na.action = na.omit,family=Gamma(link="log"))
+# mod.3.glm <- glm(wmw ~ log.sh.cen+as.factor(year) + depth.cen*as.factor(year),data=sub, na.action = na.omit,family=Gamma(link="log"))
+# mod.4.glm <- glm(wmw ~ log.sh.cen*as.factor(year) ,data=sub, na.action = na.omit,family=Gamma(link="log"))
+# mod.5.glm <- glm(wmw ~ log.sh.cen+as.factor(year) ,data=sub, na.action = na.omit,family=Gamma(link="log"))
+# mod.6.glm <- glm(wmw ~ log.sh.cen + depth.cen,data=sub, na.action = na.omit,family=Gamma(link="log"))
+#
+#
+# #########################
+# # So from all of this in section 2, I think the only thing we need to show as a result is this AIC Table
+# # Wow is that not even close, the full model kills it, suggesting both depth and sh slope should be allowed to vary by year
+# # I did this with the lm models and effectively got the same result as this, which is reassuring!
+# AIC.comp <- as.data.frame(AICtab(mod.full.glm,mod.glm.gamma,mod.2.glm,mod.3.glm,mod.4.glm,mod.5.glm,mod.6.glm))
+# AIC.comp$Model <- row.names(AIC.comp)
+# AIC.comp$formula <- NA
+# for(i in 1:nrow(AIC.comp)){
+#   AIC.comp$formula[i] <- deparse1(formula(get(AIC.comp$Model[i])))
+# }
+#
+# write.csv(x = AIC.comp, paste0(plotsGo, "/", banker, "/AICtable.csv"))
+#
+# #########################
+#
+# # Lets see what the full model diagnostics look like, might be ok...
+# diag.full.glm <- data.frame(wmw = sub$wmw,sh = sub$sh,year = sub$year,depth=sub$depth,tow = paste(sub$new_ID,sub$year),residuals = mod.full.glm$residuals)
+# # Normality is still a fail, but also not a total disaster
+# qqplot.data(diag.full.glm$residuals)
+# # This ain't awful
+# ggplot(data=diag.full.glm,aes(group=year,y=residuals)) + geom_boxplot(aes(group = cut_width(year, 1))) + geom_hline(yintercept=0,linetype='dashed',color= blues)
+# # the WMW vs residuals remain awful, but better than they've been
+# ggplot(data=diag.full.glm,aes(x=log(wmw),y=residuals)) + geom_point()
+# ggplot(data=diag.full.glm,aes(x=sh,y=residuals)) + geom_point() + geom_smooth(method='lm') # This is not terrible TBH
+# # Better I think, but the deep stuff seems biased high, but once we bring tow in we'll see things are ok
+# ggplot(data=diag.full.glm,aes(depth,residuals)) + geom_boxplot(aes(group = cut_width(depth, 5)))
+# # What about tow effects. clearly even our full model isn't able to deal well with these.
+# ggplot(data=diag.full.glm,aes(x=tow,y=residuals)) + geom_point()
+# ### End point 2 ####
 
 
 #################### Section 3, YEARLY model with random effects #############################
@@ -372,7 +375,9 @@ for(i in 1:n.yrs)
   # Could have had more complex depth smooth, but our residuals look fine with the linear smooth so sticking with that.
   #if(yrs[i] >= 2011) mod.res[[as.character(yrs[i])]] <- glmer(wmw ~ log.sh.cen + poly(depth.cen,3) + (1| new_ID),data = dat.tmp,family=Gamma(link=log))
   # No non-linearity if we don't have 10 tows to use, to complex...
-  mod.res[[as.character(yrs[i])]] <- glmer(wmw ~ log.sh.cen + depth.cen + (1| new_ID),data = dat.tmp,family=Gamma(link=log))
+  # ONLY RUN RANDOM EFFECTS IF AT LEAST 5 TOWS
+  if(n.tows>4)  mod.res[[as.character(yrs[i])]] <- glmer(wmw ~ log.sh.cen + depth.cen + (1| new_ID),data = dat.tmp,family=Gamma(link=log))
+  if(n.tows<5)  mod.res[[as.character(yrs[i])]] <- glm(wmw ~ log.sh.cen + depth.cen,data = dat.tmp,family=Gamma(link=log))
   dat.tmp$residuals <- residuals(mod.res[[as.character(yrs[i])]])
   resids[[as.character(yrs[i])]] <- dat.tmp
   #qq.plt[[as.character(yrs[i])]] <- qqplot.data(dat.tmp$residuals)
@@ -530,39 +535,53 @@ log.sh.cen <- log(seq(2.5, 197.5, by = 5)) - log(sh.cond) #each shell height bin
 mw.res.t <- NULL
 cond.pred <- NULL
 all.coef <- NULL
+mwsh.curve <- NULL
 # Takes about 1 second per year
 for(i in 1:n.yrs)
 {
   mw.dat <- sub %>% dplyr::filter(year== yrs[i])
-  s.dat <- all.surv.dat %>% dplyr::filter(bank==banker & year == yrs[i])
-
+  s.dat <- all.surv.dat %>% dplyr::filter(bank==banker & year == yrs[i]) %>% filter(state=="live")
+  ntows <- length(unique(mw.dat$tow))
   mod.r <- mod.res[[as.character(yrs[i])]]
   # Now try and do the predictions
 
-  #get IDs for the sampled tows. Use the random effects for those.
-  random.pred <- (1:nrow(s.dat))[is.element(s.dat$tow,unique(mw.dat$new_ID))]
-
-  #get IDs for the unsampled tows. Use fixed effects for IDs that weren't sampled for meat weight shell height
-  fixed.pred <- (1:nrow(s.dat))[!is.element(s.dat$tow,unique(mw.dat$new_ID))]
-
-  #Predict using Random effects for IDs that were sampled for meat weight shell height
+  #Predict using Random effects for IDs that were sampled for meat weight shell height,
+  # or using fixed effects for IDs that were not sampled
   temp <- matrix(NA,nrow(s.dat),40)
 
-  for(j in random.pred)
-  {
-    temp[j,] <- as.vector(predict(object = mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
-                                                                    depth.cen=rep(s.dat$depth.cen[j] ,40),
-                                                                    new_ID=s.dat$tow[j]),
-                                  re.form=NULL,type="response"))
-  } # end the random loop
+  if(ntows>4){
+    #get IDs for the sampled tows. Use the random effects for those.
+    random.pred <- (1:nrow(s.dat))[is.element(s.dat$tow,unique(mw.dat$new_ID))]
 
-  #Predict using fixed effects for IDs that weren't sampled for meat weight shell height
-  for(j in fixed.pred)
-  {
-    temp[j,] <- as.vector(predict(object=mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
-                                                                  depth.cen=rep(s.dat$depth.cen[j] ,40)),
-                                  re.form=~0,type="response"))
-  } # end the fixed loop
+    #get IDs for the unsampled tows. Use fixed effects for IDs that weren't sampled for meat weight shell height
+    fixed.pred <- (1:nrow(s.dat))[!is.element(s.dat$tow,unique(mw.dat$new_ID))]
+
+    for(j in random.pred)
+    {
+      temp[j,] <- as.vector(predict(object = mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
+                                                                      depth.cen=rep(s.dat$depth.cen[j], 40),
+                                                                      new_ID=s.dat$tow[j]),
+                                    re.form=NULL,type="response"))
+    } # end the random loop
+
+    #Predict using fixed effects for IDs that weren't sampled for meat weight shell height
+    for(j in fixed.pred)
+    {
+      temp[j,] <- as.vector(predict(object=mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
+                                                                    depth.cen=rep(s.dat$depth.cen[j] ,40)),
+                                    re.form=~0,type="response"))
+    } # end the fixed loop
+  }
+
+  if(ntows<5){
+    for(j in 1:nrow(s.dat))
+    {
+      temp[j,] <- as.vector(predict(object = mod.r,newdata=data.frame(log.sh.cen=log.sh.cen,
+                                                                      depth.cen=rep(s.dat$depth.cen[j], 40),
+                                                                      new_ID=s.dat$tow[j]),
+                                    type="response"))
+    } # end the glm loop
+  }
 
   #multply temp matrix (weight) by live numbers to get weight/size bin
   s.dat[,grep("h5", colnames(s.dat))[1]:grep("h200", colnames(s.dat))] <-
@@ -573,25 +592,46 @@ for(i in 1:n.yrs)
   # So finally we need to use our models to predict condition on the bank, seemingly the easiest way is to pick a depth and MW to predict at
   # for the bank and just leave it at that.  SH will be 100 mm, Going to say median depth (which is 0 as set up above) of the survey tows between 2010 and 2022 see above
   # For BBn this is 75 meters, which makes loads of sense. Downside is only way to get an SE is to try and bootstrap one, which I'm too lazy to do
-  cond.est <-   as.vector(predict(object=mod.r, newdata=data.frame(log.sh.cen=0,
+  if(ntows>4) {
+    cond.est <- as.vector(predict(object=mod.r, newdata=data.frame(log.sh.cen=0,
                                                                    depth.cen=0),
                                   re.form=~0,type="response"))
+  }
+  if(ntows<5) {
+    cond.est <- as.vector(predict(object=mod.r, newdata=data.frame(log.sh.cen=0,
+                                                                   depth.cen=0),
+                                  type="response"))
+  }
   # We can pull out the intercept now as well and see how this compares
   inter <- summary(mod.r)$coefficients[1,1]
   inter.se <- summary(mod.r)$coefficients[1,2]
   # While we are at this, let's pull out the fixed slope and the random intercepts for the mw-sh figure and the depth terms.
   slope <- summary(mod.r)$coefficients[2,1]
   slope.se <- summary(mod.r)$coefficients[2,2]
-  dep.1 <- summary(mod.r)$coefficients[3,1]
-  dep.1.se <- summary(mod.r)$coefficients[3,2]
+  dep.1 <- summary(mod.r)$coefficients[which(rownames(summary(mod.r)$coefficients)=="depth.cen"), which(colnames(summary(mod.r)$coefficients)=="Estimate")]
+  dep.1.se <- summary(mod.r)$coefficients[which(rownames(summary(mod.r)$coefficients)=="depth.cen"), which(colnames(summary(mod.r)$coefficients)=="Std. Error")]
 
-  # Now extract the random terms
-  rand.coef <- data.frame(rand.int = ranef(mod.r)$new_ID[[1]], rand.se = se.ranef(mod.r)$new_ID[[1]],
-                          tow = attr(se.ranef(mod.r)$new_ID,'dimnames')[[1]])
-  fix.coef <- data.frame(fix.int = inter, fix.int.se = inter.se, fix.slope = slope, fix.slope.se = slope.se,
+  #fixed effects or glm results
+  if(ntows<5) {
+    all.coef[[i]] <- data.frame(fix.int = inter, fix.int.se = inter.se, fix.slope = slope, fix.slope.se = slope.se,
                          depth1 = dep.1, depth1.se = dep.1.se,
-                         tow = as.character(sort(unique(s.dat$tow))),year = yrs[i])
-  all.coef[[i]] <- left_join(fix.coef,rand.coef,by='tow')
+                         tow = as.character(sort(unique(s.dat$tow))),year = yrs[i], rand.int=NA, rand.se=NA)
+  }
+  # Now extract the random terms
+  if(ntows>4) {
+    fix.coef <- data.frame(fix.int = inter, fix.int.se = inter.se, fix.slope = slope, fix.slope.se = slope.se,
+                                depth1 = dep.1, depth1.se = dep.1.se,
+                                tow = as.character(sort(unique(s.dat$tow))),year = yrs[i])
+    rand.coef <- data.frame(rand.int = ranef(mod.r)$new_ID[[1]], rand.se = se.ranef(mod.r)$new_ID[[1]],
+                          tow = attr(se.ranef(mod.r)$new_ID,'dimnames')[[1]])
+    all.coef[[i]] <- left_join(fix.coef,rand.coef,by='tow')
+  }
+# this is the object with coefficients ^^^^
+
+  # this object is for plotting annual MWSH curves
+  mwsh.curve[[i]] <- data.frame(sh = 65:200, year=yrs[i], pred = predict(object=mod.r, newdata=expand.grid(log.sh.cen=log(seq(0.65,2, 0.01)),
+                                                                   depth.cen=median(s.dat$depth.cen)),
+                                  re.form=~0,type="response"))
 
   # Object with condition prediction
   cond.pred[[i]] <- data.frame(cond = cond.est,year = yrs[i],intercept = inter,inter.se = inter.se)
@@ -602,6 +642,7 @@ for(i in 1:n.yrs)
 biomass.per.sh.by.tow <- do.call("rbind",mw.res.t)
 condition.ts <- do.call('rbind',cond.pred)
 mw.sh.coef <- do.call('rbind',all.coef)
+mwsh.curve <- do.call('rbind',mwsh.curve)
 # Add some variables
 condition.ts$cond.inter <- exp(condition.ts$intercept)
 condition.ts$cond.inter.LCI <- exp(condition.ts$intercept - 1.96*condition.ts$inter.se)
@@ -661,9 +702,12 @@ for(j in 1:n.yrs)
   slope <- mw.sh.coef %>% dplyr::filter(year == yrs[j]) %>% dplyr::pull(fix.slope); slope <- slope[1]
   int <- mw.sh.coef %>% dplyr::filter(year == yrs[j]) %>% dplyr::pull(fix.int); int <- int[1]
   rand.int <- mw.sh.coef[mw.sh.coef$year==yrs[j] & !is.na(mw.sh.coef$ran.int.act),] %>% dplyr::pull(ran.int.act,tow)
-  for(i in 1:length(rand.int)) rt[[i]] <- data.frame(sh = 100*sh,mw = exp(rand.int)[i] * sh^slope,tow = names(rand.int)[i])
-  rts <- do.call("rbind",rt)
-  r.tows[[j]] <- data.frame(rts,year = yrs[j])
+  if(length(rand.int)>0) {
+    for(i in 1:length(rand.int)) rt[[i]] <- data.frame(sh = 100*sh,mw = exp(rand.int)[i] * sh^slope,tow = names(rand.int)[i])
+    rts <- do.call("rbind",rt)
+    r.tows[[j]] <- data.frame(rts,year = yrs[j])
+  }
+  if(length(rand.int)==0) r.tows[[j]] <- data.frame(sh=NA, mw=NA, tow=NA, year=yrs[j])
   f.mws[[j]] <- data.frame(sh = 100* sh, mw = exp(int) * sh^slope,year = yrs[j])
 
 }
@@ -719,7 +763,7 @@ pall <- ggplot(r.tow %>% dplyr::filter(year %in% 1992:2022)) +
   geom_point(data=sub %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=wmw),color=blues, size=0.5, alpha=0.5) +
   geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+
   facet_wrap(~year, ncol=6) +
-  geom_line(data = f.mw %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=mw),color='black',size=1) +
+  geom_line(data = mwsh.curve[mwsh.curve$year %in% 1992:2022,],aes(x=sh,y=pred),color='black',size=1) +
   scale_x_continuous(limits = c(65,sub %>% dplyr::summarise(max(sh,na.rm=T)) %>% as.numeric()),
                      name = paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)"),
                      breaks = seq(0,200,by=25), expand = c(0.01,0.01)) +
@@ -866,12 +910,12 @@ gbb.med <- round(by.bank$med[by.bank$bank =="GBb"],digits=3)
 # SH greater than 140 mm is `0.15, so the overall fully-recruited biomass estimates in these years may be slightly underestimated (< 5%) in SFA 26C.
 
 # The overkill version would be something like this...
-
-For SFA 25A-Sab the absolute value of the residual bias was greater than 0.05 in `r sab.years` years, but the median proportion of scallop above 140 mm was `r sab.med` in these years,
-so this would have minimal impact on the biomass estimates.
-
-For SFA 25A-Mid the absolute value of the residual bias was greater than 0.05 in `r mid.years` years, the median proportion of scallop above 140 mm was `r mid.med` in these years, in
-these years the biomass estimates in SFA 25A-Mid could be somewhat effected by this bias.
-
-For SFA 25B the absolute value of the residual bias was greater than 0.05 in `r ban.years` year, but proportion of scallop above 140 mm was `r bbn.med` in this years,
-so this would could result in a small underestimate of fully-recruited biomass.
+#
+# For SFA 25A-Sab the absolute value of the residual bias was greater than 0.05 in `r sab.years` years, but the median proportion of scallop above 140 mm was `r sab.med` in these years,
+# so this would have minimal impact on the biomass estimates.
+#
+# For SFA 25A-Mid the absolute value of the residual bias was greater than 0.05 in `r mid.years` years, the median proportion of scallop above 140 mm was `r mid.med` in these years, in
+# these years the biomass estimates in SFA 25A-Mid could be somewhat effected by this bias.
+#
+# For SFA 25B the absolute value of the residual bias was greater than 0.05 in `r ban.years` year, but proportion of scallop above 140 mm was `r bbn.med` in this years,
+# so this would could result in a small underestimate of fully-recruited biomass.
