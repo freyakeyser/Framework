@@ -794,6 +794,60 @@ for(sfa in sfa){
 }
 ```
 
+# Spatial distribution of tows
+```{r}
+boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
+
+#From Dave/Jessica
+library(sf)
+library(geos)
+german <- st_read("C:/Users/keyserf/Documents/GitHub/GIS_layers/other_boundaries/WGS_84_German.shp")
+ger.concave <- geos_concave_hull(german, ratio = 0.12, allow_holes = F)
+ger.concave <- st_as_sf(ger.concave, crs = st_crs(german))
+str(ger.concave)
+st_crs(ger.concave) <- st_crs(german)
+
+banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")
+n.banks <- length(banks)
+for (i in 1:n.banks){
+  surv <- st_as_sf(surv.Live[[banks[i]]],coords = c('slon','slat'),crs = 4326,remove=F) %>% 
+    dplyr::filter(state == 'live')
+  surv$`Tow type` <- paste0('regular (n = ',length(surv$random[surv$random==1]),")")
+  if(!banks[i] %in% c("Ger")) boundary <- boundaries[boundaries$ID == banks[i],]
+  if(banks[i] %in% c("Ger")) boundary <- ger.concave
+  if(banks[i] != 'Ger') surv$`Tow type`[surv$random != 1] <- paste0('exploratory (n = ',length(surv$random[surv$random!=1]),")")
+  if(banks[i] == 'Ger') surv$`Tow type`[!surv$random %in% c(1,3)] <- paste0('exploratory (n = ',length(surv$random[!surv$random %in% c(1,3)]),")")
+  if(banks[i] == 'Ger') surv$`Tow type`[surv$random == 3] <- paste0('repeated (n = ',length(surv$random[surv$random==3]),")")
+  if(banks[i] == 'GB') surv$`Tow type`[surv$random == 3] <- paste0('regular (n = ',length(surv$random[surv$random==3]),")")
+  # Get the shapes for symbols we want, this should do what we want for all cases we've ever experienced...
+  if(length(unique(surv$`Tow type`)) ==1) shp <- 16; ptcol <- c("black")
+  if(!banks[i] == "Ger" & length(unique(surv$`Tow type`)) ==2) shp <- c(24,16); ptcol <- c("transparent", "black")
+  if(banks[i] == "Ger" & length(unique(surv$`Tow type`))==2) shp <- c(16,22); ptcol <- c("black", "black")
+  if(length(unique(surv$`Tow type`)) ==3) shp <- c(24,16,22); ptcol <- c("transparent", "black", "black")
+  ncol <- 8
+  if(banks[i] %in% c("GBb", "BBs")) ncol <- 10
+  if(banks[i] == "Ger") ncol <- 7
+  if(banks[i] == "Ban") ncol <- 3
+  by <- 0.3
+  if(banks[i]=="Sab") by <- 1
+  
+  
+  png(filename=paste0(plotsGo, "/Survey/", nickname, "/stations_", banks[i], ".png"),width=16, height=8, units = "in", res=420)
+  print(ggplot() + geom_sf(data=boundary, fill=NA) + 
+          geom_sf(data=surv, aes(shape=`Tow type`)) + 
+          scale_shape_manual(values = shp, guide=guide_legend(order=4)) +
+          facet_wrap(~year, ncol=ncol) + 
+          theme_bw() +
+          theme(legend.position = 'bottom',legend.direction = 'horizontal',
+                legend.justification = 'centre',legend.key.size = unit(.5,"line"),
+                legend.key = element_rect(fill = NA)) +
+          scale_x_continuous(breaks = seq(from = -180, to = 180, by = by))
+  )
+  dev.off()
+}
+
+```
+
 # offshore map
 ```{r}
 
@@ -1251,17 +1305,8 @@ table(check$sfa, check$ID.1) # relatively few misattributed records. Use interse
 fish_sf$sfa <- fish_sf$ID.1
 
 fishery <- fish_sf %>% 
-  dplyr::filter(!bank %in% c("GBa")) %>%
-  dplyr::filter(!is.na(bank)) %>%
-  dplyr::group_by(bank, year) %>%
-  dplyr::summarize(catch = sum(pro.repwt, na.rm=T),
-            effort=sum(hm, na.rm=T))
-
-fishery$sfa[fishery$bank %in% c("Ban", "Sab", "Mid")] <- 25
-fishery$sfa[fishery$bank %in% c("BBn", "BBs", "Ger", "BB")] <- 26
-fishery$sfa[fishery$bank %in% c("GBb")] <- 27
-
-fishery <- fishery[fishery$sfa %in% 25:27,]
+  dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
+  dplyr::filter(!is.na(bank))
 
 cpue <- NULL
 for(bank in unique(fishery$bank)){
@@ -1271,18 +1316,28 @@ for(bank in unique(fishery$bank)){
   cpue <- rbind(cpue, jack)
 }
 
+fishery <- fishery %>% 
+  dplyr::group_by(bank, year) %>%
+  dplyr::summarize(catch_raw = sum(pro.repwt, na.rm=T),
+            effort_raw=sum(hm, na.rm=T))
+
+fishery <- full_join(fishery, cpue)
+
+#unique(fishery[!fishery$catch_raw==fishery$catch,]$year) # all earlier than 2009, good
+# fixing the calculations of effort based on cpue pre-2009
+fishery$effort[!fishery$catch_raw==fishery$catch & !is.na(fishery$catch)] <- fishery$catch_raw[!fishery$catch_raw==fishery$catch & !is.na(fishery$catch)] / fishery$cpue[!fishery$catch_raw==fishery$catch & !is.na(fishery$catch)]
+fishery$catch <- fishery$catch_raw
+
+fishery <- dplyr::select(fishery, -catch_raw, -effort_raw)
+
 years <- expand.grid(year=1980:2022, bank=unique(fishery$bank))
-
 fishery <- left_join(years, as.data.frame(fishery))
-cpue <- left_join(years, as.data.frame(cpue))
-
-cpue$sfa[cpue$bank %in% c("Ban", "Sab", "Mid")] <- 25
-cpue$sfa[cpue$bank %in% c("BBn", "BBs", "Ger", "BB")] <- 26
-cpue$sfa[cpue$bank %in% c("GBb")] <- 27
 
 fishery$sfa[fishery$bank %in% c("Ban", "Sab", "Mid")] <- 25
 fishery$sfa[fishery$bank %in% c("BBn", "BBs", "Ger", "BB")] <- 26
 fishery$sfa[fishery$bank %in% c("GBb")] <- 27
+
+fishery <- fishery[fishery$sfa %in% 25:27,]
 
 if(french==F) cpuelab <- expression(paste("Catch per unit effort  ",bgroup("(",frac(kg,hm)   ,")")))
 if(french==T) cpuelab <- expression(paste("Captures par unité d’effort  ",bgroup("(",frac(kg,hm)   ,")")))
@@ -1298,15 +1353,6 @@ fishery$subarea[fishery$bank=="BBs"] <- "26B"
 fishery$subarea[fishery$bank=="Ger"] <- "26C"
 fishery$subarea[fishery$bank=="GBb"] <- "27B"
 
-cpue$subarea[cpue$bank=="Mid"] <- "25A-Mid"
-cpue$subarea[cpue$bank=="Sab"] <- "25A-Sab"
-cpue$subarea[cpue$bank=="Ban"] <- "25B"
-cpue$subarea[cpue$bank=="BBn"] <- "26A"
-cpue$subarea[cpue$bank=="BBs"] <- "26B"
-cpue$subarea[cpue$bank=="Ger"] <- "26C"
-cpue$subarea[cpue$bank=="GBb"] <- "27B"
-
- 
 for(sfa in 25:27){
   png(filename=paste0(plotsGo, "/Fishery/fishery_", sfa, fr, ".png"),width=6.5*1.5, height=4*1.5, units = "in", res=420)
   kg <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=subarea, shape=subarea), size=2) +
@@ -1326,9 +1372,9 @@ for(sfa in 25:27){
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
     ylab(paste0(en2fr("Effort", translate=french, custom_terms=rosetta_terms), " (", en2fr("hour-metre", translate=french, custom_terms=rosetta_terms), ")"))
   
-  cp <- ggplot() + geom_point(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=subarea, shape=subarea), size=2) +
-    geom_line(data=cpue[cpue$sfa==sfa,], aes(year, cpue, colour=subarea)) +
-    geom_errorbar(data=cpue[cpue$sfa==sfa,], aes(x=year, ymax=UCI, ymin=LCI, colour=subarea), width=0) +
+  cp <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, cpue, colour=subarea, shape=subarea), size=2) +
+    geom_line(data=fishery[fishery$sfa==sfa,], aes(year, cpue, colour=subarea)) +
+    geom_errorbar(data=fishery[fishery$sfa==sfa,], aes(x=year, ymax=UCI, ymin=LCI, colour=subarea), width=0) +
     theme_bw() +
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
     scale_shape_discrete(name=man.unit) +
@@ -1340,6 +1386,8 @@ for(sfa in 25:27){
   dev.off()
 }
 
+
+#labels for mapping
 labels <- github_spatial_import(subfolder = "other_boundaries/labels", zipname = "labels.zip")
 labels <- labels[grepl('offshore_detailed',labels$region),]
 
@@ -1391,6 +1439,7 @@ nonGB$nudgey[nonGB$SFA %in% "SFA25B"] <- 10000
 nonGB$nudgex[nonGB$SFA %in% "SFA25A"] <- 0
 nonGB$nudgey[nonGB$SFA %in% "SFA25A"] <- 0
 
+# calculating footprints
 for(sfa in 25:27){
   
   if(sfa==25) { 
@@ -1463,6 +1512,7 @@ for(sfa in 25:27){
   dev.off()
 }  
 
+# for TAC and Landings figure
 #tac <- read.csv("Y:/Offshore/Assessment/Data/Model/Ref_pts_and_tac.csv")
 tac2 <- read.csv("C:/Users/keyserf/Downloads/RE2795A Fleet Quota Monitoring Report.csv")
 tac3 <- read.csv("Y:/Offshore/Resource Management/Fishing_and_TAC/TAC_Landings_IFMP.csv")
@@ -1578,8 +1628,16 @@ dev.off()
 
 # exploitation rates (relative, not modelled)
 # using survey year, so June to May
-fish.dat$surv.year <- fish.dat$year 
-fish.dat$month <- lubridate::month(lubridate::ymd(fish.dat$fished))
+
+
+load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
+
+fish.dat <- fish.dat[!is.na(fish.dat$lon),]
+fish.dat <- fish.dat[!is.na(fish.dat$lat),]
+fish.dat <- fish.dat[!fish.dat$lon==0,]
+fish.dat <- fish.dat[!fish.dat$lat==0,]
+# bbn.fish_dk$month <- lubridate::month(bbn.fish_dk$date)
+fish.dat$month <- lubridate::month(lubridate::ymd(fish.dat$date))
 fish.dat$sfa[grep(x=fish.dat$sfa, "25")] <- 25
 fish.dat$sfa[grep(x=fish.dat$sfa, "26")] <- 26
 fish.dat$sfa[grep(x=fish.dat$sfa, "27")] <- 27
@@ -1587,11 +1645,23 @@ fish.dat$sfa[fish.dat$bank %in% c("Ban", "Sab","Mid")] <- 25
 fish.dat$sfa[fish.dat$bank %in% c("BBn", "BBs", "Ger")] <- 26
 fish.dat$sfa[fish.dat$bank %in% c("GBb")] <- 27
 
-# fish.dat$surv.year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26]+1
-# fish.dat$surv.year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27]+1
-
+fish.dat$surv.year <- fish.dat$year 
 fish.dat$surv.year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26]-1
 fish.dat$surv.year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27]-1
+
+strata <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
+fish_sf2 <- st_as_sf(fish.dat, coords=c("lon", "lat"), remove=F, crs=4326) %>% st_transform(32619)
+fish_sf2 <- st_intersection(fish_sf2, st_transform(strata, 32619))
+fish.dat2 <- fish.dat #safekeeping
+fish.dat <- fish_sf2
+#st_geometry(fish.dat) <- NULL
+
+by.sy <- fish.dat %>% data.frame() %>%  group_by(bank, surv.year)%>%   summarize(sum = sum(pro.repwt/1000))
+
+by.sy[by.sy$bank=="BBn" & by.sy$surv.year>1990,]
+
+# fish.dat$surv.year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26]+1
+# fish.dat$surv.year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27]+1
 
 #tail(fish.dat[, c("fished", "month", "year", "surv.year")], 50)
 survey.yr <- fish.dat %>%

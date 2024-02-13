@@ -102,7 +102,7 @@ qqplot.data <- function (dat,facet=F, ncol=NULL,...)
 
 # Start analysis
 
-banker <- "Sab"
+banker <- "BBs"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
@@ -713,7 +713,8 @@ p3 <- ggplot(r.tow %>% dplyr::filter(year %in% y3)) +
                      name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
                      breaks = seq(0,100,by=20)) +
   theme_bw()
-
+by.y <- 25
+if(banker == "BBs") by.y <- 10
 pall <- ggplot(r.tow %>% dplyr::filter(year %in% 1992:2022)) +
   geom_point(data=sub %>% dplyr::filter(year %in% 1992:2022),aes(x=sh,y=wmw),color=blues, size=0.5, alpha=0.5) +
   geom_line(aes(x=sh,y=mw,group=tow),color=yellows, size=0.25)+
@@ -724,7 +725,7 @@ pall <- ggplot(r.tow %>% dplyr::filter(year %in% 1992:2022)) +
                      breaks = seq(0,200,by=25), expand = c(0.01,0.01)) +
   scale_y_continuous(limits = c(0,sub %>% dplyr::summarise(max(wmw,na.rm=T)) %>% as.numeric()),
                      name = paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)"),
-                     breaks = seq(0,100,by=25)) +
+                     breaks = seq(0,100,by=by.y)) +
   theme_bw()
 
 # Ok so final thing is to show the depth effects, I was gonna get fancy but why bother.. it's easy...

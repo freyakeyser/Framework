@@ -65,6 +65,10 @@ ps_tab$`Stock`[ps_tab$`Stock`=="GBb"] <- "27B"
 
 ps_tab <- dplyr::select(ps_tab, SFA, `Stock`, Bank, Label, 3:10)
 ps_tab <- arrange(ps_tab, Label)
+ps_tab$`Long term median MW (g)` <- round(ps_tab$`Long term median MW (g)`, 1)
+ps_tab$`Standard deviation MW (g)` <- round(ps_tab$`Standard deviation MW (g)`, 1)
+ps_tab$`Minimum MW (g)` <- round(ps_tab$`Minimum MW (g)`, 1)
+ps_tab$`Maximum MW (g)` <- round(ps_tab$`Maximum MW (g)`, 1)
 
 mwsh_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/AICtable.csv")
 mwsh_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/AICtable.csv")
@@ -207,7 +211,7 @@ opts <- options(knitr.kable.NA = "")
 #   )
 # )
 
-csas_table(ps_tab, caption ="Summary of port sampling data for SFAs 25, 26, and 27B from 2006—2022, describing sampling distribution and meat weights (MW) in grams (g).") %>% 
+csas_table(ps_tab, caption ="Summary of port sampling (PS) data for SFAs 25, 26, and 27B from 2006—2022, describing sampling distribution and meat weights (MW) in grams (g).") %>% 
   kableExtra::row_spec(0,bold=TRUE) %>% 
   kableExtra::row_spec(0,bold=ifelse(ps_tab$`Stock`%in% c("26A-BBn", "25A-Sab"), TRUE, FALSE))
 
@@ -225,7 +229,7 @@ csas_table(ps_tab, caption ="Summary of port sampling data for SFAs 25, 26, and 
 #   )
 # )
 
-csas_table(strata, caption ="Current survey design and allocation information for SFAs 25, 26, and 27B. Stratum areas are provided in square kilometres (km^2^), and Universal Transverse Mercator Zones area in the northern hemisphere. Catch rates used for stratification are reported in kilograms per hour-metre (kg/hm). Some columns are not applicable (NA) for certain Stocks.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(strata, caption ="Current survey design and allocation information for SFAs 25, 26, and 27B. Stratum areas are provided in square kilometres (km^2^), and Universal Transverse Mercator zones are in the northern hemisphere. Catch rates used for stratification are reported in kilograms per hour-metre (kg/hm). Some columns are not applicable (NA) for certain Stocks.") %>% kableExtra::row_spec(0,bold=TRUE)
 #qflextable(strata)
 
 #<!---BLOCK_LANDSCAPE_START--->
@@ -287,6 +291,20 @@ csas_table(age_summary, caption ="Tow, shell, and increment counts associated wi
 #<!---BLOCK_LANDSCAPE_START--->
 ```
 
+```{r age-inc, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+csas_table(inc, caption ="Summary of age assignments and measurements for SFA 25A Sable Bank and SFA 26A Browns Bank North. Median increment height is measured in millimetres (mm). Standard deviation (SD) in increment height is provided in parentheses.") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
 
 ```{r rec-size, echo=F, message=F}
 #<!---BLOCK_LANDSCAPE_START--->
@@ -298,22 +316,6 @@ csas_table(age_summary, caption ="Tow, shell, and increment counts associated wi
 # )
 
 csas_table(rec_size, caption ="Recruit size ranges (mm) for SFAs 25, 26, and 27B used to calculate survey indices.") %>% kableExtra::row_spec(0,bold=TRUE)
-
-#qflextable(strata)
-
-#<!---BLOCK_LANDSCAPE_START--->
-```
-
-
-```{r age-inc, echo=F, message=F}
-#<!---BLOCK_LANDSCAPE_START--->
-# block_section(
-#   prop_section(
-#     page_size = page_size(orient = "landscape"),
-#     type="continuous"
-#   )
-# )
-csas_table(inc, caption ="Summary of age assignments and measurements for SFA 25A Sable Bank and SFA 26A Browns Bank North. Median increment height is measured in millimetres (mm). Standard deviation (SD) in increment height is provided in parentheses.") %>% kableExtra::row_spec(0,bold=TRUE)
 
 #qflextable(strata)
 

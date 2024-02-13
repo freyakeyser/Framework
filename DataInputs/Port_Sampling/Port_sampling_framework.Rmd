@@ -230,7 +230,7 @@ write.csv(ps_tab, paste0(plotsGo, "/ps_tab.csv"))
 
 # Single bank results
 ```{r}
-bank <- "BBn"
+bank <- "Sab"
 
 bbn.dat <- port.sampling[port.sampling$bank == bank,]
 
@@ -337,8 +337,8 @@ print(sh.plt)
 #                                bandwidth=5 # you may wish to adjust this
 #                                ) +
 
-if(length(unique(bbn.dat$surv.year))<6) scale_fac = 0.55
-if(length(unique(bbn.dat$surv.year))>5) scale_fac = 0.9
+
+scale_fac <- length(unique(bbn.dat$surv.year[!is.na(bbn.dat$sh)]))/length(unique(bbn.dat$surv.year))
 
 png(paste0(plotsGo, bank, "/shf_ps", fr, "_new.png"), width=6.5, height=8, units = "in", res=420)
 ggplot() + 
@@ -452,6 +452,7 @@ if(height>8) height <- 8
 if(height<4) height <- 4
 
 if(bank=="Ger") shf <- shf[shf$years>2007,]
+if(bank=="GBb") shf <- shf[!shf$years==2020,]
 
 png(paste0(plotsGo, bank, "/shf_selectivity", fr, ".png"), width=6, height=height, units = "in", res=420)
 ggplot() + geom_line(data=shf, aes(shf, value, colour=name), linewidth=1) + 
@@ -463,7 +464,135 @@ ggplot() + geom_line(data=shf, aes(shf, value, colour=name), linewidth=1) +
   scale_y_continuous(n.breaks = 3)
 dev.off()
 
+# do it all again but all sizes and cumulative density
+
+shf <- SHF.summary[[bank]]
+names(shf)[1] <- "years"
+if(bank %in% c("Sab", "BBn", "BBs", "GBb")) {
+  shf <- shf %>% tidyr::pivot_longer(cols = starts_with("V"))
+  shf$name <- gsub(x=shf$name, pattern="V", replacement="")
+}
+if(bank %in% c("Mid", "Ban", "Ger")) shf <- shf %>% tidyr::pivot_longer(cols = as.character(seq(5,200,5)))
+
+if(!any(shf$name==200)) shf$name <- (as.numeric(shf$name)-1)*5
+if(!any(shf$name==0)) shf$name <- as.numeric(shf$name)-5
+# bins go from 0-5mm to 195-200mm, labelled as 0 and 195 respectively
+
+shf <- shf[!is.na(shf$years),]
+
+years <- shf %>%
+  dplyr::group_by(years) %>%
+  dplyr::summarize(total=sum(value))
+
+shf <- left_join(shf, years)
+shf$density <- shf$value/shf$total
+shf$name <- as.numeric(shf$name)
+
+# need these wonky bins to get the "steps" for the plot
+bins <- data.frame(shf=seq(5,204.9,0.1),
+                   name=rep(seq(5,200,5), each=50))
+yearsbins <- data.frame(years=rep(unique(shf$years), each=length(seq(5,200,5))), 
+                        name=rep(seq(5,200,5), length(unique(shf$years))))
+bins <- full_join(bins, yearsbins, relationship="many-to-many")
+
+shf <- full_join(shf, bins)
+
+# get the range of years with data, blanks in missing years
+shf <- left_join(data.frame(years = min(shf$years, na.rm=T):max(shf$years, na.rm=T)), shf)
+shf$bank <- bank
+
+# do the same for the PS data
+shfps <- bbn.dat[!is.na(bbn.dat$sh),]
+shfps <- shfps[shfps$month %in% c(4:8),]
+
+shfps.yr <- shfps %>%
+  dplyr::group_by(surv.year) %>%
+  dplyr::summarize(total=n())
+
+shfps <- shfps %>%
+  dplyr::mutate(bin = cut(sh, breaks=seq(5,210,5), right=F)) %>% # gotta go above 200 since these are estimates (not 5mm bins)
+  dplyr::group_by(surv.year, bin) %>%
+  dplyr::summarize(value=n())
+
+shfps <- left_join(shfps, shfps.yr)
+shfps$density <- shfps$value/shfps$total
+# tidy up the brackets
+bins <- unlist(strsplit(x = as.character(shfps$bin), split=","))
+bins <- bins[grep(x=bins,pattern="[", fixed=T)]
+bins <- gsub(x=bins, pattern="[", replacement="", fixed=T)
+shfps$name <- bins # named for lower bound
+
+bins <- data.frame(shf=seq(5,214.9,0.1),
+                   name=rep(seq(5,210,5), each=50))
+yearsbins <- data.frame(years=rep(unique(shfps$surv.year), each=length(seq(5,210,5))), 
+                        name=rep(seq(5,210,5), length(unique(shfps$surv.year))))
+bins <- full_join(bins, yearsbins, relationship="many-to-many")
+
+shfps$name <- as.numeric(shfps$name)
+names(shfps)[names(shfps)=="surv.year"] <- "years"
+shfps <- full_join(shfps, bins) # has NAs
+
+shfps <- left_join(data.frame(years = min(shfps$years, na.rm=T):max(shfps$years, na.rm=T)), shfps) # should not be removing NAs for these years
+shfps$bank <- bank
+
+shfps <- dplyr::select(shfps, bank, years, name, shf, density)
+shfps$density[is.na(shfps$density)] <- 0
+names(shfps) <- c("bank", "years", "name", "shf", "density_ps")
+shfps$name <- as.numeric(shfps$name)
+
+# getting ready to join survey with fishery
+shf <- unique(dplyr::select(shf, bank, years, name, shf, density))
+
+# years with port sampling data
+#shfps.yr$surv.year # this is NOT survey year any more, just labelled as such
+
+shf <- full_join(shf, shfps)
+shf <- shf[shf$years %in% shfps.yr$surv.year,]
+names(shf)[names(shf)=="name"] <- "bin"
+shf <- shf %>% tidyr::pivot_longer(cols = starts_with("d"))
+
+height <- length(unique(shf$years)) * 2
+if(height>8) height <- 8
+if(height<4) height <- 4
+
+if(bank=="Ger") shf <- shf[shf$years>2007,]
+shf$value[is.na(shf$value)] <- 0
+shf <- shf %>%
+  dplyr::select(-shf) %>%
+  dplyr::distinct() %>%
+  dplyr::group_by(years, name) %>%
+  mutate(cumsum_d = cumsum(value))
+
+RS <- unique(survey.obj[[bank]]$model.dat$RS[survey.obj[[bank]]$model.dat$year>2020])
+CS <- unique(survey.obj[[bank]]$model.dat$CS[survey.obj[[bank]]$model.dat$year>2020])
+
+if(bank=="GBb") shf <- shf[!shf$years==2020,]
+
+xmax <- max(shf$bin[shf$value>0]) +5
+
+png(paste0(plotsGo, bank, "/shf_selectivity_cumulative", fr, ".png"), width=6, height=height, units = "in", res=420)
+print(ggplot() + 
+        geom_line(data=shf, aes(bin, cumsum_d, colour=name), linewidth=1) + 
+        facet_wrap(~years, ncol=1, strip.position="right") +
+        theme_bw() +
+        scale_colour_manual(name=NULL, labels=c("Survey", "Fishery"), values=c("blue", "black")) +
+        xlab("Shell height (5 mm bin)") +
+        ylab("Cumulative proportion of scallops measured") +
+        scale_y_continuous(n.breaks = 3, limits=c(0,1)) +
+        xlim(0,xmax)+
+        geom_vline(data=shf, xintercept=RS, linetype="dashed") +
+        geom_vline(data=shf, xintercept=CS, linetype="dashed")
+)
+dev.off()
+
 # HERE IS THE MAIN ANALYSIS FOR the BBn Res doc, shows proportion below certain sizes
+if(bank=="Ger"){
+  n.bl.105 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 105) %>% dplyr::summarise(n = length(sh))
+  n.all.bbn <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::summarise(tot = length(sh))
+  prop.bl.105 <- left_join(n.bl.105,n.all.bbn,'year')
+  prop.bl.105$prop <- prop.bl.105$n / prop.bl.105$tot
+}
+
 n.bl.100 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 100) %>% dplyr::summarise(n = length(sh))
 n.all.bbn <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::summarise(tot = length(sh))
 
@@ -474,7 +603,6 @@ ggplot(data = prop.bl.100,aes(x=year,y=prop)) +
   geom_point() + ylab("Proportion of meats below 100 mm") +
   #theme(text = element_text(size=22)) + 
   scale_x_continuous(breaks = seq(2000,2030,by=2))
-
 
 n.bl.95 <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 95) %>% dplyr::summarise(n = length(sh))
 prop.bl.95 <- left_join(n.bl.95,n.all.bbn,'year')
@@ -498,7 +626,6 @@ ggplot(data = prop.bl.90,aes(x=year,y=prop)) +
   #theme(text = element_text(size=22)) + 
   scale_x_continuous(breaks = seq(2000,2030,by=2))
 
-
 n.bl.85 <- bbn.dat %>% dplyr::group_by(year,.drop=F) %>% dplyr::filter(sh < 85) %>% dplyr::summarise(n = length(sh))
 prop.bl.85 <- left_join(n.bl.85,n.all.bbn,'year')
 prop.bl.85$prop <- prop.bl.85$n / prop.bl.85$tot
@@ -507,14 +634,20 @@ prop.bl.85$prop <- prop.bl.85$n / prop.bl.85$tot
 ggplot(data = prop.bl.85,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
-
+if(bank=="Ger") prop.bl.105$lim <- "<105"
 prop.bl.100$lim <- "<100"
 prop.bl.95$lim <- "<95"
 prop.bl.90$lim <- "<90"
 prop.bl.85$lim <- "<85"
 
-overall <- full_join(full_join(full_join(prop.bl.100, prop.bl.95), prop.bl.90), prop.bl.85)
-overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
+if(bank=="Ger") {
+  overall <- full_join(full_join(full_join(full_join(prop.bl.105, prop.bl.100), prop.bl.95), prop.bl.90), prop.bl.85)
+  overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100", "<105"))
+  }
+if(!bank=="Ger") {
+  overall <- full_join(full_join(full_join(prop.bl.100, prop.bl.95), prop.bl.90), prop.bl.85)
+  overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
+}
 
 # for text:
 yearround <- overall %>% group_by(lim) %>% summarize(median(prop))
@@ -557,25 +690,42 @@ n.all.bbn.ss <-  bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(month %in% 
 prop.bl.100.ss <- left_join(n.bl.100.ss,n.all.bbn.ss,'year')
 prop.bl.100.ss$prop <- prop.bl.100.ss$n / prop.bl.100.ss$tot
 
+if(bank=="Ger"){
+  n.bl.105.ss <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 105 & month %in% sel.months) %>% dplyr::summarise(n = length(sh))
+  n.all.bbn.ss <-  bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(month %in% sel.months) %>% dplyr::summarise(tot = length(sh))
+  prop.bl.105.ss <- left_join(n.bl.105.ss,n.all.bbn.ss,'year')
+  prop.bl.105.ss$prop <- prop.bl.105.ss$n / prop.bl.105.ss$tot
+}
+
 n.bl.85.ss <- bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(sh < 85 & month %in% sel.months) %>% dplyr::summarise(n = length(sh))
 n.all.bbn.ss <-  bbn.dat %>% dplyr::group_by(year) %>% dplyr::filter(month %in% sel.months) %>% dplyr::summarise(tot = length(sh))
 prop.bl.85.ss <- left_join(n.bl.85.ss,n.all.bbn.ss,'year')
 prop.bl.85.ss$prop <- prop.bl.85.ss$n / prop.bl.85.ss$tot
 
 
+if(bank=="Ger") prop.bl.105.ss$lim <- "<105"
 prop.bl.100.ss$lim <- "<100"
 prop.bl.95.ss$lim <- "<95"
 prop.bl.90.ss$lim <- "<90"
 prop.bl.85.ss$lim <- "<85"
 
-overall <- full_join(full_join(full_join(prop.bl.100.ss, prop.bl.95.ss), prop.bl.90.ss), prop.bl.85.ss)
-overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
-
+if(bank=="Ger"){
+  overall <- full_join(full_join(full_join(full_join(prop.bl.105.ss, prop.bl.100.ss), prop.bl.95.ss), prop.bl.90.ss), prop.bl.85.ss)
+  overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100", "<105"))
+}
+if(!bank=="Ger"){
+  overall <- full_join(full_join(full_join(prop.bl.100.ss, prop.bl.95.ss), prop.bl.90.ss), prop.bl.85.ss)
+  overall$lim <- factor(overall$lim, levels=c("<85", "<90", "<95", "<100"))
+}
 
 # This is basically under 1%, which I think will be fine.
 ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
+if(bank=="Ger"){
+  ggplot(data = prop.bl.105.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 105 mm") +
+    theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
+}
 png(paste0(plotsGo, bank, "/proportion_boxplot_ss", fr, "_new.png"), width=6.5, height=4, units = "in", res=420)
 ggplot() + 
   geom_boxplot(data=overall, aes(lim, prop, group=lim))+
@@ -592,4 +742,8 @@ overall <- full_join(yearround, ss)
 write.csv(overall, paste0(plotsGo, bank, "/boxplot_vals.csv"))
 
 # Based on the ageing work, if we go with 90 mm as our end of recruitment bin, the recruits should be 75-90 mm in size.
+
+# bonus german checks
+
+
 ```

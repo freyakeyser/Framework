@@ -15,7 +15,7 @@ require(patchwork)
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH.Rdata")
 # this is only used to get l.bar and for some final checks at the end, which do not go in Res Doc.
 
-plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/"
+plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing"
 
 french <- F # set to T for french
 if(french==T) {fr <- "_fr"}
@@ -924,7 +924,7 @@ resids_long$name2 <- factor(resids_long$name2, labels=c("gam_k3", "gam_k5", "gam
 png(paste0(plotsGo, "/", bank, "/resid.png"),width=4200, height=2100, units = "px", res=420)
 ggplot() + 
   geom_point(data=resids_long[resids_long$name %in% c("vonB", "vonB2", "gam_re_3.4f", "gam_re_5.4f"),], aes(AGE, value)) + 
-  geom_smooth(data=resids_long[resids_long$name %in% c("vonB", "vonB2", "gam_re_3.4f", "gam_re_5.4f"),], aes(AGE, value), method="lm", colour="black") + 
+  # geom_smooth(data=resids_long[resids_long$name %in% c("vonB", "vonB2", "gam_re_3.4f", "gam_re_5.4f"),], aes(AGE, value), method="lm", colour="black") + 
   facet_wrap(~name2) +
   ylab("Residuals (observed - predicted)") +
   xlab("Age") +
@@ -1049,7 +1049,7 @@ df$Model[grep(x=df$Model, pattern = "cheat2")] <- "von B (shell)"
 
 names(df)[2] <- "Formula"
 
-write.csv(x = df, paste0(plotsGo, bank, "/summary_stats.csv"))
+write.csv(x = df, paste0(plotsGo, "/", bank, "/summary_stats.csv"))
 
 ```
 
@@ -1129,7 +1129,7 @@ sh <- ggplot() +
   theme_bw() +
   theme(panel.grid=element_blank())
 
-png(paste0(plotsGo, bank, "/growth.png"),width=4200, height=2100, units = "px", res=420)
+png(paste0(plotsGo, "/", bank, "/growth.png"),width=4200, height=2100, units = "px", res=420)
 age + sh + plot_layout(guides="collect")  
 dev.off()
 # SH of 95-100 is 15mm (80-95 or 85-100mm)
@@ -1208,7 +1208,7 @@ dev.off()
 png(paste0(plotsGo, "/", bank, "/resid_vb", fr, ".png"),width=6.5, height=5, units = "in", res=420)
 ggplot() + 
   geom_point(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value)) + 
-  geom_smooth(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value), method="lm", colour="black") + 
+  #geom_smooth(data=resids_long[resids_long$name %in% c("vonB"),], aes(AGE, value), method="lm", colour="black") + 
   #facet_wrap(~name2) +
   ylab(en2fr("Residuals", translate=french, custom_terms=rosetta_terms)) +
   xlab(en2fr("Age", translate=french, custom_terms=rosetta_terms)) +
@@ -1234,7 +1234,7 @@ sh <- ggplot() +
   theme_bw() +
   theme(panel.grid=element_blank())
 
-png(paste0(plotsGo, bank, "/growth_vb", fr, ".png"), width=6.5, height=4, units = "in", res=420)
+png(paste0(plotsGo, "/", bank, "/growth_vb", fr, ".png"), width=6.5, height=4, units = "in", res=420)
 age + sh + plot_layout(guides="collect")  
 dev.off()
 
