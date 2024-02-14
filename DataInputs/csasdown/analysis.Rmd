@@ -703,7 +703,7 @@ tab_cf <- cfts %>%
   group_by(subarea, type) %>%
   summarize(LTM=median(CF, na.rm=T)) %>%
   mutate(index="CF", liner=type) %>%
-  select(-type)
+  dplyr::select(-type)
 
 bankpertow_all_sub <- bankpertow_all[bankpertow_all$recsize=="75-90" | bankpertow_all$subarea=="27B",]
 
@@ -711,7 +711,7 @@ tab_sts <- bankpertow_all_sub %>%
   group_by(subarea, liner, index, size) %>%
   summarize(LTM=median(index.val, na.rm=T)) %>%
   mutate(index =paste0(index, size)) %>%
-  select(-size)
+  dplyr::select(-size)
 
 tab_sts <- full_join(tab_clap, tab_cf) %>% full_join(tab_sts) %>%
   pivot_wider(names_from = index, values_from = LTM) %>%
