@@ -939,38 +939,53 @@ dev.off()
 ```{r growth, echo=F, include=F}
 # from dave
 library(tidyverse)
-repo.loc <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/Model/" #VERY SLOW!!
-num.knots <- 20 
-init.m <- 0.2 
-qR <- 0.33
-g.mod <- 'g_original'
-vary.q <- T
-R.size <- "75"
-FR.size <- "90"
-years <- 1994:2022
-mod.select <- "SEAM"
+# repo.loc <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/Model/" #VERY SLOW!!
+# num.knots <- 20 
+# init.m <- 0.2 
+# qR <- 0.33
+# g.mod <- 'g_original'
+# vary.q <- T
+# R.size <- "75"
+# FR.size <- "90"
+# years <- 1994:2022
+# mod.select <- "SEAM"
+# 
+# scenario.10 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",10,"_knots_",'g_original')
+# scenario.20 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",20,"_knots_",'g_original')
+# 
+# # SEAM results
+# sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
+# bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
+bbn.20 <- read.csv("C:/Users/keyserf/Documents/temp_data/BBn_input_data_for_freya.csv")
+bbn.20 <- bbn.20[bbn.20$year %in% years,]
 
-scenario.10 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",10,"_knots_",'g_original')
-scenario.20 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",20,"_knots_",'g_original')
-
-# SEAM results
-sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
-bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
+sab.10 <- read.csv("C:/Users/keyserf/Documents/temp_data/Sab_mod_input_for_freya.csv")
+sab.10 <- sab.10[sab.10$year %in% years,]
 
 # Extract growth
 
-sab.gs <- data.frame(g = c(sab.10$obj$env$data$gI[-length(sab.10$obj$env$data$gI)]),
-                     gR = c(sab.10$obj$env$data$gR[-length(sab.10$obj$env$data$gR)]),
+# sab.gs <- data.frame(g = c(sab.10$obj$env$data$gI[-length(sab.10$obj$env$data$gI)]),
+#                      gR = c(sab.10$obj$env$data$gR[-length(sab.10$obj$env$data$gR)]),
+#                      year = years) %>%
+#   pivot_longer(cols=c("g", "gR"))
+sab.gs <- data.frame(g = c(sab.10$g),
+                     gR = c(sab.10$gR),
                      year = years) %>%
   pivot_longer(cols=c("g", "gR"))
+
 sab.gs$name <- gsub(x=sab.gs$name, pattern="gR", replacement="Recruit")
 sab.gs$name <- gsub(x=sab.gs$name, pattern="g", replacement="Fully recruited")
 sab.gs$name <- factor(sab.gs$name, levels=c("Recruit", "Fully recruited"))
 
-bbn.gs <- data.frame(g = c(bbn.20$obj$env$data$gI[-length(bbn.20$obj$env$data$gI)]),
-                     gR = c(bbn.20$obj$env$data$gR[-length(bbn.20$obj$env$data$gR)]),
+# bbn.gs <- data.frame(g = c(bbn.20$obj$env$data$gI[-length(bbn.20$obj$env$data$gI)]),
+#                      gR = c(bbn.20$obj$env$data$gR[-length(bbn.20$obj$env$data$gR)]),
+#                      year = years,
+#                      version = "new")
+bbn.gs <- data.frame(g = c(bbn.20$g),
+                     gR = c(bbn.20$gR),
                      year = years,
                      version = "new")
+
 
 # old way for bbn
 load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input.RData")

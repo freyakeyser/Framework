@@ -317,6 +317,8 @@ for(i in 1:length(years))
   # bbn.dat$sh[bbn.dat$year == years[i]] <- 100*(bbn.dat$meat_weight[bbn.dat$year == years[i]]/all.may$a[i])^(1/3)
 }
 
+bbn.dat$sh[bbn.dat$year==2020] <- NA
+
 sh.plt <- ggplot(bbn.dat,aes(date,sh)) + 
   geom_point(alpha = 0.05,size=0.2) +
   #geom_smooth(method = 'gam')+
@@ -355,6 +357,7 @@ dev.off()
 # combine with survey SHF
 shf <- SHF.summary[[bank]]
 names(shf)[1] <- "years"
+shf <- shf[!shf$years==2020,]
 if(bank %in% c("Sab", "BBn", "BBs", "GBb")) {
   shf <- shf %>% tidyr::pivot_longer(cols = starts_with("V"))
   shf$name <- gsub(x=shf$name, pattern="V", replacement="")
