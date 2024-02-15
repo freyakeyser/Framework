@@ -577,21 +577,21 @@ dev.off()
 
 # get values for doc
 
-# cfts %>% 
-#   tidyr::pivot_wider(names_from = version, values_from = CF) %>%
-#   dplyr::mutate(new/old) %>%
-#   dplyr::group_by(subarea) %>%
-#   dplyr::summarize(med = median(`new/old`, na.rm=T))
-# 
+cfts %>%
+  tidyr::pivot_wider(names_from = version, values_from = CF) %>%
+  dplyr::mutate(new/old) %>%
+  dplyr::group_by(subarea) %>%
+  dplyr::summarize(med = median(`new/old`, na.rm=T))
+
 #   subarea   med
 #   <chr>   <dbl>
 # 1 25A-Mid 1.07 
 # 2 25A-Sab 1.02 
 # 3 25B     1.03 
-# 4 26A     1.01 
-# 5 26B     1.06 
-# 6 26C     0.963
-# 7 27B     1.01 
+# 4 26A     1.02 
+# 5 26B     1.07 
+# 6 26C     0.937
+# 7 27B     1.01  
 
 
 # clappers
@@ -956,10 +956,10 @@ library(tidyverse)
 # # SEAM results
 # sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
 # bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
-bbn.20 <- read.csv("C:/Users/keyserf/Documents/temp_data/BBn_input_data_for_freya.csv")
+bbn.20 <- read.csv("C:/Users/keyserf/Documents/temp_data/BBn_input_data_for_freya 2.csv")
 bbn.20 <- bbn.20[bbn.20$year %in% years,]
 
-sab.10 <- read.csv("C:/Users/keyserf/Documents/temp_data/Sab_mod_input_for_freya.csv")
+sab.10 <- read.csv("C:/Users/keyserf/Documents/temp_data/Sab_mod_input_for_freya 2.csv")
 sab.10 <- sab.10[sab.10$year %in% years,]
 
 # Extract growth
@@ -1003,6 +1003,10 @@ if(french==T){
   growth$version <- gsub(x=growth$version, pattern="new", replacement="nouveau")
   #growth$version <- gsub(x=growth$version, pattern="vonB only", replacement="vonB seulement")
 }
+
+# remove missing data years
+growth[growth$year %in% 2019:2020,]$value <- NA
+sab.gs[sab.gs$year %in% 2014:2015,]$value <- NA
 
 png(filename=paste0(plotsGo, "/Survey/", nickname, "/growth_BBn.png"),width=6.5, height=4, units = "in", res=420)
 ggplot() + 

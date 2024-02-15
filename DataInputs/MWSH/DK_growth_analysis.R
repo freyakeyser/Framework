@@ -20,7 +20,7 @@ library(arm)
 
 
 # hydration data
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_oldMWSH_GBb.RData")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 # used for mw data, to develop new MWSH model
 #load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90_newareas_issue120.RData")
 
@@ -101,9 +101,30 @@ qqplot.data <- function (dat,facet=F, ncol=NULL,...)
   print(p)
 } # end fun
 
+# overview table
+
+mwsh.samples <- NULL
+for(bank in names(mw.dat.all)) {
+  med_depth <- median(all.surv.dat[all.surv.dat$bank==bank & all.surv.dat$year %in% 2010:2022,]$depth)
+
+  mw.dat.all[[bank]]$depth_cen <- mw.dat.all[[bank]]$depth - med_depth
+
+  out <- mw.dat.all[[bank]] %>%
+    dplyr::group_by(year) %>%
+    dplyr::summarize(ntows = length(unique(tow)),
+                     nsamples = length(tow),
+                     bank = bank,
+                     depth_median = median(depth),
+                     depth_cen_median = median(depth_cen))
+  mwsh.samples <- rbind(mwsh.samples, out)
+}
+mwsh.samples <- mwsh.samples %>%
+  dplyr::select(bank, year, ntows, nsamples, depth_median, depth_cen_median)
+write.csv(mwsh.samples, "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/mwsh.samples.csv")
+
 # Start analysis
 
-banker <- "Mid"
+banker <- "Sab"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
@@ -116,15 +137,18 @@ sub <- sub %>% dplyr::filter(sh >= 65)
 # which may come in handy later (or may not)
 sh.cond <- 100
 sub$log.sh.cen <- log(sub$sh) - log(sh.cond)
+
+# Also need to update the survey data.
+all.sub <- all.surv.dat[!all.surv.dat$year %in% 2020 & all.surv.dat$bank==banker,]
+
 # Same idea here, if we center depth on the bank median, then our intercept is the condition at the median
 # Bank depth, which should be our measure of condition
 #Going to say median depth of the survey tows between 2010 and 2022 see above
 # For BBn this is 75 meters, which makes loads of sense. So Center the depth at the bank mean
-med.depth <- sub %>% dplyr::filter(year %in% 2010:2022) %>% dplyr::summarise(med = median(depth,na.rm=T)) %>% signif(digits=2)
+med.depth <- all.sub %>% dplyr::filter(bank == banker & year %in% 2010:2022) %>% dplyr::summarise(med = median(depth,na.rm=T)) %>% signif(digits=2)
 sub$depth.cen <- sub$depth - med.depth$med
-# Also need to update the survey data.
-all.surv.dat <- all.surv.dat[!all.surv.dat$year %in% 2020,]
-all.surv.dat$depth.cen <- all.surv.dat$depth - med.depth$med
+all.sub$depth.cen <- all.sub$depth - med.depth$med
+
 
 # We need tow to be unique by year, ooh, so we have the 0 tow problem here, need
 # to make up something that gets us a unique tow for the 0s..
@@ -382,7 +406,7 @@ for(i in 1:n.yrs)
 
     if(any(grepl("failed to converge",  mod.res[[as.character(yrs[i])]]@optinfo$conv$lme4$messages))|
        any(grepl("unidentifiable",  mod.res[[as.character(yrs[i])]]@optinfo$conv$lme4$messages))){
-      warning <- data.frame(year = yrs[i], warn = mod.res[[as.character(yrs[i])]]@optinfo$conv$lme4$messages)
+      warning <- data.frame(year = yrs[i], warn = as.character(mod.res[[as.character(yrs[i])]]@optinfo$conv$lme4$messages))
       warningsdf <- rbind(warningsdf, warning)
     }
   }
@@ -559,7 +583,7 @@ mwsh.curve <- NULL
 for(i in 1:n.yrs)
 {
   mw.dat <- sub %>% dplyr::filter(year== yrs[i])
-  s.dat <- all.surv.dat %>% dplyr::filter(bank==banker & year == yrs[i]) %>% filter(state=="live")
+  s.dat <- all.sub %>% dplyr::filter(bank==banker & year == yrs[i]) %>% filter(state=="live")
   ntows <- length(unique(mw.dat$tow))
   mod.r <- mod.res[[as.character(yrs[i])]]
   # Now try and do the predictions

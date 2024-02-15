@@ -568,6 +568,10 @@ shf <- shf %>%
 
 RS <- unique(survey.obj[[bank]]$model.dat$RS[survey.obj[[bank]]$model.dat$year>2020])
 CS <- unique(survey.obj[[bank]]$model.dat$CS[survey.obj[[bank]]$model.dat$year>2020])
+if(bank== "Ger"){
+  RS <- unique(lined.survey.obj$model.dat$RS[lined.survey.obj$model.dat$year>2020])
+  CS <- unique(lined.survey.obj$model.dat$CS[lined.survey.obj$model.dat$year>2020])
+}
 
 if(bank=="GBb") shf <- shf[!shf$years==2020,]
 

@@ -1,0 +1,28 @@
+---
+title: "Presentation"
+output:
+  slidy_presentation: default
+  beamer_presentation: default
+  ioslides_presentation: default
+date: "2024-02-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F)
+language <- "english"
+nickname <- "framework5"
+fr <-""
+MWSH <- "_newMWSH"
+```
+
+
+### slide
+
+
+```{r map, echo=F, fig.cap="Map showing the offshore Scallop Fishing Areas (SFAs) used for management purposes in the Maritimes Region."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Offshore_banks.png"))
+```
+
+```{r hist, echo=F, fig.cap="Total allowable catch (TAC) levels (tonnes, black outlined bars), and catch (landings, tonnes, grey shading) from SFAs 25 (A), 26 (B) and 27B (C) by management unit. TACs were not used on the Eastern Scotian Shelf until 1995, however fishing was allowed. SFA 25A and 25B were treated as one management unit and SFA 26A and SFA 26B were treated as one management unit until 1998. Prior to 1998, fishing in SFA 27B was combined with fishing in SFA 27A (not shown)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Fishery/tac", fr, ".png"))
+```
