@@ -151,7 +151,7 @@ csas_table(bbn.20.parm.table,caption="Parameter predictions and their standard e
 
 \newpage
 ```{r sfa-25-bssm-bias-table,include=T,echo=F}
-csas_table(bias.sab.bssm.clean,caption ="Annual retrospective results from BSSM in SFA 25A. Positive values indicate the retrospective model predictions were higher than that full model.
+csas_table(bias.sab.bssm.clean,caption ="Annual retrospective results from BSSM in SFA 25A. Positive values indicate the retrospective model predictions were higher than the full model.
                                            The Fully-recruited Biomass ($BD_{fr,t,retro}$) and Recruit Biomass ($BD_{r,t,retro}$) retrospectives are in tonnes.
                                           The natural mortality retrospective (instantaneous) is $MD_{t,retro}$. The relative metrics, $RBD_{fr,t,retro}$, $RBD_{r,t,retro}$, and $RMD_{t,retro}$                                            are the proportional differences between the retrospective model and the full model for fully-recruited biomass, recruit biomass, and natural mortality                                                    respectively. The year represents the terminal year used to compare with the full model.")
 
@@ -161,7 +161,7 @@ csas_table(bias.sab.bssm.clean,caption ="Annual retrospective results from BSSM 
 \newpage
 ```{r sfa-25-bias-table,include=T,echo=F}
 csas_table(bias.sab.clean,caption ="Annual retrospective results from SEAM in SFA 25A. Positive values indicate the retrospective
-                              model predictions were higher than that full model. The Fully-recruited Biomass ($BD_{fr,t,retro}$) and Recruit Biomass ($BD_{r,t,retro}$) retrospectives are in tonnes.
+                              model predictions were higher than the full model. The Fully-recruited Biomass ($BD_{fr,t,retro}$) and Recruit Biomass ($BD_{r,t,retro}$) retrospectives are in tonnes.
                               The natural mortality retrospective (instantaneous) is $MD_{t,retro}$. The relative metrics, $RBD_{fr,t,retro}$, $RBD_{r,t,retro}$, and $RMD_{t,retro}$ are the
                               proportional differences between the retrospective model and the full model for fully-recruited biomass, recruit biomass, and natural mortality respectively.
                               The year represents the terminal year used to compare with the full model.")
@@ -171,7 +171,7 @@ csas_table(bias.sab.clean,caption ="Annual retrospective results from SEAM in SF
 \newpage
 ```{r sfa-26-bssm-bias-table,include=T,echo=F}
 csas_table(bias.bbn.bssm.clean,caption ="Annual retrospective results from BSSM in SFA 26A. Positive values indicate the retrospective
-                              model predictions were higher than that full model. The Fully-recruited Biomass ($BD_{fr,t,retro}$) and Recruit Biomass ($BD_{r,t,retro}$) retrospectives are in tonnes.
+                              model predictions were higher than the full model. The Fully-recruited Biomass ($BD_{fr,t,retro}$) and Recruit Biomass ($BD_{r,t,retro}$) retrospectives are in tonnes.
                               The natural mortality retrospective (instantaneous) is $MD_{t,retro}$. The relative metrics, $RBD_{fr,t,retro}$, $RBD_{r,t,retro}$, and $RMD_{t,retro}$ are the
                               proportional differences between the retrospective model and the full model for fully-recruited biomass, recruit biomass, and natural mortality respectively.
                               The year represents the terminal year used to compare with the full model.")
@@ -182,7 +182,7 @@ csas_table(bias.bbn.bssm.clean,caption ="Annual retrospective results from BSSM 
 \newpage
 ```{r sfa-26-bias-table,include=T,echo=F}
 csas_table(bias.bbn.clean, caption ="Annual retrospective results from SEAM in SFA 26A. Positive values indicate the retrospective
-                              model predictions were higher than that full model. The Fully-recruited Biomass ($BD_{fr,t,retro}$) and Recruit Biomass ($BD_{r,t,retro}$) retrospectives are in tonnes.
+                              model predictions were higher than the full model. The Fully-recruited Biomass ($BD_{fr,t,retro}$) and Recruit Biomass ($BD_{r,t,retro}$) retrospectives are in tonnes.
                               The natural mortality retrospective (instantaneous) is $MD_{t,retro}$. The relative metrics, $RBD_{fr,t,retro}$, $RBD_{r,t,retro}$, and $RMD_{t,retro}$ are the
                               proportional differences between the retrospective model and the full model for fully-recruited biomass, recruit biomass, and natural mortality respectively.
                               The year represents the terminal year used to compare with the full model.")
@@ -191,24 +191,24 @@ csas_table(bias.bbn.clean, caption ="Annual retrospective results from SEAM in S
 
 \newpage
 ```{r sfa-25-bssm-dt,include=T,echo=F}
-csas_table(sab.bssm.dt, caption ="Decision table using the 2022 BSSM output for SFA 25A to estimate fully-recruited biomass in 2023 using the no growth scenario.")
+csas_table(sab.bssm.dt, caption ="Decision table using the 2022 BSSM output for SFA 25A to estimate fully-recruited biomass in 2023 using the no growth method.")
 ```
 
 
 
 \newpage
 ```{r sfa-25-seam-dt,include=T,echo=F}
-csas_table(sab.dt$table, caption ="Decision table using the 2022 SEAM output for SFA 25A to estimate fully-recruited biomass in 2023 using the no growth scenario.")
+csas_table(sab.dt$table, caption ="Decision table using the 2022 SEAM output for SFA 25A to estimate fully-recruited biomass in 2023 using the no growth method.")
 ```
 
 
 \newpage
 ```{r sfa-26-bssm-dt,include=T,echo=F}
-csas_table(bbn.bssm.dt, caption ="Decision table using the 2022 BSSM output for SFA 26A to estimate fully-recruited biomass in 2023 using the no growth scenario.")
+csas_table(bbn.bssm.dt, caption ="Decision table using the 2022 BSSM output for SFA 26A to estimate fully-recruited biomass in 2023 using the no growth method.")
 ```
 
 
 \newpage
 ```{r sfa-26-seam-dt,include=T,echo=F}
-csas_table(bbn.dt$table, caption ="Decision table using the 2022 SEAM output for SFA 26A to estimate fully-recruited biomass in 2023 using the no growth scenario.")
+csas_table(bbn.dt$table, caption ="Decision table using the 2022 SEAM output for SFA 26A to estimate fully-recruited biomass in 2023 using the no growth method.")
 ```

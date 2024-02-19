@@ -35,7 +35,7 @@ theme_set(theme_few(base_size = 22))
 direct <- "Y:/Offshore/Assessment/"
 
 
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 # Get the survey boundary file...
 temp <- tempfile()
 
@@ -141,21 +141,23 @@ mod.dat$gR2 <- waa.t2/waa.tm1# setwd("C:/Assessment/2014/r")
     
 # change 2019 and 2020 values to NA    
 
-mod.dat$g[which(mod.dat$year %in% c(2019:2020))] <- NA
+mod.dat$g[which(mod.dat$year %in% c(2020))] <- NA
 mod.dat$g2[which(mod.dat$year %in% c(2020))] <- NA
   
-mod.dat$gR[which(mod.dat$year %in% 2019:2020)] <- NA
+mod.dat$gR[which(mod.dat$year %in% 2020)] <- NA
 mod.dat$gR2[which(mod.dat$year %in% 2020)] <- NA
     
 # replace the NAs with long term medians
-mod.dat$g[which(mod.dat$year %in% c(2019:2020))] <- median(mod.dat$g, na.rm=T)
+mod.dat$g[which(mod.dat$year %in% c(2020))] <- median(mod.dat$g, na.rm=T)
 mod.dat$g2[which(mod.dat$year %in% c(2020))] <- median(mod.dat$g2, na.rm=T)
     
-mod.dat$gR[which(mod.dat$year %in% c(2019:2020))] <- median(mod.dat$gR, na.rm=T)
+mod.dat$gR[which(mod.dat$year %in% c(2020))] <- median(mod.dat$gR, na.rm=T)
 mod.dat$gR2[which(mod.dat$year %in% c(2020))] <- median(mod.dat$gR2, na.rm=T)
-    
 
-  
+#mod.tmp <- read.csv("D:/Framework/SFA_25_26_2024/Model/Data/BBn_input_data_for_freya.csv")
+#mod.tmp$g[1:29] - growth$g[1:29]
+
+
 strt.mod.yr <- 1994
 # Grab the data, start model at either 1986 (note that BBn data starts in 1991 so anything earlier will default to 1991)
 DD.dat <- subset(mod.dat,year %in% strt.mod.yr:max(mod.dat$year),

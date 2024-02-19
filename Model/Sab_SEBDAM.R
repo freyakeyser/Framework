@@ -318,8 +318,8 @@ g.proper[g.proper$year %in% c(1986:1991,2015,2020),-1] <- NA
 g.proper[g.proper$year %in% c(2014,2019),which(names(g.proper) %in% c("g.proper","gR.proper"))] <- NA
 
 # Fill in the mean for the missing years
-g.proper$g.proper[g.proper$year %in% c(1986:1991,2014:2015,2019:2020,2022)]  <- mean(g.proper$g.proper,na.rm=T)
-g.proper$gR.proper[g.proper$year %in% c(1986:1991,2014:2015,2019:2020,2022)] <- mean(g.proper$gR.proper,na.rm=T)
+g.proper$g.proper[g.proper$year %in% c(1986:1991,2014:2015,2019:2020,2022)]  <- median(g.proper$g.proper,na.rm=T)
+g.proper$gR.proper[g.proper$year %in% c(1986:1991,2014:2015,2019:2020,2022)] <- median(g.proper$gR.proper,na.rm=T)
 
 
 # now need to add in 2015 and 2020 to mod.dat...
@@ -332,8 +332,8 @@ growth <- data.frame(year = mod.dat.tmp$year,g = mod.dat.tmp$g, gR = mod.dat.tmp
                      g.alt = alt.g$alt.g, gR.alt = mod.dat.tmp$gR, # I don't have a good idea how to estiamte gR growth, so using the other way
                      g.proper = g.proper$g.proper,gR.proper = g.proper$gR.proper)
 # Now addin the missing growth years for g and gR
-growth$g[growth$year %in% c(2015,2020)] <- mean(growth$g,na.rm=T)
-growth[growth$year %in% c(2015,2020),names(growth) %in% c("gR","gR.alt")] <- mean(growth$gR,na.rm=T)
+growth$g[growth$year %in% c(2015,2020)] <- median(growth$g,na.rm=T)
+growth[growth$year %in% c(2015,2020),names(growth) %in% c("gR","gR.alt")] <- median(growth$gR,na.rm=T)
 growth <- growth[which(!is.na(growth$g)),]
 growth[nrow(growth)+1,] <- growth[nrow(growth),]
 growth$year[nrow(growth)] <- max(years) + 1
@@ -347,6 +347,9 @@ if(g.mod == 'g_1') g <- data.frame(g=growth$g/growth$g,gR = growth$gR/growth$gR)
 
 # And now we need to get the survey year right, note that same has the months in numbers not month names, this is already taken care of...
 #Sab.fish$survey.year[Sab.fish$month %in% 1:5] <- Sab.fish$survey.year[Sab.fish$month %in% 1:5]-1
+#write.csv(growth,"D:/Framework/SFA_25_26_2024/Model/Data/Sab_mod_input_for_freya.csv")
+# mod.tmp <- read.csv("D:/Framework/SFA_25_26_2024/Model/Data/Sab_mod_input_for_freya.csv")
+# mod.tmp$g[1:29] - growth$g[1:29]
 
 # Subset the fishery data to the correct years. We need to take on next year catch too..)
 Sab.fish <- Sab.fish %>% dplyr::filter(survey.year %in% years) # c(years,(max(years)+1))

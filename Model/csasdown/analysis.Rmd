@@ -766,12 +766,13 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 m.brk <- log(c(0.03,0.1,0.3,1))
 #m.brk <- pretty(log(m.dat.plot$m))
 m.lab <- signif(exp(m.brk),digits=2)
-
-spatial.m.plot <-  ggplot() + geom_sf(data=m.spat.sab.10,aes(fill=log(m)),color='grey')+
+m.spat.sab.10 <- m.spat.sab.10[m.spat.sab.10$Year != 2023,]
+spatial.m.plot <-  ggplot(data=m.spat.sab.10) + geom_sf(aes(fill=log(m)),color='grey')+
                               facet_wrap(~Year,ncol=5)+
                               # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
                               # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
-                              scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) + theme(axis.text.x=element_text(angle=-45,hjust=0))
+                              scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) +
+                              theme(axis.text.x=element_text(angle=-45,hjust=0))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
@@ -904,15 +905,17 @@ if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
 
 
-m.brk <- log(c(0.03,0.1,0.3,1))
+m.brk <- log(c(0.003,0.01,0.03,0.1,0.3,1))
 #m.brk <- pretty(log(m.dat.plot$m))
 m.lab <- signif(exp(m.brk),digits=2)
+m.spat.bbn.20 <- m.spat.bbn.20[m.spat.bbn.20$Year != 2023,]
 
 spatial.m.plot <-  ggplot() + geom_sf(data=m.spat.bbn.20,aes(fill=log(m)),color='grey')+
                               facet_wrap(~Year,ncol=5)+
                               # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
                               # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
-                              scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) + theme(axis.text.x=element_text(angle=-45,hjust=0))
+                              scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) +
+                              theme(axis.text.x=element_text(angle=-45,hjust=0))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)

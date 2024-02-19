@@ -141,55 +141,55 @@ img.asp <- magick::image_info(img)$height /  magick::image_info(img)$width # cal
 
 # APPENDIX A {#app:A}
 
-## SFA 25a
+## SFA 25A
 
-The number of knots has a minimal impact the fully-recruited biomass estimates in SFA 25a, with an average annual biomass difference of `r abs(mn.b.knot.diff.sab)` tonnes (`r abs(mn.b.per.knot.diff.sab)`%) (Fig. \@ref(fig:sfa-25-bm-20-fig)). The overall recruit biomass estimates are also very similar between the 10 knot and 20 knot models with an average annual biomass difference of `r mn.r.knot.diff.sab` tonnes (`r mn.r.per.knot.diff.sab`%) (Fig. \@ref(fig:sfa-25-rec-20-fig)). However, the natural mortality estimates do differ substantially between the 10 and 20 knot models, with the natural mortality in the 10 knot model being higher than the 20 knot model; the natural mortality of the 10 knot model is on average `r mn.m.knot.diff.sab` (`r mn.m.per.knot.diff.sab`%) higher than the 20 knot model model (Fig. \@ref(fig:sfa-25-nm-20-fig)). The catchabilities were similar between the models, with the range of catchabilities of 20 knot model (`r min.q.sab.20` - `r max.q.sab.20`) being slightly wider than the 10 knot model (`r min.q.sab` - `r max.q.sab`).
+The number of knots has a minimal impact the fully-recruited biomass estimates in SFA 25A, with an average annual biomass difference of `r abs(mn.b.knot.diff.sab)` tonnes (`r abs(mn.b.per.knot.diff.sab)`%) (Fig. \@ref(fig:sfa-25-bm-20-fig)). The overall recruit biomass estimates are also very similar between the 10 knot and 20 knot models with an average annual biomass difference of `r mn.r.knot.diff.sab` tonnes (`r mn.r.per.knot.diff.sab`%) (Fig. \@ref(fig:sfa-25-rec-20-fig)). However, the natural mortality estimates do differ substantially between the 10 and 20 knot models, with the natural mortality in the 10 knot model being higher than the 20 knot model; the natural mortality of the 10 knot model is on average `r mn.m.knot.diff.sab` (`r mn.m.per.knot.diff.sab`%) higher than the 20 knot model model (Fig. \@ref(fig:sfa-25-nm-20-fig)). The catchabilities were similar between the models, with the range of catchabilities of 20 knot model (`r min.q.sab.20` - `r max.q.sab.20`) being slightly wider than the 10 knot model (`r min.q.sab` - `r max.q.sab`).
 
-## SFA 26a
+## SFA 26A
 
-The number of knots does impact the fully-recruited biomass estimates in SFA 26a, with the 10 knot model having a higher annual biomass estimate, on average the 10 knot model biomass is `r mn.b.knot.diff.bbn` tonnes (`r mn.b.per.knot.diff.bbn`%) higher than the 20 knot model (Fig. \@ref(fig:sfa-26-bm-10-fig)). The overall recruit biomass estimates are also higher in the 10 knot model, with recruit biomass `r mn.r.knot.diff.bbn` tonnes (`r mn.r.per.knot.diff.bbn`%) higher in the 10 knot model (Fig. \@ref(fig:sfa-26-rec-10-fig)). The natural mortality estimates  in the 10 knot model are higher than the 20 knot model; the natural mortality of the 10 knot model is on average `r mn.m.knot.diff.bbn` (`r mn.m.per.knot.diff.bbn`%) higher than the 20 knot model model (Fig. \@ref(fig:sfa-26-nm-10-fig)). The catchabilities are similar between the models, with the range of catchabilities of 20 knot model (`r min.q.bbn` - `r max.q.bbn`) being slightly wider than the 10 knot model (`r min.q.bbn.10` - `r max.q.bbn.10`).
+The number of knots does impact the fully-recruited biomass estimates in SFA 26A, with the 10 knot model having a higher annual biomass estimate, on average the 10 knot model biomass is `r mn.b.knot.diff.bbn` tonnes (`r mn.b.per.knot.diff.bbn`%) higher than the 20 knot model (Fig. \@ref(fig:sfa-26-bm-10-fig)). The overall recruit biomass estimates are also higher in the 10 knot model, with recruit biomass `r mn.r.knot.diff.bbn` tonnes (`r mn.r.per.knot.diff.bbn`%) higher in the 10 knot model (Fig. \@ref(fig:sfa-26-rec-10-fig)). The natural mortality estimates  in the 10 knot model are higher than the 20 knot model; the natural mortality of the 10 knot model is on average `r mn.m.knot.diff.bbn` (`r mn.m.per.knot.diff.bbn`%) higher than the 20 knot model model (Fig. \@ref(fig:sfa-26-nm-10-fig)). The catchabilities are similar between the models, with the range of catchabilities of 20 knot model (`r min.q.bbn` - `r max.q.bbn`) being slightly wider than the 10 knot model (`r min.q.bbn.10` - `r max.q.bbn.10`).
 
 \newpage
 
 ## Figures
 
 
-```{r sfa-25-bm-20-fig, echo=F, fig.cap="SFA-25a SEAM fully-recruited biomass estimate using 20 knots, shaded area represents the 95\\% confidence interval."}
+```{r sfa-25-bm-20-fig, echo=F, fig.cap="SFA-25A SEAM fully-recruited biomass estimate using 20 knots, shaded area represents the 95\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/Sab_Biomass_time_series.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/Sab_Biomass_time_series.png"))
 ```
 
 
 \newpage
-```{r sfa-25-rec-20-fig, echo=F, fig.cap="SFA-25a SEAM recruit biomass estimate using 20 knots, shaded area represents the 95\\% confidence interval."}
+```{r sfa-25-rec-20-fig, echo=F, fig.cap="SFA-25A SEAM recruit biomass estimate using 20 knots, shaded area represents the 95\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/Sab_Recruit_time_series.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/Sab_Recruit_time_series.png"))
 ```
 
 
 \newpage
-```{r sfa-25-nm-20-fig, echo=F, fig.cap="SFA-25a SEAM natural mortality (instantaneous) using 20 knots, shaded area represents the 95\\% confidence interval."}
+```{r sfa-25-nm-20-fig, echo=F, fig.cap="SFA-25A SEAM natural mortality (instantaneous) using 20 knots, shaded area represents the 95\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/Sab_nat_mort_time_series.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/Sab_nat_mort_time_series.png"))
 ```
 
 
 \newpage
-```{r sfa-26-bm-10-fig, echo=F, fig.cap="SFA-26a SEAM fully-recruited biomass estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
+```{r sfa-26-bm-10-fig, echo=F, fig.cap="SFA-26A SEAM fully-recruited biomass estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_Biomass_time_series.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_Biomass_time_series.png"))
 ```
 
 
 \newpage
-```{r sfa-26-rec-10-fig, echo=F, fig.cap="SFA-26a SEAM recruit biomass estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
+```{r sfa-26-rec-10-fig, echo=F, fig.cap="SFA-26A SEAM recruit biomass estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_Recruit_time_series.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_Recruit_time_series.png"))
 ```
 
 
 \newpage
-```{r sfa-26-nm-10-fig, echo=F, fig.cap="SFA-26a SEAM natural mortality (instantaneous) estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
+```{r sfa-26-nm-10-fig, echo=F, fig.cap="SFA-26A SEAM natural mortality (instantaneous) estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_nat_mort_time_series.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_nat_mort_time_series.png"))
 ```

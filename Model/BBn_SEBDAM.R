@@ -120,7 +120,7 @@ num.knots <- 20 # Going to test 10, 15, and 20
 qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1. Can be used with SEAM too in place of the m and R initiailztion.
 init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.8,0.4, 0.15, and 0.05
 # Various explorations of the g models.
-g.mod <- 'g_1'
+g.mod <- 'g_original'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 # I do we want to vary catchabilty spatially.
@@ -287,8 +287,8 @@ g.proper[g.proper$year %in% c(1991,2020),-1] <- NA
 g.proper[g.proper$year %in% c(2019),which(names(g.proper) %in% c("g.proper","gR.proper"))] <- NA
 
 # Fill in the mean for the missing years
-g.proper$g.proper[g.proper$year %in% c(1991,2019,2020,2022)] <- mean(g.proper$g.proper,na.rm=T)
-g.proper$gR.proper[g.proper$year %in% c(1991,2019,2020,2022)] <- mean(g.proper$gR.proper,na.rm=T)
+g.proper$g.proper[g.proper$year %in% c(1991,2019,2020,2022)] <- median(g.proper$g.proper,na.rm=T)
+g.proper$gR.proper[g.proper$year %in% c(1991,2019,2020,2022)] <- median(g.proper$gR.proper,na.rm=T)
 
 # now need to add in 2020 to mod.dat...
 mod.dat.tmp <- mod.dat
@@ -301,7 +301,7 @@ growth <- data.frame(year = mod.dat.tmp$year,g = mod.dat.tmp$g, gR = mod.dat.tmp
                      g.proper = g.proper$g.proper,gR.proper = g.proper$gR.proper)
 # Now addin the missing growth years for g and gR
 growth$g[growth$year == 2020] <- mean(growth$g,na.rm=T)
-growth[growth$year == 2020,names(growth) %in% c("gR","gR.alt")] <- mean(growth$gR,na.rm=T)
+growth[growth$year == 2020,names(growth) %in% c("gR","gR.alt")] <- median(growth$gR,na.rm=T)
 growth <- growth[which(!is.na(growth$g)),]
 growth <- growth[which(!is.na(growth$g)),]
 growth[nrow(growth)+1,] <- growth[nrow(growth),]
@@ -313,6 +313,10 @@ if(g.mod == 'g_original') g <- data.frame(g=growth$g,gR = growth$gR)
 if(g.mod == 'alt_g') g <- data.frame(g=growth$g.alt,gR = growth$gR.alt)
 if(g.mod == 'proper_g') g <- data.frame(g=growth$g.proper,gR = growth$gR.proper)
 if(g.mod == 'g_1') g <- data.frame(g=growth$g/growth$g,gR = growth$gR/growth$gR)
+
+#write.csv(growth,"D:/Framework/SFA_25_26_2024/Model/Data/BBn_input_data_for_freya.csv")
+#mod.tmp <- read.csv("D:/Framework/SFA_25_26_2024/Model/Data/BBn_input_data_for_freya.csv")
+#mod.tmp$g[1:29] - growth$g[1:29]
 
 # Now we can clip both of these to subset it to the data that I think we need for the analysis....
 # If we run with random == 1 then we need to fill in 2020...
@@ -528,12 +532,7 @@ if(mod.select != "TLM")
   # Explotation
   # The catch data
   # So catches from June 2021-May 2022 are called 2021 and removed from the 2021 survey biomass (this is different indexing from how we used to handle this for offshore)
-  #
-  # SS model mu(t) <- C(t) / (B(t) + C(t)) because our model is B(t) <- B(t-1) - C(t) and C(2017) is June 2016-Aug 2017.
-  #  mu[2017] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) 
-  # TLM and SEAM don't calculate mu, so we do it manually here, to be analogous...
-  # SEAM/TLM mu(t) <- C(t-1) / (B(t) + C(t-1)) because our model is B(t) <- B(t-1) - C(t-1) and C(2016) is now June 2016-Aug 2017.
-  # mu[2016] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) # The fishing mortality associated with 2016-2017 fishing
+  
   F.dat<-data.frame(B=as.vector(mod.fit$report$areaB[,-ncol(mod.fit$report$areaB)]/1000),
                     C = c(as.vector(as.matrix(catchy[,-c((ncol(catchy)-1),ncol(catchy))])),rep(NA,num.knots)), Year=matYear1, knotID=knots1)
   F.dat <- F.dat %>% dplyr::mutate(exploit = C/(B+C)) # Sticking with how offshore does this (C/(B+C)) C/B or some variant may be more realistic

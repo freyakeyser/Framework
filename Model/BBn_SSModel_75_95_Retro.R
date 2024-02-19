@@ -35,7 +35,7 @@ theme_set(theme_few(base_size = 22))
 direct <- "Y:/Offshore/Assessment/"
 repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 # Get the survey boundary file...
 temp <- tempfile()
 
@@ -124,7 +124,7 @@ waa.t2 <- mod.dat$CF*(laa.t/100)^3
 mod.dat$g <- waa.t/waa.tm1
 # This is using the actual condition factor and growing the scallops by laa.t
 mod.dat$g2 <- waa.t2/waa.tm1
-  
+
 # same thing here but for the recruits
 waa.tm1 <- mod.dat$CF*(mod.dat$l.k/100)^3
 laa.t <- L.inf*(1-exp(-K))+exp(-K)*mod.dat$l.k
@@ -153,7 +153,9 @@ mod.dat$g2[which(mod.dat$year %in% c(2020))] <- median(mod.dat$g2, na.rm=T)
     
 mod.dat$gR[which(mod.dat$year %in% c(2019:2020))] <- median(mod.dat$gR, na.rm=T)
 mod.dat$gR2[which(mod.dat$year %in% c(2020))] <- median(mod.dat$gR2, na.rm=T)
-    
+
+# Quick for Freya
+#write.csv(mod.dat,"D:/Framework/SFA_25_26_2024/Model/Data/BBn_input_data_for_freya.csv")
 
 strt.mod.yr <- 1994
 years <-strt.mod.yr:max(mod.dat$year)

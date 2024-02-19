@@ -187,39 +187,16 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_"
 
 
 \newpage
-```{r sfa-25-fm-fig, echo=F, fig.cap="Model estimated fishing mortality (instantaneous) between 1994 and 2022 from SEAM in SFA 25A.The shaded area represents the 95\\% confidence interval, the red line is the estimated fishing mortality."}
+```{r sfa-25-fm-fig, echo=F, fig.cap="Model estimated fishing mortality (instantaneous) between 1994 and 2021 from SEAM in SFA 25A.The shaded area represents the 95\\% confidence interval, the red line is the estimated fishing mortality. The year is the fishing mortality associated with the survey year fishery removals and the biomass estimate for that year (e.g., the fishing mortality for 2021 is calculated using the fishery removals from June 2021 to May 2022 and the biomass estimate in 2021). As such, no fishing mortality is calculated for the terminal year of the model."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_fish_mort_time_series.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_fish_mort_time_series.png"))
 ```
 
 
 \newpage
-```{r sfa-25-spat-fm-fig, echo=F, fig.cap="Model estimated fishing mortality (instantaneous) between 1994 and 2022 from SEAM in SFA 25A in each knot. Grey knots indicate areas in which no fishing occurred."}
+```{r sfa-25-spat-fm-fig, echo=F, fig.cap="Model estimated fishing mortality (instantaneous) between 1994 and 2021 from SEAM in SFA 25A in each knot. Grey knots indicate areas in which no fishing occurred. The year is the fishing mortality associated with the survey year fishery removals and the biomass estimate for that year (e.g., the fishing mortality for 2021 is calculated using the fishery removals from June 2021 to May 2022 and the biomass estimate in 2021). As such, no fishing mortality is calculated for the terminal year of the model."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_fm.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_fm.png"))
-```
-
-
-<!---- The Kobe, relative F vs mod F, and Jem Plots will go here, need to be moved tho... --->
-
-\newpage
-```{r sfa-25-kobe-fig, echo=F, fig.cap="SFA 25A phase plots, a) is BSSM, b) is SEAM. The exploitation rate (proportional) is on the y-axis and biomass is on the x-axis. The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate)."}
-if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_kobe.png"))
-if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_kobe.png"))
-```
-
-
-\newpage
-```{r sfa-25-jem-fig, echo=F, fig.cap="SFA 25A percent change in fully-recruited biomass versus exploitation rate for a) BSSM and b) SEAM. The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate). "}
-if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_jem.png"))
-if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_jem.png"))
-```
-
-
-\newpage
-```{r sfa-25-rel-f-fig, echo=F, fig.cap="SFA 25A relative fishing mortality from Keyser et al. (In Press) vs estimated fishing mortality from a) BSSM, and b) SEAM. The numbers on the plot represent the year (e.g., 14 is the exploitation rate for 2014-2015). The blue line is the linear relationship between relative F and the model predicted fishing mortality with the shaded area representing the 95% confidence interval."}
-if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_rel_vs_mod_F.png"))
-if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_rel_vs_mod_F.png"))
 ```
 
 
@@ -276,28 +253,51 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 
 
 \newpage
-```{r sfa-26-fm-fig, echo=F, fig.cap="Model estimated fishing mortality (instantaneous) between 1994 and 2022 from SEAM in SFA 26A.The shaded area represents the 95\\% confidence interval, the red line is the estimated fishing mortality."}
+```{r sfa-26-fm-fig, echo=F, fig.cap="Model estimated fishing mortality (instantaneous) between 1994 and 2021 from SEAM in SFA 26A.The shaded area represents the 95\\% confidence interval, the red line is the estimated fishing mortality. The year is the fishing mortality associated with the survey year fishery removals and the biomass estimate for that year (e.g., the fishing mortality for 2021 is calculated using the fishery removals from June 2021 to May 2022 and the biomass estimate in 2021). As such, no fishing mortality is calculated for the terminal year of the model."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_fish_mort_time_series.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_fish_mort_time_series.png"))
 ```
 
 
 \newpage
-```{r sfa-26-spat-fm-fig, echo=F, fig.cap="Model estimated fishing mortality (instantaneous) between 1994 and 2022 from SEAM in SFA 26A in each knot. Grey knots indicate areas in which no fishing occurred."}
+```{r sfa-26-spat-fm-fig, echo=F, fig.cap="Model estimated fishing mortality (instantaneous) between 1994 and 2021 from SEAM in SFA 26A in each knot. Grey knots indicate areas in which no fishing occurred. The year is the fishing mortality associated with the survey year fishery removals and the biomass estimate for that year (e.g., the fishing mortality for 2021 is calculated using the fishery removals from June 2021 to May 2022 and the biomass estimate in 2021). As such, no fishing mortality is calculated for the terminal year of the model."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_fm.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_fm.png"))
 ```
 
 
+<!---- The Kobe, relative F vs mod F, and Jem Plots will go here, need to be moved tho... --->
 \newpage
-```{r sfa-26-kobe-fig, echo=F, fig.cap= "SFA 26A phase plot for a) BSSM and b) SEAM. The exploitation rate (proportional) is on the y-axis and biomass is on the x-axis. The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate)."}
+```{r sfa-25-kobe-fig, echo=F, fig.cap="SFA 25A phase plots, upper panel is BSSM lower panel is SEAM. The exploitation rate (proportional) is on the y-axis and biomass is on the x-axis. The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate)."}
+if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_kobe.png"))
+if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_kobe.png"))
+```
+
+
+\newpage
+```{r sfa-25-jem-fig, echo=F, fig.cap="SFA 25A percent change in fully-recruited biomass versus exploitation rate for BSSM (upper panel) SEAM (lower panel). The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate). "}
+if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_jem.png"))
+if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_jem.png"))
+```
+
+
+\newpage
+```{r sfa-25-rel-f-fig, echo=F, fig.cap="SFA 25A relative fishing mortality from Keyser et al. (In Press) vs estimated fishing mortality from BSSM (upper panel) and SEAM (lower panel). The numbers on the plot represent the year (e.g., 14 is the exploitation rate for 2014-2015). The blue line is the linear relationship between relative F and the model predicted fishing mortality with the shaded area representing the 95% confidence interval."}
+if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_rel_vs_mod_F.png"))
+if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_rel_vs_mod_F.png"))
+```
+
+
+
+\newpage
+```{r sfa-26-kobe-fig, echo=F, fig.cap= "SFA 26A phase plots for BSSM (upper panel) and SEAM (lower panel). The exploitation rate (proportional) is on the y-axis and biomass is on the x-axis. The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate)."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_kobe.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_kobe.png"))
 ```
 
 
 \newpage
-```{r sfa-26-jem-fig, echo=F, fig.cap= "SFA 26A percent change in fully-recruited biomass versus exploitation rate for a) BSSM and b) SEAM. The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate)."}
+```{r sfa-26-jem-fig, echo=F, fig.cap= "SFA 26A percent change in fully-recruited biomass versus exploitation rate for BSSM (upper panel) and SEAM (lower panel). The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate)."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_jem.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_jem.png"))
 ```
@@ -305,7 +305,7 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 
 <!-- Final thing we'll need to get in here is the Prediction Evaluation figures -->
 \newpage
-```{r sfa-26-rel-f-fig, echo=F, fig.cap= "SFA 26A relative fishing mortality from Keyser et al. (In Press) vs estimated fishing mortality from a) BSSM, and b) SEAM. The numbers on the plot represent the year (e.g., 14 is the exploitation rate for 2014-2015). The blue line is the linear relationship between relative F and the model estimated fishing mortality with the shaded area representing the 95% confidence interval."}
+```{r sfa-26-rel-f-fig, echo=F, fig.cap= "SFA 26A relative fishing mortality from Keyser et al. (In Press) vs estimated fishing mortality from BSSM (upper panel) and SEAM (lower panel). The numbers on the plot represent the year (e.g., 14 is the exploitation rate for 2014-2015). The blue line is the linear relationship between relative F and the model estimated fishing mortality with the shaded area representing the 95% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_rel_vs_mod_F.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_rel_vs_mod_F.png"))
 ```
@@ -316,7 +316,7 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 <!-- Now for the Process error Figures, starting with SFA 25... -->
 
 \newpage
-```{r sfa-25-bssm-PE-ts-fig, echo=F, out.width = "30%",fig.cap="SFA 25A BSSM annual process error, a) raw (log scale), b) standardized"}
+```{r sfa-25-bssm-PE-ts-fig, echo=F, out.width = "30%",fig.cap="SFA 25A BSSM annual process error, upper panel is raw (log scale) and lower panel is standardized."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSmodel/English/Sab_bssm_process_error.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSmodel/French/Sab_bssm_process_error.png"))
 ```
@@ -353,7 +353,7 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_"
 <!-- Now SFA 26 Process error-->
 
 \newpage
-```{r sfa-26-bssm-PE-ts-fig, echo=F, out.width = "30%",fig.cap="SFA 26A BSSM annual process error, a) raw (log scale), b) standardized"}
+```{r sfa-26-bssm-PE-ts-fig, echo=F, out.width = "30%",fig.cap="SFA 26A BSSM annual process error, upper panel is raw (log scale) and lower panel is standardized."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSmodel/English/BBn_bssm_process_error.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSmodel/French/BBn_bssm_process_error.png"))
 ```
@@ -436,28 +436,28 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 
 
 \newpage
-```{r sfa-25-bssm-resid-I-fig, echo=F, fig.cap="SFA 25A BSSM fully-recruited biomass residuals versus fitted values, a) raw residuals (log scale), b) standardized residuals. Note the spacing on the x-axis is using a log scale. "}
+```{r sfa-25-bssm-resid-I-fig, echo=F, fig.cap="SFA 25A BSSM fully-recruited biomass residuals versus fitted values, upper panel is raw (log scale) and lower panel is standardized. Note the spacing on the x-axis is using a log scale. "}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSmodel/English/Sab_bssm_FR_resids.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSmodel/French/Sab_bssm_FR_resids.png"))
 ```
 
 
 \newpage
-```{r sfa-25-bssm-resid-IR-fig, echo=F, fig.cap="SFA 25A BSSM recruit biomass residuals versus fitted values, a) raw residuals (log scale), b) standardized residuals. Note the spacing on the x-axis is using a log scale."}
+```{r sfa-25-bssm-resid-IR-fig, echo=F, fig.cap="SFA 25A BSSM recruit biomass residuals versus fitted values, upper panel is raw (log scale) and lower panel is standardized. Note the spacing on the x-axis is using a log scale."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSmodel/English/Sab_bssm_rec_resids.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSmodel/French/Sab_bssm_rec_resids.png"))
 ```
 
 
 \newpage
-```{r sfa-26-bssm-resid-I-fig, echo=F, fig.cap="SFA 26A BSSM fully-recruited biomass residuals versus fitted values, a) raw residuals (log scale), b) standardized residuals. Note the spacing on the x-axis is using a log scale."}
+```{r sfa-26-bssm-resid-I-fig, echo=F, fig.cap="SFA 26A BSSM fully-recruited biomass residuals versus fitted values, upper panel is raw (log scale) and lower panel is standardized.. Note the spacing on the x-axis is using a log scale."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSmodel/English/BBn_bssm_FR_resids.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSmodel/French/BBn_bssm_FR_resids.png"))
 ```
 
 
 \newpage
-```{r sfa-26-bssm-resid-IR-fig, echo=F, fig.cap="SFA 26A BSSM recruit biomass residuals versus fitted values, a) raw residuals (log scale), b) standardized residuals. Note the spacing on the x-axis is using a log scale."}
+```{r sfa-26-bssm-resid-IR-fig, echo=F, fig.cap="SFA 26A BSSM recruit biomass residuals versus fitted values, upper panel is raw (log scale) and lower panel is standardized. Note the spacing on the x-axis is using a log scale."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSmodel/English/BBn_bssm_rec_resids.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSmodel/French/BBn_bssm_rec_resids.png"))
 ```
@@ -493,28 +493,28 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 
 
 \newpage
-```{r sfa-25-resid-qq-I-fig, echo=F, fig.cap="SFA 25A SEAM a) fully-recruited biomass residual quantile plot, the line represents the expected value of the residual if it was normally distributed (log scale), and b) is a density plot showing the distribution of the observed survey fully-recruited biomass."}
+```{r sfa-25-resid-qq-I-fig, echo=F, fig.cap="SFA 25A SEAM, the upper panel is the fully-recruited biomass residual quantile plot, the line represents the expected value of the residual if it was normally distributed (log scale). The lower panel is the density plot showing the distribution of the observed survey fully-recruited biomass."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_I_qq.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_I_qq.png"))
 ```
 
 
 \newpage
-```{r sfa-25-resid-qq-IR-fig, echo=F, fig.cap="SFA 25A SEAM 1) recruit biomass residual quantile plot, the line represents the expected value of an observation if it is normally distributed (log scale), and b) is a density plot showing the distribution of the observed survey recruit biomass."}
+```{r sfa-25-resid-qq-IR-fig, echo=F, fig.cap="SFA 25A SEAM, the upper panel is the recruit biomass residual quantile plot, the line represents the expected value of an observation if it is normally distributed (log scale). The lower panel is the density plot showing the distribution of the observed survey recruit biomass."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_IR_qq.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_IR_qq.png"))
 ```
 
 
 \newpage
-```{r sfa-26-resid-qq-I-fig, echo=F, fig.cap="SFA 26A SEAM a) fully-recruited biomass residual quantile plot, the line represents the expected value of the residual if it was normally distributed (log scale), and b) is a density plot showing the distribution of the observed survey fully-recruited biomass."}
+```{r sfa-26-resid-qq-I-fig, echo=F, fig.cap="SFA 26A SEAM, the upper panel is the fully-recruited biomass residual quantile plot, the line represents the expected value of the residual if it was normally distributed (log scale). The lower panel is the density plot showing the distribution of the observed survey fully-recruited biomass."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_qq.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_I_qq.png"))
 ```
 
 
 \newpage
-```{r sfa-26-resid-qq-IR-fig, echo=F, fig.cap="SFA 26A SEAM a) recruit biomass residual quantile plot, the line represents the expected value of the residual if it was normally distributed (log scale), and b) is a density plot showing the distribution of the observed survey recruit biomass."}
+```{r sfa-26-resid-qq-IR-fig, echo=F, fig.cap="SFA 26A SEAM, the upper panel is the recruit biomass residual quantile plot, the line represents the expected value of the residual if it was normally distributed (log scale). The lower panel is the density plot showing the distribution of the observed survey recruit biomass."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_qq.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_IR_qq.png"))
 ```
@@ -524,41 +524,41 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 
 
 \newpage
-```{r sfa-25-bssm-retro-bm-fig, echo=F, fig.cap="SFA 25A BSSM fully-recruited biomass (kilotonnes) retrospective time series.  Retrospective fully-recruited biomass was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-25-bssm-retro-bm-fig, echo=F, fig.cap="SFA 25A BSSM fully-recruited biomass (kilotonnes) retrospective time series.  Retrospective fully-recruited biomass was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/English/Sab_bssm_biomass_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/French/Sab_bssm_biomass_retro.png"))
 ```
 
 
 \newpage
-```{r sfa-25-bssm-retro-rec-fig, echo=F, fig.cap="SFA 25A BSSM recruit biomass retrospective biomass (kilotonnes).  Retrospective recruit biomass was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-25-bssm-retro-rec-fig, echo=F, fig.cap="SFA 25A BSSM recruit biomass retrospective biomass (kilotonnes).  Retrospective recruit biomass was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/English/Sab_bssm_recruit_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/French/Sab_bssm_recruit_retro.png"))
 ```
 
 
 \newpage
-```{r sfa-25-bssm-retro-nm-fig, echo=F, fig.cap="SFA 25A BSSM natural mortality retrospective analysis.  Retrospective natural mortality was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-25-bssm-retro-nm-fig, echo=F, fig.cap="SFA 25A BSSM natural mortality retrospective analysis.  Retrospective natural mortality was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/English/Sab_bssm_nm_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/French/Sab_bssm_nm_retro.png"))
 ```
 
 \newpage
-```{r sfa-25-retro-bm-fig, echo=F, fig.cap="SFA 25A SEAM fully-recruited biomass (kilotonnes) retrospective time series.  Retrospective fully-recruited biomass was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-25-retro-bm-fig, echo=F, fig.cap="SFA 25A SEAM fully-recruited biomass (kilotonnes) retrospective time series.  Retrospective fully-recruited biomass was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.10,"/English/Sab_biomass_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.10,"/French/Sab_biomass_retro.png"))
 ```
 
 
 \newpage
-```{r sfa-25-retro-rec-fig, echo=F, fig.cap="SFA 25A SEAM recruit biomass retrospective biomass (kilotonnes).  Retrospective recruit biomass was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-25-retro-rec-fig, echo=F, fig.cap="SFA 25A SEAM recruit biomass retrospective biomass (kilotonnes).  Retrospective recruit biomass was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.10,"/English/Sab_recruit_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.10,"/French/Sab_recruit_retro.png"))
 ```
 
 
 \newpage
-```{r sfa-25-retro-nm-fig, echo=F, fig.cap="SFA 25A SEAM natural mortality retrospective analysis.  Retrospective natural mortality was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-25-retro-nm-fig, echo=F, fig.cap="SFA 25A SEAM natural mortality retrospective analysis.  Retrospective natural mortality was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.10,"/English/Sab_nm_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.10,"/French/Sab_nm_retro.png"))
 ```
@@ -566,21 +566,21 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_"
 <!---- Now we have SFA 26 retros starting with BSSM--->
 
 \newpage
-```{r sfa-26-bssm-retro-bm-fig, echo=F, fig.cap="SFA 26A BSSM fully-recruited biomass (kilotonnes) retrospective time series.  Retrospective fully-recruited biomass was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-26-bssm-retro-bm-fig, echo=F, fig.cap="SFA 26A BSSM fully-recruited biomass (kilotonnes) retrospective time series.  Retrospective fully-recruited biomass was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/English/BBn_bssm_biomass_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/French/BBn_bssm_biomass_retro.png"))
 ```
 
 
 \newpage
-```{r sfa-26-bssm-retro-rec-fig, echo=F, fig.cap="SFA 26A BSSM recruit biomass retrospective biomass (kilotonnes).  Retrospective recruit biomass was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-26-bssm-retro-rec-fig, echo=F, fig.cap="SFA 26A BSSM recruit biomass retrospective biomass (kilotonnes).  Retrospective recruit biomass was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/English/BBn_bssm_recruit_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/French/BBn_bssm_recruit_retro.png"))
 ```
 
 
 \newpage
-```{r sfa-26-bssm-retro-nm-fig, echo=F, fig.cap="SFA 26A BSSM natural mortality retrospective analysis.  Retrospective natural mortality was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-26-bssm-retro-nm-fig, echo=F, fig.cap="SFA 26A BSSM natural mortality retrospective analysis.  Retrospective natural mortality was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/English/BBn_bssm_nm_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/French/BBn_bssm_nm_retro.png"))
 ```
@@ -588,21 +588,21 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 
 
 \newpage
-```{r sfa-26-retro-bm-fig, echo=F, fig.cap="SFA 26A SEAM fully-recruited biomass (kilotonnes) retrospective time series.  Retrospective fully-recruited biomass was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-26-retro-bm-fig, echo=F, fig.cap="SFA 26A SEAM fully-recruited biomass (kilotonnes) retrospective time series.  Retrospective fully-recruited biomass was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_biomass_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_biomass_retro.png"))
 ```
 
 
 \newpage
-```{r sfa-26-retro-rec-fig, echo=F, fig.cap="SFA 26A SEAM recruit biomass retrospective biomass (kilotonnes).  Retrospective recruit biomass was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-26-retro-rec-fig, echo=F, fig.cap="SFA 26A SEAM recruit biomass retrospective biomass (kilotonnes).  Retrospective recruit biomass was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_recruit_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_recruit_retro.png"))
 ```
 
 
 \newpage
-```{r sfa-26-retro-nm-fig, echo=F, fig.cap="SFA 26A SEAM natural mortality retrospective analysis.  Retrospective natural mortality was estimated using models with terminal years from 2005 to 2021."}
+```{r sfa-26-retro-nm-fig, echo=F, fig.cap="SFA 26A SEAM natural mortality retrospective analysis.  Retrospective natural mortality was estimated using models with terminal years from 2005 to 2021. Full model represents the model fit from 1994 to 2022."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_nm_retro.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_nm_retro.png"))
 ```
@@ -611,42 +611,42 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 
 <!---- The Prediction Evaluation figures --->
 \newpage
-```{r sfa-25-bssm-pred-eval-ts-fig, echo=F, fig.cap="SFA 25A (BSSM) difference between realized biomass and one-year projections using seven different methods. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. a) is the difference in kilotonnes  while b) is the percent difference. The blue horizontal dashed line represents no biomass difference. No comparisons could be made in 2015, 2016, 2020, and 2021 due to a lack of survey data in 2015 and 2020."}
+```{r sfa-25-bssm-pred-eval-ts-fig, echo=F, fig.cap="SFA 25A (BSSM) difference between realized biomass and one-year projections using seven different methods. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. The upper panel is the difference in kilotonnes while the lower panel is the percent difference. The blue horizontal dashed line represents no biomass difference. No comparisons could be made in 2015, 2016, 2020, and 2021 due to a lack of survey data in 2015 and 2020."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/English/Sab_bssm_PE_bm_ts_combo.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/French/Sab_bssm_PE_bm_ts_combo.png"))
 ```
 
 
 \newpage
-```{r sfa-25-bssm-pred-eval-violin-fig, echo=F, fig.cap="SFA 25A (BSSM) violin plots of the difference between realized biomass and one-year projections using seven different methods. For the violin plots the horizontal lines represent the minimum, median, and maximum values, the width of the violin represents the relative amount of data. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. a) is absolute difference in kilotonnes, b) is the difference in kilotonnes, and c) is the percent difference. The blue horizontal dashed line represents no biomass difference."}
+```{r sfa-25-bssm-pred-eval-violin-fig, echo=F, fig.cap="SFA 25A (BSSM) violin plots of the difference between realized biomass and one-year projections using seven different methods. For the violin plots the horizontal lines represent the minimum, median, and maximum values, the width of the violin represents the relative amount of data. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. The upper panel is absolute difference in kilotonnes, the middle panel is the difference in kilotonnes, and lower panel is the percent difference. The blue horizontal dashed line represents no biomass difference."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/English/Sab_bssm_PE_biomass_violin.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/French/Sab_bssm_PE_biomass_violin.png"))
 ```
 
 
 \newpage
-```{r sfa-25-pred-eval-ts-fig, echo=F, fig.cap="SFA 25A (SEAM) difference between realized biomass and one-year projections for eight different methods using SEAM. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. a) is the difference in kilotonnes  while b) is the percent difference. The blue horizontal dashed line represents no biomass difference. No comparisons could be made in 2015, 2016, 2020, and 2021 due to a lack of survey data in 2015 and 2020."}
+```{r sfa-25-pred-eval-ts-fig, echo=F, fig.cap="SFA 25A (SEAM) difference between realized biomass and one-year projections for eight different methods using SEAM. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. The upper panel is the difference in kilotonnes while the lower panel is the percent difference. The blue horizontal dashed line represents no biomass difference. No comparisons could be made in 2015, 2016, 2020, and 2021 due to a lack of survey data in 2015 and 2020."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.10,"/English/Sab_PE_bm_ts_combo.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.10,"/French/Sab_PE_bm_ts_combo.png"))
 ```
 
 
 \newpage
-```{r sfa-25-pred-eval-violin-fig, echo=F, fig.cap="SFA 25A (SEAM) violin plots of the difference between realized biomass and one-year projections using eight different methods. For the violin plots the horizontal lines represent the minimum, median, and maximum values, the width of the violin represents the relative amount of data. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. a) is absolute difference in kilotonnes, b) is the difference in kilotonnes, and c) is the percent difference. The blue horizontal dashed line represents no biomass difference."}
+```{r sfa-25-pred-eval-violin-fig, echo=F, fig.cap="SFA 25A (SEAM) violin plots of the difference between realized biomass and one-year projections using eight different methods. For the violin plots the horizontal lines represent the minimum, median, and maximum values, the width of the violin represents the relative amount of data. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. The upper panel is absolute difference in kilotonnes, the middle panel is the difference in kilotonnes, and lower panel is the percent difference. The blue horizontal dashed line represents no biomass difference."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.10,"/English/Sab_PE_biomass_violin.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.10,"/French/Sab_PE_biomass_violin.png"))
 ```
 
 
 \newpage
-```{r sfa-26-bssm-pred-eval-ts-fig, echo=F, fig.cap= "SFA 26A (BSSM) difference between realized biomass and one-year projections using seven different methods. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. a) is the difference in kilotonnes  while b) is the percent difference. The blue horizontal dashed line represents no biomass difference. No comparisons could be made in 2020 and 2021 due to a lack of survey data in 2020."}
+```{r sfa-26-bssm-pred-eval-ts-fig, echo=F, fig.cap= "SFA 26A (BSSM) difference between realized biomass and one-year projections using seven different methods. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. The upper panel is the difference in kilotonnes while the lower panel is the percent difference. The blue horizontal dashed line represents no biomass difference. No comparisons could be made in 2020 and 2021 due to a lack of survey data in 2020."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/English/BBn_bssm_PE_bm_ts_combo.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/French/BBn_bssm_PE_bm_ts_combo.png"))
 ```
 
 
 \newpage
-```{r sfa-26-bssm-pred-eval-violin-fig, echo=F, fig.cap="SFA 26A (BSSM) violin plots of the difference between realized biomass and one-year projections using seven different methods. For the violin plots the horizontal lines represent the minimum, median, and maximum values, the width of the violin represents the relative amount of data. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. a) is absolute difference in kilotonnes, b) is the difference in kilotonnes, and c) is the percent difference. The blue horizontal dashed line represents no biomass difference."}
+```{r sfa-26-bssm-pred-eval-violin-fig, echo=F, fig.cap="SFA 26A (BSSM) violin plots of the difference between realized biomass and one-year projections using seven different methods. For the violin plots the horizontal lines represent the minimum, median, and maximum values, the width of the violin represents the relative amount of data. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. The upper panel is absolute difference in kilotonnes, the middle panel is the difference in kilotonnes, and lower panel is the percent difference. The blue horizontal dashed line represents no biomass difference."}
 
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/English/BBn_bssm_PE_biomass_violin.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SS_model/French/BBn_bssm_PE_biomass_violin.png"))
@@ -654,14 +654,14 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_"
 
 
 \newpage
-```{r sfa-26-pred-eval-ts-fig, echo=F, fig.cap= "SFA 26A (SEAM) difference between realized biomass and one-year projections using eight different methods. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. a) is the difference in kilotonnes  while b) is the percent difference. The blue horizontal dashed line represents no biomass difference. No comparisons could be made in 2020 and 2021 due to a lack of survey data in 2020."}
+```{r sfa-26-pred-eval-ts-fig, echo=F, fig.cap= "SFA 26A (SEAM) difference between realized biomass and one-year projections using eight different methods. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. The upper panel is the difference in kilotonnes while the lower panel is the percent difference. The blue horizontal dashed line represents no biomass difference. No comparisons could be made in 2020 and 2021 due to a lack of survey data in 2020."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_PE_bm_ts_combo.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_PE_bm_ts_combo.png"))
 ```
 
 
 \newpage
-```{r sfa-26-pred-eval-violin-fig, echo=F, fig.cap="SFA 26A (SEAM) violin plots of the difference between realized biomass and one-year projections using eight different methods. For the violin plots the horizontal lines represent the minimum, median, and maximum values, the width of the violin represents the relative amount of data. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. a) is absolute difference in kilotonnes, b) is the difference in kilotonnes, and c) is the percent difference. The blue horizontal dashed line represents no biomass difference."}
+```{r sfa-26-pred-eval-violin-fig, echo=F, fig.cap="SFA 26A (SEAM) violin plots of the difference between realized biomass and one-year projections using eight different methods. For the violin plots the horizontal lines represent the minimum, median, and maximum values, the width of the violin represents the relative amount of data. A value of zero indicates the one-year projection biomass was the same as the realized, positive (negative) values indicate the one-year projection predicted the biomass to be higher (lower) than realized. The upper panel is absolute difference in kilotonnes, the middle panel is the difference in kilotonnes, and lower panel is the percent difference. The blue horizontal dashed line represents no biomass difference."}
 
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_PE_biomass_violin.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_PE_biomass_violin.png"))

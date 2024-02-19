@@ -35,7 +35,7 @@ theme_set(theme_few(base_size = 22))
 direct <- "Y:/Offshore/Assessment/"
 
 
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 # Get the survey boundary file...
 temp <- tempfile()
 
@@ -136,29 +136,32 @@ waa.t <- c(mod.dat$CF[-1],mod.dat$CF[nrow(mod.dat)])*(laa.t/100)^3
 waa.t2 <- mod.dat$CF*(laa.t/100)^3
 mod.dat$gR <- waa.t/waa.tm1
 mod.dat$gR2 <- waa.t2/waa.tm1# setwd("C:/Assessment/2014/r")
-  
+
+
 ### overwrite imputation for growth here using whichever method
 # in 2020, the covid-19 pandemic prevented the DFO survey from occurring. An industry-lead survey of limited scope occurred, but is not suitable for inclusion in the 
 # assessment models. As such, we need to fill-in the blank row for 2020 with some data. We'll try out different options for doing that here. 
 # We imputed the values in the survey data earlier, but for the "mixed" imputation method, we'll handle growth separately.
 # Maybe it makes more sense to use the LTM for growth but midpoint for other values. 
     
-# change 2019 and 2020 values to NA     # Also missed the 2015 survey on Sable so same thing 
+# change 2020 values to NA     # Also missed the 2015 survey on Sable so same thing 
 
-mod.dat$g[which(mod.dat$year %in% c(2014:2015,2019:2020))] <- NA
+mod.dat$g[which(mod.dat$year %in% c(2015,2020))] <- NA
 mod.dat$g2[which(mod.dat$year %in% c(2015,2020))] <- NA
   
-mod.dat$gR[which(mod.dat$year %in% 2019:2020)] <- NA
+mod.dat$gR[which(mod.dat$year %in% 2020)] <- NA
 mod.dat$gR2[which(mod.dat$year %in% 2020)] <- NA
     
 # replace the NAs with long term medians
-mod.dat$g[which(mod.dat$year %in% c(2014:2015,2019:2020))] <- median(mod.dat$g, na.rm=T)
+mod.dat$g[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$g, na.rm=T)
 mod.dat$g2[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$g2, na.rm=T)
     
-mod.dat$gR[which(mod.dat$year %in% c(2014:2015,2019:2020))] <- median(mod.dat$gR, na.rm=T)
+mod.dat$gR[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$gR, na.rm=T)
 mod.dat$gR2[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$gR2, na.rm=T)
     
-
+#write.csv(mod.dat,"D:/Framework/SFA_25_26_2024/Model/Data/Sab_mod_input_for_freya.csv")
+#mod.tmp <- read.csv("D:/Framework/SFA_25_26_2024/Model/Data/BBn_input_data_for_freya.csv")
+#mod.tmp$g[4:32] - growth$g[1:29]
   
 strt.mod.yr <- 1994
 # Grab the data, start model at either 1986 (note that BBn data starts in 1991 so anything earlier will default to 1991)

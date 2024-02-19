@@ -35,7 +35,7 @@ theme_set(theme_few(base_size = 22))
 direct <- "Y:/Offshore/Assessment/"
 repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 
-load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH.Rdata")
+load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 # Get the survey boundary file...
 temp <- tempfile()
 

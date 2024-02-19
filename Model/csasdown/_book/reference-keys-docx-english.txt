@@ -34,9 +34,6 @@ fig:sfa-25-nm-fig
 fig:sfa-25-spat-nm-fig
 fig:sfa-25-fm-fig
 fig:sfa-25-spat-fm-fig
-fig:sfa-25-kobe-fig
-fig:sfa-25-jem-fig
-fig:sfa-25-rel-f-fig
 fig:sfa-26-bm-fig
 fig:sfa-26-spat-bm-fig
 fig:sfa-26-catchy-fig
@@ -46,6 +43,9 @@ fig:sfa-26-nm-fig
 fig:sfa-26-spat-nm-fig
 fig:sfa-26-fm-fig
 fig:sfa-26-spat-fm-fig
+fig:sfa-25-kobe-fig
+fig:sfa-25-jem-fig
+fig:sfa-25-rel-f-fig
 fig:sfa-26-kobe-fig
 fig:sfa-26-jem-fig
 fig:sfa-26-rel-f-fig
