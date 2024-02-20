@@ -322,7 +322,7 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_"
 ```
 
 
-
+\newpage
 ```{r sfa-25-rf-bm-fig, echo=F, fig.cap="SFA 25A SEAM process error field (log scale)."}
 if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_B_rf.png"))
 if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_B_rf.png"))

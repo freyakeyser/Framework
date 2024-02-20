@@ -720,6 +720,20 @@ spatial.B.plot<- ggplot() + geom_sf(data=b.spat.sab.10 %>% dplyr::filter(Year !=
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 16)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 16)
 
+# A wide version of the same
+
+spatial.B.wide.plot<- ggplot() + geom_sf(data=b.spat.sab.10 %>% dplyr::filter(Year != 2023),aes(fill=log(B)),color='grey')+
+                            facet_wrap(~Year,nrow=4)+ 
+                            #scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                            #scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                            scale_fill_viridis_c(breaks = b.brk, labels=b.lab,name="Biomass \nDensity \n(kg\U2022km\U207B\U00B2)",option = "A",begin=0.2) + 
+                            theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_biomass_wide.png"),spatial.B.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_biomass_wide.png"),spatial.B.wide.plot,base_width = 18,base_height = 10)
+
+
+
 # Catchability
 
 spatial.q.plot <- ggplot() + geom_sf(data=q.spat.sab.10,aes(fill=qI),col=NA)+
@@ -751,6 +765,15 @@ spatial.R.plot<-  ggplot() + geom_sf(data=r.spat.sab.10,aes(fill=log(R)),col='gr
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 16)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/English/Sab_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 16)
 
+spatial.R.wide.plot<-  ggplot() + geom_sf(data=r.spat.sab.10,aes(fill=log(R)),col='grey')+
+                             facet_wrap(~Year,nrow=4)+ 
+                             # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                             # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                             scale_fill_viridis_c(breaks = r.brk, labels = r.lab,name="Recruit \nDensity \n(kg\U2022km\U207B\U00B2)",end=0.8)+ 
+                             theme(axis.text.x=element_text(angle=-45,hjust=0))
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_recruits_wide.png"),spatial.R.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/English/Sab_Spatial_recruits_wide.png"),spatial.R.wide.plot,base_width = 18,base_height = 10)
+
 # Remove missing survey years
 
 
@@ -776,6 +799,21 @@ spatial.m.plot <-  ggplot(data=m.spat.sab.10) + geom_sf(aes(fill=log(m)),color='
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
+# Wide
+
+m.brk <- log(c(0.03,0.1,0.3,1))
+#m.brk <- pretty(log(m.dat.plot$m))
+m.lab <- signif(exp(m.brk),digits=2)
+m.spat.sab.10 <- m.spat.sab.10[m.spat.sab.10$Year != 2023,]
+spatial.m.wide.plot <-  ggplot(data=m.spat.sab.10) + geom_sf(aes(fill=log(m)),color='grey')+
+                              facet_wrap(~Year,nrow=4)+
+                              # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                              # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                              scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) +
+                              theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_nm_wide.png"),spatial.m.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_nm_wide.png"),spatial.m.wide.plot,base_width = 18,base_height = 10)
 
 # Remove missing survey years
 
@@ -799,6 +837,13 @@ spatial.exploit.plot<- ggplot() + geom_sf(data=F.spat.sab.10,aes(fill=log(F.na))
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_FM.png"),spatial.exploit.plot,base_width = 12,base_height = 16)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_FM.png"),spatial.exploit.plot,base_width = 12,base_height = 16)
 
+spatial.exploit.wide.plot<- ggplot() + geom_sf(data=F.spat.sab.10,aes(fill=log(F.na)),color='grey') +
+                                  # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                                  # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                                  facet_wrap(~Year,nrow=4) + scale_fill_viridis_c(breaks = e.brk,labels = e.lab,name="Fishing \nmortality \n(Instantaneous)",option = "D") + theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_FM_wide.png"),spatial.exploit.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_FM_wide.png"),spatial.exploit.wide.plot,base_width = 18,base_height = 10)
 ## 20 knots big 3 figures for comparison....
 
 # Biomass
@@ -862,6 +907,17 @@ spatial.B.plot<- ggplot() + geom_sf(data=b.spat.bbn.20 %>% dplyr::filter(Year !=
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 16)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 16)
 
+spatial.B.wide.plot<- ggplot() + geom_sf(data=b.spat.bbn.20 %>% dplyr::filter(Year != 2023),aes(fill=log(B)),color='grey')+
+                            facet_wrap(~Year,nrow=4)+ 
+                            #scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                            #scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                            scale_fill_viridis_c(breaks = b.brk, labels=b.lab,name="Biomass \nDensity \n(kg\U2022km\U207B\U00B2)",option = "A",begin=0.2) + 
+                            theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_biomass_wide.png"),spatial.B.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_biomass_wide.png"),spatial.B.wide.plot,base_width = 18,base_height = 10)
+
+
 # Catchability
 
 spatial.q.plot <- ggplot() + geom_sf(data=q.spat.bbn.20,aes(fill=qI),col=NA)+
@@ -893,6 +949,17 @@ spatial.R.plot<-  ggplot() + geom_sf(data=r.spat.bbn.20,aes(fill=log(R)),col='gr
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 16)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/French/BBn_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 16)
 
+# Wide...
+spatial.R.wide.plot<-  ggplot() + geom_sf(data=r.spat.bbn.20,aes(fill=log(R)),col='grey')+
+                             facet_wrap(~Year,nrow=4)+ 
+                             # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                             # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                             scale_fill_viridis_c(breaks = r.brk, labels = r.lab,name="Recruit \nDensity \n(kg\U2022km\U207B\U00B2)",end=0.8)+ 
+                             theme(axis.text.x=element_text(angle=-45,hjust=0))
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_recruits_wide.png"),spatial.R.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/French/BBn_Spatial_recruits_wide.png"),spatial.R.wide.plot,base_width = 18,base_height = 10)
+
+
 # Remove missing survey years
 
 
@@ -920,6 +987,19 @@ spatial.m.plot <-  ggplot() + geom_sf(data=m.spat.bbn.20,aes(fill=log(m)),color=
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
 
+# Wide....
+
+spatial.m.wide.plot <-  ggplot() + geom_sf(data=m.spat.bbn.20,aes(fill=log(m)),color='grey')+
+                              facet_wrap(~Year,nrow=4)+
+                              # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                              # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                              scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) +
+                              theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_nm_wide.png"),spatial.m.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_nm_wide.png"),spatial.m.wide.plot,base_width = 18,base_height = 10)
+
+
 # Remove missing survey years
 
 # Fishing mortality Time Series
@@ -940,6 +1020,14 @@ spatial.exploit.plot<- ggplot() + geom_sf(data=F.spat.bbn.20,aes(fill=log(F.na))
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_fm.png"),spatial.exploit.plot,base_width = 12,base_height = 16)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_fm.png"),spatial.exploit.plot,base_width = 12,base_height = 16)
 
+# Wide
+spatial.exploit.wide.plot<- ggplot() + geom_sf(data=F.spat.bbn.20,aes(fill=log(F.na)),color='grey') +
+                                  # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                                  # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                                  facet_wrap(~Year,nrow=4) + scale_fill_viridis_c(breaks = e.brk,labels = e.lab,name="Fishing \nmortality \n(Instantaneous)",option = "D") + theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_fm_wide.png"),spatial.exploit.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_fm_wide.png"),spatial.exploit.wide.plot,base_width = 18,base_height = 10)
 
 # 10 knot competition
 
@@ -1104,6 +1192,20 @@ p.B.rf<- ggplot() + geom_sf(data=sab.10.B.field,aes(fill=value,color=value)) +
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 16)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 16)
 
+# Wide
+p.B.rf.wide<- ggplot() + geom_sf(data=sab.10.B.field,aes(fill=value,color=value)) +
+                                  # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                                  # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                                  facet_wrap(~name,nrow=4) + 
+                                  scale_fill_viridis_c(name="Process Error \nRandom Field",option = "D") + 
+                                  scale_color_viridis_c(name="Process Error \nRandom Field",option = "D") + 
+                                  theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_B_rf_wide.png"),p.B.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_B_rf_wide.png"),p.B.rf.wide,base_width = 18,base_height = 10)
+
+# Recruits
+
 # Recruits
 p.R.rf<- ggplot() + geom_sf(data=sab.10.R.field,aes(fill=value,color=value)) +
                                   # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
@@ -1116,6 +1218,18 @@ p.R.rf<- ggplot() + geom_sf(data=sab.10.R.field,aes(fill=value,color=value)) +
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 16)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 16)
 
+# Wide
+p.R.rf.wide<- ggplot() + geom_sf(data=sab.10.R.field,aes(fill=value,color=value)) +
+                                  # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                                  # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                                  facet_wrap(~name,nrow=4) + 
+                                  scale_fill_viridis_c(name="Recruit Biomass \nRandom Field",option = "D") + 
+                                  scale_color_viridis_c(name="Recruit Biomass \nRandom Field",option = "D") + 
+                                  theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_R_rf_wide.png"),p.R.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_R_rf_wide.png"),p.R.rf.wide,base_width = 18,base_height = 10)
+
 # mortality
 p.m.rf<- ggplot() + geom_sf(data=sab.10.m.field,aes(fill=value,color=value)) +
                                   # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
@@ -1127,6 +1241,19 @@ p.m.rf<- ggplot() + geom_sf(data=sab.10.m.field,aes(fill=value,color=value)) +
 
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 16)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 16)
+
+# Wide
+p.m.rf.wide<- ggplot() + geom_sf(data=sab.10.m.field,aes(fill=value,color=value)) +
+                                  # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                                  # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                                  facet_wrap(~name,nrow=4) + 
+                                  scale_fill_viridis_c(name="Natural mortality \nRandom Field",option = "D") + 
+                                  scale_color_viridis_c(name="Natural mortality \nRandom Field",option = "D") + 
+                                  theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_m_rf_wide.png"),p.m.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_m_rf_wide.png"),p.m.rf.wide,base_width = 18,base_height = 10)
+
 
 # A new figure summarizing the fully-recruited biomass "Process error"
 
@@ -1160,6 +1287,18 @@ p.B.rf<- ggplot() + geom_sf(data=bbn.20.B.field,aes(fill=value,color=value)) +
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 16)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 16)
 
+# Wide
+p.B.rf.wide<- ggplot() + geom_sf(data=bbn.20.B.field,aes(fill=value,color=value)) +
+                                  # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                                  # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                                  facet_wrap(~name,nrow=4) + 
+                                  scale_fill_viridis_c(name="Process Error \nRandom Field",option = "D") + 
+                                  scale_color_viridis_c(name="Process Error \nRandom Field",option = "D") + 
+                                  theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_B_rf_wide.png"),p.B.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_B_rf_wide.png"),p.B.rf.wide,base_width = 18,base_height = 10)
+
 # Recruits
 p.R.rf<- ggplot() + geom_sf(data=bbn.20.R.field,aes(fill=value,color=value)) +
                                   # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
@@ -1172,6 +1311,20 @@ p.R.rf<- ggplot() + geom_sf(data=bbn.20.R.field,aes(fill=value,color=value)) +
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 16)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 16)
 
+# Wide
+p.R.rf.wide<- ggplot() + geom_sf(data=bbn.20.R.field,aes(fill=value,color=value)) +
+                                  # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                                  # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                                  facet_wrap(~name,nrow=4) + 
+                                  scale_fill_viridis_c(name="Recruit Biomass \nRandom Field",option = "D") + 
+                                  scale_color_viridis_c(name="Recruit Biomass \nRandom Field",option = "D") + 
+                                  theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_R_rf_wide.png"),p.R.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_R_rf_wide.png"),p.R.rf.wide,base_width = 18,base_height = 10)
+
+
+
 # mortality
 p.m.rf<- ggplot() + geom_sf(data=bbn.20.m.field,aes(fill=value,color=value)) +
                                   # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
@@ -1183,6 +1336,17 @@ p.m.rf<- ggplot() + geom_sf(data=bbn.20.m.field,aes(fill=value,color=value)) +
 
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 16)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 16)
+# Wide...
+p.m.rf.wide<- ggplot() + geom_sf(data=bbn.20.m.field,aes(fill=value,color=value)) +
+                                  # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
+                                  # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
+                                  facet_wrap(~name,nrow=4) + 
+                                  scale_fill_viridis_c(name="Natural mortality \nRandom Field",option = "D") + 
+                                  scale_color_viridis_c(name="Natural mortality \nRandom Field",option = "D") + 
+                                  theme(axis.text.x=element_text(angle=-45,hjust=0))
+
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_m_rf_wide.png"),p.m.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_m_rf_wide.png"),p.m.rf.wide,base_width = 18,base_height = 10)
 
 
 
@@ -1442,19 +1606,23 @@ sab.I.resids.plt <- ggplot(sab.10.I.resids) + geom_point(aes(x=I.mod,y=residual)
                                                geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
                                                scale_x_log10(name="Fitted Values (Fully-recruited biomass density; (kg\U2022km\U00B2))")
 
-
-# sab.I.stan.resids.plt <- ggplot(sab.10.I.resids) + geom_point(aes(x=I.mod,y=stan.resid)) + 
-#                                               #facet_wrap(~knotID) + 
-#                                               xlab("") + ylab("Standardized residual") +
-#                                                scale_x_log10(name="Fitted Values (kg/sqkm)")
-# 
-# sab.I.resids <- plot_grid(sab.I.resids.plt,sab.I.stan.resids.plt,nrow=2)
-
-
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_I_resids.png"),
                                     sab.I.resids.plt,base_width = 8,base_height = 8)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_I_resids.png"),
                                    sab.I.resids.plt,base_width = 8,base_height = 8)
+# Wide
+sab.I.resids.wide.plt <- ggplot(sab.10.I.resids) + geom_point(aes(x=I.mod,y=residual)) + 
+                                              facet_wrap(~knotID,ncol=5) + 
+                                               ylab("Resdiual") +
+                                               geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
+                                               scale_x_log10(name="Fitted Values (Fully-recruited biomass density; (kg\U2022km\U00B2))")+ 
+                                                theme(panel.spacing = unit(1.5, "lines"))
+
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_I_resids_wide.png"),
+                                    sab.I.resids.wide.plt,base_width = 12,base_height = 8)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_I_resids_wide.png"),
+                                   sab.I.resids.wide.plt,base_width = 12,base_height = 8)
+
 
 #Recruits
 sab.IR.resids.plt <- ggplot(sab.10.IR.resids) + geom_point(aes(x=IR.mod,y=residual)) + 
@@ -1463,20 +1631,24 @@ sab.IR.resids.plt <- ggplot(sab.10.IR.resids) + geom_point(aes(x=IR.mod,y=residu
                                                geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
                                                scale_x_log10(name="Fitted Values (Recruit Biomass density; (kg\U2022km\U00B2))")
 
-
-# sab.IR.stan.resids.plt <- ggplot(sab.10.IR.resids) + geom_point(aes(x=IR.mod,y=stan.resid)) + 
-#                                               #facet_wrap(~knotID) + 
-#                                               xlab("") + ylab("Standardized residual") +
-#                                                scale_x_log10(name="Fitted Values (kg/sqkm)")
-# 
-# 
-# sab.IR.resids <- plot_grid(sab.IR.resids.plt,sab.IR.stan.resids.plt,nrow=2)
-
-
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_IR_resids.png"),
                                     sab.IR.resids.plt,base_width = 8,base_height = 8)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_IR_resids.png"),
                                    sab.IR.resids.plt,base_width = 8,base_height = 8)
+# Wide
+sab.IR.resids.wide.plt <- ggplot(sab.10.IR.resids) + geom_point(aes(x=IR.mod,y=residual)) + 
+                                               facet_wrap(~knotID,ncol=5) + 
+                                               ylab("Residual") +
+                                               geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
+                                               scale_x_log10(name="Fitted Values (Recruit Biomass density; (kg\U2022km\U00B2))")+ 
+                                                theme(panel.spacing = unit(1.5, "lines"))
+
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_IR_resids_wide.png"),
+                                    sab.IR.resids.wide.plt,base_width = 12,base_height = 8)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_IR_resids_wide.png"),
+                                   sab.IR.resids.wide.plt,base_width = 12,base_height = 8)
+
+
 
 # QQ plots...
 
@@ -1541,18 +1713,18 @@ bbn.I.resids.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=residual)
                                                 geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
                                                 scale_x_log10(name="Fitted Values (Fully-recruited biomass density; (kg\U2022km\U00B2))")
 
-# bbn.I.stan.resids.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=stan.resid)) + 
-#                                               #facet_wrap(~knotID,scales = 'free_x') + 
-#                                               xlab("") + ylab("Standardized residual") +
-#                                                 scale_x_log10(name="Fitted Values (kg/sqkm)")
-# 
-# bbn.I.resids <- plot_grid(bbn.I.resids.plt,bbn.I.stan.resids.plt,nrow=2)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids.png"),bbn.I.resids.plt,base_width = 8,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids.png"),bbn.I.resids.plt,base_width = 8,base_height = 10)
+# Wide
+bbn.I.resids.wide.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=residual)) + 
+                                              facet_wrap(~knotID,ncol=5) + 
+                                               ylab("Residual") +
+                                                geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
+                                                scale_x_log10(name="Fitted Values (Fully-recruited biomass density; (kg\U2022km\U00B2))")+ 
+                                                theme(panel.spacing = unit(1.5, "lines"))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids.png"),
-                                    bbn.I.resids.plt,base_width = 8,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids.png"),
-                                   bbn.I.resids.plt,base_width = 8,base_height = 10)
-
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids_wide.png"),bbn.I.resids.wide.plt,base_width = 12,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids_wide.png"),bbn.I.resids.wide.plt,base_width = 12,base_height = 10)
 
 
 
@@ -1562,21 +1734,19 @@ bbn.IR.resids.plt <- ggplot(bbn.20.IR.resids) + geom_point(aes(x=IR.mod,y=residu
                                                ylab("Residual") +
                                                 geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
                                                 scale_x_log10(name="Fitted Values (Recruit Biomass density; (kg\U2022km\U00B2))")
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids.png"),bbn.IR.resids.plt,base_width = 8,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids.png"),bbn.IR.resids.plt,base_width = 8,base_height = 10)
 
-# 
-# bbn.IR.stan.resids.plt <- ggplot(bbn.20.IR.resids) + geom_point(aes(x=IR.mod,y=stan.resid)) + 
-#                                               #facet_wrap(~knotID,scales = 'free_x') + 
-#                                               xlab("") + ylab("Standardized residual") +
-#                                                scale_x_log10(name="Fitted Values (kg/sqkm)")
-# 
-# 
-# 
-# bbn.IR.resids <- plot_grid(bbn.IR.resids.plt,bbn.IR.stan.resids.plt,nrow=2)
+# Wide
+bbn.IR.resids.wide.plt <- ggplot(bbn.20.IR.resids) + geom_point(aes(x=IR.mod,y=residual)) + 
+                                              facet_wrap(~knotID,ncol=5) + 
+                                               ylab("Residual") +
+                                                geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
+                                                scale_x_log10(name="Fitted Values (Recruit Biomass density; (kg\U2022km\U00B2))")+ 
+                                                theme(panel.spacing = unit(1.5, "lines"))
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids_wide.png"),bbn.IR.resids.wide.plt,base_width = 12,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids_wide.png"),bbn.IR.resids.wide.plt,base_width = 12,base_height = 10)
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids.png"),
-                                    bbn.IR.resids.plt,base_width = 8,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids.png"),
-                                   bbn.IR.resids.plt,base_width = 8,base_height = 10)
 
 # QQ plots...
 
@@ -2176,6 +2346,14 @@ if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SSmodel/French/BBn_bssm_rec_resids.png"),
                                    pe.IR.res,base_width = 6,base_height = 8)
 
+
+
+```
+
+```{r save-em-all,echo=F,include=F}
+# Save everything...
+if(language == 'english') save(file = paste0(repo.loc,"Results/All_results_english_R_",R.size,"_FR_",g.mod,".RData"),list=ls())
+if(language == 'french') save(file = paste0(repo.loc,"Results/All_results_french_R_",R.size,"_FR_",g.mod,".RData"),list=ls())
 ```
 
 

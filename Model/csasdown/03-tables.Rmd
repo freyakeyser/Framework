@@ -16,7 +16,7 @@ editor_options:
 # clean things up...
 # Parameter tables 
 # First Sable and BSSM, here pulling this for parameters with only a single estimate
-parameters.bssm <- c("K","S","$\\frac{1}{\\kappa_{tau}^2}$","$\\frac{1}{\\kappa_{rho}^2}$", "$q$", "$\\sigma$")
+parameters.bssm <- c("K","S","$\\frac{1}{\\kappa_{rho}^2}$","$\\frac{1}{\\kappa_{tau}^2}$", "$q$", "$\\sigma$")
 parameters.seam <- c("$\\sigma_{\\epsilon}$", "$\\sigma_{\\upsilon}$",  "$R_0$", "$B_0$",
                      "$p_I$" ,"$p_{IR}$", "$\\psi_B$","$\\lambda_B$" , "$\\psi_R$", "$\\lambda_R$", "$\\psi_m$","$\\lambda_m$", "$S$")
 # parameters.sab.seam <- c("$\\sigma_{\\epsilon}$", "$\\sigma_{\\upsilon}$", "$B_0$", "$R_0$", "$m_0$", 

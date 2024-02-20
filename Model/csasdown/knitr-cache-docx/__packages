@@ -34,3 +34,7 @@ GGally
 xtable
 terra
 tidyterra
+coda
+rjags
+R2jags
+rgdal
