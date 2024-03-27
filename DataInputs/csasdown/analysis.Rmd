@@ -812,6 +812,14 @@ n.banks <- length(banks)
 for (i in 1:n.banks){
   surv <- st_as_sf(surv.Live[[banks[i]]],coords = c('slon','slat'),crs = 4326,remove=F) %>% 
     dplyr::filter(state == 'live')
+
+  if(banks[i]=="Mid") {
+    surv$random[surv$random == 1 & surv$year==2022] <- 3
+    surv$random[surv$random == 3] <- "fixed"
+    surv$random[surv$random == 1] <- "exploratory"
+    surv$random[surv$random == "fixed"] <- 1
+    surv$random[surv$random == "exploratory"] <- 3
+  }
   surv$`Tow type` <- paste0('regular (n = ',length(surv$random[surv$random==1]),")")
   if(!banks[i] %in% c("Ger")) boundary <- boundaries[boundaries$ID == banks[i],]
   if(banks[i] %in% c("Ger")) boundary <- ger.concave
@@ -820,22 +828,37 @@ for (i in 1:n.banks){
   if(banks[i] == 'Ger') surv$`Tow type`[surv$random == 3] <- paste0('repeated (n = ',length(surv$random[surv$random==3]),")")
   if(banks[i] == 'GB') surv$`Tow type`[surv$random == 3] <- paste0('regular (n = ',length(surv$random[surv$random==3]),")")
   # Get the shapes for symbols we want, this should do what we want for all cases we've ever experienced...
-  if(length(unique(surv$`Tow type`)) ==1) shp <- 16; ptcol <- c("black")
-  if(!banks[i] == "Ger" & length(unique(surv$`Tow type`)) ==2) shp <- c(24,16); ptcol <- c("transparent", "black")
-  if(banks[i] == "Ger" & length(unique(surv$`Tow type`))==2) shp <- c(16,22); ptcol <- c("black", "black")
-  if(length(unique(surv$`Tow type`)) ==3) shp <- c(24,16,22); ptcol <- c("transparent", "black", "black")
+  if(length(unique(surv$`Tow type`)) ==1) shp <- 21; ptcol <- c("black")
+  if(!banks[i] == "Ger" & length(unique(surv$`Tow type`)) ==2) shp <- c(24,21); ptcol <- c("transparent", "black")
+  if(banks[i] == "Ger" & length(unique(surv$`Tow type`))==2) shp <- c(21,22); ptcol <- c("black", "black")
+  if(length(unique(surv$`Tow type`)) ==3) shp <- c(24,21,22); ptcol <- c("transparent", "black", "black")
+  
   ncol <- 8
   if(banks[i] %in% c("GBb", "BBs")) ncol <- 10
   if(banks[i] == "Ger") ncol <- 7
   if(banks[i] == "Ban") ncol <- 3
   by <- 0.3
   if(banks[i]=="Sab") by <- 1
+  surv$`Tow type` <- as.factor(surv$`Tow type`)
+  unique(surv$`Tow type`)
   
+  # add colour for sampling
+  out <- mw.dat.all[[banks[i]]] %>%
+    dplyr::select(year,tow) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(sampled = 1,
+                  year=as.numeric(year),
+                  tow=as.numeric(tow))
   
+  surv <- left_join(surv, out)
+  surv$sampled[is.na(surv$sampled)] <- 0
+ 
   png(filename=paste0(plotsGo, "/Survey/", nickname, "/stations_", banks[i], ".png"),width=16, height=8, units = "in", res=420)
-  print(ggplot() + geom_sf(data=boundary, fill=NA) + 
-          geom_sf(data=surv, aes(shape=`Tow type`)) + 
+  print(ggplot() + geom_sf(data=boundary, fill="grey", colour=NA) + 
+          geom_sf(data=surv[surv$sampled==0,], aes(shape=`Tow type`, fill=as.factor(sampled))) + 
+          geom_sf(data=surv[surv$sampled==1,], aes(shape=`Tow type`, fill=as.factor(sampled))) + 
           scale_shape_manual(values = shp, guide=guide_legend(order=4)) +
+          scale_fill_manual(values=c("transparent", "black"), guide=F) +
           facet_wrap(~year, ncol=ncol) + 
           theme_bw() +
           theme(legend.position = 'bottom',legend.direction = 'horizontal',
@@ -1142,7 +1165,9 @@ for(b in c("Mid", "Ban", "Ger")){
   stns$col <- gsub(x=stns$col, pattern=16, replacement = "black")
   stns$col <- gsub(x=stns$col, pattern=22, replacement = "black")
   tows <- unique(stns[,c("random", "shape", "col")])
+  if(b=="Ger") sf_use_s2(FALSE)
   shpf_b <- st_union(shpf)
+  if(b=="Ger") sf_use_s2(TRUE)
     
   p <- pecjector(area = b,plot = F,
                  add_layer = list(eez = 'eez' , sfa = 'offshore',bathy = c(50, 'c'),scale.bar = "br")) +
@@ -1183,6 +1208,7 @@ for(b in c("Mid", "Ban", "Ger")){
     )
     dev.off()
   }
+  tows <- dplyr::arrange(tows, random)
   if(b %in% c("Ger")){
     png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
     print(
@@ -1373,7 +1399,7 @@ fishery$subarea[fishery$bank=="Ger"] <- "26C"
 fishery$subarea[fishery$bank=="GBb"] <- "27B"
 
 for(sfa in 25:27){
-  png(filename=paste0(plotsGo, "/Fishery/fishery_", sfa, fr, ".png"),width=6.5*1.5, height=4*1.5, units = "in", res=420)
+  png(filename=paste0(plotsGo, "/Fishery/fishery_", sfa, fr, "_pres.png"),width=4*1.5, height=4*1.5, units = "in", res=420)
   kg <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=subarea, shape=subarea), size=2) +
     geom_line(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=subarea)) +
     theme_bw() +
@@ -1401,7 +1427,10 @@ for(sfa in 25:27){
     ylab(cpuelab) +
     guides(colour="none", shape="none")
   
+  #regular: 
   print(kg / hm / cp)
+  #presentation:
+  print(kg / hm / cp + plot_layout(guides = "collect") & theme(legend.position = 'bottom'))
   dev.off()
 }
 
@@ -1526,10 +1555,121 @@ for(sfa in 25:27){
                        fun.geometry = sf::st_centroid,
                        nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
                        nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
-          )
+          )#+
+          #theme(legend.position="bottom",legend.key.width= unit(2, 'cm'))
   )
   dev.off()
 }  
+
+# annual footprints
+for(sfa in 25:27){
+  
+  if(sfa==25) { 
+    crs <- 32620
+    foot <- st_as_sf(fish_sf[grep(x=fish_sf$sfa, pattern="25"),]) %>%
+      st_transform(crs)
+    base <- offshore[grep(x=offshore$ID, pattern="25"),] %>% st_transform(crs)
+  }
+  
+  if(sfa==26) {
+    crs <- 32619
+    foot <- st_as_sf(fish_sf[grep(x=fish_sf$sfa, pattern="26"),]) %>%
+      st_transform(crs)
+    base <- offshore[grep(x=offshore$ID, pattern="26"),] %>% st_transform(crs)
+  }  
+  
+  if(sfa==27) {
+    crs <- 32619
+    foot <- st_as_sf(fish_sf[grep(x=fish_sf$sfa, pattern="27B"),]) %>%
+      st_transform(crs)
+    base <- offshore[grep(x=offshore$ID, pattern="27B"),] %>% st_transform(crs)
+  }  
+  
+  r <- create_grid(gridsize = sqrt(10)*1000, polygon = base)
+  
+  #plot(r)
+  
+  foot <- foot %>% 
+    st_intersection(r) %>%
+    group_by(bank, cell, year) %>%
+    dplyr::summarize(kg = sum(pro.repwt, na.rm = T),
+                     hm = sum(hm, na.rm=T),
+                     nvessels = length(unique(vrnum)) + length(unique(vesid)))
+
+  st_geometry(foot) <- NULL
+  
+  foot <- dplyr::left_join(r, foot)
+  
+  lims <- foot[!is.na(foot$kg),] %>% 
+    st_combine() %>% 
+    st_convex_hull() %>% 
+    st_buffer(dist=50000) %>% 
+    st_bbox()
+  
+  if(french==T) nonGB$final <- nonGB$fr
+  if(french==F) nonGB$final <- nonGB$lab_short
+  
+  bp <- pecjector(area=list(y = c(lims$ymin[[1]], lims$ymax[[1]]),
+                            x =c(lims$xmin[[1]], lims$xmax[[1]]),
+                            crs = crs),
+                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), sfa = 'offshore'),plot=F, quiet=T)# + 
+  
+  #manual adjustment to scalebar text size
+  #bp$layers[[5]]$geom_params$text_cex <- 1.5
+
+  png(filename=paste0(plotsGo, "/Fishery/footprint_year_kg_", sfa, fr, ".png"),width=18, height=9, units = "in", res=420)
+  print(bp +
+          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/1000), colour=NA, show.legend=T) +
+          theme(legend.position="right") +
+          scale_fill_viridis_c(name=paste0(en2fr(x = "Catch", translate=french, custom_terms=rosetta_terms), " (t)"), option="rocket", begin=0.95, end=0)+
+          coord_sf(expand=F)+
+          # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+          #              aes(label = final), 
+          #              size=6,
+          #              fun.geometry = sf::st_centroid,
+          #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+          #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+          # )+
+          facet_wrap(~year, ncol=9)
+  )
+  dev.off()
+  
+   png(filename=paste0(plotsGo, "/Fishery/footprint_year_hm_", sfa, fr, ".png"),width=18, height=9, units = "in", res=420)
+  print(bp +
+          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=hm), colour=NA, show.legend=T) +
+          theme(legend.position="right") +
+          scale_fill_viridis_c(name=paste0(en2fr(x = "Effort", translate=french, custom_terms=rosetta_terms), " (hm)"), option="rocket", begin=0.95, end=0)+
+          coord_sf(expand=F)+
+          # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+          #              aes(label = final), 
+          #              size=6,
+          #              fun.geometry = sf::st_centroid,
+          #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+          #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+          # )+
+          facet_wrap(~year, ncol=9)
+  )
+  dev.off()
+  
+     png(filename=paste0(plotsGo, "/Fishery/footprint_year_cpue_", sfa, fr, ".png"),width=18, height=9, units = "in", res=420)
+  print(bp +
+          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/hm), colour=NA, show.legend=T) +
+          theme(legend.position="right") +
+          scale_fill_viridis_c(name=paste0(en2fr(x = "CPUE", translate=french, custom_terms=rosetta_terms), " (kg/hm)"), option="rocket", begin=0.95, end=0)+
+          coord_sf(expand=F)+
+          # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+          #              aes(label = final), 
+          #              size=6,
+          #              fun.geometry = sf::st_centroid,
+          #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+          #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+          # )+
+          facet_wrap(~year, ncol=9)
+  )
+  dev.off()
+}  
+
+
 
 # for TAC and Landings figure
 #tac <- read.csv("Y:/Offshore/Assessment/Data/Model/Ref_pts_and_tac.csv")
@@ -1645,6 +1785,17 @@ png(filename=paste0(plotsGo, "/Fishery/tac", fr, ".png"),width=6.5, height= 8, u
 print(tac25 + tac26 + tac27 + plot_annotation(tag_levels=c("A", "B")) + plot_layout(design = areas))
 dev.off()
 
+png(filename=paste0(plotsGo, "/Fishery/tac", fr, "_25.png"),width=4, height= 5, units = "in", res=420)
+print(tac25)
+dev.off()
+
+png(filename=paste0(plotsGo, "/Fishery/tac", fr, "_26.png"),width=4, height= 5, units = "in", res=420)
+print(tac26)
+dev.off()
+
+png(filename=paste0(plotsGo, "/Fishery/tac", fr, "_27.png"),width=4, height= 3, units = "in", res=420)
+print(tac27)
+dev.off()
 # exploitation rates (relative, not modelled)
 # using survey year, so June to May
 
@@ -1766,6 +1917,19 @@ areas <- "A#\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB\nAB
           
 png(filename=paste0(plotsGo, "/Fishery/relF_", nickname, ".png"),width=6.5, height= 8, units = "in", res=420)
 print(exp25 + exp26 + exp27 + plot_annotation(tag_levels=c("A", "B", "C")) + plot_layout(design = areas))
+dev.off()
+
+
+png(filename=paste0(plotsGo, "/Fishery/relF", fr, "_25.png"),width=4, height= 5, units = "in", res=420)
+print(exp25)
+dev.off()
+
+png(filename=paste0(plotsGo, "/Fishery/relF", fr, "_26.png"),width=4, height= 5, units = "in", res=420)
+print(exp26)
+dev.off()
+
+png(filename=paste0(plotsGo, "/Fishery/relF", fr, "_27.png"),width=4, height= 3, units = "in", res=420)
+print(exp27)
 dev.off()
 
 

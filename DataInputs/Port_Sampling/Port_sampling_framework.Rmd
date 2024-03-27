@@ -105,6 +105,7 @@ if(french==T) ylabel <- "Masse de la chair (g)"
 # dev.off()
 
 port.sampling$ID <- 1:nrow(port.sampling)
+port.sampling$meat_weight <- port.sampling$meat_weight*1.0989011 # add the bit
 
 medians <- port.sampling %>%
   group_by(bank, month, year) %>%
@@ -226,11 +227,97 @@ ps_tab$main[ps_tab$bank %in% c("Sab", "BBn")] <- "*"
 # Sable is missing data from Jan and Feb
 write.csv(ps_tab, paste0(plotsGo, "/ps_tab.csv"))
 
+ps_tab$ltm_mc <- 500/ps_tab$ltm_mw
+mc.reg <- read.csv("Y:/Offshore/Assessment/Data/Fishery_regulations_by_bank.csv")
+mc.reg <- unique(dplyr::select(mc.reg, Bank, MC_reg))
+mc.reg$bank <- mc.reg$Bank
+mc.reg <- dplyr::select(mc.reg, -Bank)
+ps_tab3 <- left_join(ps_tab, mc.reg)
+write.csv(ps_tab3, paste0(plotsGo, "/ps_tab_w_MC.csv"))
+
+# more summaries for meeting
+ps_tab2 <- port.sampling %>% 
+  dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
+  dplyr::group_by(sfa,bank,year, month) %>%
+  dplyr::summarize(`number of port samples`=length(unique(ID)),
+            `number of port sampled vessels`=length(unique(boat))) %>%
+  dplyr::ungroup()
+
+png(paste0(plotsGo, "ps_summary_vessels.png"), width=18, height=9, units = "in", res=420)
+ggplot() + geom_point(data=ps_tab2, aes(year, month, size=vessels)) +
+  geom_text(data=ps_tab2, aes(year, month, label=vessels), size=3, nudge_x = 0.2) + 
+  facet_grid(sfa+bank~., drop=T,scales="free") +
+  scale_size_continuous(name="Number of\nvessels sampled")
+dev.off()
+
+png(paste0(plotsGo, "ps_summary_samples.png"), width=18, height=9, units = "in", res=420)
+ggplot() + geom_point(data=ps_tab2, aes(year, month, size=total)) +
+  geom_text(data=ps_tab2, aes(year, month, label=total), size=3, nudge_x = 0.15, hjust=0) + 
+  facet_grid(sfa+bank~., drop=T,scales="free") +
+  scale_size_continuous(name="Number of samples")
+dev.off()
+
+fishing <- fish.dat %>%
+  dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
+  dplyr::mutate(month=month(ymd(date)))%>%
+  dplyr::group_by(bank, year, month) %>%
+  dplyr::summarize(`number of fishing trips` = length(unique(trip.id))) %>%
+  dplyr::ungroup()
+
+ps_tab2$sfa <- as.character(ps_tab2$sfa)
+ps_tab2 <- left_join(fishing, ps_tab2)
+
+write.csv(ps_tab2, paste0(plotsGo, "/ps_tab2.csv"))
+
+
+simplified <- port.sampling
+simplified$lon <- round(simplified$lon,2)
+simplified$lat <- round(simplified$lat,2)
+simplified <- unique(simplified[, c("lon", "lat", "year", "boat", "bank", "sfa")])
+
+png(paste0(plotsGo, "ps_summary_spatial_25.png"), width=18, height=9, units = "in", res=420)
+ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==25,], aes(lon, lat)) + 
+  facet_wrap(~year, scales="free")
+dev.off()
+
+png(paste0(plotsGo, "ps_summary_spatial_26.png"), width=18, height=9, units = "in", res=420)
+ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==26,], aes(lon, lat)) + 
+  facet_wrap(~year, scales="free")
+
+png(paste0(plotsGo, "ps_summary_spatial_27.png"), width=18, height=9, units = "in", res=420)
+ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==27,], aes(lon, lat)) + 
+  facet_wrap(~year, scales="free")
+dev.off()
+
+# what proportion of landings from april to august?
+total <- fish.dat %>%
+  dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
+  dplyr::mutate(month=month(ymd(date)))%>%
+  dplyr::group_by(bank, year) %>%
+  dplyr::summarize(total=sum(pro.repwt))
+
+months <- fish.dat %>%
+  dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
+  dplyr::mutate(month=month(ymd(date)))%>%
+  dplyr::group_by(bank, year, month) %>%
+  dplyr::summarize(kg=sum(pro.repwt)) %>%
+  dplyr::filter(month %in% 4:8) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(bank, year) %>%
+  dplyr::summarize(springsummer = sum(kg)) %>%
+  dplyr::left_join(total) %>%
+  dplyr::mutate(prop = springsummer/total)
+
+png(paste0(plotsGo, "april_to_august.png"), width=6, height=5, units = "in", res=420)
+ggplot() + geom_boxplot(data=months, aes(bank, prop)) + 
+  ylab("Proportion of landings in April-August each year")
+dev.off()
+
 ```
 
 # Single bank results
 ```{r}
-bank <- "Sab"
+bank <- "Ger"
 
 bbn.dat <- port.sampling[port.sampling$bank == bank,]
 
@@ -406,7 +493,7 @@ shfps.yr <- shfps %>%
   dplyr::summarize(total=n())
 
 shfps <- shfps %>%
-  dplyr::mutate(bin = cut(sh, breaks=seq(70,210,5), right=F)) %>% # gotta go above 200 since these are estimates (not 5mm bins)
+  dplyr::mutate(bin = cut(sh, breaks=seq(70,215,5), right=F)) %>% # gotta go above 200 since these are estimates (not 5mm bins)
   dplyr::group_by(surv.year, bin) %>%
   dplyr::summarize(value=n())
 
@@ -421,10 +508,10 @@ shfps$name <- bins # named for lower bound
 
 # bins <- data.frame(name=as.character(rep(seq(5,210,5), length(unique(shfps$year)))), year=rep(unique(shfps$year), each=42))
 # bins <- data.frame(shf=rep(seq(65,209.9,0.1), length(unique(shfps$surv.year))), name=rep(rep(seq(70,210,5), each=50), length(unique(shfps$surv.year))), surv.year=rep(unique(shfps$surv.year), each=1450))
-bins <- data.frame(shf=seq(70,214.9,0.1),
-                   name=rep(seq(70,210,5), each=50))
-yearsbins <- data.frame(years=rep(unique(shfps$surv.year), each=length(seq(70,210,5))), 
-                        name=rep(seq(70,210,5), length(unique(shfps$surv.year))))
+bins <- data.frame(shf=seq(70,219.9,0.1),
+                   name=rep(seq(70,215,5), each=50))
+yearsbins <- data.frame(years=rep(unique(shfps$surv.year), each=length(seq(70,215,5))), 
+                        name=rep(seq(70,215,5), length(unique(shfps$surv.year))))
 bins <- full_join(bins, yearsbins, relationship="many-to-many")
 
 shfps$name <- as.numeric(shfps$name)
@@ -513,7 +600,7 @@ shfps.yr <- shfps %>%
   dplyr::summarize(total=n())
 
 shfps <- shfps %>%
-  dplyr::mutate(bin = cut(sh, breaks=seq(5,210,5), right=F)) %>% # gotta go above 200 since these are estimates (not 5mm bins)
+  dplyr::mutate(bin = cut(sh, breaks=seq(5,215,5), right=F)) %>% # gotta go above 200 since these are estimates (not 5mm bins)
   dplyr::group_by(surv.year, bin) %>%
   dplyr::summarize(value=n())
 
@@ -525,10 +612,10 @@ bins <- bins[grep(x=bins,pattern="[", fixed=T)]
 bins <- gsub(x=bins, pattern="[", replacement="", fixed=T)
 shfps$name <- bins # named for lower bound
 
-bins <- data.frame(shf=seq(5,214.9,0.1),
-                   name=rep(seq(5,210,5), each=50))
-yearsbins <- data.frame(years=rep(unique(shfps$surv.year), each=length(seq(5,210,5))), 
-                        name=rep(seq(5,210,5), length(unique(shfps$surv.year))))
+bins <- data.frame(shf=seq(5,219.9,0.1),
+                   name=rep(seq(5,215,5), each=50))
+yearsbins <- data.frame(years=rep(unique(shfps$surv.year), each=length(seq(5,215,5))), 
+                        name=rep(seq(5,215,5), length(unique(shfps$surv.year))))
 bins <- full_join(bins, yearsbins, relationship="many-to-many")
 
 shfps$name <- as.numeric(shfps$name)
@@ -753,4 +840,58 @@ write.csv(overall, paste0(plotsGo, bank, "/boxplot_vals.csv"))
 # bonus german checks
 
 
+```
+
+# comparing port sampling to logs
+```{r}
+load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
+yearly_fish <- fish.dat %>% 
+  dplyr::filter(!is.na(bank)) %>%
+  dplyr::group_by(bank, year) %>%
+  dplyr::summarize(nwatches = n())
+
+yearly_ps <- port.sampling %>% 
+  dplyr::filter(!is.na(bank)) %>%
+  dplyr::group_by(bank, year) %>%
+  dplyr::summarize(nsamp = n())
+
+fish_ps <- full_join(yearly_fish, yearly_ps)
+
+min(yearly_ps$year)
+
+fish_ps[fish_ps$year>2005 & is.na(fish_ps$nsamp),]
+
+# check on these
+unique(fish.dat[fish.dat$bank=="Ban" & fish.dat$year==2021,]$tripnum)
+unique(fish.dat[fish.dat$bank=="BBs" & fish.dat$year==2022,]$tripnum)
+unique(fish.dat[fish.dat$bank=="BBs" & fish.dat$year==2013,]$tripnum)
+```
+
+#comparing bit to no bit
+```{r}
+no_bit <- NULL
+with_bit <- NULL
+for(bank in c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")){
+  no <- read.csv(paste0(plotsGo, bank, "/no bit/boxplot_vals.csv"))
+  no$bank <- bank
+  no_bit <- rbind(no_bit, no)
+  
+  with <- read.csv(paste0(plotsGo, bank, "/boxplot_vals.csv"))
+  with$bank <- bank
+  with_bit <- rbind(with_bit, with)
+}
+
+no_bit$bit <- "no"
+with_bit$bit <- "yes"
+bit <- rbind(no_bit, with_bit)
+
+bit$lim <- gsub(bit$lim, pattern = "<", replacement="")
+bit$lim <-as.numeric(bit$lim)
+png(filename=paste0(plotsGo, "bit_comparison.png"), height=6, width=10, units="in", res=420)
+ggplot() + geom_point(data=bit, aes(lim, median.prop., shape=bit)) + 
+  facet_grid(type~bank) + theme_bw() +
+  scale_shape_manual(values=c(1,16)) +
+  xlab("Minimum fully recruited size (mm)") +
+  ylab("Proportion of meats below fully recruited size")
+dev.off()
 ```

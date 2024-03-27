@@ -351,7 +351,7 @@ Time series of scallop condition (meat weight (g) of a 100 mm shell height scall
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/cfts_27.png"))
 ```
 
-,fig.align="center"Ages and shell heights (in millimetres, mm) of scallops collected from SFA 25A-Sab in 2012 (black points), and the von Bertalanffy growth model based on incremental age analysis (black line). Model parameters are shown in text.  Grey shading represents the bootstrapped 95% confidence interval. The dashed red line shows the predicted age for a 90 mm shell height, while the green dashed line shows the predicted shell height (in mm) for scallops one year prior.
+Ages and shell heights (in millimetres, mm) of scallops collected from SFA 25A-Sab in 2012 (black points), and the von Bertalanffy growth model based on incremental age analysis (black line). Model parameters are shown in text.  Grey shading represents the bootstrapped 95% confidence interval. The dashed red line shows the predicted age for a 90 mm shell height, while the green dashed line shows the predicted shell height (in mm) for scallops one year prior.
 
 ```{r vb-sab, echo=FALSE, message=F}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/fit_vb", fr, ".png"))
@@ -359,7 +359,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 # out.width=400, out.height=400,
 ```
 
-,  fig.align="center"Residuals of the von Bertalanffy growth model for SFA 25A-Sab in 2012.
+Residuals of the von Bertalanffy growth model for SFA 25A-Sab in 2012.
 
 ```{r resid-sab, echo=FALSE, message=F}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/resid_vb", fr, ".png"))
@@ -367,7 +367,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 #out.width=400, out.height=400,
 ```
 
-,fig.align="center"Ages and shell heights (in millimetres, mm) of scallops collected in SFA 26A in 2011 and 2012 (black points), and the von Bertalanffy growth model based on incremental age analysis (black line). Model parameters are shown in text.  Grey shading represents the bootstrapped 95% confidence interval. The dashed red line shows the predicted age for a 90 mm shell height, while the green dashed line shows the predicted shell height (in mm) for scallops one year prior.
+Ages and shell heights (in millimetres, mm) of scallops collected in SFA 26A in 2011 and 2012 (black points), and the von Bertalanffy growth model based on incremental age analysis (black line). Model parameters are shown in text.  Grey shading represents the bootstrapped 95% confidence interval. The dashed red line shows the predicted age for a 90 mm shell height, while the green dashed line shows the predicted shell height (in mm) for scallops one year prior.
 
 ```{r vb-bbn, echo=FALSE, message=F}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/fit_vb", fr, ".png"))
@@ -708,7 +708,7 @@ Annual cumulative density of estimated shell heights of meats landed by the comm
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/shf_selectivity_cumulative", fr, ".png"))
 ```
 
-, fig.asp=img.asp.sel.ban, fig.width=6Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 25B collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25B survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range.
+Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 25B collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25B survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range.
 
 ```{r sh-sel-ban-cum, echo=FALSE, message=F}
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/shf_selectivity_cumulative", fr, ".png"))

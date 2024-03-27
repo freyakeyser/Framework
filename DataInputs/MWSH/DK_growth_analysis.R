@@ -124,7 +124,7 @@ write.csv(mwsh.samples, "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInp
 
 # Start analysis
 
-banker <- "Sab"
+banker <- "Mid"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
@@ -433,7 +433,7 @@ resid_summary <- resid[resid$sh>140,] %>%
   dplyr::group_by(year) %>%
   dplyr::summarize(bank=banker,`med.resid.140+`=median(residuals, na.rm=T))
 
-rs_range <- read.csv("Y:/Offshore/Assessment/Data/Size_categories_by_bank_75-90.csv")
+rs_range <- read.csv("W:/Offshore/Assessment/Data/Size_categories_by_bank_75-90.csv")
 minFR <- rs_range$CS[rs_range$Bank==banker] + 5 # column in n.yst for FRs
 if(200 %in% names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst)) & "years" %in% names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst))){
   colnum <- which(names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst))==minFR)
@@ -483,7 +483,7 @@ for(y in 1:length(ys)){
     #ylim(-1,1) +
     xlim(floor(depthrange[1]),ceiling(depthrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-    #geom_smooth(method = 'loess',color=yellows) +
+    geom_smooth(method = 'loess', color=yellows) +
     xlab(paste0(en2fr("Depth",  custom_terms=rosetta_terms, translate=french), " (m)")) +
     ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
 
@@ -492,7 +492,7 @@ for(y in 1:length(ys)){
     #ylim(-1,1) +
     xlim(floor(shrange[1]),ceiling(shrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed')+
-    #geom_smooth(method = 'gam',color=yellows) +
+    geom_smooth(method = 'gam', color=yellows) +
     xlab(paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)")) +
     ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
 
@@ -501,7 +501,7 @@ for(y in 1:length(ys)){
     #ylim(-1,1) +
     xlim(floor(mwrange[1]),ceiling(mwrange[2]))+
     geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-    #geom_smooth(method = 'gam',color=yellows) +
+    geom_smooth(method = 'gam',color=yellows) +
     xlab(paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)")) +
     ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()#+
     #scale_x_continuous(expand=c(0.075,0.075))
@@ -525,21 +525,21 @@ p.res.d <- ggplot() +
   geom_point(data=resid,aes(x=depth,y=residuals), size=0.5) +
   facet_wrap(~year, ncol=6) +
   geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-  #geom_smooth(method = 'loess',color=yellows) +
+  geom_smooth(data=resid,aes(x=depth,y=residuals), method = 'gam')+#,color=yellows) +
   xlab(paste0(en2fr("Depth",  custom_terms=rosetta_terms, translate=french), " (m)")) +
   ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
 
 p.res.sh <- ggplot(resid,aes(x=sh,y=residuals)) + geom_point(size=0.5) +
   facet_wrap(~year, ncol=6) +
   geom_hline(yintercept = 0,color=blues,linetype='dashed')+
-  #geom_smooth(method = 'gam',color=yellows) +
+  geom_smooth(method = 'gam') +
   xlab(paste0(en2fr("Shell height",  custom_terms=rosetta_terms, translate=french), " (mm)")) +
   ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()
 
 p.res.mw <- ggplot(resid,aes(x=wmw,y=residuals)) + geom_point(size=0.5) +
   facet_wrap(~year, ncol=6) +
   geom_hline(yintercept = 0,color=blues,linetype='dashed') +
-  #geom_smooth(method = 'gam',color=yellows) +
+  geom_smooth(method = 'gam') +
   xlab(paste0(en2fr("Meat weight",  custom_terms=rosetta_terms, translate=french), " (g)")) +
   ylab(en2fr("Residual",  custom_terms=rosetta_terms, translate=french)) + theme_bw()+
   scale_x_continuous(expand=c(0.075,0.075))
