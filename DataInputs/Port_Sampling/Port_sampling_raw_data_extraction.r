@@ -44,58 +44,58 @@ dat <- NULL
 # Run this for all years we have data, this takes about 10 minutes...
 for(i in 1:length(years))
 {
-  # This identifies all the files that for each year of Port Sampling, this should include the vast majority of trips each year, probably would be useful
-  # to have someone check if these are exhaustive lists or not...
-  if(years[i]<2006) {
-    files <- list.files(path = paste0(direct,"Data/Archive/PortSampling/", years[i], "/"),pattern = "\\.txt", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2006) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/origportsamplesfiles"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2007) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/OriginalPortSamples2007"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2008) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/OrigianlPortSamples2008"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2009) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/originals"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2010) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/Originals2010"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]>2010 & years[i]<2018) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/JoansOriginals"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]>2017) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/JoansOriginals"),pattern = "\\.csv", recursive = T, ignore.case = T)
-  }
-  if(years[i] < 2018) files2 <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.xls", ignore.case = T)
-  if(years[i] > 2017) files2 <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.csv", ignore.case = T)
-  print(years[i])
-  #
-
-  # if(years[i] <2006){
-  #
+  # # This identifies all the files that for each year of Port Sampling, this should include the vast majority of trips each year, probably would be useful
+  # # to have someone check if these are exhaustive lists or not...
+  # if(years[i]<2006) {
+  #   files <- list.files(path = paste0(direct,"Data/Archive/PortSampling/", years[i], "/"),pattern = "\\.txt", recursive = T, ignore.case = T)
   # }
-  if(years[i] < 2018 & years[i]>2005) {
-    files <- gsub(x = tolower(files), pattern=".xlsx", replacement="", fixed=T)
-    files <- gsub(x = tolower(files), pattern=".xls", replacement="", fixed=T)
-    files2 <- gsub(x = tolower(files2), pattern=".xlsx", replacement="", fixed=T)
-    files2 <- gsub(x = tolower(files2), pattern=".xls", replacement="", fixed=T)
-  }
-  if(years[i] > 2017) {
-    files <- gsub(x = tolower(files), pattern=".csv", replacement="", fixed=T)
-    files2 <- gsub(x = tolower(files2), pattern=".csv", replacement="", fixed=T)
-  }
-
-  if(any(nchar(files)>8)) files <- str_sub(string = files,-8)
-
-  # names that are in files2 but not in files
-  files2[which(!files2 %in% files)]
-
-  # names that are in files but not in files2
-  files[which(!files %in% files2)]
+  # if(years[i]==2006) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/origportsamplesfiles"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2007) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/OriginalPortSamples2007"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2008) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/OrigianlPortSamples2008"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2009) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/originals"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2010) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/Originals2010"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]>2010 & years[i]<2018) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/JoansOriginals"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]>2017) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/JoansOriginals"),pattern = "\\.csv", recursive = T, ignore.case = T)
+  # }
+  # if(years[i] < 2018) files2 <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.xls", ignore.case = T)
+  # if(years[i] > 2017) files2 <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.csv", ignore.case = T)
+  # print(years[i])
+  # #
+  #
+  # # if(years[i] <2006){
+  # #
+  # # }
+  # if(years[i] < 2018 & years[i]>2005) {
+  #   files <- gsub(x = tolower(files), pattern=".xlsx", replacement="", fixed=T)
+  #   files <- gsub(x = tolower(files), pattern=".xls", replacement="", fixed=T)
+  #   files2 <- gsub(x = tolower(files2), pattern=".xlsx", replacement="", fixed=T)
+  #   files2 <- gsub(x = tolower(files2), pattern=".xls", replacement="", fixed=T)
+  # }
+  # if(years[i] > 2017) {
+  #   files <- gsub(x = tolower(files), pattern=".csv", replacement="", fixed=T)
+  #   files2 <- gsub(x = tolower(files2), pattern=".csv", replacement="", fixed=T)
+  # }
+  #
+  # if(any(nchar(files)>8)) files <- str_sub(string = files,-8)
+  #
+  # # names that are in files2 but not in files
+  # files2[which(!files2 %in% files)]
+  #
+  # # names that are in files but not in files2
+  # files[which(!files %in% files2)]
 
 # 2013, COME0613 # this trip doesn't exist?
   if(years[i] < 2006) files <- list.files(path = paste0(direct,"Data/Archive/PortSampling/", years[i], "/"),pattern = "\\.txt", ignore.case = T)
@@ -116,6 +116,7 @@ for(i in 1:length(years))
     # Remove the blank columns
     remove <- names(dat[[index]])[which(names(dat[[index]]) == "space")]
     dat[[index]] <- dat[[index]][,!names(dat[[index]]) %in% remove]
+
     dat[[index]] <- reshape2::melt(dat[[index]],id.vars = c("date","boat","port","id","fished"))
     # And now reorder the data by ID so the samples all stay together and the 0's come at the end so we can chuck those..
     dat[[index]] <- dat[[index]] %>% arrange(desc(value)) # First order the values from biggest to smallest
@@ -123,7 +124,8 @@ for(i in 1:length(years))
 
     # Now we can quickly add a sample ID to these in case we want it later...
     samp.ids <- unique(dat[[index]]$id)
-    n.samp.ids <- length(samp.ids) # This is generally the number of days fished from what I've seen, but in case is varies I won't call it that...
+    n.samp.ids <- length(samp.ids) # The first 1-2 digits of the ID is the day of the trip (i.e. 1 = first day, 2 = second day)
+                                    # The last 2 digits decribe the location of the sample in the tub (i.e. middle/top/bottom/front/back etc.)
     for(r in 1:n.samp.ids)
     {
       dat[[index]]$sample_id[dat[[index]]$id == samp.ids[r]] <- 1:nrow(dat[[index]][dat[[index]]$id == samp.ids[r],])
@@ -174,7 +176,7 @@ vessel_ids <- as.character(unique(port.dat$boat))
 num.vessels <- length(vessel_ids)
 # I want to add these columns to the port sampling data from the fishery data....
 fish.df.to.add <- data.frame(date = NA, lon= NA,lat=NA,fleet = NA, ves=NA,vrnum=NA, vesid = NA,bank=NA,pro.repwt = NA,
-                             h = NA, m=NA, hm = NA, kg.h = NA, kg.hm = NA, depth = NA)
+                             h = NA, m=NA, hm = NA, kg.h = NA, kg.hm = NA, depth = NA, tripnum=NA)
 port.dat <- data.frame(port.dat,fish.df.to.add)
 
 head(port.dat)
@@ -192,7 +194,7 @@ for(k in 1:num.vessels)
   # Get the vessel of interest
   vessel <- na.omit(off.fleet[off.fleet$ID_alt_Port_Sampling == vessel_ids[k], c("Pre_2008_ID","VMS_old_ID","ID")])
   # Get all the fishery data for that vessel, checking all types of identifiers
-  ves.fish.dat <- fish.dat[fish.dat$vesid %in% vessel | fish.dat$ves %in% vessel | fish.dat$vrnum %in% vessel,]
+  ves.fish.dat <- fish.dat[fish.dat$vesid %in% unlist(vessel) | fish.dat$ves %in% unlist(vessel) | fish.dat$vrnum %in% unlist(vessel),]
   # Get the port sampling data for this vessel
   ves.port.dat <- port.dat[port.dat$boat == vessel_ids[k],]
   # Get the dates we port sampling data for this vessel
@@ -205,21 +207,9 @@ for(k in 1:num.vessels)
     print(paste0("m=",m))
     # Now get the fishery data for this vessel and these dates.
     fishery.data.ps <- ves.fish.dat[ves.fish.dat$date %in% dates.ps[m],names(fish.df.to.add)]
-    # if fishery.data.ps is EMPTY we have date trouble in the PS file, check other nearby dates
-    if(nrow(fishery.data.ps) == 0){
-      fishery.data.ps <- ves.fish.dat[ves.fish.dat$date %in% c(dates.ps[m]-days(1), dates.ps[m]+days(1)),names(fish.df.to.add)]
-    }
-    # if bank is NA in the logs, try to borrow from the day before or after, but if that creates multiple options, then stick with NA
-    if(nrow(fishery.data.ps) == 1 && is.na(fishery.data.ps$bank)){
-      if(length(unique(ves.fish.dat$bank[ves.fish.dat$date %in% c(dates.ps[m]-days(1), dates.ps[m]+days(1))]))==1){
-        fishery.data.ps$bank <- unique(ves.fish.dat$bank[ves.fish.dat$date %in% c(dates.ps[m]-days(1), dates.ps[m]+days(1))])
-      }
-      if(!length(unique(ves.fish.dat$bank[ves.fish.dat$date %in% c(dates.ps[m]-days(1), dates.ps[m]+days(1))]))==1){
-        fishery.data.ps$bank <- NA
-      }
-    }
+
     # Now we need to take care of fishery data for when we have multiple entries for a vessel day combination
-    if(nrow(fishery.data.ps) > 1)
+    if(nrow(fishery.data.ps) > 1 && (length(unique(fishery.data.ps$bank))==1)) # 2-4 watches
     {
       # Make a temporary object with the first row of fishery data
       tmp <- fishery.data.ps[1,]
@@ -232,6 +222,23 @@ for(k in 1:num.vessels)
       # And pop that back into the fishery data object which is now just a single line of data... hopefully
       fishery.data.ps <- tmp
     } # end if(nrow(fishery.data.ps) > 1) to deal with multiple observations each day.
+
+    # if the trip fished multiple banks in one day, we drop the PS data because we can't reasonably assign to one bank or the other.
+    if(nrow(fishery.data.ps) > 1 && (length(unique(fishery.data.ps$bank))>1)) # 2-4 watches
+    {
+      # Make a temporary object with the first row of fishery data
+      tmp <- fishery.data.ps[1,]
+      # Now add up catch and effort for each watch
+      tmp[,c("pro.repwt","h","m","hm")] <- NA
+      # Find the centroid of the lat's and lon's..  This may/may not be ideal but seems like a legit way to lump the data into a general area fished...
+      tmp[,c("lat","lon")] <- NA
+      # Calculate the effort by day
+      tmp[,c("kg.h","kg.hm")] <- NA
+      tmp$bank <- NA
+      # And pop that back into the fishery data object which is now just a single line of data... hopefully
+      fishery.data.ps <- tmp
+    }
+
     # We then pump this data back into the port sampling data
     if(nrow(fishery.data.ps) > 0) ves.port.dat[ves.port.dat$ps.fished == dates.ps[m],names(fish.df.to.add)] <- fishery.data.ps
   } # End for(m in 1:length(dates.ps)) to sweep through each date...
@@ -249,6 +256,9 @@ mia <- unique(port.sampling[is.na(port.sampling$bank),c("ves", "vrnum", "vesid",
 unique(fish.dat[fish.dat$vesid==mia$vesid[1] & fish.dat$year == year(mia$ps.fished[1]),]$date)
 
 unique(fish.dat[fish.dat$vesid==mia$vesid[1] & fish.dat$date == mia$ps.fished[1],])
+
+table(port.sampling$year, port.sampling$bank)
+
 
 # The below list is vessel port sampling that doesn't have fishing logs associated.  Generally these are cases in which the
 # port sampling dates are not matching the fishing logs, for the most part the port sampling dates are transposed by a day (i.e. log says fishing started

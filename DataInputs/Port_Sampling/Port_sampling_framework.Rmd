@@ -895,3 +895,12 @@ ggplot() + geom_point(data=bit, aes(lim, median.prop., shape=bit)) +
   ylab("Proportion of meats below fully recruited size")
 dev.off()
 ```
+
+# comparing to GR numbers of samples per year by bank
+```{r}
+# In some cases, we have MORE samples than Ginette. This was due to double-counting samples collected on days where a vessel fished on both banks (split trips). 
+
+
+
+
+```

@@ -1322,8 +1322,10 @@ for(sfa in 25:27){
 # Fishery
 ```{r fishery-ts, echo=F, include=F}
 
-load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
-
+#load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
+logs_and_fish(loc="offshore", get.local=T, direct="Y:/Offshore/Assessment/", year = 1981:2022)
+fish.dat<-merge(new.log.dat,old.log.dat,all=T)
+fish.dat$ID<-1:nrow(fish.dat)
 fish.dat <- fish.dat[!is.na(fish.dat$lon),]
 fish.dat <- fish.dat[!is.na(fish.dat$lat),]
 fish.dat <- fish.dat[!fish.dat$lon==0,]
@@ -1331,6 +1333,7 @@ fish.dat <- fish.dat[!fish.dat$lat==0,]
 fish_sf <- st_as_sf(fish.dat, coords=c(X="lon", Y="lat"), crs=4326)
 
 offshore <- github_spatial_import("offshore", "offshore.zip", quiet=T)
+#ggplot() + geom_sf(data=offshore) + facet_wrap(~ID)
 
 sf_use_s2(FALSE)
 fish_sf <- st_intersection(fish_sf, offshore)
@@ -1340,11 +1343,18 @@ unique(fish_sf$bank)
 unique(fish_sf$sfa)
 fish_sf$ID.1 <- gsub(x=fish_sf$ID.1, pattern="SFA", replacement="")
 
+# if shp ID doesn't match log sfa:
 dim(fish_sf[!fish_sf$ID.1==fish_sf$sfa & !is.na(fish_sf$sfa),])
+# if shp ID matches log sfa:
 dim(fish_sf[fish_sf$ID.1==fish_sf$sfa,])
+unique(fish_sf$sfa)
+unique(fish_sf$ID.1)
 
+# look at the "bad" matches
 check <- fish_sf[!fish_sf$ID.1==fish_sf$sfa & !is.na(fish_sf$sfa),]
 ggplot() + geom_point(data=check, aes(sfa, ID.1))
+#unique(fish_sf[fish_sf$bank=="Ban",]$ID.1)
+#unique(fish_sf[fish_sf$bank=="Sab",]$ID.1)
 table(check$sfa, check$ID.1) # relatively few misattributed records. Use intersected results
 
 fish_sf$sfa <- fish_sf$ID.1
@@ -1399,7 +1409,7 @@ fishery$subarea[fishery$bank=="Ger"] <- "26C"
 fishery$subarea[fishery$bank=="GBb"] <- "27B"
 
 for(sfa in 25:27){
-  png(filename=paste0(plotsGo, "/Fishery/fishery_", sfa, fr, "_pres.png"),width=4*1.5, height=4*1.5, units = "in", res=420)
+  png(filename=paste0(plotsGo, "/Fishery/fishery_", sfa, fr, ".png"),width=6.5*1.5, height=4*1.5, units = "in", res=420)
   kg <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=subarea, shape=subarea), size=2) +
     geom_line(data=fishery[fishery$sfa==sfa,], aes(year, catch/1000, colour=subarea)) +
     theme_bw() +
@@ -1430,7 +1440,7 @@ for(sfa in 25:27){
   #regular: 
   print(kg / hm / cp)
   #presentation:
-  print(kg / hm / cp + plot_layout(guides = "collect") & theme(legend.position = 'bottom'))
+  #print(kg / hm / cp + plot_layout(guides = "collect") & theme(legend.position = 'bottom'))
   dev.off()
 }
 
