@@ -34,6 +34,8 @@ for(t in 1:NY)
 # (clapper connective tissue becomes too weak to hold together)
 # A prior of a=8 and b = 11 gives this prior a normal-ish shape with mean around 0.45 and most of the density between 0.15-0.7
 S ~ dbeta(S.a,S.b)
+# A different dissultion rate for recruits
+SR ~ dbeta(SR.a,SR.b)
 
 
 # Survey catchability prior, q priors should be between 0.2 and 0.5 (based on US dredge studies), q.a = 20, q.b = 40 gets us this result.
@@ -74,9 +76,9 @@ IR.precision[t] ~ dgamma(IR.precision.a[t],IR.precision.b[t])
 IR.vsam[t]<-1/IR.precision[t]
 
 # Prior for the precision of the Commercial Catch rate (CPUE)...
-U.precision[t] ~ dgamma(U.precision.a[t],U.precision.b[t])
+#U.precision[t] ~ dgamma(U.precision.a[t],U.precision.b[t])
 # And it's variance
-U.vsam[t]<-1/U.precision[t]
+#U.vsam[t]<-1/U.precision[t]
 } 
 ##############  END OF PRIORS ################################  END OF PRIORS ################################  END OF PRIORS ##################
 
@@ -109,13 +111,13 @@ for(t in 2:NY)
 # For the first year get the clapper index as Natural mortality * dissolution rate * Abundance
 Cmed[1]<-log(m[1]*S*N[1])
 # And same for the recruits
-CRmed[1]<-log(mR[1]*S*NR[1])
+CRmed[1]<-log(mR[1]*SR*NR[1])
 
 # The clapper equation from year 2 to the final year (likelihood)
 for(t in 2:NY)
 {
 		Cmed[t]<-log(m[t]*S*(S*N[t-1]+(2-S)*N[t])/2)
-		CRmed[t]<-log(mR[t]*S*(S*NR[t-1]+(2-S)*NR[t])/2)
+		CRmed[t]<-log(mR[t]*SR*(SR*NR[t-1]+(2-SR)*NR[t])/2)
 }
 
 # And now include the observation error for the clappers.

@@ -16,21 +16,25 @@ editor_options:
 # clean things up...
 # Parameter tables 
 # First Sable and BSSM, here pulling this for parameters with only a single estimate
-parameters.bssm <- c("K","S","$\\frac{1}{\\kappa_{rho}^2}$","$\\frac{1}{\\kappa_{tau}^2}$", "$q$", "$\\sigma$")
+parameters.bssm <- c("K","$\\frac{1}{\\kappa_{rho}^2}$","$\\frac{1}{\\kappa_{tau}^2}$", "$q$", "$\\sigma$")
 parameters.seam <- c("$\\sigma_{\\epsilon}$", "$\\sigma_{\\upsilon}$",  "$R_0$", "$B_0$",
-                     "$p_I$" ,"$p_{IR}$", "$\\psi_B$","$\\lambda_B$" , "$\\psi_R$", "$\\lambda_R$", "$\\psi_m$","$\\lambda_m$", "$S$")
+                     "$p_I$" ,"$p_{IR}$", "$\\psi_B$","$\\lambda_B$" , "$\\psi_R$", "$\\lambda_R$", "$\\psi_m$","$\\lambda_m$")
 # parameters.sab.seam <- c("$\\sigma_{\\epsilon}$", "$\\sigma_{\\upsilon}$", "$B_0$", "$R_0$", "$m_0$", 
 #                      "$p_I$" ,"$p_{IR}$", "$\\psi_B$", "$\\psi_R$", "$\\psi_m$","$\\lambda_B$", "$\\lambda_R$", "$\\lambda_m$", "$S$")
 
-extract.bssm <- which(rownames(sab.bssm.mod.out$summary) %in% c("sigma","S","q","ikappa.rho2","ikappa.tau2",'K'))
+extract.bssm <- which(rownames(sab.bssm.mod.out$summary) %in% c("sigma","q","ikappa.rho2","ikappa.tau2",'K'))
 
 sab.bssm.parm.table <- data.frame(sab.bssm.mod.out$summary[extract.bssm,c("mean","sd")])
 rownames(sab.bssm.parm.table) <- parameters.bssm
 names(sab.bssm.parm.table) <- c("Estimate","Standard Error")
-sab.bssm.parm.table$Estimate <- as.character(round(sab.bssm.parm.table$Estimate,digits=2))
-sab.bssm.parm.table$Estimate[c(1,3,4)] <- substr(sab.bssm.parm.table$Estimate[c(1,3,4)],start = 1,stop = 3)
-sab.bssm.parm.table$`Standard Error`<- as.character(round(sab.bssm.parm.table$`Standard Error`,digits=2))
-sab.bssm.parm.table$`Standard Error`[c(1,3,4)]<- substr(sab.bssm.parm.table$`Standard Error`[c(1,3,4)],start=1,stop=3)
+sab.bssm.parm.table$Estimate[1] <- round(sab.bssm.parm.table$Estimate[1],digits=0)
+sab.bssm.parm.table$Estimate[2:3] <- round(sab.bssm.parm.table$Estimate[2:3],digits=1)
+sab.bssm.parm.table$Estimate[4:5] <- round(sab.bssm.parm.table$Estimate[4:5],digits=2)
+sab.bssm.parm.table$Estimate <- as.character(sab.bssm.parm.table$Estimate)
+sab.bssm.parm.table$`Standard Error`[1] <- round(sab.bssm.parm.table$`Standard Error`[1],digits=0)
+sab.bssm.parm.table$`Standard Error`[2:3] <- round(sab.bssm.parm.table$`Standard Error`[2:3],digits=1)
+sab.bssm.parm.table$`Standard Error`[4:5] <- round(sab.bssm.parm.table$`Standard Error`[4:5],digits=2)
+sab.bssm.parm.table$`Standard Error`<- as.character(sab.bssm.parm.table$`Standard Error`)
 
 
 
@@ -38,42 +42,49 @@ sab.bssm.parm.table$`Standard Error`[c(1,3,4)]<- substr(sab.bssm.parm.table$`Sta
 # SEAM...  get these from sdrep so we can get the standard errors reported as well.
 sab.10.parm.table <- summary(sab.10$sdrep)
 # Names we want to extract...
-extract <- rownames(sab.10.parm.table)[c(1:12,23)]
+extract <- rownames(sab.10.parm.table)[c(1:12)]
 sab.10.parm.table <- data.frame(sab.10.parm.table[extract,])
 rownames(sab.10.parm.table) <- parameters.seam
 names(sab.10.parm.table) <- c("Estimate","Standard Error")
-sab.10.parm.table$Estimate <- as.character(round(sab.10.parm.table$Estimate,digits=2))
-sab.10.parm.table$Estimate[-c(1,2)] <- substr(sab.10.parm.table$Estimate[-c(1,2)],1,4)
-sab.10.parm.table$Estimate[c(3:6,8,10,12)] <- substr(sab.10.parm.table$Estimate[c(3:6,8,10,12)],1,3)
-sab.10.parm.table$Estimate[c(7,9,11,13)] <- substr(sab.10.parm.table$Estimate[c(7,9,11,13)],1,4)
-sab.10.parm.table$`Standard Error`<- as.character(round(sab.10.parm.table$`Standard Error`,digits=3))
-sab.10.parm.table$`Standard Error`[-c(1:2)]<- substr(sab.10.parm.table$`Standard Error`[-c(1:2)],1,4)
+sab.10.parm.table$Estimate[1] <- round(sab.10.parm.table$Estimate[1],digits=3)
+sab.10.parm.table$Estimate[-1] <- round(sab.10.parm.table$Estimate[-1],digits=2)
+sab.10.parm.table$Estimate <- as.character(sab.10.parm.table$Estimate)
+# sab.10.parm.table$Estimate[1:2] <- substr(sab.10.parm.table$Estimate[1:2],1,5)
+# sab.10.parm.table$Estimate[c(3,4,6,7,9,11)] <- substr(sab.10.parm.table$Estimate[c(3,4,6,7,9,11)],1,3)
+# sab.10.parm.table$Estimate[c(5,8,10,12)] <- substr(sab.10.parm.table$Estimate[c(5,8,10,12)],1,4)
+sab.10.parm.table$`Standard Error`<- substr(as.character(sab.10.parm.table$`Standard Error`),1,5)
+
 
 
 # Now BBn and BSSM, here pulling this for parameters with only a single estimate
-extract.bssm <- which(rownames(bbn.bssm.mod.out$summary) %in% c("sigma","S","q","ikappa.rho2","ikappa.tau2",'K'))
+extract.bssm <- which(rownames(sab.bssm.mod.out$summary) %in% c("sigma","q","ikappa.rho2","ikappa.tau2",'K'))
+
 bbn.bssm.parm.table <- data.frame(bbn.bssm.mod.out$summary[extract.bssm,c("mean","sd")])
 rownames(bbn.bssm.parm.table) <- parameters.bssm
 names(bbn.bssm.parm.table) <- c("Estimate","Standard Error")
-bbn.bssm.parm.table$Estimate <- as.character(round(bbn.bssm.parm.table$Estimate,digits=2))
-bbn.bssm.parm.table$Estimate[c(1,3,4)] <- substr(bbn.bssm.parm.table$Estimate[c(1,3,4)],start = 1,stop = 3)
-bbn.bssm.parm.table$`Standard Error`<- as.character(round(bbn.bssm.parm.table$`Standard Error`,digits=2))
-bbn.bssm.parm.table$`Standard Error`[c(3,4)]<- substr(bbn.bssm.parm.table$`Standard Error`[c(3,4)],start=1,stop=3)
-bbn.bssm.parm.table$`Standard Error`[1]<- substr(bbn.bssm.parm.table$`Standard Error`[1],start=1,stop=2)
+bbn.bssm.parm.table$Estimate[1] <- round(bbn.bssm.parm.table$Estimate[1],digits=0)
+bbn.bssm.parm.table$Estimate[2:3] <- round(bbn.bssm.parm.table$Estimate[2:3],digits=1)
+bbn.bssm.parm.table$Estimate[4:5] <- round(bbn.bssm.parm.table$Estimate[4:5],digits=2)
+bbn.bssm.parm.table$Estimate <- as.character(bbn.bssm.parm.table$Estimate)
+bbn.bssm.parm.table$`Standard Error`[1] <- round(bbn.bssm.parm.table$`Standard Error`[1],digits=0)
+bbn.bssm.parm.table$`Standard Error`[2:3] <- round(bbn.bssm.parm.table$`Standard Error`[2:3],digits=1)
+bbn.bssm.parm.table$`Standard Error`[4:5] <- round(bbn.bssm.parm.table$`Standard Error`[4:5],digits=2)
+bbn.bssm.parm.table$`Standard Error`<- as.character(bbn.bssm.parm.table$`Standard Error`)
 
 # BBn
 bbn.20.parm.table <- summary(bbn.20$sdrep)
 # Names we want to extract...
-extract <- rownames(bbn.20.parm.table)[c(1:12,33)]
+extract <- rownames(bbn.20.parm.table)[1:12]
 bbn.20.parm.table <- data.frame(bbn.20.parm.table[extract,])
 rownames(bbn.20.parm.table) <- parameters.seam
 names(bbn.20.parm.table) <- c("Estimate","Standard Error")
-bbn.20.parm.table$Estimate <- as.character(round(bbn.20.parm.table$Estimate,digits=2))
-bbn.20.parm.table$Estimate[-c(1,2)] <- substr(bbn.20.parm.table$Estimate[-c(1,2)],1,4)
-bbn.20.parm.table$Estimate[c(3:6,8,10,12)] <- substr(bbn.20.parm.table$Estimate[c(3:6,8,10,12)],1,3)
-bbn.20.parm.table$Estimate[c(7,9,11,13)] <- substr(bbn.20.parm.table$Estimate[c(7,9,11,13)],1,4)
-bbn.20.parm.table$`Standard Error`<- as.character(round(bbn.20.parm.table$`Standard Error`,digits=3))
-bbn.20.parm.table$`Standard Error`[-c(1:2)]<- substr(bbn.20.parm.table$`Standard Error`[-c(1:2)],1,4)
+bbn.20.parm.table$Estimate[1] <- round(bbn.20.parm.table$Estimate[1],digits=2)
+bbn.20.parm.table$Estimate[-1] <- round(bbn.20.parm.table$Estimate[-1],digits=2)
+bbn.20.parm.table$Estimate <- as.character(bbn.20.parm.table$Estimate)
+# sab.10.parm.table$Estimate[1:2] <- substr(sab.10.parm.table$Estimate[1:2],1,5)
+# sab.10.parm.table$Estimate[c(3,4,6,7,9,11)] <- substr(sab.10.parm.table$Estimate[c(3,4,6,7,9,11)],1,3)
+# sab.10.parm.table$Estimate[c(5,8,10,12)] <- substr(sab.10.parm.table$Estimate[c(5,8,10,12)],1,4)
+bbn.20.parm.table$`Standard Error`<- substr(as.character(bbn.20.parm.table$`Standard Error`),1,5)
 
 
 # BSSM bias table...

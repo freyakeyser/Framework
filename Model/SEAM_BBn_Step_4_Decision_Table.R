@@ -25,9 +25,9 @@ R.size <- "75"
 FR.size <- "90"
 num.knots <- 20 # Going to test 10, 15, and 20
 qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
-init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
+#init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
 # Various explorations of the g models.
-g.mod <- 'g_original'
+#g.mod <- 'g_original'
 #g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
@@ -37,7 +37,7 @@ g.mod <- 'g_original'
 
 #seam.select <- "1994_2022_vary_m_m0_1_qR_0.5_15_knots" # This has the old von B growth parameters...
 #seam.select <- "1994_2022_vary_m_m0_1_qR_0.5_10_knots"
-seam.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod,"_vary_q=TRUE")
+seam.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
 bbn.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",seam.select,".Rds"))
 
 
@@ -53,8 +53,8 @@ USR <- NULL #  Two options are 80% of BMSY (4579), or 40% of B0 (3612)
 LRP <- NULL # Three options, 30% BMSY (1717), 40% BMSY (2290), or 20% B0 (1806)
 RR  <-   NULL # This is in %, with latest run about 6% makes sense seems to make sense on BBn.
 #RR.TRP <- 10
-g.adj <- 0 # A 0 sets growth as 'no growth', when a number other than 0 this is a multiplier on the actual growth rate, so g.adj=1 uses the most recent year growth rate. 
-gR.adj <-0 # A 0 sets growth as 'no growth', when a number other than 0 this is a multiplier on the actual growth rate, so g.adj=1 uses the most recent year growth rate. 
+g.adj <- 1 # A 0 sets growth as 'no growth', when a number other than 0 this is a multiplier on the actual growth rate, so g.adj=1 uses the most recent year growth rate. 
+gR.adj <-1 # A 0 sets growth as 'no growth', when a number other than 0 this is a multiplier on the actual growth rate, so g.adj=1 uses the most recent year growth rate. 
 n.sims <- 1e6
 
 # 0 growth model.

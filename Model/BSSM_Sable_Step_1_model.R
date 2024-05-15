@@ -108,35 +108,90 @@ proj.dat <- fishery.dat(proj.sub,bk="Sab",yr=(min(years)-1):max(years),method='j
 # So first up, this condition is the weighted mean condition, this uses the GAM predicted scallop condition factor for each tow
 # and the biomass from each tow to come up with an overall bank average condition factor.
 # This is weight in this year, which becomes t-1 
-waa.tm1 <- mod.dat$CF*(mod.dat$l.bar/100)^3
-# Using this years average shell height we can find the exptected shell height for the scallops in the next year
-# ht = (Linf * (1-exp(-K)) + exp(-K) * height(last year))
-# laa.t is the projected size of the current years scallops into next year.
-laa.t <- L.inf*(1-exp(-K)) + exp(-K) * mod.dat$l.bar
-# The c() term in the below offsets the condition so that current year's condition slots into the previous year and repeats 
-# the condition for the final year), this effectively lines up "next year's condition" with "predictied shell height next year (laa.t)
-# This gets us the predicted weight of the current crop of scallops next year based on next years CF * laa.t^3
-# Of course we don't have next years condition thus th last condition is simply repeated
-# waa.t is using the condition from next year and the growth from next year to get next years weight
-waa.t <- c(mod.dat$CF[-1],mod.dat$CF[nrow(mod.dat)])*(laa.t/100)^3
-# Here we use the current condition factor to calculate the weight next year (since we use laa.t)
-# That's really the only difference between waa.t and waa.t2, waa.t uses next years condition to project growth
-# what waa.t2 uses the current condition to project growth.  So that's really what we are comparing here with these
-# two growth metrics isn't it, this is really just comparing impact of using current vs. future condition factor on our growth estimates.
-waa.t2 <- mod.dat$CF*(laa.t/100)^3
-# Now the growth, expected and realized.
-mod.dat$g <- waa.t/waa.tm1
-# This is using the actual condition factor and growing the scallops by laa.t
-mod.dat$g2 <- waa.t2/waa.tm1
-  
-# same thing here but for the recruits
-waa.tm1 <- mod.dat$CF*(mod.dat$l.k/100)^3
-laa.t <- L.inf*(1-exp(-K))+exp(-K)*mod.dat$l.k
-waa.t <- c(mod.dat$CF[-1],mod.dat$CF[nrow(mod.dat)])*(laa.t/100)^3
-waa.t2 <- mod.dat$CF*(laa.t/100)^3
-mod.dat$gR <- waa.t/waa.tm1
-mod.dat$gR2 <- waa.t2/waa.tm1# setwd("C:/Assessment/2014/r")
+# waa.tm1 <- mod.dat$CF*(mod.dat$l.bar/100)^3
+# # Using this years average shell height we can find the exptected shell height for the scallops in the next year
+# # ht = (Linf * (1-exp(-K)) + exp(-K) * height(last year))
+# # laa.t is the projected size of the current years scallops into next year.
+# laa.t <- L.inf*(1-exp(-K)) + exp(-K) * mod.dat$l.bar
+# # The c() term in the below offsets the condition so that current year's condition slots into the previous year and repeats 
+# # the condition for the final year), this effectively lines up "next year's condition" with "predictied shell height next year (laa.t)
+# # This gets us the predicted weight of the current crop of scallops next year based on next years CF * laa.t^3
+# # Of course we don't have next years condition thus th last condition is simply repeated
+# # waa.t is using the condition from next year and the growth from next year to get next years weight
+# waa.t <- c(mod.dat$CF[-1],mod.dat$CF[nrow(mod.dat)])*(laa.t/100)^3
+# # Here we use the current condition factor to calculate the weight next year (since we use laa.t)
+# # That's really the only difference between waa.t and waa.t2, waa.t uses next years condition to project growth
+# # what waa.t2 uses the current condition to project growth.  So that's really what we are comparing here with these
+# # two growth metrics isn't it, this is really just comparing impact of using current vs. future condition factor on our growth estimates.
+# waa.t2 <- mod.dat$CF*(laa.t/100)^3
+# # Now the growth, expected and realized.
+# mod.dat$g <- waa.t/waa.tm1
+# # This is using the actual condition factor and growing the scallops by laa.t
+# mod.dat$g2 <- waa.t2/waa.tm1
+#   
+# # same thing here but for the recruits
+# waa.tm1 <- mod.dat$CF*(mod.dat$l.k/100)^3
+# laa.t <- L.inf*(1-exp(-K))+exp(-K)*mod.dat$l.k
+# waa.t <- c(mod.dat$CF[-1],mod.dat$CF[nrow(mod.dat)])*(laa.t/100)^3
+# waa.t2 <- mod.dat$CF*(laa.t/100)^3
+# mod.dat$gR <- waa.t/waa.tm1
+# mod.dat$gR2 <- waa.t2/waa.tm1# setwd("C:/Assessment/2014/r")
 
+sizes <- seq(0.025,2,by=0.05) # So I'd be using the 1.025 bin and everything bigger for the t+1 fully-recruited
+
+surv.years <- unique(surv.dat$Sab$year)
+# But not 2020...
+#surv.years <- surv.years[surv.years != 2020]
+# The w.yst object is exactly proportional to mod.dat$I, there is an offset, but given I need proportions I think this object is perfectly fine to use.
+# SO this mw.per.bin is taking the stratified biomass and dividing it by the stratified numbers in each bin, which gives us the MW in that bin. 
+# There is probably a MW object out there somewhere with this in it, but it should just be the same thing as this.
+mw.per.bin <- data.frame(mw.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst/survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020))
+N.per.bin <- data.frame(N.per.bin = rbind(survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020))
+#reorder them
+mw.per.bin <- mw.per.bin[order(mw.per.bin$year),]
+N.per.bin <- N.per.bin[order(N.per.bin$year),]
+# Get the right bins for the FRs
+max.bin <- length(sizes)
+bin.frs.plus <- which(sizes == 1.025):max.bin
+bin.90.plus <- which(sizes == 0.925):max.bin
+bin.rec <- which(sizes == 0.775):min((bin.90.plus-1))
+bin.frs.minus <- min(bin.90.plus):(min(bin.90.plus)+1)
+
+# and the right bins for the recruits
+
+# Now make a new object
+g.proper <- data.frame(year = mw.per.bin$year)
+g.proper$total.abun.90 <- rowSums(N.per.bin[,bin.90.plus])
+g.proper$total.abun.frs <- rowSums(N.per.bin[,bin.frs.plus])
+g.proper$total.rec.abun <- rowSums(N.per.bin[,bin.rec])
+g.proper$total.frs.minus <- rowSums(N.per.bin[,bin.frs.minus])
+# Propotions in each bin, FRs and
+B.prop.per.bin.90 <- N.per.bin[,bin.90.plus]/g.proper$total.abun.90
+B.prop.per.bin.frs <- N.per.bin[,bin.frs.plus]/g.proper$total.abun.frs
+# Recs
+B.prop.per.bin.rec       <- N.per.bin[,bin.rec]/g.proper$total.rec.abun
+B.prop.per.bin.frs.minus <- N.per.bin[,bin.frs.minus]/g.proper$total.frs.minus
+
+# And the average mw in each of the bins of interest, first for the FRs
+g.proper$mw.frs.plus <-  rowSums(mw.per.bin[,bin.frs.plus] * B.prop.per.bin.frs,na.rm=T)
+g.proper$mw.90.plus <-   rowSums(mw.per.bin[,bin.90.plus] * B.prop.per.bin.90,na.rm=T)
+# and for the rec
+g.proper$mw.recs <-      rowSums(mw.per.bin[,bin.rec] * B.prop.per.bin.rec,na.rm=T)
+g.proper$mw.frs.minus <- rowSums(mw.per.bin[,bin.frs.minus] * B.prop.per.bin.frs.minus,na.rm=T)
+
+g.proper$g.proper <- c(g.proper$mw.frs.plus[2:length(g.proper$mw.frs.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA)
+g.proper$gR.proper<- c(g.proper$mw.frs.minus[2:length(g.proper$mw.frs.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA)
+
+
+g.proper[g.proper$year %in% c(1991,2015,2020),-1] <- NA
+g.proper[g.proper$year %in% c(2014,2019),which(names(g.proper) %in% c("g.proper","gR.proper"))] <- NA
+
+# Fill in the mean for the missing years
+g.proper$g.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] <- median(g.proper$g.proper,na.rm=T)
+g.proper$gR.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] <- median(g.proper$gR.proper,na.rm=T)
+
+mod.dat$g <- g.proper$g.proper
+mod.dat$gR <- g.proper$gR.proper
 
 ### overwrite imputation for growth here using whichever method
 # in 2020, the covid-19 pandemic prevented the DFO survey from occurring. An industry-lead survey of limited scope occurred, but is not suitable for inclusion in the 
@@ -145,39 +200,42 @@ mod.dat$gR2 <- waa.t2/waa.tm1# setwd("C:/Assessment/2014/r")
 # Maybe it makes more sense to use the LTM for growth but midpoint for other values. 
     
 # change 2020 values to NA     # Also missed the 2015 survey on Sable so same thing 
-
-mod.dat$g[which(mod.dat$year %in% c(2015,2020))] <- NA
-mod.dat$g2[which(mod.dat$year %in% c(2015,2020))] <- NA
-  
-mod.dat$gR[which(mod.dat$year %in% 2020)] <- NA
-mod.dat$gR2[which(mod.dat$year %in% 2020)] <- NA
-    
-# replace the NAs with long term medians
-mod.dat$g[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$g, na.rm=T)
-mod.dat$g2[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$g2, na.rm=T)
-    
-mod.dat$gR[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$gR, na.rm=T)
-mod.dat$gR2[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$gR2, na.rm=T)
+# 
+# mod.dat$g[which(mod.dat$year %in% c(2015,2020))] <- NA
+# mod.dat$g2[which(mod.dat$year %in% c(2015,2020))] <- NA
+#   
+# mod.dat$gR[which(mod.dat$year %in% 2020)] <- NA
+# mod.dat$gR2[which(mod.dat$year %in% 2020)] <- NA
+#     
+# # replace the NAs with long term medians
+# mod.dat$g[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$g, na.rm=T)
+# mod.dat$g2[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$g2, na.rm=T)
+#     
+# mod.dat$gR[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$gR, na.rm=T)
+# mod.dat$gR2[which(mod.dat$year %in% c(2015,2020))] <- median(mod.dat$gR2, na.rm=T)
     
 #write.csv(mod.dat,"D:/Framework/SFA_25_26_2024/Model/Data/Sab_mod_input_for_freya.csv")
 #mod.tmp <- read.csv("D:/Framework/SFA_25_26_2024/Model/Data/BBn_input_data_for_freya.csv")
 #mod.tmp$g[4:32] - growth$g[1:29]
+
+#mod.dat$g <- mod.dat$g -0.2
+#mod.dat$gR <- mod.dat$gR -0.4
   
 strt.mod.yr <- 1994
 # Grab the data, start model at either 1986 (note that BBn data starts in 1991 so anything earlier will default to 1991)
 DD.dat <- subset(mod.dat,year %in% strt.mod.yr:max(mod.dat$year),
                  select = c("year","n.x","I","I.cv","IR",  "IR.cv", "IPR", "IPR.cv","N","N.cv","NR","NR.cv", "NPR", "NPR.cv",
                             "w.bar","l.bar", "l.k", "w.k","CF","clappers","clappersR","CS",  "RS","catch","effort","n.y","cpue",
-                            "cpue.var","cpue.se","LCI","UCI","U.cv", "g","g2","gR","gR2"))
+                            "cpue.var","cpue.se","LCI","UCI","U.cv", "g","gR"))
 
 names(DD.dat) <- c( "year","n","I","I.cv","IR",  "IR.cv", "IPR", "IPR.cv","N","N.cv","NR","NR.cv", "NPR", "NPR.cv",
                     "w.bar","l.bar", "l.k", "w.k","CF","clappers","clappersR","CS",  "RS","C","E","n.trips","U",
-                    "U.var","U.se","LCI","UCI","U.cv", "g","g2","gR","gR2") 
+                    "U.var","U.se","LCI","UCI","U.cv", "g","gR") 
 # Organize the data and set up the model priors/initialization data, then run the model.
 yrs<-min(DD.dat$year):max(DD.dat$year)
 NY<- length(yrs)
 DD.lst<-as.list(subset(DD.dat,year %in% yrs,c("I","I.cv","IR","IR.cv","g","gR","C","U","U.cv","N","NR","clappers",
-                                                            "clappersR","g2","gR2")))
+                                                            "clappersR")))
 # DK NOTE: Downweight the CV for the CPUE data. This is done to be consistent with CV used
 # Previously in the model assessments. This has been flagged as an action item to investigate 
 # and resolve in the next framework.
@@ -211,7 +269,8 @@ DDpriors=list(
   r=				    list(a=0, 		b=1,		d="dlnorm",	l=NY	),		# scaled recruit biomass, a= meanlog  b = sdlog
   m=				    list(a=-2,		b=2,		d="dlnorm",	l=NY	),		# natural mortality fully recruited a= meanlog  b = sdlog
   mR=				    list(a=-2,		b=2,		d="dlnorm",	l=NY	),		# natural mortality  recruits a= meanlog  b = sdlog
-  S=				    list(a=8, 		b=11,		d="dbeta",  l=1		),		# clapper dissolution rate a= shape1, b=shape2, 8 & 11 gives ~ normal mean of .45ish
+  S=				    list(a=1.24e3, 		b=1e4,		d="dbeta",  l=1		),		# clapper dissolution rate a= shape1, b=shape2, 8 & 11 gives ~ normal mean of .45ish
+  SR=				    list(a=0.62e3, 		b=1e4,		d="dbeta",  l=1		),		# clapper dissolution rate a= shape1, b=shape2, 8 & 11 gives ~ normal mean of .45ish
   q=				    list(a=20, 		b=40,		d="dbeta",	l=1		),		# survey catchability fully recruited a= shape1, b=shape2
   #qU=				    list(a=0,		  b=1,	  d="dunif",	l=1		),		# fishery catchability CPUE a= min, b = max
   sigma=			  list(a=0, 		b=5,		d="dunif",	l=1		),		# process error (SD) a = min, b = max
@@ -258,7 +317,7 @@ parameters <- c(names(DDpriors),'K','P','B','R','mu','Imed','Ipred','Irep', 'IRm
 # Run the model now.
 start<-Sys.time()
 ## Call to JAGS, do you want to run in parallel?
-jags.model = "D:/Github/Framework/Model/DD_no_cpue.bug"
+jags.model = "D:/Github/Framework/Model/DD_no_cpue_fix_S.bug"
   out <- jags.parallel(data =  c(prior.lst,DD.lst), inits = NULL,parameters.to.save = parameters,  
                        model.file = jags.model,n.chains = 8, n.iter = 375000, n.burnin = 300000, 
                        n.thin = 20,jags.seed = 1)
@@ -274,7 +333,10 @@ mod.out <- out
 
 mod.out$BUGSoutput$summary
 
-
+summary(DD.out$summary[588:616,5])
+summary(DD.out$summary[617:645,5])
+DD.out$summary[582:583,]
+rownames(DD.out$summary)
 
 #source("fn/projections.r")
 # The catch since the survey for the most recent year is this, if there was no catch set this to 0.
@@ -551,9 +613,11 @@ sab.pe.resids <- rbind(sab.PE,sab.stan.PE,
                        sab.I.resids,sab.stan.I.resids,
                        sab.IR.resids,sab.stan.IR.resids)
 
-saveRDS(sab.pe.resids,paste0(repo.loc,"Results/Sab_SS_model/R_75_FR_90/PE_and_resids.Rds"))
+saveRDS(sab.pe.resids,paste0("D:/Framework/SFA_25_26_2024/Model/Results/Sab_SS_model/R_75_FR_90/PE_and_resids.Rds"))
 
+#ggplot(sab.pe.resids) + geom_point(aes(x=year,y=median)) + facet_wrap(~type,scales='free_y')
 
+median(sab.stan.PE$median[1:25])
 
 
 # Finally we can put all the key data together into one object so we can use this to compare

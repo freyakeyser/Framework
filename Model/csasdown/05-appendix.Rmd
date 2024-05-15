@@ -69,8 +69,8 @@ years <- 1994:2022
 mod.select <- "SEAM"
 language <- 'english' #'french'
 
-scenario.10 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",10,"_knots_",'g_original')
-scenario.20 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",20,"_knots_",'g_original')
+scenario.10 <- paste0(min(years),"_",max(years),"_qR_",qR,"_",10,"_knots")
+scenario.20 <- paste0(min(years),"_",max(years),"_qR_",qR,"_",20,"_knots")
 
 # Load things we need...# The nicely summarized model object
 pred.proc.sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
@@ -78,18 +78,18 @@ pred.proc.sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.si
 pred.proc.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
                                mod.select,"_model_output_",scenario.20,"_pred_proc.Rds"))
 pred.proc.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_pred_proc.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_pred_proc.Rds"))
 pred.proc.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_pred_proc.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_pred_proc.Rds"))
 # q spatial
 q.spat.sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
                                mod.select,"_model_output_",scenario.10,"_q_spatial.Rds"))
 q.spat.sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
                                mod.select,"_model_output_",scenario.20,"_q_spatial.Rds"))
 q.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_q_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_q_spatial.Rds"))
 q.spat.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_q_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_q_spatial.Rds"))
 drops <- length(pred.proc.sab.10$totals$totB)
 
 # SEAM processed results...
@@ -176,20 +176,20 @@ if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/Sab/R_"
 
 \newpage
 ```{r sfa-26-bm-10-fig, echo=F, fig.cap="SFA-26A SEAM fully-recruited biomass estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
-if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_Biomass_time_series.png"))
-if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_Biomass_time_series.png"))
+if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/BBn_Biomass_time_series.png"))
+if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/BBn_Biomass_time_series.png"))
 ```
 
 
 \newpage
 ```{r sfa-26-rec-10-fig, echo=F, fig.cap="SFA-26A SEAM recruit biomass estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
-if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_Recruit_time_series.png"))
-if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_Recruit_time_series.png"))
+if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/BBn_Recruit_time_series.png"))
+if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/BBn_Recruit_time_series.png"))
 ```
 
 
 \newpage
 ```{r sfa-26-nm-10-fig, echo=F, fig.cap="SFA-26A SEAM natural mortality (instantaneous) estimate using 10 knots, shaded area represents the 95\\% confidence interval."}
-if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_nat_mort_time_series.png"))
-if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_nat_mort_time_series.png"))
+if(language== 'english') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/BBn_nat_mort_time_series.png"))
+if(language== 'french') knitr::include_graphics(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/BBn_nat_mort_time_series.png"))
 ```

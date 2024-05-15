@@ -41,8 +41,6 @@ bbn.20.mesh.sf <- data.frame(bbn.20.mesh.sf)
 bbn.20.mesh.sf$geometry <- bbn.20.mesh.sf$geometry*1000
 bbn.20.mesh.sf <- st_as_sf(bbn.20.mesh.sf)
 
-
-
 # First biomass for sable 10....
 sab.10.B.field <- as.data.frame(sab.10$report$omega_B[,-drops])
 names(sab.10.B.field) <- years
@@ -72,8 +70,6 @@ sab.10.m.field <- sab.10.m.field %>% pivot_longer(!meshID)
 sab.10.m.field <- merge(sab.10.mesh.sf,sab.10.m.field,by="meshID",)
 st_crs(sab.10.m.field) <- 32620
 sab.10.m.field <- st_join(sab.10.mesh.sf.triangles,sab.10.m.field)
-
-
 
 # Now the same thing for BBn
 # First Biomass field
@@ -141,7 +137,7 @@ bbn.med.pe.seam$year <- as.numeric(bbn.med.pe.seam$year)
 
 
 
-```{r analysis, echo=F, include=F, paged.print=FALSE,cache=T}
+```{r analysis, echo=F, include=F, paged.print=FALSE,cache=F}
 
 # Numbers for the text...
 # For some stuff we need to drop the prediction year piece
@@ -211,7 +207,7 @@ bbn.med.q <- round(median(bbn.bssm.q$q,na.rm=T),digits=2)
 
 # natural mortality on Sable of recruits since 2011
 sab.last.10.rec.nm <- round(median(sab.bssm.nm.rec$med[sab.bssm.nm.rec$year >= 2011]),digits=2)
-bbn.last.5.rec.nm <- round(median(bbn.bssm.nm.rec$med[bbn.bssm.nm.rec$year >= 2018]),digits=2)
+bbn.last.5.fr.nm <- round(median(bbn.bssm.nm.fr$med[bbn.bssm.nm.fr$year >= 2018]),digits=2)
 
 
 # Now SEAM
@@ -365,7 +361,7 @@ bbn.20.obs.IR <- bbn.20.obs[,which(names(bbn.20.obs) %in% c("IR","Year","knotID"
 #bbn.20.obs.L$m <- bbn.20.obs.L$L/bbn.20.obs.L$N
 # Now remove the NAs and we have the observations by knotID.
 
-#bbn.20 <- readRDS("D:/Framework/SFA_25_26_2024/Model/Results/BBn/R_75_FR_90/BBn_SEAM_model_output_1994_2022_vary_m_m0_0.2_qR_0.33_20_knots_g_1_vary_q=TRUE.Rds")
+#bbn.20 <- readRDS("D:/Framework/SFA_25_26_2024/Model/Results/BBn/R_75_FR_90/BBn_SEAM_model_output_1994_2022_vary_m_m0_0.2_qR_0.33_20_knots_g_1.Rds")
 
 # Now get the q-corrected model estimates by knot, remember the observations are in kg/km^2
 # so we want to use the biomass densities (B) within a knot as our 'residual' metric to make them apples et apples.
@@ -590,6 +586,53 @@ bbn.bssm.dt.delta.b <- round(bbn.bssm.dt$`Biomass change (%)`[bbn.dt$table$`Catc
 sab.dt.delta.b <- round(sab.dt$table$`Biomass change (%)`[1],digits=0)
 bbn.dt.delta.b <- round(bbn.dt$table$`Biomass change (%)`[bbn.dt$table$`Catch (tonnes)` == 225],digits=1)
 
+# Prediction evaluations in numbers.... 
+#Start with Sab BSSM
+sab.bssm.pred.eval$Method <- sab.bssm.pred.eval$scenario
+sab.bssm.pe.summary <- sab.bssm.pred.eval |> collapse::fgroup_by(Method) |> collapse::fsummarise(med.bd = median(B.diff),
+                                                                                                 med.pbd = median(PB.diff))
+# Now extract the bits I want out
+sab.bssm.pe.py.med <- sab.bssm.pe.summary |> collapse::fsubset(Method == "normal",med.pbd) |> round(digits=1) |> as.numeric()
+sab.bssm.pe.py.med.ton <- sab.bssm.pe.summary |> collapse::fsubset(Method == "normal",med.bd) |> round(digits=0) |> as.numeric()
+
+
+sab.bssm.nfrg.py.med <- sab.bssm.pe.summary |> collapse::fsubset(Method == "no fully-recruited growth",med.pbd) |> round(digits=1)|> as.numeric()
+sab.bssm.nfrg.py.med.ton <- sab.bssm.pe.summary |> collapse::fsubset(Method == "no fully-recruited growth",med.bd) |> round(digits=0)|> as.numeric()
+
+#Sab SEAM
+sab.pred.eval$Method <- sab.pred.eval$Scenario
+
+sab.pe.summary <- sab.pred.eval |> collapse::fgroup_by(Method) |> collapse::fsummarise(med.bd = median(B.diff),
+                                                                                                 med.pbd = median(Per.B.diff))
+# Now extract the bits I want out
+sab.pe.spat.med <- sab.pe.summary |> collapse::fsubset(Method == "Spatial Model",med.pbd) |> round(digits=1)|> as.numeric()
+sab.pe.spat.med.ton <- sab.pe.summary |> collapse::fsubset(Method == "Spatial Model",med.bd) |> round(digits=0)|> as.numeric()
+
+sab.pe.ng.med <- sab.pe.summary |> collapse::fsubset(Method == "No Growth",med.pbd) |> round(digits=1)|> as.numeric()
+sab.pe.ng.med.ton <- sab.pe.summary |> collapse::fsubset(Method == "No Growth",med.bd) |> round(digits=0)|> as.numeric()
+
+# Now to BBn
+bbn.bssm.pred.eval$Method <- bbn.bssm.pred.eval$scenario
+
+bbn.bssm.pe.summary <- bbn.bssm.pred.eval |> collapse::fgroup_by(Method) |> collapse::fsummarise(med.bd = median(B.diff),
+                                                                                                 med.pbd = median(PB.diff))
+# Now extract the bits I want out
+bbn.bssm.pe.py.med <- bbn.bssm.pe.summary |> collapse::fsubset(Method == "normal",med.pbd) |> round(digits=1)|> as.numeric()
+bbn.bssm.pe.py.med.ton <- bbn.bssm.pe.summary |> collapse::fsubset(Method == "normal",med.bd) |> round(digits=0)|> as.numeric()
+
+bbn.bssm.mp.py.med <- bbn.bssm.pe.summary |> collapse::fsubset(Method == "Median productivity",med.pbd) |> round(digits=1)|> as.numeric()
+bbn.bssm.mp.py.med.ton <- bbn.bssm.pe.summary |> collapse::fsubset(Method == "Median productivity",med.bd) |> round(digits=0)|> as.numeric()
+#bbn SEAM
+bbn.pred.eval$Method <- bbn.pred.eval$Scenario
+
+bbn.pe.summary <- bbn.pred.eval |> collapse::fgroup_by(Method) |> collapse::fsummarise(med.bd = median(B.diff),
+                                                                                                 med.pbd = median(Per.B.diff))
+# Now extract the bits I want out
+bbn.pe.spat.med <- bbn.pe.summary |> collapse::fsubset(Method == "Spatial Model",med.pbd) |> round(digits=1)|> as.numeric()
+bbn.pe.spat.med.ton <- bbn.pe.summary |> collapse::fsubset(Method == "Spatial Model",med.bd) |> round(digits=0)|> as.numeric()
+
+bbn.ng.py.med <- bbn.pe.summary |> collapse::fsubset(Method == "Previous year",med.pbd) |> round(digits=1)|> as.numeric()
+bbn.ng.py.med.ton <- bbn.pe.summary |> collapse::fsubset(Method == "Previous year",med.bd) |> round(digits=0)|> as.numeric()
 
 ```
 
@@ -598,7 +641,7 @@ bbn.dt.delta.b <- round(bbn.dt$table$`Biomass change (%)`[bbn.dt$table$`Catch (t
 <!-- Make the figures -->
 
 
-```{r knoty, echo=F,include=F}
+```{r knoty, echo=F,include=F,cache=T}
   bbn.knots <- length(bbn.mesh.20$knots$size)
   sab.knots <- length(sab.mesh.10$knots$size)
   NY <- length(years)
@@ -699,8 +742,9 @@ if(language == 'french') save_plot(filename = paste0(repo.loc,"Figures/Catchabil
 
 # Biomass
 bm.ts.plot <- ggplot(pred.proc.sab.10$log_processes) + geom_line(aes(year,exp(log_B)/1000),color='firebrick2',linewidth=1.5) + 
-                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + ylim(c(0,15)) + 
-                                xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
+                                xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Biomass_time_series.png"),bm.ts.plot,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Biomass_time_series.png"),bm.ts.plot,base_width = 8,base_height = 6)
@@ -717,8 +761,8 @@ spatial.B.plot<- ggplot() + geom_sf(data=b.spat.sab.10 %>% dplyr::filter(Year !=
                             scale_fill_viridis_c(breaks = b.brk, labels=b.lab,name="Biomass \nDensity \n(kg\U2022km\U207B\U00B2)",option = "A",begin=0.2) + 
                             theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 16)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 16)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 13)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 13)
 
 # A wide version of the same
 
@@ -748,7 +792,8 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 # Recruit biomass
 rec.ts.plot <- ggplot(pred.proc.sab.10$log_processes) + geom_line(aes(year,exp(log_R)/1000),color='firebrick2',linewidth=1.5) + 
                                 geom_ribbon(aes(ymin=totR.LCI/1000,ymax=totR.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-                                xlab("") + ylab("Recruit Biomass (tonnes x 1000)") + ylim(c(0,1.9)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                xlab("") + ylab("Recruit Biomass (tonnes x 1000)")  + ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Recruit_time_series.png"),rec.ts.plot,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Recruit_time_series.png"),rec.ts.plot,base_width = 8,base_height = 6)
@@ -762,8 +807,8 @@ spatial.R.plot<-  ggplot() + geom_sf(data=r.spat.sab.10,aes(fill=log(R)),col='gr
                              # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
                              scale_fill_viridis_c(breaks = r.brk, labels = r.lab,name="Recruit \nDensity \n(kg\U2022km\U207B\U00B2)",end=0.8)+ 
                              theme(axis.text.x=element_text(angle=-45,hjust=0))
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 16)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/English/Sab_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 16)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 13)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/English/Sab_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 13)
 
 spatial.R.wide.plot<-  ggplot() + geom_sf(data=r.spat.sab.10,aes(fill=log(R)),col='grey')+
                              facet_wrap(~Year,nrow=4)+ 
@@ -780,7 +825,8 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 # Natural mortality time series...
 mort.ts.plot <- ggplot(pred.proc.sab.10$log_processes) + geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) + 
                                 geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-                                xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,1)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                xlab("") + ylab("Natural mortality (Instantaneous)") +  ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
@@ -797,8 +843,8 @@ spatial.m.plot <-  ggplot(data=m.spat.sab.10) + geom_sf(aes(fill=log(m)),color='
                               scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) +
                               theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 13)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 13)
 # Wide
 
 m.brk <- log(c(0.03,0.1,0.3,1))
@@ -818,8 +864,10 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 # Remove missing survey years
 
 # Fishing mortality Time Series
-exploit.plot <- ggplot(F.sab.10) + geom_line(aes(x=year,y=FM),linewidth = 1.5) + geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
-                                   xlab("") + ylab("Fishing mortality (Instantaneous)") + ylim(c(0,0.06)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+exploit.plot <- ggplot(F.sab.10) + geom_line(aes(x=year,y=FM),linewidth = 1.5) +  
+                                   geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
+                                   xlab("") + ylab("Fishing mortality (Instantaneous)") + ylim(c(0,NA)) +
+                                   scale_x_continuous(breaks = seq(1980,2030,by=3))
 
 if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_fish_mort_time_series.png"),exploit.plot,base_width = 8,base_height = 6)
 if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_fish_mort_time_series.png"),exploit.plot,base_width = 8,base_height = 6)
@@ -834,8 +882,8 @@ spatial.exploit.plot<- ggplot() + geom_sf(data=F.spat.sab.10,aes(fill=log(F.na))
                                   # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
                                   facet_wrap(~Year,ncol=5) + scale_fill_viridis_c(breaks = e.brk,labels = e.lab,name="Fishing \nmortality \n(Instantaneous)",option = "D") + theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_FM.png"),spatial.exploit.plot,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_FM.png"),spatial.exploit.plot,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_FM.png"),spatial.exploit.plot,base_width = 12,base_height = 13)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_FM.png"),spatial.exploit.plot,base_width = 12,base_height = 13)
 
 spatial.exploit.wide.plot<- ggplot() + geom_sf(data=F.spat.sab.10,aes(fill=log(F.na)),color='grey') +
                                   # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
@@ -848,8 +896,9 @@ if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR
 
 # Biomass
 bm.20.ts.plot <- ggplot(pred.proc.sab.20$log_processes) + geom_line(aes(year,exp(log_B)/1000),color='firebrick2',linewidth=1.5) + 
-                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + ylim(c(0,15)) + 
-                                xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
+                                xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/Sab_Biomass_time_series.png"),bm.20.ts.plot,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/Sab_Biomass_time_series.png"),bm.20.ts.plot,base_width = 8,base_height = 6)
@@ -857,7 +906,8 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 # Recruit biomass
 rec.20.ts.plot <- ggplot(pred.proc.sab.20$log_processes) + geom_line(aes(year,exp(log_R)/1000),color='firebrick2',linewidth=1.5) + 
                                 geom_ribbon(aes(ymin=totR.LCI/1000,ymax=totR.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-                                xlab("") + ylab("Recruit Biomass (tonnes x 1000)") + ylim(c(0,1.9)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                xlab("") + ylab("Recruit Biomass (tonnes x 1000)") +  ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/Sab_Recruit_time_series.png"),rec.ts.plot,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/Sab_Recruit_time_series.png"),rec.ts.plot,base_width = 8,base_height = 6)
@@ -867,7 +917,8 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 # Natural mortality time series...
 mort.20.ts.plot <- ggplot(pred.proc.sab.20$log_processes) + geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) + 
                                 geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-                                xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,1)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                xlab("") + ylab("Natural mortality (Instantaneous)") +  ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/Sab_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/Sab_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
@@ -882,15 +933,16 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 
 
-```{r sfa26-seam, echo=F,include=T}
+```{r sfa26-seam, echo=F,include=T,cache=T}
 
 # Biomass
 bm.ts.plot <- ggplot(pred.proc.bbn.20$log_processes) + geom_line(aes(year,exp(log_B)/1000),color='firebrick2',linewidth=1.5) + 
-                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + ylim(c(0,25)) + 
-                                xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
+                                xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Biomass_time_series.png"),bm.ts.plot,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Biomass_time_series.png"),bm.ts.plot,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Biomass_time_series.png"),bm.ts.plot,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Biomass_time_series.png"),bm.ts.plot,base_width = 8,base_height = 6)
 
 # Spatial biomass
 #B
@@ -904,8 +956,8 @@ spatial.B.plot<- ggplot() + geom_sf(data=b.spat.bbn.20 %>% dplyr::filter(Year !=
                             scale_fill_viridis_c(breaks = b.brk, labels=b.lab,name="Biomass \nDensity \n(kg\U2022km\U207B\U00B2)",option = "A",begin=0.2) + 
                             theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 16)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 16)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 13)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_biomass.png"),spatial.B.plot,base_width = 12,base_height = 13)
 
 spatial.B.wide.plot<- ggplot() + geom_sf(data=b.spat.bbn.20 %>% dplyr::filter(Year != 2023),aes(fill=log(B)),color='grey')+
                             facet_wrap(~Year,nrow=4)+ 
@@ -914,8 +966,8 @@ spatial.B.wide.plot<- ggplot() + geom_sf(data=b.spat.bbn.20 %>% dplyr::filter(Ye
                             scale_fill_viridis_c(breaks = b.brk, labels=b.lab,name="Biomass \nDensity \n(kg\U2022km\U207B\U00B2)",option = "A",begin=0.2) + 
                             theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_biomass_wide.png"),spatial.B.wide.plot,base_width = 18,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_biomass_wide.png"),spatial.B.wide.plot,base_width = 18,base_height = 10)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_biomass_wide.png"),spatial.B.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_biomass_wide.png"),spatial.B.wide.plot,base_width = 18,base_height = 10)
 
 
 # Catchability
@@ -925,17 +977,18 @@ spatial.q.plot <- ggplot() + geom_sf(data=q.spat.bbn.20,aes(fill=qI),col=NA)+
                              #scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
                              scale_fill_viridis_c(name="Catchability (qI)",option = "C",begin = 0.2,end =0.8) + 
                              theme(axis.text.x=element_text(angle=-45,hjust=0))
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_catchability.png"),spatial.q.plot,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_catchability.png"),spatial.q.plot,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_catchability.png"),spatial.q.plot,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_catchability.png"),spatial.q.plot,base_width = 8,base_height = 6)
 
 
 # Recruit biomass
 rec.ts.plot <- ggplot(pred.proc.bbn.20$log_processes) + geom_line(aes(year,exp(log_R)/1000),color='firebrick2',linewidth=1.5) + 
                                 geom_ribbon(aes(ymin=totR.LCI/1000,ymax=totR.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-                                xlab("") + ylab("Recruit Biomass (tonnes x 1000)") + ylim(c(0,7)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                xlab("") + ylab("Recruit Biomass (tonnes x 1000)") + ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Recruit_time_series.png"),rec.ts.plot,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Recruit_time_series.png"),rec.ts.plot,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Recruit_time_series.png"),rec.ts.plot,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Recruit_time_series.png"),rec.ts.plot,base_width = 8,base_height = 6)
 
 
 r.brk <- pretty(log(r.spat.bbn.20$R))
@@ -946,8 +999,8 @@ spatial.R.plot<-  ggplot() + geom_sf(data=r.spat.bbn.20,aes(fill=log(R)),col='gr
                              # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
                              scale_fill_viridis_c(breaks = r.brk, labels = r.lab,name="Recruit \nDensity \n(kg\U2022km\U207B\U00B2)",end=0.8)+ 
                              theme(axis.text.x=element_text(angle=-45,hjust=0))
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 16)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/French/BBn_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 16)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 13)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/French/BBn_Spatial_recruits.png"),spatial.R.plot,base_width = 12,base_height = 13)
 
 # Wide...
 spatial.R.wide.plot<-  ggplot() + geom_sf(data=r.spat.bbn.20,aes(fill=log(R)),col='grey')+
@@ -956,8 +1009,8 @@ spatial.R.wide.plot<-  ggplot() + geom_sf(data=r.spat.bbn.20,aes(fill=log(R)),co
                              # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
                              scale_fill_viridis_c(breaks = r.brk, labels = r.lab,name="Recruit \nDensity \n(kg\U2022km\U207B\U00B2)",end=0.8)+ 
                              theme(axis.text.x=element_text(angle=-45,hjust=0))
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_recruits_wide.png"),spatial.R.wide.plot,base_width = 18,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/French/BBn_Spatial_recruits_wide.png"),spatial.R.wide.plot,base_width = 18,base_height = 10)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_recruits_wide.png"),spatial.R.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/French/BBn_Spatial_recruits_wide.png"),spatial.R.wide.plot,base_width = 18,base_height = 10)
 
 
 # Remove missing survey years
@@ -966,10 +1019,11 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 # Natural mortality time series...
 mort.ts.plot <- ggplot(pred.proc.bbn.20$log_processes) + geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) + 
                                 geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-                                xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,0.35)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                xlab("") + ylab("Natural mortality (Instantaneous)") +  ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_nat_mort_time_series.png"),mort.ts.plot,base_width = 8,base_height = 6)
 
 
 m.brk <- log(c(0.003,0.01,0.03,0.1,0.3,1))
@@ -984,8 +1038,8 @@ spatial.m.plot <-  ggplot() + geom_sf(data=m.spat.bbn.20,aes(fill=log(m)),color=
                               scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) +
                               theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 16)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 13)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_nm.png"),spatial.m.plot,base_width = 12,base_height = 13)
 
 # Wide....
 
@@ -996,18 +1050,18 @@ spatial.m.wide.plot <-  ggplot() + geom_sf(data=m.spat.bbn.20,aes(fill=log(m)),c
                               scale_fill_viridis_c(breaks = m.brk, labels = m.lab,name="Natural \nmortality \n(Instantaneous)",option = "B",direction =1,begin = 0.2,end=1) +
                               theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_nm_wide.png"),spatial.m.wide.plot,base_width = 18,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_nm_wide.png"),spatial.m.wide.plot,base_width = 18,base_height = 10)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_nm_wide.png"),spatial.m.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_nm_wide.png"),spatial.m.wide.plot,base_width = 18,base_height = 10)
 
 
 # Remove missing survey years
 
 # Fishing mortality Time Series
-exploit.plot <- ggplot(F.bbn.20) + geom_line(aes(x=year,y=FM),linewidth = 1.5) + geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +
-                                   xlab("") + ylab("Fishing mortality (Instantaneous)") + ylim(c(0,0.3)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+exploit.plot <- ggplot(F.bbn.20) + geom_line(aes(x=year,y=FM),linewidth = 1.5) + geom_ribbon(aes(ymin=exploit.LCI,ymax=exploit.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') +ylim(c(0,NA)) +
+                                   xlab("") + ylab("Fishing mortality (Instantaneous)") +  scale_x_continuous(breaks = seq(1980,2030,by=3))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_fish_mort_time_series.png"),exploit.plot,base_width = 8,base_height = 6)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_fish_mort_time_series.png"),exploit.plot,base_width = 8,base_height = 6)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_fish_mort_time_series.png"),exploit.plot,base_width = 8,base_height = 6)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_fish_mort_time_series.png"),exploit.plot,base_width = 8,base_height = 6)
 
 
 e.brk <- pretty(log(F.spat.bbn.20$F.na))
@@ -1017,8 +1071,8 @@ spatial.exploit.plot<- ggplot() + geom_sf(data=F.spat.bbn.20,aes(fill=log(F.na))
                                   # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
                                   facet_wrap(~Year,ncol=5) + scale_fill_viridis_c(breaks = e.brk,labels = e.lab,name="Fishing \nmortality \n(Instantaneous)",option = "D") + theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_fm.png"),spatial.exploit.plot,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_fm.png"),spatial.exploit.plot,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_fm.png"),spatial.exploit.plot,base_width = 12,base_height = 13)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_fm.png"),spatial.exploit.plot,base_width = 12,base_height = 13)
 
 # Wide
 spatial.exploit.wide.plot<- ggplot() + geom_sf(data=F.spat.bbn.20,aes(fill=log(F.na)),color='grey') +
@@ -1026,38 +1080,41 @@ spatial.exploit.wide.plot<- ggplot() + geom_sf(data=F.spat.bbn.20,aes(fill=log(F
                                   # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) +
                                   facet_wrap(~Year,nrow=4) + scale_fill_viridis_c(breaks = e.brk,labels = e.lab,name="Fishing \nmortality \n(Instantaneous)",option = "D") + theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_fm_wide.png"),spatial.exploit.wide.plot,base_width = 18,base_height = 10)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_fm_wide.png"),spatial.exploit.wide.plot,base_width = 18,base_height = 10)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_fm_wide.png"),spatial.exploit.wide.plot,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_fm_wide.png"),spatial.exploit.wide.plot,base_width = 18,base_height = 10)
 
 # 10 knot competition
 
 
 # Biomass
 bm.10.ts.plot <- ggplot(pred.proc.bbn.10$log_processes) + geom_line(aes(year,exp(log_B)/1000),color='firebrick2',linewidth=1.5) + 
-                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + ylim(c(0,31)) + 
-                                xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                geom_ribbon(aes(ymin=totB.LCI/1000,ymax=totB.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
+                                xlab("") + ylab("Fully Recruited Biomass (tonnes x 1000)") + ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_Biomass_time_series.png"),bm.10.ts.plot,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_Biomass_time_series.png"),bm.10.ts.plot,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/BBn_Biomass_time_series.png"),bm.10.ts.plot,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/BBn_Biomass_time_series.png"),bm.10.ts.plot,base_width = 8,base_height = 6)
 
 
 # Recruit biomass
 rec.10.ts.plot <- ggplot(pred.proc.bbn.10$log_processes) + geom_line(aes(year,exp(log_R)/1000),color='firebrick2',linewidth=1.5) + 
                                 geom_ribbon(aes(ymin=totR.LCI/1000,ymax=totR.UCI/1000,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-                                xlab("") + ylab("Recruit Biomass (tonnes x 1000)") + ylim(c(0,7)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                xlab("") + ylab("Recruit Biomass (tonnes x 1000)") +  ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_Recruit_time_series.png"),rec.10.ts.plot,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_Recruit_time_series.png"),rec.10.ts.plot,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/BBn_Recruit_time_series.png"),rec.10.ts.plot,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/BBn_Recruit_time_series.png"),rec.10.ts.plot,base_width = 8,base_height = 6)
 
 
 
 # Natural mortality time series...
 mort.10.ts.plot <- ggplot(pred.proc.bbn.10$log_processes) + geom_line(aes(year,exp(log_m)),color='firebrick2',linewidth=1.5) + 
                                 geom_ribbon(aes(ymin=m.LCI,ymax=m.UCI,x=year),alpha=0.2,fill='darkblue',color='darkblue') + 
-                                xlab("") + ylab("Natural mortality (Instantaneous)") + ylim(c(0,0.35)) + scale_x_continuous(breaks = seq(1980,2030,by=3))
+                                xlab("") + ylab("Natural mortality (Instantaneous)") +  ylim(c(0,NA)) +
+                                scale_x_continuous(breaks = seq(1980,2030,by=3))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/English/BBn_nat_mort_time_series.png"),mort.10.ts.plot,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"_vary_q=TRUE/French/BBn_nat_mort_time_series.png"),mort.10.ts.plot,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/BBn_nat_mort_time_series.png"),mort.10.ts.plot,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/BBn_nat_mort_time_series.png"),mort.10.ts.plot,base_width = 8,base_height = 6)
 
 
 ```
@@ -1069,43 +1126,54 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 ```{r sfa25-bssm, echo=F,include=F}
 
-p.bssm.bm <- ggplot(sab.bssm %>% dplyr::filter(term == "Biomass (tonnes)"), aes(x=year,y=med/1000)) + geom_line(linewidth=1.5,color='firebrick2') +
-  geom_ribbon(aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Fully Recruited Biomass (tonnes x 1000)") + xlab("")  + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,11.5))
+p.bssm.bm <- ggplot(sab.bssm %>% dplyr::filter(term == "Biomass (tonnes)"), aes(x=year,y=med/1000)) + 
+                                          geom_line(linewidth=1.5,color='firebrick2') +
+                                          geom_ribbon(aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                          ylab("Fully Recruited Biomass (tonnes x 1000)") + xlab("")  + ylim(c(0,NA)) +
+                                          scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/English/Sab_Biomass.png"),p.bssm.bm,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/French/Sab_Biomass.png"),p.bssm.bm,base_width = 8,base_height = 6)
 
 # Just the recruits
 
-p.bssm.rec <- ggplot(sab.bssm %>% dplyr::filter(term == "Recruit Biomass (tonnes)"), aes(x=year,y=med/1000)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Recruit Biomass (tonnes x 1000)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,2.5))
+p.bssm.rec <- ggplot(sab.bssm %>% dplyr::filter(term == "Recruit Biomass (tonnes)"), aes(x=year,y=med/1000)) + 
+                                            geom_line(color='firebrick2',linewidth=1.5) +
+                                            geom_ribbon(aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                            ylab("Recruit Biomass (tonnes x 1000)") + xlab("") + ylim(c(0,NA)) +
+                                            scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/English/Sab_Recruits.png"),p.bssm.rec,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/French/Sab_Recruits.png"),p.bssm.rec,base_width = 8,base_height = 6)
 
 # Natural mortality
 
-p.bssm.nat.mort <- ggplot(sab.bssm %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.4))
+p.bssm.nat.mort <- ggplot(sab.bssm %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)"), aes(x=year,y=med)) + 
+                                            geom_line(color='firebrick2',linewidth=1.5) +
+                                            geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                            ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + ylim(c(0,NA)) +
+                                            scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/English/Sab_fr_nm.png"),p.bssm.nat.mort,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/French/Sab_fr_nm.png"),p.bssm.nat.mort,base_width = 8,base_height = 6)
 
-p.bssm.rec.nat.mort <- ggplot(sab.bssm %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Natural Mortality (75-90 mm, instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1))
+p.bssm.rec.nat.mort <- ggplot(sab.bssm %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)"), aes(x=year,y=med)) + 
+                                                geom_line(color='firebrick2',linewidth=1.5) +
+                                                geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                                ylab("Natural Mortality (75-90 mm, instantaneous)") + xlab("") + ylim(c(0,NA)) +
+                                                scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/English/Sab_rec_nm.png"),p.bssm.rec.nat.mort,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/French/Sab_rec_nm.png"),p.bssm.rec.nat.mort,base_width = 8,base_height = 6)
 
 # Exploitation Rate
 
-p.bssm.F <- ggplot(sab.bssm %>% dplyr::filter(term == "Fishing Mortality (instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Fishing Mortality (instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.08))
+# need to subtract a year from the F...
+p.bssm.F <- ggplot(sab.bssm %>% dplyr::filter(term == "Fishing Mortality (instantaneous)"), aes(x=year-1,y=med)) + 
+                                                    geom_line(color='firebrick2',linewidth=1.5) +
+                                                    geom_ribbon(aes(x=year-1,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                                    ylab("Fishing Mortality (instantaneous)") + xlab("") + ylim(c(0,NA)) +
+                                                    scale_x_continuous(breaks = seq(1980,2030,by=3),limits = c(1994,2022)) 
 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/SSModel/English/Sab_fm.png"),p.bssm.F,base_width = 8,base_height = 6)
@@ -1127,43 +1195,53 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 ```{r sfa26-bssm, echo=F,include=F}
 
-p.bssm.bm <- ggplot(bbn.bssm %>% dplyr::filter(term == "Biomass (tonnes)"), aes(x=year,y=med/1000)) + geom_line(linewidth=1.5,color='firebrick2') +
-  geom_ribbon(aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Fully Recruited Biomass (tonnes x 1000)") + xlab("")  + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,25))
+p.bssm.bm <- ggplot(bbn.bssm %>% dplyr::filter(term == "Biomass (tonnes)"), aes(x=year,y=med/1000)) + 
+                                      geom_line(linewidth=1.5,color='firebrick2') +
+                                      geom_ribbon(aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                      ylab("Fully Recruited Biomass (tonnes x 1000)") + xlab("")  + ylim(c(0,NA)) +
+                                      scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/English/BBn_Biomass.png"),p.bssm.bm,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/French/BBn_Biomass.png"),p.bssm.bm,base_width = 8,base_height = 6)
 
 # Just the recruits
 
-p.bssm.rec <- ggplot(bbn.bssm %>% dplyr::filter(term == "Recruit Biomass (tonnes)"), aes(x=year,y=med/1000)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Recruit Biomass (tonnes x 1000)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,7))
+p.bssm.rec <- ggplot(bbn.bssm %>% dplyr::filter(term == "Recruit Biomass (tonnes)"), aes(x=year,y=med/1000)) + 
+                                        geom_line(color='firebrick2',linewidth=1.5) +
+                                        geom_ribbon(aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                        ylab("Recruit Biomass (tonnes x 1000)") + xlab("") + ylim(c(0,NA)) +
+                                        scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/English/BBn_Recruits.png"),p.bssm.rec,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/French/BBn_Recruits.png"),p.bssm.rec,base_width = 8,base_height = 6)
 
 # Natural mortality
 
-p.bssm.nat.mort <- ggplot(bbn.bssm %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.9))
+p.bssm.nat.mort <- ggplot(bbn.bssm %>% dplyr::filter(term == "FR Natural Mortality (90+ mm, instantaneous)"), aes(x=year,y=med)) + 
+                                        geom_line(color='firebrick2',linewidth=1.5) +
+                                        geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                        ylab("Natural Mortality (90+ mm, instantaneous)") + xlab("") + ylim(c(0,NA)) +
+                                        scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/English/BBn_fr_nm.png"),p.bssm.nat.mort,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/French/BBn_fr_nm.png"),p.bssm.nat.mort,base_width = 8,base_height = 6)
 
-p.bssm.rec.nat.mort <- ggplot(bbn.bssm %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Natural Mortality (75-90 mm, instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,3.3))
+p.bssm.rec.nat.mort <- ggplot(bbn.bssm %>% dplyr::filter(term == "Recruit Natural Mortality (75-90 mm, instantaneous)"), aes(x=year,y=med)) + 
+                            geom_line(color='firebrick2',linewidth=1.5) +
+                            geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                            ylab("Natural Mortality (75-90 mm, instantaneous)") + xlab("") + ylim(c(0,NA)) +
+                            scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/English/BBn_rec_nm.png"),p.bssm.rec.nat.mort,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/French/BBn_rec_nm.png"),p.bssm.rec.nat.mort,base_width = 8,base_height = 6)
 
 # Exploitation Rate
 
-p.bssm.F <- ggplot(bbn.bssm %>% dplyr::filter(term == "Fishing Mortality (instantaneous)"), aes(x=year,y=med)) + geom_line(color='firebrick2',linewidth=1.5) +
-  geom_ribbon(aes(x=year,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + ylab("Fishing Mortality (instantaneous)") + xlab("") + 
-  scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.4))
+p.bssm.F <- ggplot(bbn.bssm %>% dplyr::filter(term == "Fishing Mortality (instantaneous)"), aes(x=year-1,y=med)) + 
+                                        geom_line(color='firebrick2',linewidth=1.5) +
+                                        geom_ribbon(aes(x=year-1,ymin=lci,ymax=uci),fill='darkblue',color='darkblue',alpha = 0.2) + 
+                                        ylab("Fishing Mortality (instantaneous)") + xlab("") + ylim(c(0,NA)) +
+                                        scale_x_continuous(breaks = seq(1980,2030,by=3),limits=c(1994,2022)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/English/BBn_fm.png"),p.bssm.F,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/SSModel/French/BBn_fm.png"),p.bssm.F,base_width = 8,base_height = 6)
@@ -1189,8 +1267,8 @@ p.B.rf<- ggplot() + geom_sf(data=sab.10.B.field,aes(fill=value,color=value)) +
                                   scale_color_viridis_c(name="Process Error \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 13)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 13)
 
 # Wide
 p.B.rf.wide<- ggplot() + geom_sf(data=sab.10.B.field,aes(fill=value,color=value)) +
@@ -1215,8 +1293,8 @@ p.R.rf<- ggplot() + geom_sf(data=sab.10.R.field,aes(fill=value,color=value)) +
                                   scale_color_viridis_c(name="Recruit Biomass \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 13)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 13)
 
 # Wide
 p.R.rf.wide<- ggplot() + geom_sf(data=sab.10.R.field,aes(fill=value,color=value)) +
@@ -1239,8 +1317,8 @@ p.m.rf<- ggplot() + geom_sf(data=sab.10.m.field,aes(fill=value,color=value)) +
                                   scale_color_viridis_c(name="Natural mortality \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 13)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 13)
 
 # Wide
 p.m.rf.wide<- ggplot() + geom_sf(data=sab.10.m.field,aes(fill=value,color=value)) +
@@ -1284,8 +1362,8 @@ p.B.rf<- ggplot() + geom_sf(data=bbn.20.B.field,aes(fill=value,color=value)) +
                                   scale_color_viridis_c(name="Process Error \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 13)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_B_rf.png"),p.B.rf,base_width = 12,base_height = 13)
 
 # Wide
 p.B.rf.wide<- ggplot() + geom_sf(data=bbn.20.B.field,aes(fill=value,color=value)) +
@@ -1296,8 +1374,8 @@ p.B.rf.wide<- ggplot() + geom_sf(data=bbn.20.B.field,aes(fill=value,color=value)
                                   scale_color_viridis_c(name="Process Error \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_B_rf_wide.png"),p.B.rf.wide,base_width = 18,base_height = 10)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_B_rf_wide.png"),p.B.rf.wide,base_width = 18,base_height = 10)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_B_rf_wide.png"),p.B.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_B_rf_wide.png"),p.B.rf.wide,base_width = 18,base_height = 10)
 
 # Recruits
 p.R.rf<- ggplot() + geom_sf(data=bbn.20.R.field,aes(fill=value,color=value)) +
@@ -1308,8 +1386,8 @@ p.R.rf<- ggplot() + geom_sf(data=bbn.20.R.field,aes(fill=value,color=value)) +
                                   scale_color_viridis_c(name="Recruit Biomass \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 13)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_R_rf.png"),p.R.rf,base_width = 12,base_height = 13)
 
 # Wide
 p.R.rf.wide<- ggplot() + geom_sf(data=bbn.20.R.field,aes(fill=value,color=value)) +
@@ -1320,8 +1398,8 @@ p.R.rf.wide<- ggplot() + geom_sf(data=bbn.20.R.field,aes(fill=value,color=value)
                                   scale_color_viridis_c(name="Recruit Biomass \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_R_rf_wide.png"),p.R.rf.wide,base_width = 18,base_height = 10)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_R_rf_wide.png"),p.R.rf.wide,base_width = 18,base_height = 10)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_R_rf_wide.png"),p.R.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_R_rf_wide.png"),p.R.rf.wide,base_width = 18,base_height = 10)
 
 
 
@@ -1334,8 +1412,8 @@ p.m.rf<- ggplot() + geom_sf(data=bbn.20.m.field,aes(fill=value,color=value)) +
                                   scale_color_viridis_c(name="Natural mortality \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 16)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 16)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 13)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_m_rf.png"),p.m.rf,base_width = 12,base_height = 13)
 # Wide...
 p.m.rf.wide<- ggplot() + geom_sf(data=bbn.20.m.field,aes(fill=value,color=value)) +
                                   # scale_x_continuous(breaks = c(-61.66667,-61), labels = c("61° 40'W","61° W")) +
@@ -1345,8 +1423,8 @@ p.m.rf.wide<- ggplot() + geom_sf(data=bbn.20.m.field,aes(fill=value,color=value)
                                   scale_color_viridis_c(name="Natural mortality \nRandom Field",option = "D") + 
                                   theme(axis.text.x=element_text(angle=-45,hjust=0))
 
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_m_rf_wide.png"),p.m.rf.wide,base_width = 18,base_height = 10)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_m_rf_wide.png"),p.m.rf.wide,base_width = 18,base_height = 10)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_m_rf_wide.png"),p.m.rf.wide,base_width = 18,base_height = 10)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_m_rf_wide.png"),p.m.rf.wide,base_width = 18,base_height = 10)
 
 
 
@@ -1357,8 +1435,8 @@ bbn.seam.pe<- ggplot(data=bbn.med.pe.seam, aes(x=year,y=med)) +
                                     scale_x_continuous(breaks = seq(1990,2030,by=3)) + xlab("") + 
                                     ylab("Median Process Error")
                                   
-if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_seam_median_pe.png"),bbn.seam.pe,base_width = 8,base_height = 8)
-if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_seam_median_pe.png"),bbn.seam.pe,base_width = 8,base_height = 8)
+if(language == 'english')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_seam_median_pe.png"),bbn.seam.pe,base_width = 8,base_height = 8)
+if(language == 'french')  save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_seam_median_pe.png"),bbn.seam.pe,base_width = 8,base_height = 8)
 
 ```
 
@@ -1489,7 +1567,7 @@ r.retro <- ggplot(data=retro.bssm.bbn %>% dplyr::filter(years < 2020),aes(x= yea
                                     #geom_line(data=base.trend,aes(x=years, y = B,color=retro.year),size=1) +
                                     scale_color_manual("",values =cols) + scale_fill_manual("",values =cols) +
                                     scale_x_continuous(breaks = seq(1990,2030,by=3)) + xlab("") + 
-                                    ylab("Recruited biomass (tonnes x 1000)")
+                                    ylab("Recruit biomass (tonnes x 1000)")
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/English/BBn_bssm_recruit_retro.png"),r.retro,base_width = 8,base_height = 6)
 if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/SS_model/French/BBn_bssm_recruit_retro.png"),r.retro,base_width = 8,base_height = 6)
@@ -1525,8 +1603,8 @@ b.retro <- ggplot(data=retro.bbn %>% dplyr::filter(years < 2020),aes(x= years, y
                                     scale_x_continuous(breaks = seq(1990,2030,by=3)) + xlab("") + 
                                     ylab("Fully recruited biomass (tonnes x 1000)")
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_biomass_retro.png"),b.retro,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_biomass_retro.png"),b.retro,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"/English/BBn_biomass_retro.png"),b.retro,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"/French/BBn_biomass_retro.png"),b.retro,base_width = 8,base_height = 6)
 
 
 
@@ -1537,10 +1615,10 @@ r.retro <- ggplot(data=retro.bbn %>% dplyr::filter(years < 2020),aes(x= years, y
                                     #geom_line(data=base.trend,aes(x=years, y = B,color=retro.year),size=1) +
                                     scale_color_manual("",values =cols) + scale_fill_manual("",values =cols) +
                                     scale_x_continuous(breaks = seq(1990,2030,by=3)) + xlab("") + 
-                                    ylab("Recruited biomass (tonnes x 1000)")
+                                    ylab("Recruit biomass (tonnes x 1000)")
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_recruit_retro.png"),r.retro,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_recruit_retro.png"),r.retro,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"/English/BBn_recruit_retro.png"),r.retro,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"/French/BBn_recruit_retro.png"),r.retro,base_width = 8,base_height = 6)
 
 
 m.retro <- ggplot(data=retro.bbn %>% dplyr::filter(years < 2020),aes(x= years, y = m,group=retro.year,color=retro.year,shape = retro.year,fill = retro.year)) +
@@ -1552,8 +1630,8 @@ m.retro <- ggplot(data=retro.bbn %>% dplyr::filter(years < 2020),aes(x= years, y
                                     scale_x_continuous(breaks = seq(1990,2030,by=3)) + xlab("") + 
                                     ylab("Natural mortality (instantaneous)")
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_nm_retro.png"),m.retro,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_nm_retro.png"),m.retro,base_width = 8,base_height = 6)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"/English/BBn_nm_retro.png"),m.retro,base_width = 8,base_height = 6)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Retros/",mod.select,"_",scenario.20,"/French/BBn_nm_retro.png"),m.retro,base_width = 8,base_height = 6)
 
 ```
 
@@ -1586,9 +1664,9 @@ bbn.20.f.vs.rel.f <- ggplot(bbn.20.rel.f,aes(x=mod.exploit,y=rel.f,label=substr(
 
 bbn.f.vs.rel.f <- plot_grid(bbn.bssm.f.vs.rel.f,bbn.20.f.vs.rel.f,nrow=2)
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_rel_vs_mod_F.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_rel_vs_mod_F.png"),
                                     bbn.f.vs.rel.f,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_rel_vs_mod_F.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_rel_vs_mod_F.png"),
                                    bbn.f.vs.rel.f,base_width = 8,base_height = 6)
 
 
@@ -1653,7 +1731,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 # QQ plots...
 
 sab.I.qq <- ggplot(sab.10.I.resids,aes(sample = residual)) + geom_qq() + geom_qq_line() + xlab("Theoretical") + ylab("Sample")
-sab.I.dens <- ggplot(sab.10.I.resids,aes(x= I)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey fully-recruited biomass (tonnes)")
+sab.I.dens <- ggplot(sab.10.I.resids,aes(x= I)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey fully-recruited biomass density (kg\U2022km\U00B2)")
 sab.I.qq.dens <- plot_grid(sab.I.qq,sab.I.dens,nrow=2)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_I_qq.png"),
@@ -1664,7 +1742,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 # and for recruits
 
 sab.IR.qq <- ggplot(sab.10.IR.resids,aes(sample = residual)) + geom_qq() + geom_qq_line() + xlab("Theoretical") + ylab("Sample")
-sab.IR.dens <- ggplot(sab.10.IR.resids,aes(x= IR)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey recruit biomass (tonnes")
+sab.IR.dens <- ggplot(sab.10.IR.resids,aes(x= IR)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey recruit biomass density (kg\U2022km\U00B2)")
 sab.IR.qq.dens <- plot_grid(sab.IR.qq,sab.IR.dens,nrow=2)
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_IR_qq.png"),
@@ -1713,8 +1791,8 @@ bbn.I.resids.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=residual)
                                                 geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
                                                 scale_x_log10(name="Fitted Values (Fully-recruited biomass density; (kg\U2022km\U00B2))")
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids.png"),bbn.I.resids.plt,base_width = 8,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids.png"),bbn.I.resids.plt,base_width = 8,base_height = 10)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_I_resids.png"),bbn.I.resids.plt,base_width = 8,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_I_resids.png"),bbn.I.resids.plt,base_width = 8,base_height = 10)
 # Wide
 bbn.I.resids.wide.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=residual)) + 
                                               facet_wrap(~knotID,ncol=5) + 
@@ -1723,8 +1801,8 @@ bbn.I.resids.wide.plt <- ggplot(bbn.20.I.resids) + geom_point(aes(x=I.mod,y=resi
                                                 scale_x_log10(name="Fitted Values (Fully-recruited biomass density; (kg\U2022km\U00B2))")+ 
                                                 theme(panel.spacing = unit(1.5, "lines"))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids_wide.png"),bbn.I.resids.wide.plt,base_width = 12,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_resids_wide.png"),bbn.I.resids.wide.plt,base_width = 12,base_height = 10)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_I_resids_wide.png"),bbn.I.resids.wide.plt,base_width = 12,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_I_resids_wide.png"),bbn.I.resids.wide.plt,base_width = 12,base_height = 10)
 
 
 
@@ -1734,8 +1812,8 @@ bbn.IR.resids.plt <- ggplot(bbn.20.IR.resids) + geom_point(aes(x=IR.mod,y=residu
                                                ylab("Residual") +
                                                 geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
                                                 scale_x_log10(name="Fitted Values (Recruit Biomass density; (kg\U2022km\U00B2))")
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids.png"),bbn.IR.resids.plt,base_width = 8,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids.png"),bbn.IR.resids.plt,base_width = 8,base_height = 10)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_IR_resids.png"),bbn.IR.resids.plt,base_width = 8,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_IR_resids.png"),bbn.IR.resids.plt,base_width = 8,base_height = 10)
 
 # Wide
 bbn.IR.resids.wide.plt <- ggplot(bbn.20.IR.resids) + geom_point(aes(x=IR.mod,y=residual)) + 
@@ -1744,32 +1822,32 @@ bbn.IR.resids.wide.plt <- ggplot(bbn.20.IR.resids) + geom_point(aes(x=IR.mod,y=r
                                                 geom_hline(yintercept = 0,color='blue',linetype='dashed',size=1.5) +
                                                 scale_x_log10(name="Fitted Values (Recruit Biomass density; (kg\U2022km\U00B2))")+ 
                                                 theme(panel.spacing = unit(1.5, "lines"))
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids_wide.png"),bbn.IR.resids.wide.plt,base_width = 12,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_resids_wide.png"),bbn.IR.resids.wide.plt,base_width = 12,base_height = 10)
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_IR_resids_wide.png"),bbn.IR.resids.wide.plt,base_width = 12,base_height = 10)
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_IR_resids_wide.png"),bbn.IR.resids.wide.plt,base_width = 12,base_height = 10)
 
 
 # QQ plots...
 
 bbn.I.qq <- ggplot(bbn.20.I.resids,aes(sample = residual)) + geom_qq() + geom_qq_line() + xlab("Theoretical") + ylab("Sample")
-bbn.I.dens <- ggplot(bbn.20.I.resids,aes(x= I)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey fully-recruited biomass (tonnes)")
+bbn.I.dens <- ggplot(bbn.20.I.resids,aes(x= I)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey fully-recruited biomass density (kg\U2022km\U00B2)")
 bbn.I.qq.dens <- plot_grid(bbn.I.qq,bbn.I.dens,nrow=2)
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_qq.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_I_qq.png"),
                                     bbn.I.qq.dens,base_width = 8,base_height = 8)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_I_qq.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_I_qq.png"),
                                    bbn.I.qq.dens,base_width = 8,base_height = 8)
 
 
 # and for recruits
 
 bbn.IR.qq <- ggplot(bbn.20.IR.resids,aes(sample = residual)) + geom_qq() + geom_qq_line() + xlab("Theoretical") + ylab("Sample")
-bbn.IR.dens <- ggplot(bbn.20.IR.resids,aes(x= IR)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey recruit biomass (tonnes")
+bbn.IR.dens <- ggplot(bbn.20.IR.resids,aes(x= IR)) + geom_density() + ylab("Density") + scale_x_log10(name = "Observed survey recruit biomass density (kg\U2022km\U00B2)")
 
 bbn.IR.qq.dens <- plot_grid(bbn.IR.qq,bbn.IR.dens,nrow=2)
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_qq.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_IR_qq.png"),
                                     bbn.IR.qq.dens,base_width = 8,base_height = 8)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_IR_qq.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_IR_qq.png"),
                                    bbn.IR.qq.dens,base_width = 8,base_height = 8)
 
 
@@ -1779,9 +1857,9 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 #                                                ylab("Raw residual (proportion)") +
 #                                                scale_x_continuous(name="",breaks = seq(1980,2030,by=5))
 # 
-# if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_nm_resid.png"),
+# if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_nm_resid.png"),
 #                                     bbn.L.resids.plt,base_width = 8,base_height = 8)
-# if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_nm_resid.png"),
+# if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_nm_resid.png"),
 #                                    bbn.L.resids.plt,base_width = 8,base_height = 8)
 # 
 # bbn.L.stan.resids.plt <- ggplot(bbn.20.L.resids) + geom_point(aes(x=Year,y=stan.resid)) + 
@@ -1789,9 +1867,9 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 #                                               xlab("") + ylab("Standardized residual") +
 #                                                scale_x_continuous(name="",breaks = seq(1980,2030,by=5))
 # 
-# if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_nm_stan_resid.png"),
+# if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_nm_stan_resid.png"),
 #                                     bbn.L.stan.resids.plt,base_width = 8,base_height = 8)
-# if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_nm_stan_resid.png"),
+# if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_nm_stan_resid.png"),
 #                                    bbn.L.stan.resids.plt,base_width = 8,base_height = 8)
 
 ```
@@ -1816,7 +1894,7 @@ bbn.bssm.bm.diff <- bbn.bssm.bm.diff[-(nrow(bbn.bssm.bm.diff)),]
 
 
 # So here 2014 means the 2014-2015 explotation rate and the change in biomass from 2014-2015
-sab.10.kobe.plt <- ggplot(F.sab.10,aes(x=B,y=exploit)) + geom_text(aes(label=substr(year,3,4))) +  ylim(c(0,0.06)) +  xlim(c(0,10000)) +
+sab.10.kobe.plt <- ggplot(F.sab.10,aes(x=B,y=exploit)) + geom_text(aes(label=substr(year,3,4))) +  ylim(c(0,0.06)) +  xlim(c(0,11000)) +
                                     #annotate(geom="rect",xmin=0,xmax=5500,ymin=0.02,ymax=Inf, fill = "red", alpha=0.5)+
                                     #annotate(geom="rect",xmin=5500,xmax=Inf,ymin=0,ymax=0.02, fill="green", alpha = 0.5) +
                                     #annotate(geom="rect",xmin=0,xmax=5500,ymin=0,ymax=0.02, fill="gold1", alpha = 0.6) +
@@ -1825,7 +1903,7 @@ sab.10.kobe.plt <- ggplot(F.sab.10,aes(x=B,y=exploit)) + geom_text(aes(label=sub
                                     ylab("Exploitation Rate (Proportional)") + xlab("Biomass (tonnes)") 
                                     
                                     #geom_hline(yintercept = 0.03,linetype='dashed') + geom_vline(xintercept = 4000,linetype='dashed')
-sab.bssm.kobe.plt <- ggplot(sab.bssm.fm) + geom_text(aes(x = sab.bssm.bm.diff$med,y=exp,label = substr(year,3,4))) +  ylim(c(0,0.06)) + xlim(c(0,10000)) + 
+sab.bssm.kobe.plt <- ggplot(sab.bssm.fm) + geom_text(aes(x = sab.bssm.bm.diff$med,y=exp,label = substr(year,3,4))) +  ylim(c(0,0.06)) + xlim(c(0,11000)) + 
                                            geom_path(aes(x = sab.bssm.bm.diff$med,y=exp)) + xlab("") + 
                                             ylab("Exploitation Rate (Proportional)") + theme(axis.text.x=element_blank())
 
@@ -1860,7 +1938,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 
 # So here 2014 means the 2014-2015 explotation rate and the change in biomass from 2014-2015
-bbn.20.kobe.plt <- ggplot(F.bbn.20,aes(x=B,y=exploit)) + geom_text(aes(label=substr(year,3,4))) +  xlim(c(0,17000)) + ylim(c(0,0.27)) +
+bbn.20.kobe.plt <- ggplot(F.bbn.20,aes(x=B,y=exploit)) + geom_text(aes(label=substr(year,3,4))) +  xlim(c(0,18000)) + ylim(c(0,0.27)) +
                                     #annotate(geom="rect",xmin=0,xmax=5500,ymin=0.02,ymax=Inf, fill = "red", alpha=0.5)+
                                     #annotate(geom="rect",xmin=5500,xmax=Inf,ymin=0,ymax=0.02, fill="green", alpha = 0.5) +
                                     #annotate(geom="rect",xmin=0,xmax=5500,ymin=0,ymax=0.02, fill="gold1", alpha = 0.6) +
@@ -1869,7 +1947,7 @@ bbn.20.kobe.plt <- ggplot(F.bbn.20,aes(x=B,y=exploit)) + geom_text(aes(label=sub
                                     
                                     #geom_hline(yintercept = 0.03,linetype='dashed') + geom_vline(xintercept = 4000,linetype='dashed')
 
-bbn.bssm.kobe.plt <- ggplot(bbn.bssm.fm) + geom_text(aes(x = bbn.bssm.bm.diff$med,y=exp,label = substr(year,3,4))) + xlim(c(0,17000)) + ylim(c(0,0.27)) +
+bbn.bssm.kobe.plt <- ggplot(bbn.bssm.fm) + geom_text(aes(x = bbn.bssm.bm.diff$med,y=exp,label = substr(year,3,4))) + xlim(c(0,18000)) + ylim(c(0,0.27)) +
                                            geom_path(aes(x = bbn.bssm.bm.diff$med,y=exp)) + 
                                            ylab("Exploitation Rate (Proportional)") + xlab("")+
                                            theme(axis.text.x=element_blank())
@@ -1878,30 +1956,35 @@ bbn.bssm.kobe.plt <- ggplot(bbn.bssm.fm) + geom_text(aes(x = bbn.bssm.bm.diff$me
 bbn.kobe.plt <- plot_grid(bbn.bssm.kobe.plt,bbn.20.kobe.plt,nrow=2)
 
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_kobe.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_kobe.png"),
                                     bbn.kobe.plt,base_width = 8,base_height = 8)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_kobe.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_kobe.png"),
                                    bbn.kobe.plt,base_width = 8,base_height = 8)
 
 # So here 2014 means the 2014-2015 explotation rate and the change in biomass from 2014-2015
-bbn.20.jem.plt <- ggplot(F.bbn.20,aes(y=delta.B.per,x=exploit)) + geom_text(aes(label=substr(year,3,4))) + geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
-                                                              geom_hline(yintercept = 0,linetype='dashed')   + xlim(c(0,0.27)) + ylim(c(-70,75)) +
-                                                              xlab("Exploitation Rate (Proportional)") + ylab("Biomass Change (%)")    
+bbn.20.jem.plt <- ggplot(F.bbn.20,aes(y=delta.B.per,x=exploit)) + 
+                                        geom_text(aes(label=substr(year,3,4))) + 
+                                        geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
+                                        geom_hline(yintercept = 0,linetype='dashed')   + xlim(c(0,0.27)) + ylim(c(-70,75)) +
+                                        scale_x_continuous(name = "Exploitation Rate (Proportional)",limits = c(0,0.23),breaks= seq(0,0.5,by=0.025)) + 
+                                        ylab("Biomass Change (%)")    
 
-bbn.bssm.jem.plt <- ggplot(bbn.bssm.fm,aes(y=bbn.bssm.bm.diff$delta.B.per,x=exp)) + geom_text(aes(label=substr(year,3,4)))  + xlim(c(0,0.27)) + ylim(c(-70,75)) + 
-                                                              geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
-                                                              geom_hline(yintercept = 0,linetype='dashed')   +
-                                                              xlab("") + ylab("Biomass Change (%)")  +
-                                                              theme(axis.text.x=element_blank())
+bbn.bssm.jem.plt <- ggplot(bbn.bssm.fm,aes(y=bbn.bssm.bm.diff$delta.B.per,x=exp)) + 
+                                         geom_text(aes(label=substr(year,3,4)))  + 
+                                         ylim(c(-70,75)) + ylab("Biomass Change (%)")  +
+                                         geom_smooth(method='lm',color='blue',fill='blue',alpha=0.2) +
+                                         geom_hline(yintercept = 0,linetype='dashed')   +
+                                         scale_x_continuous(name = "",limits = c(0,0.23),breaks= seq(0,0.5,by=0.025)) + 
+                                         theme(axis.text.x=element_blank())
                                                               
 
 bbn.jem.plt <- plot_grid(bbn.bssm.jem.plt,bbn.20.jem.plt,nrow=2)
 
 
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_jem.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_jem.png"),
                                     bbn.jem.plt,base_width = 8,base_height = 10)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_jem.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_jem.png"),
                                    bbn.jem.plt,base_width = 8,base_height = 10)
 
 
@@ -1918,8 +2001,8 @@ bm.bssm.seam.sab <- ggplot() +geom_line(data=sab.bssm.bm, aes(x=year,y=med/1000)
                               geom_ribbon(data=sab.bssm.bm,aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',alpha = 0.2) + 
                               geom_line(data = sab.seam, aes(year,exp(log_B)/1000),linewidth=1.5,color='firebrick2') +
                               geom_ribbon(data = sab.seam,aes(x=year,ymin=totB.LCI/1000,ymax=totB.UCI/1000),fill='firebrick2',alpha = 0.2) + 
-                              ylab("Fully Recruited Biomass (tonnes x 1000)") + xlab("")  + 
-                              scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,15))
+                              scale_y_continuous(name= "Fully Recruited Biomass (tonnes x 1000)",breaks = seq(0,20,by=2)) +
+                              scale_x_continuous(name ="",breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_bssm_seam_bm.png"),
                                     bm.bssm.seam.sab,base_width = 8,base_height = 6)
@@ -1931,7 +2014,7 @@ rec.bssm.seam.sab <- ggplot() +geom_line(data=sab.bssm.rec, aes(x=year,y=med/100
                                geom_line(data = sab.seam, aes(year,exp(log_R)/1000),linewidth=1.5,color='firebrick2') +
                                geom_ribbon(data = sab.seam,aes(x=year,ymin=totR.LCI/1000,ymax=totR.UCI/1000),fill='firebrick2',alpha = 0.2) + 
                                ylab("Recruit Biomass (tonnes x 1000)") + xlab("")  + 
-                               scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,2.5))
+                               scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_bssm_seam_rec.png"),
                                     rec.bssm.seam.sab,base_width = 8,base_height = 6)
@@ -1942,8 +2025,8 @@ nm.bssm.seam.sab <- ggplot() + geom_line(data=sab.bssm.nm.fr, aes(x=year,y=med),
                                geom_ribbon(data=sab.bssm.nm.fr,aes(x=year,ymin=lci,ymax=uci),fill='darkblue',alpha = 0.2) + 
                                geom_line(data = sab.seam, aes(year,exp(log_m)),linewidth=1.5,color='firebrick2') +
                                geom_ribbon(data = sab.seam,aes(x=year,ymin=m.LCI,ymax=m.UCI),fill='firebrick2',alpha = 0.2) + 
-                               ylab("Natural mortality (Instantaneous)") + xlab("")  + 
-                               scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,1.5))
+                               ylab("Natural mortality (Instantaneous)") + 
+                               scale_x_continuous(name="",breaks = seq(1980,2030,by=3)) 
 
 if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_bssm_seam_nm.png"),
                                     nm.bssm.seam.sab,base_width = 8,base_height = 6)
@@ -1955,12 +2038,12 @@ bm.bssm.seam.bbn <- ggplot() +geom_line(data=bbn.bssm.bm, aes(x=year,y=med/1000)
                               geom_ribbon(data=bbn.bssm.bm,aes(x=year,ymin=lci/1000,ymax=uci/1000),fill='darkblue',alpha = 0.2) + 
                               geom_line(data = bbn.seam, aes(year,exp(log_B)/1000),linewidth=1.5,color='firebrick2') +
                               geom_ribbon(data = bbn.seam,aes(x=year,ymin=totB.LCI/1000,ymax=totB.UCI/1000),fill='firebrick2',alpha = 0.2) + 
-                              ylab("Fully Recruited Biomass (tonnes x 1000)") + xlab("")  + 
-                              scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,25))
+                              scale_y_continuous(name = "Fully Recruited Biomass (tonnes x 1000)",breaks = seq(0,30,by=5))+
+                              scale_x_continuous(name = "", breaks = seq(1980,2030,by=3))
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_bssm_seam_bm.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_bssm_seam_bm.png"),
                                     bm.bssm.seam.bbn,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_bssm_seam_bm.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_bssm_seam_bm.png"),
                                    bm.bssm.seam.bbn,base_width = 8,base_height = 6)
 
 rec.bssm.seam.bbn <- ggplot() +geom_line(data=bbn.bssm.rec, aes(x=year,y=med/1000),linewidth=1.5,color='darkblue') +
@@ -1968,11 +2051,11 @@ rec.bssm.seam.bbn <- ggplot() +geom_line(data=bbn.bssm.rec, aes(x=year,y=med/100
                                geom_line(data = bbn.seam, aes(year,exp(log_R)/1000),linewidth=1.5,color='firebrick2') +
                                geom_ribbon(data = bbn.seam,aes(x=year,ymin=totR.LCI/1000,ymax=totR.UCI/1000),fill='firebrick2',alpha = 0.2) + 
                                ylab("Recruit Biomass (tonnes x 1000)") + xlab("")  + 
-                               scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,7))
+                               scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_bssm_seam_rec.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_bssm_seam_rec.png"),
                                     rec.bssm.seam.bbn,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_bssm_seam_rec.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_bssm_seam_rec.png"),
                                    rec.bssm.seam.bbn,base_width = 8,base_height = 6)
 
 
@@ -1981,11 +2064,11 @@ nm.bssm.seam.bbn <- ggplot() + geom_line(data=bbn.bssm.nm.fr, aes(x=year,y=med),
                                geom_line(data = bbn.seam, aes(year,exp(log_m)),linewidth=1.5,color='firebrick2') +
                                geom_ribbon(data = bbn.seam,aes(x=year,ymin=m.LCI,ymax=m.UCI),fill='firebrick2',alpha = 0.2) + 
                                ylab("Natural mortality (Instantaneous)") + xlab("")  + 
-                               scale_x_continuous(breaks = seq(1980,2030,by=3)) + ylim(c(0,0.9))
+                               scale_x_continuous(breaks = seq(1980,2030,by=3)) 
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_bssm_seam_nm.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_bssm_seam_nm.png"),
                                     nm.bssm.seam.bbn,base_width = 8,base_height = 6)
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_bssm_seam_nm.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_bssm_seam_nm.png"),
                                    nm.bssm.seam.bbn,base_width = 8,base_height = 6)
 ```
 
@@ -1994,7 +2077,6 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 liner <- c(1,2,1,1,2,1,2,2)
 shaper <- rep(c(21,23,22,24),2)
-sab.bssm.pred.eval$Method <- sab.bssm.pred.eval$scenario
 sab.bssm.pred.eval$Method[sab.bssm.pred.eval$Method =='zp'] <- "Zero Productivity"
 sab.bssm.pred.eval$Method[sab.bssm.pred.eval$Method =='normal'] <- "Previous Year"
 sab.bssm.pred.eval$Method[sab.bssm.pred.eval$Method =='no fully-recruited growth'] <- "No FR Growth"
@@ -2032,22 +2114,24 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 
 
-pe.biomass.abs <- ggplot(sab.bssm.pred.eval) + geom_violin(aes(x=Method,y=abs(B.diff)/1000),draw_quantiles = c(0.5)) + 
+pe.biomass.abs <- ggplot(sab.bssm.pred.eval,aes(x=Method,y=abs(B.diff)/1000)) +  geom_violin() + geom_boxplot(width=0.2)+ 
                                           ylab("|Biomass difference| (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_x_discrete(labels=NULL,name='') +
                                           theme(plot.margin = margin(0,0.5,0,1, "cm"))+
                                           scale_y_continuous(breaks=c(seq(0,10,by=1)))
 
 
-pe.biomass.diff <- ggplot(sab.bssm.pred.eval) + geom_violin(aes(x=Method,y=B.diff/1000),draw_quantiles = c(0.5)) + 
-                                            ylab("Biomass difference (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
+pe.biomass.diff <- ggplot(sab.bssm.pred.eval,aes(x=Method,y=B.diff/1000)) + geom_violin() + geom_boxplot(width=0.2)+ 
+                                            ylab("Biomass difference (tonnes x 1000)")+ 
+                                            geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                             scale_x_discrete(labels=NULL,name='') +
                                             theme(plot.margin = margin(0,0.5,0,1, "cm"))+
                                             scale_y_continuous(breaks=c(seq(-6,10,by=1)))
 
 
-pe.biomass.per <- ggplot(sab.bssm.pred.eval) + geom_violin(aes(x=Method,y=PB.diff),draw_quantiles = c(0.5)) + 
-                                          ylab("Biomass difference (%)") + geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
+pe.biomass.per <- ggplot(sab.bssm.pred.eval,aes(x=Method,y=PB.diff)) + geom_violin() + geom_boxplot(width=0.2)+ 
+                                          ylab("Biomass difference (%)") + 
+                                          geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_y_continuous(breaks=c(seq(-100,200,by=10)))
 
 sab.pe.violin <- plot_grid(pe.biomass.abs,pe.biomass.diff,pe.biomass.per,ncol=1)
@@ -2065,7 +2149,6 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 liner <- c(1,2,1,1,2,1,2,2)
 shaper <- rep(c(21,23,22,24),2)
-sab.pred.eval$Method <- sab.pred.eval$Scenario
 pe.tonnes.ts <- ggplot() + geom_line(data = sab.pred.eval |> fsubset(year < 2015) , aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.5) + 
                            # geom_line(data = sab.pred.eval %>% dplyr::filter(year %in% 2017:2019), 
                            #           aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.25) + 
@@ -2098,21 +2181,21 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 
 
-pe.biomass.abs <- ggplot(sab.pred.eval) + geom_violin(aes(x=Method,y=B.diff.abs/1000),draw_quantiles = c(0.5)) + 
+pe.biomass.abs <- ggplot(sab.pred.eval,aes(x=Method,y=B.diff.abs/1000)) +  geom_violin() + geom_boxplot(width=0.2)+ 
                                           ylab("|Biomass difference| (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_x_discrete(labels=NULL,name='') +
                                           theme(plot.margin = margin(0,0.5,0,1, "cm"))+
                                           scale_y_continuous(breaks=c(seq(0,10,by=1)))
 
 
-pe.biomass.diff <- ggplot(sab.pred.eval) + geom_violin(aes(x=Method,y=B.diff/1000),draw_quantiles = c(0.5)) + 
+pe.biomass.diff <- ggplot(sab.pred.eval,aes(x=Method,y=B.diff/1000))  +  geom_violin() + geom_boxplot(width=0.2)+ 
                                             ylab("Biomass difference (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                             scale_x_discrete(labels=NULL,name='') +
                                             theme(plot.margin = margin(0,0.5,0,1, "cm"))+
                                             scale_y_continuous(breaks=c(seq(-6,10,by=1)))
 
 
-pe.biomass.per <- ggplot(sab.pred.eval) + geom_violin(aes(x=Method,y=Per.B.diff),draw_quantiles = c(0.5)) + 
+pe.biomass.per <- ggplot(sab.pred.eval,aes(x=Method,y=Per.B.diff))  +  geom_violin() + geom_boxplot(width=0.2)+ 
                                           ylab("Biomass difference (%)") + geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_y_continuous(breaks=c(seq(-100,200,by=10)))
 
@@ -2131,7 +2214,6 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_
 
 liner <- c(1,2,1,1,2,1,2,2)
 shaper <- rep(c(21,23,22,24),2)
-bbn.bssm.pred.eval$Method <- bbn.bssm.pred.eval$scenario
 bbn.bssm.pred.eval$Method[bbn.bssm.pred.eval$Method =='zp'] <- "Zero Productivity"
 bbn.bssm.pred.eval$Method[bbn.bssm.pred.eval$Method =='normal'] <- "Previous Year"
 bbn.bssm.pred.eval$Method[bbn.bssm.pred.eval$Method =='no fully-recruited growth'] <- "No FR Growth"
@@ -2169,21 +2251,21 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 
 
-pe.biomass.abs <- ggplot(bbn.bssm.pred.eval) + geom_violin(aes(x=Method,y=abs(B.diff)/1000),draw_quantiles = c(0.5)) + 
-                                          ylab("|Biomass difference| (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
+pe.biomass.abs <- ggplot(bbn.bssm.pred.eval,aes(x=Method,y=abs(B.diff)/1000)) +  geom_violin() + geom_boxplot(width=0.2)+ 
+                                          ylab("|Biomass difference| (tonnes x 1000)")+ #geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_x_discrete(labels=NULL,name='') +
                                           theme(plot.margin = margin(0,0.5,0,0.9, "cm"))+
                                           scale_y_continuous(breaks=c(seq(0,10,by=1)))
 
 
-pe.biomass.diff <- ggplot(bbn.bssm.pred.eval) + geom_violin(aes(x=Method,y=B.diff/1000),draw_quantiles = c(0.5)) + 
+pe.biomass.diff <- ggplot(bbn.bssm.pred.eval,aes(x=Method,y=B.diff/1000)) +  geom_violin() + geom_boxplot(width=0.2)+ 
                                             ylab("Biomass difference (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                             scale_x_discrete(labels=NULL,name='') +
                                             theme(plot.margin = margin(0,0.5,0,0.8, "cm"))+
                                             scale_y_continuous(breaks=c(seq(-6,10,by=1)))
 
 
-pe.biomass.per <- ggplot(bbn.bssm.pred.eval) + geom_violin(aes(x=Method,y=PB.diff),draw_quantiles = c(0.5)) + 
+pe.biomass.per <- ggplot(bbn.bssm.pred.eval,aes(x=Method,y=PB.diff),draw_quantiles = c(0.5)) +  geom_violin() + geom_boxplot(width=0.2)+ 
                                           ylab("Biomass difference (%)") + geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_y_continuous(breaks=c(seq(-100,200,by=10)))
 
@@ -2207,7 +2289,7 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 liner <- c(1,2,1,1,2,1,2,2)
 shaper <- rep(c(21,23,22,24),2)
-bbn.pred.eval$Method <- bbn.pred.eval$Scenario
+
 pe.tonnes.ts <- ggplot() + geom_line(data = bbn.pred.eval|> fsubset(year < 2020), aes(x=year,y=B.diff/1000,group = Method,color=Method,linetype=Method),size=1.5) + 
                                      geom_point(data = bbn.pred.eval,aes(x=year,y=B.diff/1000,group = Method,color=Method,fill=Method,shape =Method),size=3) + 
                                      geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
@@ -2228,29 +2310,29 @@ pe.per.ts <- ggplot() + geom_line(data = bbn.pred.eval|> fsubset(year < 2020),ae
 bbn.pe.ts <- plot_grid(pe.tonnes.ts,pe.per.ts,ncol=1)
 
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"_vary_q=TRUE/English/BBn_PE_bm_ts_combo.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"/English/BBn_PE_bm_ts_combo.png"),
                           bbn.pe.ts,base_width = 12,base_height = 15)
 
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"_vary_q=TRUE/French/BBn_PE_bm_ts_combo.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"/French/BBn_PE_bm_ts_combo.png"),
                          bbn.pe.ts,base_width = 12,base_height = 15)
 
 
 
-pe.biomass.abs <- ggplot(bbn.pred.eval) + geom_violin(aes(x=Method,y=B.diff.abs/1000),draw_quantiles = c(0.5)) + 
+pe.biomass.abs <- ggplot(bbn.pred.eval,aes(x=Method,y=B.diff.abs/1000))  +  geom_violin() + geom_boxplot(width=0.2)+ 
                                           ylab("|Biomass difference| (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_x_discrete(labels=NULL,name='') +
                                           theme(plot.margin = margin(0,0.5,0,0.9, "cm"))+
                                           scale_y_continuous(breaks=c(seq(0,10,by=1)))
 
 
-pe.biomass.diff <- ggplot(bbn.pred.eval) + geom_violin(aes(x=Method,y=B.diff/1000),draw_quantiles = c(0.5)) + 
+pe.biomass.diff <- ggplot(bbn.pred.eval,aes(x=Method,y=B.diff/1000)) +  geom_violin() + geom_boxplot(width=0.2)+ 
                                             ylab("Biomass difference (tonnes x 1000)")+ geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                             scale_x_discrete(labels=NULL,name='') +
                                             theme(plot.margin = margin(0,0.5,0,0.8, "cm"))+
                                             scale_y_continuous(breaks=c(seq(-6,10,by=1)))
 
 
-pe.biomass.per <- ggplot(bbn.pred.eval) + geom_violin(aes(x=Method,y=Per.B.diff),draw_quantiles = c(0.5)) + 
+pe.biomass.per <- ggplot(bbn.pred.eval,aes(x=Method,y=Per.B.diff)) +  geom_violin() + geom_boxplot(width=0.2)+ 
                                           ylab("Biomass difference (%)") + geom_hline(yintercept=0,color='#005BBB',linetype='dashed',size=1.5) +
                                           scale_y_continuous(breaks=c(seq(-100,200,by=10)))
 
@@ -2258,10 +2340,10 @@ pe.biomass.per <- ggplot(bbn.pred.eval) + geom_violin(aes(x=Method,y=Per.B.diff)
 bbn.pe.violin <- plot_grid(pe.biomass.abs,pe.biomass.diff,pe.biomass.per,ncol=1)
 
 
-if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"_vary_q=TRUE/English/BBn_PE_biomass_violin.png"),
+if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"/English/BBn_PE_biomass_violin.png"),
                                      bbn.pe.violin,base_width = 12,base_height = 12)
 
-if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"_vary_q=TRUE/French/BBn_PE_biomass_violin.png"),
+if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/Pred_eval/SEAM_",scenario.20,"/French/BBn_PE_biomass_violin.png"),
                                    bbn.pe.violin,base_width = 12,base_height = 12)
 
 ```
@@ -2350,10 +2432,10 @@ if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_
 
 ```
 
-```{r save-em-all,echo=F,include=F}
+```{r save-em-all,echo=F,include=F,cache=T}
 # Save everything...
-if(language == 'english') save(file = paste0(repo.loc,"Results/All_results_english_R_",R.size,"_FR_",g.mod,".RData"),list=ls())
-if(language == 'french') save(file = paste0(repo.loc,"Results/All_results_french_R_",R.size,"_FR_",g.mod,".RData"),list=ls())
+if(language == 'english') save(file = paste0(repo.loc,"Results/All_results_english_R_",R.size,"_FR_",FR.size,".RData"),list=ls())
+if(language == 'french') save(file = paste0(repo.loc,"Results/All_results_french_R_",R.size,"_FR_",FR.size,".RData"),list=ls())
 ```
 
 
@@ -2385,8 +2467,8 @@ if(language == 'french') save(file = paste0(repo.loc,"Results/All_results_french
 <!--                                 # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) + -->
 <!--                                 scale_fill_distiller(type = 'div',breaks = bd.brk, labels=bd.lab, name="Process \nError \n(tonnes x 1000)",palette = "RdBu") +  -->
 <!--                                 theme(axis.text.x=element_text(angle=-45,hjust=0)) -->
-<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_PE.png"),spatial.Bdiff.plot,base_width = 12,base_height = 16) -->
-<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_res.png"),spatial.Bdiff.plot,base_width = 12,base_height = 16) -->
+<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_PE.png"),spatial.Bdiff.plot,base_width = 12,base_height = 13) -->
+<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_res.png"),spatial.Bdiff.plot,base_width = 12,base_height = 13) -->
 
 <!-- pb.brk <- pretty(Bdiff.sab.10$B.per.diff) -->
 <!-- pb.lab <- pb.brk#signif(exp(b.brk),digits=2) -->
@@ -2397,8 +2479,8 @@ if(language == 'french') save(file = paste0(repo.loc,"Results/All_results_french
 <!--                                     # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) + -->
 <!--                                     scale_fill_distiller(type = 'div',breaks = pb.brk, labels=pb.lab, name="Process \nError \n(%)",palette = "RdBu") +  -->
 <!--                                     theme(axis.text.x=element_text(angle=-45,hjust=0)) -->
-<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_PE_per.png"),spatial.Bdiff.per.plot,base_width = 12,base_height = 16) -->
-<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_PE_per.png"),spatial.Bdiff.per.plot,base_width = 12,base_height = 16) -->
+<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/English/Sab_Spatial_PE_per.png"),spatial.Bdiff.per.plot,base_width = 12,base_height = 13) -->
+<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/Sab/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.10,"/French/Sab_Spatial_PE_per.png"),spatial.Bdiff.per.plot,base_width = 12,base_height = 13) -->
 
 <!-- ``` -->
 
@@ -2417,8 +2499,8 @@ if(language == 'french') save(file = paste0(repo.loc,"Results/All_results_french
 
 <!-- p.res.annual <- plot_grid(p.res.abs.an,p.res.per.an,ncol=1) -->
 
-<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_PE_time_series.png"),p.res.annual,base_width = 6,base_height = 8) -->
-<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_PE_time_series.png"),p.res.annual,base_width = 6,base_height = 8) -->
+<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_PE_time_series.png"),p.res.annual,base_width = 6,base_height = 8) -->
+<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_PE_time_series.png"),p.res.annual,base_width = 6,base_height = 8) -->
 
 <!-- # Now plot the Process Errror spatially -->
 
@@ -2432,8 +2514,8 @@ if(language == 'french') save(file = paste0(repo.loc,"Results/All_results_french
 <!--                                 # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) + -->
 <!--                                 scale_fill_distiller(type = 'div',breaks = bd.brk, labels=bd.lab, name="Process \nError \n(tonnes x 1000)",palette = "RdBu") +  -->
 <!--                                 theme(axis.text.x=element_text(angle=-45,hjust=0)) -->
-<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_PE.png"),spatial.Bdiff.plot,base_width = 12,base_height = 16) -->
-<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_PE.png"),spatial.Bdiff.plot,base_width = 12,base_height = 16) -->
+<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_PE.png"),spatial.Bdiff.plot,base_width = 12,base_height = 13) -->
+<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_PE.png"),spatial.Bdiff.plot,base_width = 12,base_height = 13) -->
 
 <!-- pb.brk <- pretty(Bdiff.bbn.20$B.per.diff) -->
 <!-- pb.lab <- pb.brk#signif(exp(b.brk),digits=2) -->
@@ -2444,7 +2526,7 @@ if(language == 'french') save(file = paste0(repo.loc,"Results/All_results_french
 <!--                                     # scale_y_continuous(breaks = c(43.33333, 43.666667, 44),labels = c("43°20'N","43°40'N","44°N")) + -->
 <!--                                     scale_fill_distiller(type = 'div',breaks = pb.brk, labels=pb.lab, name="Process \nError \n(%)",palette = "RdBu") +  -->
 <!--                                     theme(axis.text.x=element_text(angle=-45,hjust=0)) -->
-<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/English/BBn_Spatial_PE_per.png"),spatial.Bdiff.per.plot,base_width = 12,base_height = 16) -->
-<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"_vary_q=TRUE/French/BBn_Spatial_PE.per.png"),spatial.Bdiff.per.plot,base_width = 12,base_height = 16) -->
+<!-- if(language == 'english') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/English/BBn_Spatial_PE_per.png"),spatial.Bdiff.per.plot,base_width = 12,base_height = 13) -->
+<!-- if(language == 'french') save_plot(paste0(repo.loc,"Figures/BBn/R_",R.size,"_FR_",FR.size,"/",mod.select,"_",scenario.20,"/French/BBn_Spatial_PE.per.png"),spatial.Bdiff.per.plot,base_width = 12,base_height = 13) -->
 
 <!-- ``` -->

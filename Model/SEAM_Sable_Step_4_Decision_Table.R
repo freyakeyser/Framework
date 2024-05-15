@@ -15,15 +15,15 @@ source(paste0(fun.loc,"Decision_Table_function.R"))
 R.size <- 75
 FR.size <- 90
 qR <- 0.33
-init.m <- 0.2
-g.mod <- 'g_original'
+#init.m <- 0.2
+#g.mod <- 'g_original'
 #g.mod <- "g_1"
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
 num.knots <- 10
 
 # And a Sable decision table 
-seam.select <- paste0("1994_2022_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+seam.select <- paste0("1994_2022_qR_",qR,"_",num.knots,"_knots")
 sab.mod <- readRDS(paste0(mod.loc,"Results/Sab/R_75_FR_90/Sab_SEAM_model_output_",seam.select,".Rds"))
 #rp.res <- readRDS(paste0(mod.loc,"Results/Sab/R_75_FR_90/",seam.select,"/RPs/SEAM_g_bp_8000_dist_1_0.05_r_bp_dist_3500_0.034_0.23_m_bp_dist_3000_0.54_0.1.Rds"))
 
@@ -47,11 +47,10 @@ LRP <- NULL # So 20% of B0
 RR <- NULL # THis is in %
 #RR.TRP <- 5
 n.sims <- 1e6
-g.adj <- gR.adj <- 0
+# So I'm going with no fully-recruited growth for the best predictions from SEAM
+g.adj <- 0
+gR.adj <- 1
 catchs <- seq(0,200,by=10)
-
-
-
 
 # Interesting, in the 'no growth' scenario, for the FR biomass we only have natural mortality acting on it, so
 # taking out the biomass early means less dies and thus the biomass change from removing X tonnes is actually less than the X tonnes
@@ -82,3 +81,4 @@ tab.pdf <- kableExtra::kbl(sab.dt$table, booktabs = TRUE, escape =F, format='lat
 #kable_styling(latex_options = c("hold_position","scale_down")) %>%
 #add_footnote(notation = 'number',ft.note,escape=F)
 saveRDS(tab.pdf,paste0(mod.loc,"Results/Sab/R_75_FR_90/SEAM_",seam.select,"/Decision_Table/Sab_pdf_ready_DT_TRP_",TRP,"_USR_",USR,"_LRP_",LRP,"_RR_",RR,"_g_adj_",g.adj,"_gR_adj_",gR.adj,".Rds"))
+

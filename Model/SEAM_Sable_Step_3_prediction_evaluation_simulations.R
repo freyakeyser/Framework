@@ -24,11 +24,7 @@ source(paste0(fun.loc,"Decision_Table_function.R"))
 R.size <- 75
 FR.size <- 90
 qR <- 0.33
-init.m <- 0.2
-g.mod <- 'g_original'
-#g.mod <- 'g_1'
-#g.mod <- 'alt_g'
-#g.mod <- 'proper_g'
+
 num.knots <- 10
 
 sab.shape <- st_read("D:/Github/GIS_layers/survey_boundaries/Sab.shp", quiet=T)
@@ -65,9 +61,9 @@ for(i in 1:n.pe.years)
 rem <- sab.fish.survey.year$tot[sab.fish.survey.year$survey.year == pe.years[i]]
 
 # You want the PE.year -1 model here as that's what we'd use to do the prediction
-pred.select <- paste0("1994_",pe.years[i]-1,"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+pred.select <- paste0("1994_",pe.years[i]-1,"_qR_",qR,"_",num.knots,"_knots")
 # Then you want the real model to compare your predictions too
-realized.select <- paste0("1994_",pe.years[i],"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+realized.select <- paste0("1994_",pe.years[i],"_qR_",qR,"_",num.knots,"_knots")
 # For i =1 this is the 2010 model whose parameters we can use to get a prediction for 2011 biomass
 pred.mod <- readRDS(paste0(mod.loc,"Results/Sab/R_75_FR_90/Retros/Sab_SEAM_model_output_",pred.select,".Rds"))
 # This is then the 2011 model that gives us the realized value.

@@ -113,9 +113,9 @@ R.size <- "75"
 FR.size <- "90"
 c_sys <- 32620
 qR <- 0.33# log recruit catchability making this the same are FR catchability.
-init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 2, 0.8, and 0.4
+#init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 2, 0.8, and 0.4
 # Various explorations of the g models.
-g.mod <- "g_original"
+#g.mod <- "g_original"
 #g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
@@ -233,93 +233,89 @@ mod.dat$g.new <- c(dk.growth,dk.growth[length(dk.growth)])
 head(mod.dat)
 # With the recruit and FR q assumed to be approx 0.45 and natural mortality shared, there is no need to tweak the recruit and FR ratios
 # at all. If we did we could multiply each by 0.9 or so and divide by whatever q is, 0.45 is the same for both currently.
-alt.g <- data.frame(year = c(mod.dat$year,2015,2020),B.rec = c(unlist(mod.dat$IR),NA,NA), B.fr = c(unlist(mod.dat$I),NA,NA),wgt.fr = c(mod.dat$w.bar,NA,NA), 
-                    sh.fr = c(mod.dat$l.bar,NA,NA),wgt.rec = c(mod.dat$w.k,NA,NA),sh.rec = c(mod.dat$l.k,NA,NA),
-                    sh.rec.nxt = c(len.rec.next,NA,NA),wgt.rec.nxt = c(w.rec.next,NA,NA))
-alt.g <- alt.g[order(alt.g$year),]
-
-# So if we can figure out what the expected weight of the recruits will be next year using the von B we
-# can then figure out how to remove that from the average weight, and I have that size above in the 
-# len.rec.next vector
-# So we can get the "g" for the year, which will be wgt.rec.nxt/wgt.rec
-alt.g$g.rec <- 1 # I'm not going to allow the recruits to grow, just using the biomass from last year, it gets weird with that big gR term...
-alt.g$B.rec.2.fr <- alt.g$B.rec * (alt.g$g.rec)
-alt.g$B.rec.2.fr <- c(NA,alt.g$B.rec.2.fr[-nrow(alt.g)])
-alt.g$B.FR.excluding.new.rec <- alt.g$B.fr - alt.g$B.rec.2.fr
-alt.g$wgt.of.last.yrs.recs <- c(NA,alt.g$wgt.rec.nxt[-nrow(alt.g)])
-alt.g$prop.rec <- alt.g$B.rec.2.fr/alt.g$B.fr
-alt.g$prop.FR <- alt.g$B.FR.excluding.new.rec/alt.g$B.fr
+# alt.g <- data.frame(year = c(mod.dat$year,2015,2020),B.rec = c(unlist(mod.dat$IR),NA,NA), B.fr = c(unlist(mod.dat$I),NA,NA),wgt.fr = c(mod.dat$w.bar,NA,NA), 
+#                     sh.fr = c(mod.dat$l.bar,NA,NA),wgt.rec = c(mod.dat$w.k,NA,NA),sh.rec = c(mod.dat$l.k,NA,NA),
+#                     sh.rec.nxt = c(len.rec.next,NA,NA),wgt.rec.nxt = c(w.rec.next,NA,NA))
+# alt.g <- alt.g[order(alt.g$year),]
+# 
+# # So if we can figure out what the expected weight of the recruits will be next year using the von B we
+# # can then figure out how to remove that from the average weight, and I have that size above in the 
+# # len.rec.next vector
+# # So we can get the "g" for the year, which will be wgt.rec.nxt/wgt.rec
+# alt.g$g.rec <- 1 # I'm not going to allow the recruits to grow, just using the biomass from last year, it gets weird with that big gR term...
+# alt.g$B.rec.2.fr <- alt.g$B.rec * (alt.g$g.rec)
+# alt.g$B.rec.2.fr <- c(NA,alt.g$B.rec.2.fr[-nrow(alt.g)])
+# alt.g$B.FR.excluding.new.rec <- alt.g$B.fr - alt.g$B.rec.2.fr
+# alt.g$wgt.of.last.yrs.recs <- c(NA,alt.g$wgt.rec.nxt[-nrow(alt.g)])
+# alt.g$prop.rec <- alt.g$B.rec.2.fr/alt.g$B.fr
+# alt.g$prop.FR <- alt.g$B.FR.excluding.new.rec/alt.g$B.fr
 
 
 # So using some rearranged weighted averages I should be able to get a new wgt.fr column that excludes the recruits and gets us a 'real' average size.
 # Given sh Rec is between 97 and 99 we could also just calculate the change in weight of everything above 100 mm using the raw sh frequency data
 # to give a possibly better version of this.
 # So we can do some weighted averaging here to figure out what the wgt of the 'old' FR scallop were
+# 
+# alt.g$wgt.fr.excluding.new.rec <- (alt.g$wgt.fr - alt.g$prop.rec*alt.g$wgt.rec.nxt) / alt.g$prop.FR
+# #alt.g$wgt.fr.excluding.new.rec[find.negs] <- mean(alt.g$wgt.fr.excluding.new.rec[c(find.negs-1,find.negs+1)])
+# alt.g$alt.g <- c(alt.g$wgt.fr.excluding.new.rec[2:nrow(alt.g)]/alt.g$wgt.fr.excluding.new.rec[1:(nrow(alt.g)-1)],NA)
+# # Now make the NAs the mean
+# alt.g$alt.g[which(is.na(alt.g$alt.g))] <- mean(alt.g$alt.g,na.rm=T)
+# 
 
-alt.g$wgt.fr.excluding.new.rec <- (alt.g$wgt.fr - alt.g$prop.rec*alt.g$wgt.rec.nxt) / alt.g$prop.FR
-#alt.g$wgt.fr.excluding.new.rec[find.negs] <- mean(alt.g$wgt.fr.excluding.new.rec[c(find.negs-1,find.negs+1)])
-alt.g$alt.g <- c(alt.g$wgt.fr.excluding.new.rec[2:nrow(alt.g)]/alt.g$wgt.fr.excluding.new.rec[1:(nrow(alt.g)-1)],NA)
-# Now make the NAs the mean
-alt.g$alt.g[which(is.na(alt.g$alt.g))] <- mean(alt.g$alt.g,na.rm=T)
 
 
+# The other option is to calculate the growth using w.bar of everything over 100 mm
 
-
-# The other option is to calculate the growth using w.bar of everything over 105 mm, which will be default exclude the vast majority of the
-# recruits as 90 mm scallop will grow by about 17 cm, so might have a few recruits in there, but tracking the changes in that size class tells
-# us what the realized growth was for the FRs that excludes the recruits
-# So what we do is take the ratio of the w.bar for everything bigger than 105 mm in year 2, to the w.bar for all FR scallop in year one
-# Based on the von.B the vast majority of the scallop in that ratio be the same individuals.
-# So to calculate the 105 mm thing I'll need to use the shf in surv.dat...
-
-sizes <- seq(0.025,2,by=0.05) # So I'd be using the 1.075 bin and everything bigger
+sizes <- seq(0.025,2,by=0.05) # So I'd be using the 1.025 bin and everything bigger for the t+1 fully-recruited
+surv.years <- unique(surv.dat$year)
 # The w.yst object is exactly proportional to mod.dat$I, there is an offset, but given I need proportions I think this object is perfectly fine to use.
-mw.per.bin <- data.frame(mw.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst/survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(mod.dat$year,2015,2020))
-B.per.bin <- data.frame(B.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst,rep(NA,40),rep(NA,40)),year = c(mod.dat$year,2015,2020))
+# SO this mw.per.bin is taking the stratified biomass and dividing it by the stratified numbers in each bin, which gives us the MW in that bin. 
+# There is probably a MW object out there somewhere with this in it, but it should just be the same thing as this.
+mw.per.bin <- data.frame(mw.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst/survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020))
+N.per.bin <- data.frame(N.per.bin = rbind(survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020))
 #reorder them
 mw.per.bin <- mw.per.bin[order(mw.per.bin$year),]
-B.per.bin <- B.per.bin[order(B.per.bin$year),]
+N.per.bin <- N.per.bin[order(N.per.bin$year),]
 # Get the right bins for the FRs
 max.bin <- length(sizes)
-bin.105.plus <- which(sizes == 1.075):max.bin
+bin.frs.plus <- which(sizes == 1.025):max.bin
 bin.90.plus <- which(sizes == 0.925):max.bin
 bin.rec <- which(sizes == 0.775):min((bin.90.plus-1))
-bin.105.minus <- min(bin.90.plus):which(sizes == 1.025)
+bin.frs.minus <- min(bin.90.plus):(min(bin.90.plus)+1)
 
 # and the right bins for the recruits
 
 # Now make a new object
 g.proper <- data.frame(year = mw.per.bin$year)
-
-g.proper$total.biomass.90 <- rowSums(B.per.bin[,bin.90.plus])
-g.proper$total.biomass.105 <- rowSums(B.per.bin[,bin.105.plus])
-g.proper$total.rec.biomass <- rowSums(B.per.bin[,bin.rec])
-g.proper$total.105.minus <- rowSums(B.per.bin[,bin.105.minus])
+g.proper$total.abun.90 <- rowSums(N.per.bin[,bin.90.plus])
+g.proper$total.abun.frs <- rowSums(N.per.bin[,bin.frs.plus])
+g.proper$total.rec.abun <- rowSums(N.per.bin[,bin.rec])
+g.proper$total.frs.minus <- rowSums(N.per.bin[,bin.frs.minus])
 # Propotions in each bin, FRs and
-B.prop.per.bin.90 <- B.per.bin[,bin.90.plus]/g.proper$total.biomass.90
-B.prop.per.bin.105 <- B.per.bin[,bin.105.plus]/g.proper$total.biomass.105
+B.prop.per.bin.90 <- N.per.bin[,bin.90.plus]/g.proper$total.abun.90
+B.prop.per.bin.frs <- N.per.bin[,bin.frs.plus]/g.proper$total.abun.frs
 # Recs
-B.prop.per.bin.rec       <- B.per.bin[,bin.rec]/g.proper$total.rec.biomass
-B.prop.per.bin.105.minus <- B.per.bin[,bin.105.minus]/g.proper$total.105.minus
+B.prop.per.bin.rec       <- N.per.bin[,bin.rec]/g.proper$total.rec.abun
+B.prop.per.bin.frs.minus <- N.per.bin[,bin.frs.minus]/g.proper$total.frs.minus
 
 # And the average mw in each of the bins of interest, first for the FRs
-g.proper$mw.105.plus <-  rowSums(mw.per.bin[,bin.105.plus] * B.prop.per.bin.105,na.rm=T)
+g.proper$mw.frs.plus <-  rowSums(mw.per.bin[,bin.frs.plus] * B.prop.per.bin.frs,na.rm=T)
 g.proper$mw.90.plus <-   rowSums(mw.per.bin[,bin.90.plus] * B.prop.per.bin.90,na.rm=T)
 # and for the rec
 g.proper$mw.recs <-      rowSums(mw.per.bin[,bin.rec] * B.prop.per.bin.rec,na.rm=T)
-g.proper$mw.105.minus <- rowSums(mw.per.bin[,bin.105.minus] * B.prop.per.bin.105.minus,na.rm=T)
+g.proper$mw.frs.minus <- rowSums(mw.per.bin[,bin.frs.minus] * B.prop.per.bin.frs.minus,na.rm=T)
 
-# Now calculate our g
-g.proper$g.proper <- c(g.proper$mw.105.plus[2:length(g.proper$mw.105.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA)
-g.proper$gR.proper<- c(g.proper$mw.105.minus[2:length(g.proper$mw.105.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA)
+g.proper$g.proper <- c(g.proper$mw.frs.plus[2:length(g.proper$mw.frs.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA)
+g.proper$gR.proper<- c(g.proper$mw.frs.minus[2:length(g.proper$mw.frs.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA)
 
-# And tidy up and put in mean values for the missing years (means are lower than medians mostly for these data)
-g.proper[g.proper$year %in% c(1986:1991,2015,2020),-1] <- NA
+
+g.proper[g.proper$year %in% c(1991,2015,2020),-1] <- NA
 g.proper[g.proper$year %in% c(2014,2019),which(names(g.proper) %in% c("g.proper","gR.proper"))] <- NA
 
 # Fill in the mean for the missing years
-g.proper$g.proper[g.proper$year %in% c(1986:1991,2014:2015,2019:2020,2022)]  <- median(g.proper$g.proper,na.rm=T)
-g.proper$gR.proper[g.proper$year %in% c(1986:1991,2014:2015,2019:2020,2022)] <- median(g.proper$gR.proper,na.rm=T)
+g.proper$g.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] <- median(g.proper$g.proper,na.rm=T)
+g.proper$gR.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] <- median(g.proper$gR.proper,na.rm=T)
 
 
 # now need to add in 2015 and 2020 to mod.dat...
@@ -329,7 +325,7 @@ mod.dat.tmp$year[nrow(mod.dat.tmp):(nrow(mod.dat.tmp)-1)] <- c(2015,2020)
 mod.dat.tmp <- mod.dat.tmp[order(mod.dat.tmp$year),]
 
 growth <- data.frame(year = mod.dat.tmp$year,g = mod.dat.tmp$g, gR = mod.dat.tmp$gR,
-                     g.alt = alt.g$alt.g, gR.alt = mod.dat.tmp$gR, # I don't have a good idea how to estiamte gR growth, so using the other way
+                     #g.alt = alt.g$alt.g, gR.alt = mod.dat.tmp$gR, # I don't have a good idea how to estiamte gR growth, so using the other way
                      g.proper = g.proper$g.proper,gR.proper = g.proper$gR.proper)
 # Now addin the missing growth years for g and gR
 growth$g[growth$year %in% c(2015,2020)] <- median(growth$g,na.rm=T)
@@ -340,10 +336,14 @@ growth$year[nrow(growth)] <- max(years) + 1
 
 growth <- growth %>% dplyr::filter(year >= min(years))
 
-if(g.mod == 'g_original') g <- data.frame(g=growth$g,gR = growth$gR)
-if(g.mod == 'alt_g') g <- data.frame(g=growth$g.alt,gR = growth$gR.alt)
-if(g.mod == 'proper_g') g <- data.frame(g=growth$g.proper,gR = growth$gR.proper)
-if(g.mod == 'g_1') g <- data.frame(g=growth$g/growth$g,gR = growth$gR/growth$gR)
+#if(g.mod == 'g_original') g <- data.frame(g=growth$g,gR = growth$gR)
+#if(g.mod == 'alt_g') g <- data.frame(g=growth$g.alt,gR = growth$gR.alt)
+g <- data.frame(g=growth$g.proper,gR = growth$gR.proper) # if(g.mod == 'proper_g') 
+#if(g.mod == 'g_1') g <- data.frame(g=growth$g/growth$g,gR = growth$gR/growth$gR)
+
+#mod.dat$g <- g.proper$g.proper
+#mod.dat$gR <- g.proper$gR.proper
+
 
 # And now we need to get the survey year right, note that same has the months in numbers not month names, this is already taken care of...
 #Sab.fish$survey.year[Sab.fish$month %in% 1:5] <- Sab.fish$survey.year[Sab.fish$month %in% 1:5]-1
@@ -452,12 +452,13 @@ if(mod.select == "SEAM")
                        mult_qI=T,spat_approach="spde",
                        knot_obj=Sab.mesh$knots,knot_area=pred.grid$area,separate_R_aniso =T,
                        all_se=T,weighted_mean_m = T)
-  # So this will fix the mean value of m0 to be whatever the intial value is set at.  Let's see what happens!
-   set_data$par$log_m0 <- log(init.m) # 0 = 1, 
+  # Fixing S so that we can fix a mean level for the natural mortality, with the goal being the process error is 
+  # centers around 0 instead of being negative.  This will be a trail and error experiment!
+  set_data$par$log_S <- log(0.072) # I think 0.072 will be the 'right' number
   # #set_data$par$log_R0 <- l.init.R # 5.3 = 200, 5 = 148, 4 = 55, 5.9915 = 400, 4.606 = 100
   set_data$par$log_qR <- log(qR)
   # #set_data$map <-list(log_m0=factor(NA))
-  set_data$map <-list(log_m0=factor(NA),log_qR = factor(NA))
+  set_data$map <-list(log_S=factor(NA),log_qR = factor(NA))
   #set_data$map <-list(log_qR = factor(NA))
 #set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA),log_qR = factor(NA))
 }
@@ -481,7 +482,7 @@ if(mod.select == "SEAM")
   # m0.par <- signif(exp(set_data$par$log_m0),digits=2)
   # qR.par <- signif(exp(set_data$par$log_qR),digits=2)
   # 
-  scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+  scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
   
   saveRDS(mod.fit,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
   saveRDS(Sab.mesh,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.select,"_mesh.Rds"))
@@ -557,7 +558,7 @@ c_sys <- 32620
 theme_set(theme_few(base_size = 22))
 repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 mod.select <- "SEAM"
-g.mod <- 'g_original'
+#g.mod <- 'g_original'
 #g.mod <- 'g_1'
 #g.mod <- 'alt_g'
 #g.mod <- 'proper_g'
@@ -566,7 +567,7 @@ g.mod <- 'g_original'
 
 
 
-if(mod.select != "TLM") scenario.select <-   scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+if(mod.select != "TLM") scenario.select <-   scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
 
 if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",g.mod)
 

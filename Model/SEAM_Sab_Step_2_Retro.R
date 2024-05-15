@@ -177,54 +177,55 @@ for(i in 1:n.mods)
   # Based on the von.B the vast majority of the scallop in that ratio be the same individuals.
   # So to calculate the 105 mm thing I'll need to use the shf in surv.dat...
   
-  sizes <- seq(0.025,2,by=0.05) # So I'd be using the 1.075 bin and everything bigger
+  sizes <- seq(0.025,2,by=0.05) # So I'd be using the 1.025 bin and everything bigger for the t+1 fully-recruited
+  surv.years <- unique(surv.dat$year)
   # The w.yst object is exactly proportional to mod.dat$I, there is an offset, but given I need proportions I think this object is perfectly fine to use.
-  mw.per.bin <- data.frame(mw.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst/survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(mod.dat$year,2015,2020))
-  B.per.bin <- data.frame(B.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst,rep(NA,40),rep(NA,40)),year = c(mod.dat$year,2015,2020))
+  # SO this mw.per.bin is taking the stratified biomass and dividing it by the stratified numbers in each bin, which gives us the MW in that bin. 
+  # There is probably a MW object out there somewhere with this in it, but it should just be the same thing as this.
+  mw.per.bin <- data.frame(mw.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst/survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020))
+  N.per.bin <- data.frame(N.per.bin = rbind(survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020))
   #reorder them
   mw.per.bin <- mw.per.bin[order(mw.per.bin$year),]
-  B.per.bin <- B.per.bin[order(B.per.bin$year),]
+  N.per.bin <- N.per.bin[order(N.per.bin$year),]
   # Get the right bins for the FRs
   max.bin <- length(sizes)
-  bin.105.plus <- which(sizes == 1.075):max.bin
+  bin.frs.plus <- which(sizes == 1.025):max.bin
   bin.90.plus <- which(sizes == 0.925):max.bin
   bin.rec <- which(sizes == 0.775):min((bin.90.plus-1))
-  bin.105.minus <- min(bin.90.plus):which(sizes == 1.025)
+  bin.frs.minus <- min(bin.90.plus):(min(bin.90.plus)+1)
   
   # and the right bins for the recruits
   
   # Now make a new object
   g.proper <- data.frame(year = mw.per.bin$year)
-  
-  g.proper$total.biomass.90 <- rowSums(B.per.bin[,bin.90.plus])
-  g.proper$total.biomass.105 <- rowSums(B.per.bin[,bin.105.plus])
-  g.proper$total.rec.biomass <- rowSums(B.per.bin[,bin.rec])
-  g.proper$total.105.minus <- rowSums(B.per.bin[,bin.105.minus])
+  g.proper$total.abun.90 <- rowSums(N.per.bin[,bin.90.plus])
+  g.proper$total.abun.frs <- rowSums(N.per.bin[,bin.frs.plus])
+  g.proper$total.rec.abun <- rowSums(N.per.bin[,bin.rec])
+  g.proper$total.frs.minus <- rowSums(N.per.bin[,bin.frs.minus])
   # Propotions in each bin, FRs and
-  B.prop.per.bin.90 <- B.per.bin[,bin.90.plus]/g.proper$total.biomass.90
-  B.prop.per.bin.105 <- B.per.bin[,bin.105.plus]/g.proper$total.biomass.105
+  B.prop.per.bin.90 <- N.per.bin[,bin.90.plus]/g.proper$total.abun.90
+  B.prop.per.bin.frs <- N.per.bin[,bin.frs.plus]/g.proper$total.abun.frs
   # Recs
-  B.prop.per.bin.rec       <- B.per.bin[,bin.rec]/g.proper$total.rec.biomass
-  B.prop.per.bin.105.minus <- B.per.bin[,bin.105.minus]/g.proper$total.105.minus
+  B.prop.per.bin.rec       <- N.per.bin[,bin.rec]/g.proper$total.rec.abun
+  B.prop.per.bin.frs.minus <- N.per.bin[,bin.frs.minus]/g.proper$total.frs.minus
   
   # And the average mw in each of the bins of interest, first for the FRs
-  g.proper$mw.105.plus <-  rowSums(mw.per.bin[,bin.105.plus] * B.prop.per.bin.105,na.rm=T)
+  g.proper$mw.frs.plus <-  rowSums(mw.per.bin[,bin.frs.plus] * B.prop.per.bin.frs,na.rm=T)
   g.proper$mw.90.plus <-   rowSums(mw.per.bin[,bin.90.plus] * B.prop.per.bin.90,na.rm=T)
   # and for the rec
   g.proper$mw.recs <-      rowSums(mw.per.bin[,bin.rec] * B.prop.per.bin.rec,na.rm=T)
-  g.proper$mw.105.minus <- rowSums(mw.per.bin[,bin.105.minus] * B.prop.per.bin.105.minus,na.rm=T)
+  g.proper$mw.frs.minus <- rowSums(mw.per.bin[,bin.frs.minus] * B.prop.per.bin.frs.minus,na.rm=T)
   
-  # Now calculate our g
-  g.proper$g.proper <- c(g.proper$mw.105.plus[2:length(g.proper$mw.105.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA)
-  g.proper$gR.proper<- c(g.proper$mw.105.minus[2:length(g.proper$mw.105.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA)
+  g.proper$g.proper <- c(g.proper$mw.frs.plus[2:length(g.proper$mw.frs.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA)
+  g.proper$gR.proper<- c(g.proper$mw.frs.minus[2:length(g.proper$mw.frs.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA)
   
-  # And tidy up and put in mean values for the missing years (means are lower than medians mostly for these data)
-  g.proper[g.proper$year %in% c(1986:1991,2015,2020),-1] <- NA
+  
+  g.proper[g.proper$year %in% c(1991,2015,2020),-1] <- NA
   g.proper[g.proper$year %in% c(2014,2019),which(names(g.proper) %in% c("g.proper","gR.proper"))] <- NA
   
   # Fill in the mean for the missing years
-  g.proper$g.proper[g.proper$year %in% c(1986:1991,2014:2015,2019:2020,2022)]  <- mean(g.proper$g.proper,na.rm=T)
-  g.proper$gR.proper[g.proper$year %in% c(1986:1991,2014:2015,2019:2020,2022)] <- mean(g.proper$gR.proper,na.rm=T)
+  g.proper$g.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] <- median(g.proper$g.proper,na.rm=T)
+  g.proper$gR.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] <- median(g.proper$gR.proper,na.rm=T)
   
   
   # now need to add in 2015 and 2020 to mod.dat...
@@ -234,12 +235,21 @@ for(i in 1:n.mods)
   mod.dat.tmp <- mod.dat.tmp[order(mod.dat.tmp$year),]
   
   growth <- data.frame(year = mod.dat.tmp$year,g = mod.dat.tmp$g, gR = mod.dat.tmp$gR,
-                       g.alt = alt.g$alt.g, gR.alt = mod.dat.tmp$gR, # I don't have a good idea how to estiamte gR growth, so using the other way
+                       #g.alt = alt.g$alt.g, gR.alt = mod.dat.tmp$gR, # I don't have a good idea how to estiamte gR growth, so using the other way
                        g.proper = g.proper$g.proper,gR.proper = g.proper$gR.proper)
   # Now addin the missing growth years for g and gR
-  growth$g[growth$year %in% c(2015,2020)] <- mean(growth$g,na.rm=T)
-  growth[growth$year %in% c(2015,2020),names(growth) %in% c("gR","gR.alt")] <- mean(growth$gR,na.rm=T)
+  growth$g[growth$year %in% c(2015,2020)] <- median(growth$g,na.rm=T)
+  growth[growth$year %in% c(2015,2020),names(growth) %in% c("gR","gR.alt")] <- median(growth$gR,na.rm=T)
   growth <- growth[which(!is.na(growth$g)),]
+  growth[nrow(growth)+1,] <- growth[nrow(growth),]
+  growth$year[nrow(growth)] <- max(years) + 1
+  
+  growth <- growth %>% dplyr::filter(year >= min(years))
+  
+  #if(g.mod == 'g_original') g <- data.frame(g=growth$g,gR = growth$gR)
+  #if(g.mod == 'alt_g') g <- data.frame(g=growth$g.alt,gR = growth$gR.alt)
+  g <- data.frame(g=growth$g.proper,gR = growth$gR.proper) # if(g.mod == 'proper_g') 
+  #if(g.mod == 'g_1') g <- data.frame(g=growth$g/growth$g,gR = growth$gR/growth$gR)
   
   # Turn this into a vector and add a value for next year.
   #growths <- growth %>% dplyr::filter(year %in% c(years,(max(years)+1)))
@@ -266,9 +276,9 @@ for(i in 1:n.mods)
       NY <- length(years)
       #survey.obj$Sab$model.dat
       growths <- growth %>% dplyr::filter(year %in% c(years,(max(years)+1)))
-      if(g.mod == 'g_original') g <- data.frame(g=growths$g,gR = growths$gR)
-      if(g.mod == 'alt_g') g <- data.frame(g=growths$g.alt,gR = growths$gR.alt)
-      if(g.mod == 'proper_g') g <- data.frame(g=growths$g.proper,gR = growths$gR.proper)
+      #if(g.mod == 'g_original') g <- data.frame(g=growths$g,gR = growths$gR)
+      #if(g.mod == 'alt_g') g <- data.frame(g=growths$g.alt,gR = growths$gR.alt)
+      g <- data.frame(g=growths$g.proper,gR = growths$gR.proper) #if(g.mod == 'proper_g') 
       # Now clip mod.input.sfs to the right nubmer of years...
       mod.input.sfs$Year <- mod.input.sfs$year - (min(years)-1)
       # Adding missing survey years.  THe L and N both need 'data', but 0's are fine, so that'll do the trick!
@@ -325,13 +335,11 @@ for(i in 1:n.mods)
                              all_se=T,weighted_mean_m = T)
 
         # So this will fix the mean value of m0 to be whatever the initial value is set at in the data_setup step.  Let's see what happens!
-        set_data$par$log_m0 <- log(init.m)
-        #set_data$par$log_R0 <- l.init.R 
+        set_data$par$log_S <- log(0.072) # I think 0.072 will be the 'right' number
+        # #set_data$par$log_R0 <- l.init.R # 5.3 = 200, 5 = 148, 4 = 55, 5.9915 = 400, 4.606 = 100
         set_data$par$log_qR <- log(qR)
-        #set_data$map <-list(log_m0=factor(NA),log_R0 = factor(NA),log_qR = factor(NA))
-        set_data$map <-list(log_m0=factor(NA),log_qR = factor(NA))
-        set_data$map <-list(log_qR = factor(NA))
-        #set_data$map <-list(log_m0=factor(NA))
+        # #set_data$map <-list(log_m0=factor(NA))
+        set_data$map <-list(log_S=factor(NA),log_qR = factor(NA))
       } # end if(mod.select != "TLM")
 
       # A TLM version of the same...
@@ -352,7 +360,7 @@ for(i in 1:n.mods)
       # Now save the results appropriately
       if(mod.select != "TLM") 
       {
-        scenario.select <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+        scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
         saveRDS(mod.fit,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
         saveRDS(Sab.mesh,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,"_mesh.Rds"))
         saveRDS(pred.grid,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,"_predict_grid.Rds"))
@@ -361,7 +369,7 @@ for(i in 1:n.mods)
       if(mod.select == "TLM") 
       {
         
-        scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",g.mod)
+        scenario.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_")
         saveRDS(mod.fit,paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select,".Rds"))
       }
   }} # End the i and j loops
@@ -378,11 +386,11 @@ R.size <- "75"
 FR.size <- "90"
 num.knots <- 10 # Going to test 10
 qR <- 0.33
-init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
-g.mod <- 'g_original'
-#g.mod <- 'g_1'
-#g.mod <- 'alt_g'
-#g.mod <- 'proper_g'
+#init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
+# g.mod <- 'g_original'
+# #g.mod <- 'g_1'
+# #g.mod <- 'alt_g'
+# #g.mod <- 'proper_g'
 # The survey biomass index for 1994 says there were 249 tonnes of recruits that year.
 #l.init.R <- log(250) # Going to test 100, 250, and 500.
 
@@ -400,13 +408,13 @@ retro.trends <- NULL
 pred.proc <- NULL
 for(j in retro.years)
 {
-  if(mod.select != "TLM") scenario.select.retro <- paste0(min(years),"_",j,"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+  if(mod.select != "TLM") scenario.select.retro <- paste0(min(years),"_",j,"_qR_",qR,"_",num.knots,"_knots")
   if(mod.select == "TLM") scenario.select.retro <- paste0(min(years),"_",j,"_qR_",qR)
 
   mod.fit[[j]] <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_",mod.select,"_model_output_",scenario.select.retro,".Rds"))
   pred.proc[[j]] <- get_processes(mod.fit[[j]])
   
-  if(j == min(retro.years))  scenario.select <- paste0(min(years),"_",2022,"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod)
+  if(j == min(retro.years))  scenario.select <- paste0(min(years),"_",2022,"_qR_",qR,"_",num.knots,"_knots")
   {
 
     if(mod.select == "TLM") scenario.select <- paste0(min(years),"_",2022,"_qR_",qR)

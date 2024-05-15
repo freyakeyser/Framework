@@ -56,16 +56,17 @@ n.sims <- 1e6
 preds <- NULL
 reals <- NULL
 diffs <- NULL
-for(i in 1:n.pe.years)
+# Note the 2006 model didn't properly converge.
+for(i in 2:n.pe.years)
 {
 
 # The removals for upcoming year.
 rem <- bbn.fish.survey.year$tot[bbn.fish.survey.year$survey.year == pe.years[i]]
   
 # You want the PE.year -1 model here as that's what we'd use to do the prediction
-pred.select <- paste0("1994_",pe.years[i]-1,"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod,"_vary_q=TRUE")
+pred.select <- paste0("1994_",pe.years[i]-1,"_qR_",qR,"_",num.knots,"_knots")
 # Then you want the real model to compare your predictions too
-realized.select <- paste0("1994_",pe.years[i],"_vary_m_m0_",init.m,"_qR_",qR,"_",num.knots,"_knots_",g.mod,"_vary_q=TRUE")
+realized.select <- paste0("1994_",pe.years[i],"_qR_",qR,"_",num.knots,"_knots")
 # For i =1 this is the 2010 model whose parameters we can use to get a prediction for 2011 biomass
 pred.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/Retros/BBn_SEAM_model_output_",pred.select,".Rds"))
 # This is then the 2011 model that gives us the realized value.

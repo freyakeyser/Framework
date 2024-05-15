@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="David Keith" />
 
+<meta name="date" content="2024-03-19" />
 
-<title>01-text.knit</title>
+<title>Growth</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -348,242 +350,324 @@ display: none;
 
 
 
+<h1 class="title toc-ignore">Growth</h1>
+<h4 class="author">David Keith</h4>
+<h4 class="date">2024-03-19</h4>
 
 </div>
 
 
-<div id="introduction" class="section level1">
-<h1>Introduction</h1>
-<p>The last full assessment for the Offshore Scallop fishery occurred in
-2013, and focused on Georges Bank ‘a’ (SFA 27a) and Browns Bank north
-(SFA 26a), which are part of SFA 27 and 26, respectively. Annual updates
-for these two stocks have occurred since***. However, the offshore
-scallop fishery consists of 9 management units in total. SFA 26 also
-includes Browns Bank South and German Bank, SFA 27 includes Georges Bank
-‘b’, and SFA 25, known as the Eastern Scotian Shelf, includes management
-units 25 (Sable and Middle Bank), and 25b (Banquereau Bank).</p>
-<p>A history of the survey and fishery in Scallop Fishing Area (SFA) 25
-and SFA 26 can be found in Keyser et al. 2097(FIGURE OUT HOW TO CITE).
-The primary fishing area within SFA 26 is SFA 26a, while the Sable Bank
-portion of SFA 25a has been the most consistently fished area within SFA
-25 (CITE FREYA AGAIN). A Bayesian State-Space Delay difference model
-(BSSM) has been used to assess the status of SFA 26a for over a decade
-(Jonsen + Hubley), but no analytical models have ever been developed for
-SFA 25a.</p>
-<p>This research document focuses on the development of new stock
-assessment methodologies for SFAs 25a and 26a. A modified version of the
-BSSM developed by <span class="citation">@jonsenGeorgesBankScallop2009</span> has been developed
-for these two areas. Advances in computing power and the availability of
-new statistical methods has enabled the development of a Spatially
-Explicit Assessment model (SEAM) that is also based on the same
-conceptual delay-difference modelling framework <span class="citation">[@mcdonaldExplicitIncorporationSpatial2021]</span>. The
-SEAM model has been shown to reduce the bias from non-spatial methods
-when fishing effort is distributed heterogeneously across the domain of
-a stock <span class="citation">[@mcdonaldExplicitIncorporationSpatial2021]</span>, it
-also provides a more detailed understanding of historic and current
-patterns of biomass, explotation, natural mortality, and recruitment
-throughout the assessed area. The results for both types of model will
-be shown for comparative purposes, while model diagnostics such as
-retrospective analyses and visualization of residual patterns will be
-shown for the SEAM models.</p>
-<div id="framework-objectives" class="section level2">
-<h2>Framework objectives</h2>
-<p>The objectives of this framework are:</p>
-<ul>
-<li>Describe and document the history of the fisheries and surveys on
-SFAs 25a, 25b, 26a, 26b, 26c, and 27b (including survey design)</li>
-<li>Update fishery and survey indices for SFAs 25a, 25b, 26a, 26b, 26c,
-and 27b</li>
-<li>Develop and evaluate stock assessment models for SFAs 25a and
-26a</li>
-<li>Propose and adopt limit reference points for SFAs 25a, 26a, 26c, and
-27b (Occurring during a second CSAS meeting the Spring of 2024)</li>
-<li>Provide guidance on Removal Reference (RR) and Upper Stock Reference
-(USR) Points where appropriate (Occurring during a second CSAS meeting
-the Spring of 2024)</li>
-</ul>
-<p>This Modelling document will:</p>
-<ul>
-<li>To develop new spatial models for SFA 26a, and within the survey
-domain for the primary fishing grounds on SFA 25a (Sable Bank)</li>
-<li>Compare these results to non-spatial Bayesian state space models for
-each of these areas</li>
-<li>Evaluate the performance of the spatial models using diagnostics
-such as retrospective analyses</li>
-</ul>
-</div>
-</div>
-<div id="population-models" class="section level1">
-<h1>Population Models</h1>
-<div id="delay-difference-model" class="section level2">
-<h2>Delay-difference Model</h2>
-<p>The underlying model for both the spatial and non-spatial models is a
-delay-difference model (Cite Deriso abd Schnute). These models have
-parameters for natural mortality, recruitment, and growth, the
-complexity of the population dynamics is intermediary between a fully
-age-structured model and a simple Surplus production model. The
-underlying model formulation of the Delay-difference model is</p>
-<p><span class="math display">\[\begin{align}
-B_{t} = e^{-m_{fr}} g_{fr} (B_{t-1} - C_{t-1}) + e^{-m_{r}} g_{r}
-R_{t-1}
-\end{align}\]</span></p>
-<p>In this formulation, the fully-recruited biomass is <span class="math inline">\(B\)</span>, natural mortality is <span class="math inline">\(m\)</span>, growth is <span class="math inline">\(g\)</span>, landings are <span class="math inline">\(C\)</span>, the recruits are <span class="math inline">\(R\)</span>, and the <span class="math inline">\(t\)</span> index represents the annual time step.
-Where applicable, fully-recruited scallop are given the subscript <span class="math inline">\(fr\)</span>, while recruits have the subscript
-<span class="math inline">\(r\)</span>. Based on the ageing and port
-sampling analyses the recruits are scallop that are 75-89 mm in size in
-the previous year, scallop that are 90 mm and larger are considered
-Fully-recruited in these models.</p>
-<p>The landings used in the model are adjusted to align with the survey
-season. Both the 25A and 26A surveys normally occur in mid-late May,
-thus the fishery data is summarized in terms of a survey year, from June
-to May. For example, the removals from June 2010 to May 2011 are
-identified as fishing year 2010 removals, in the above model
-formulation, these removals are subtracted from the biomass estimated in
-the May 2010 survey. The assumption implicit in this formulation is that
-all removals happen immediately after the survey occurs.</p>
-</div>
-<div id="non-spatial-model" class="section level2">
-<h2>Non-spatial Model</h2>
-<p>The non-spatial state space model used here is based on <span class="citation">@jonsenGeorgesBankScallop2009</span> with revisions to
-framework shown in <span class="citation">@hubleyGeorgesBankBrowns2014</span>. Due to challenges
-with model convergence due the increasing efficiency of the fishery
-(Cite Freya), there was an undocumented change to the model that was
-implemented to the CPUE index component of the model (see original
-formulation in <span class="citation">[@jonsenGeorgesBankScallop2009;
-@hubleyGeorgesBankBrowns2014]</span>). The CV of the CPUE term was
-inflated by a factor of 50, which effectively eliminated the influence
-of this term in the model. Here we have removed the fishery index from
-the model entirely. No other changes were made to the non-spatial model
-formulation.</p>
-<p>Since the development of these models it has been observed that there
-are many more priors in these models that have not been fully documented
-<span class="citation">[@yinIdentifiableStatespaceModels2019]</span>.
-The undocumented priors are annual priors for both fully-recruit and
-recruit natural mortality, and recruit biomass.</p>
-<p><span class="math display">\[\begin{align}
-r_{t} \sim lognormal(0,1) \\
-m_{fr,t} \sim lognormal(-2,2) \\
-m_{r,t} \sim lognormal(-2,2)
-\end{align}\]</span></p>
-<p>Where r is a re-scaled recruit biomass estimate and m is the
-instantaneous natural mortality of recruit (<span class="math inline">\(r\)</span>) and fully-recruited (<span class="math inline">\(fr\)</span>) scallop. This results in three
-additional priors being estimated each year. These annual priors result
-in a more highly parameterized model than previously documented. This is
-likely masking identifiability and estimability issues with the
-underlying model; it may also result in complex interactions between a
-series of weakly informative priors that results in a highly constrained
-model <span class="citation">[@yinIdentifiableStatespaceModels2019]</span>.</p>
-<!-- 
-Identifiability means you can't estimate a parameter given your data, no matter how much data you have.  Estimability is that you can't get a good estimate of a parameter given the amount of data you have, but if you had more 'years' (for example) of this data you may be able to estimate the parameter.
-!-->
-</div>
-<div id="spatial-model" class="section level2">
-<h2>Spatial Model</h2>
-<p>The spatial models retain the delay-difference framework and are
-based on a non-Bayesian assessment model which required no priors <span class="citation">[@yinIdentifiableStatespaceModels2019]</span>.
-Additional research has shown that knowledge of the catchability
-parameter is necessary to provide realistic estimates of biomass in
-these models <span class="citation">[@mcdonaldExplicitIncorporationSpatial2021]</span>.
-Stimulation studies have provided evidence for a temporal bias in the
-biomass estimates when using a non-spatial delay difference models <span class="citation">[@mcdonaldExplicitIncorporationSpatial2021]</span>. The
-bias is related to the underlying model assumption that fishing is
-homogeneous across the spatial domain and is resolved when using a
-spatial model or when fishing activity is evenly distributed across the
-survey domain. Fishery removals from the Offshore Scallop fishery are
-not homogeneous as the fishery tends to target areas with higher scallop
-biomass densities <span class="citation">[@keithEvaluatingSocioeconomicConservation2020]</span>.
-Simulation studies have also indicated that natural mortality and
-recruitment estimates from these models can be confounded, but this has
-no impact on the overall biomass estimates and the models provide a good
-estimate of the overall productivity of the system if catchability is
-parameterized properly <span class="citation">[@mcdonaldExplicitIncorporationSpatial2021]</span>.</p>
-<p>The spatial Delay difference model formulation is</p>
-<p><span class="math display">\[\begin{align}
-B_{s,t} = (e^{-m_{s,t}} g_{fr} (B_{s,t-1} - C_{s,t-1}) + e^{-m_{s,t}}
-g_{r} R_{s,t-1}) e^{\Omega{^{B}_{s,t}}}
-\end{align}\]</span></p>
-<p>Here <span class="math inline">\(B_{s,t}\)</span> are the commercial
-biomass densities, <span class="math inline">\(m_{s,t}\)</span> are the
-instantaneous natural mortalities, <span class="math inline">\(C_{s,t-1}\)</span> are the commercial landings
-densities, and <span class="math inline">\(R_{s,t-1}\)</span> are the
-recruit biomass densities. The spatial field for fully-recruited biomass
-is <span class="math inline">\(\Omega{^{B}_{s,t}}\)</span>, this field
-is modelled as a Gaussian Markov Random Field (GMRF) which simplifies to
-a mean zero multivariate normal distribution using a Stochastic Partial
-Differential Equation (SPDE). The covariance matrix of <span class="math inline">\(\Omega{^{B}_{s,t}}\)</span> is</p>
-<p><span class="math display">\[\begin{align}
-\Sigma(s,s&#39;) = Matern(\parallel H^B(s-s&#39;) \parallel)
-\end{align}\]</span></p>
-<p>The recruits and natural mortality are modeled as lognormal random
-walks with error terms that are GMRF’s whic</p>
-<p><span class="math display">\[\begin{align}
-R_{s,t} = R_{s,t-1}e^{\Omega{^{R}_{s,t}}}
-\end{align}\]</span></p>
-<p><span class="math display">\[\begin{align}
-m_{s,t} = m_{s,t-1}e^{\Omega{^{m}_{s,t}}}
-\end{align}\]</span></p>
-<p>The above process equations are linked to the observations through
-three equations;</p>
-<p><span class="math display">\[\begin{align}
-I_{i,s,t} = \frac{q_{I(s)}B_{s,t}}{p_{I}} \epsilon_{i,s,t} ,
-\epsilon_{i,s,t} \stackrel{Ind}{\sim} ulN(\sigma^{2}_{\epsilon})
-\end{align}\]</span></p>
-<p><span class="math display">\[\begin{align}
-I^{R}_{i,s,t} = \frac{q_{R} R_{s,t}} {p^{R}_{I}} \nu_{i,s,t},
-\nu_{i,s,t} \stackrel{Ind}{\sim} ulN(\sigma^{2}_{\nu})
-\end{align}\]</span></p>
-<p><span class="math display">\[\begin{align}
-L_{i,s,t} = Bin(n_{i,s,t} , m_{s,t}S)
-\end{align}\]</span></p>
-<p>$$$$</p>
-<div id="knot-placement-and-number" class="section level3">
-<h3>Knot placement and number</h3>
-<p>The knot locations were determined using a k-means clustering
-algorithm <span class="citation">[@mcdonaldExplicitIncorporationSpatial2021;
-@thorsonGeostatisticalDeltageneralizedLinear2015]</span>. The clustering
-algorithm used the fishery data to identify the optimal clustering
-patterns. For this analysis 20 knots were chosen, this was a trade-off
-between spatial resolution and data availability <span class="citation">[@mcdonaldExplicitIncorporationSpatial2021]</span>, for
-both 25A and 26A this would result with an average of five tows within
-each knot in recent years (based on a 100 station survey).</p>
-</div>
-<div id="clapper-model-and-natural-mortality" class="section level3">
-<h3>Clapper Model and Natural Mortality</h3>
-<p>For the spatial model a simplified Clapper model was developed. In
-addition, the natural mortality of fully recruited and recruit scallop
-was assumed to be the same (i.e. <span class="math inline">\(M_{fr} =
-M_{r}\)</span>). Finally, the natural mortality in year one was set at
-0.2.</p>
-</div>
-</div>
-<div id="catchability" class="section level2">
-<h2>Catchability</h2>
-<p>For both the spatial and non-spatial model, catchability needs to be
-informed, for the spatial model this helps to minimize bias in the
-biomass estimates <span class="citation">[@mcdonaldExplicitIncorporationSpatial2021]</span>. For
-the non-spatial model it is one of the many required priors. For all the
-models we used a beta distribution (10,12) which is the same as the
-prior being used for the 26A non-spatial model.</p>
-<p>For the spatial model the fully recruited catchability can vary at
-each knot or be fixed across the modelling domain. In the model used
-herein the fully-recruited catchability was allowed to vary at each
-knot. The recruit recruit catchability is fixed across the model domain
-and was set to be 0.45 (the median of the beta distribution).
-distribution). A model in which fully-recruited catchability did not
-vary spatially was tested, this had an exceedingly minor impact on
-productivity parameters (natural mortality and recruitment) and overall
-biomass estimates, thus was not explored further.</p>
-</div>
-</div>
-<div id="random-results" class="section level1">
-<h1>Random Results</h1>
-<ul>
-<li>Fishery independent data</li>
-<li>Logbooks</li>
-</ul>
-</div>
-<div id="discussion" class="section level1">
-<h1>Discussion</h1>
+<div id="growth" class="section level2">
+<h2>Growth</h2>
+<p>Annual observed growth rates for recruit and fully-recruited size
+classes are calculated using a combination of the estimated meat weights
+in each shell height bin (i.e., each 5 mm shell height bin) and the
+expected growth of the scallop using the vonB relationship. The shell
+height bins are used to summarize the number of scallop in 5 mm bins,
+for the below calculations the scallop in each shell height bin are
+assumed to be at the mid-point of each shell height bin (e.g., for
+scallop in the 85-90 mm shell height category, the scallop are assumed
+to be 87.5 mm in height). For the recruit sized scallops (75-89 mm) the
+meat weight (<span class="math inline">\(MW_{rec,t}\)</span>) was
+estimated using the weighted average of the meat weight in each shell
+height bin in each year (there are three recruit shell height bins,
+75-80, 80-85, and 85-90) which was calculated using the current year
+meat-weight shell height relationship.</p>
+<p><span class="math display">\[ MW_{rec,t} =
+\sum_{i=[75:80)}^{[85:90)}{MW_{i,t}
+\frac{N_{i,t}}{N_{rec,tot,t}}}\]</span> Here, <span class="math inline">\(MW_{i,t}\)</span> is the meat weight in the <span class="math inline">\(i^th\)</span> shell height bin in year <span class="math inline">\(t\)</span>, <span class="math inline">\(N_{i,t}\)</span> is the estimated biomass in this
+shell height bin, and <span class="math inline">\(N_{rec,tot,t}\)</span>
+is the total estimated biomass of recruit scallop in year <span class="math inline">\(t\)</span>. Based on the vonB relationship, the
+majority of recruit sized scallop will grow to be between 90 and 100 mm
+in size in the following year. The average MW of scallop observed in the
+survey in the following year in the 90-100 mm size classes is calculated
+analogously</p>
+<p><span class="math display">\[ MW_{[90-100),t+1} =
+\sum_{i={[90:95)}}^{[95:100)}{MW_{i,t}
+\frac{N_{i,t}}{N_{[90-100),tot,t}}}\]</span> The ratio of these values
+provides the growth estimate for the recruit sized scallop in a given
+year.</p>
+<p><span class="math display">\[ g_{rec,t} =
+\frac{MW_{[90-100),t+1}}{MW_{rec,t}} \]</span> Fully-recruited growth is
+calculated in a similar manner. First the average meat weight of the
+fully-recruited scallop ($ MW_{fr,t}$) in year <span class="math inline">\(t\)</span> is calculated</p>
+<p><span class="math display">\[ MW_{fr,t} =
+\sum_{i=[90:95)}^{SH_{max}}{MW_{i,t}
+\frac{N_{i,t}}{N_{fr,tot,t}}}\]</span> In the following year the average
+meat weight of these scallop are again calculated. Given the 90 mm
+scallop are expected to grow into the 100-105 mm scallop shell height
+bin, only scallop in the shell height bins of 100 mm and above are used
+for the MW calculation in the following year.</p>
+<p><span class="math display">\[ MW_{100+,t+1} =
+\sum_{i=[100:105)}^{SH_{max}}{MW_{i,t} \frac{
+N_{i,t}}{N_{100+,tot,t}}}\]</span> The ratio of these values provides
+the growth estimate for fully-recruited scallop in a given year.</p>
+<p><span class="math display">\[ g_{fr,t} =
+\frac{MW_{[100+),t+1}}{MW_{fr,t}} \]</span> When used in the model,
+estimates for the terminal year and years in which data for this
+calculation are unavailable are required, the median growth rate is
+assumed for these situtations.</p>
+<pre class="r"><code># Load in the data
+load(&quot;Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData&quot;)
+
+# The other option is to calculate the growth using w.bar of everything over 100 mm, which will be default exclude the vast majority of the
+# recruits as 90 mm scallop will grow by about 12 cm, so might have a few recruits in there, but tracking the changes in that size class tells
+# us what the realized growth was for the FRs that excludes the recruits
+# So what we do is take the ratio of the w.bar for everything bigger than 100 mm in year 2, to the w.bar for all FR scallop in year one
+# Based on the von.B the vast majority of the scallop in that ratio be the same individuals.
+# So to calculate the 100 mm thing I&#39;ll need to use the shf in surv.dat...
+# I can do the same with recruit growth can&#39;t I, everything from 90 to 100 were probably recruits last year
+# so look at 75-90 last year and compare with 90 to 100 this year...
+
+sizes &lt;- seq(0.025,2,by=0.05) # So I&#39;d be using the 1.025 bin and everything bigger for the t+1 fully-recruited
+surv.years &lt;- unique(surv.dat$BBn$year)
+# But not 2020...
+surv.years &lt;- surv.years[surv.years != 2020]
+# The w.yst object is exactly proportional to mod.dat$I, there is an offset, but given I need proportions I think this object is perfectly fine to use.
+# SO this mw.per.bin is taking the stratified biomass and dividing it by the stratified numbers in each bin, which gives us the MW in that bin. 
+# There is probably a MW object out there somewhere with this in it, but it should just be the same thing as this.
+mw.per.bin &lt;- data.frame(mw.per.bin = rbind(survey.obj$BBn$shf.dat$w.yst/survey.obj$BBn$shf.dat$n.yst,rep(NA,40)),year = c(surv.years,2020))
+B.per.bin &lt;- data.frame(B.per.bin = rbind(survey.obj$BBn$shf.dat$w.yst,rep(NA,40)),year = c(surv.years,2020))
+#reorder them
+mw.per.bin &lt;- mw.per.bin[order(mw.per.bin$year),]
+B.per.bin &lt;- B.per.bin[order(B.per.bin$year),]
+# Get the right bins for the FRs
+max.bin &lt;- length(sizes)
+bin.frs.plus &lt;- which(sizes == 1.025):max.bin
+bin.90.plus &lt;- which(sizes == 0.925):max.bin
+bin.rec &lt;- which(sizes == 0.775):min((bin.90.plus-1))
+bin.frs.minus &lt;- min(bin.90.plus):(min(bin.90.plus)+1)
+
+# and the right bins for the recruits
+
+# Now make a new object
+g.proper &lt;- data.frame(year = mw.per.bin$year)
+g.proper$total.abun.90 &lt;- rowSums(B.per.bin[,bin.90.plus])
+g.proper$total.abun.frs &lt;- rowSums(B.per.bin[,bin.frs.plus])
+g.proper$total.rec.abun &lt;- rowSums(B.per.bin[,bin.rec])
+g.proper$total.frs.minus &lt;- rowSums(B.per.bin[,bin.frs.minus])
+# Propotions in each bin, FRs and
+B.prop.per.bin.90 &lt;- B.per.bin[,bin.90.plus]/g.proper$total.abun.90
+B.prop.per.bin.frs &lt;- B.per.bin[,bin.frs.plus]/g.proper$total.abun.frs
+# Recs
+B.prop.per.bin.rec       &lt;- B.per.bin[,bin.rec]/g.proper$total.rec.abun
+B.prop.per.bin.frs.minus &lt;- B.per.bin[,bin.frs.minus]/g.proper$total.frs.minus
+
+# And the average mw in each of the bins of interest, first for the FRs
+g.proper$mw.frs.plus &lt;-  rowSums(mw.per.bin[,bin.frs.plus] * B.prop.per.bin.frs,na.rm=T)
+g.proper$mw.90.plus &lt;-   rowSums(mw.per.bin[,bin.90.plus] * B.prop.per.bin.90,na.rm=T)
+# and for the rec
+g.proper$mw.recs &lt;-      rowSums(mw.per.bin[,bin.rec] * B.prop.per.bin.rec,na.rm=T)
+g.proper$mw.frs.minus &lt;- rowSums(mw.per.bin[,bin.frs.minus] * B.prop.per.bin.frs.minus,na.rm=T)
+
+g.proper$g.proper &lt;- c(g.proper$mw.frs.plus[2:length(g.proper$mw.frs.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA)
+g.proper$gR.proper&lt;- c(g.proper$mw.frs.minus[2:length(g.proper$mw.frs.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA)
+
+
+g.proper[g.proper$year %in% c(1991,2020),-1] &lt;- NA
+g.proper[g.proper$year %in% c(2019),which(names(g.proper) %in% c(&quot;g.proper&quot;,&quot;gR.proper&quot;))] &lt;- NA
+
+# Fill in the mean for the missing years
+g.proper$g.proper[g.proper$year %in% c(1991,2019,2020,2022)] &lt;- median(g.proper$g.proper,na.rm=T)
+g.proper$gR.proper[g.proper$year %in% c(1991,2019,2020,2022)] &lt;- median(g.proper$gR.proper,na.rm=T)
+
+
+g.proper</code></pre>
+<pre><code>##    year total.abun.90 total.abun.frs total.rec.abun total.frs.minus mw.frs.plus
+## 1  1991            NA             NA             NA              NA          NA
+## 2  1992      1604.662       1077.622     793.416505      527.040392    16.20332
+## 3  1993      2359.992       1474.660     465.516022      885.332433    18.85280
+## 4  1994      4217.847       3439.441     369.896613      778.405881    23.03741
+## 5  1995      4036.352       3702.498     163.978668      333.853766    20.91631
+## 6  1996      1908.179       1503.402     266.018941      404.777261    20.10757
+## 7  1997      2828.988       2519.402     197.392902      309.585783    23.46902
+## 8  1998      2530.616       2369.030       6.575777      161.586374    19.56745
+## 9  1999      4653.751       4524.869    1173.310593      128.882100    25.86948
+## 10 2000      6155.317       4575.751    2430.063056     1579.565231    31.63040
+## 11 2001      8878.655       7127.760    1556.621577     1750.895544    20.32838
+## 12 2002      8004.023       5558.902    1103.718756     2445.120588    20.15351
+## 13 2003     10323.321       8814.606     132.304124     1508.715554    20.44570
+## 14 2004      6638.931       6505.550       4.909610      133.380696    18.45901
+## 15 2005      6633.244       6617.154      18.161916       16.090725    18.97151
+## 16 2006      4125.594       3684.581     119.821128      441.013098    20.09839
+## 17 2007      3010.059       3006.802      14.869310        3.256884    24.07544
+## 18 2008      1771.847       1754.262      39.130080       17.584701    24.54277
+## 19 2009      3576.111       1545.529    2376.647578     2030.581889    23.80393
+## 20 2010      4547.466       2589.667    2571.264032     1957.798721    17.27467
+## 21 2011      3720.130       2189.549     935.790192     1530.581120    16.30661
+## 22 2012      3902.470       2857.047     358.906652     1045.423293    16.78867
+## 23 2013      3249.098       3003.352      98.016188      245.746707    20.37982
+## 24 2014      3009.848       2806.148     524.106878      203.700810    23.31301
+## 25 2015      2716.223       2328.031     842.908115      388.191951    24.99788
+## 26 2016      3012.045       2433.163     519.430012      578.881900    24.01895
+## 27 2017      1616.625       1442.097      78.805175      174.528707    21.47725
+## 28 2018      1824.940       1602.030     131.618785      222.909335    22.33296
+## 29 2019      2238.563       2048.636     124.461066      189.927360    31.71308
+## 30 2020            NA             NA             NA              NA          NA
+## 31 2021      2000.258       1811.532     133.723161      188.726918    25.69484
+## 32 2022      1958.323       1804.848      98.924158      153.475234    28.68427
+##    mw.90.plus  mw.recs mw.frs.minus  g.proper gR.proper
+## 1          NA       NA           NA 1.1084881  1.493567
+## 2    14.21981 6.559898    10.164199 1.3258119  1.950224
+## 3    16.57961 8.370158    12.793268 1.3895020  1.409973
+## 4    20.96385 8.024240    11.801696 0.9977321  1.314592
+## 5    20.05878 6.304200    10.548601 1.0024327  1.566573
+## 6    17.93717 6.632632     9.875992 1.3084015  1.615413
+## 7    22.07325 7.168165    10.714441 0.8864782  1.369295
+## 8    18.94475 7.447264     9.815332 1.3655219  1.535985
+## 9    25.46983 6.543043    11.438885 1.2418771  2.123388
+## 10   27.07877 9.114663    13.893421 0.7507126  1.131210
+## 11   18.35284 6.753734    10.310598 1.0981138  1.672400
+## 12   17.44734 7.367122    11.294941 1.1718522  1.691377
+## 13   19.27870 9.384568    12.460583 0.9574816  1.094216
+## 14   18.29446 7.787253    10.268747 1.0370086  1.243342
+## 15   18.94898 6.935488     9.682217 1.0606583  1.888291
+## 16   19.34988 8.753487    13.096221 1.2442164  1.452944
+## 17   24.06315 7.945934    12.718330 1.0199318  1.184601
+## 18   24.39261 6.350081     9.412763 0.9758664  1.706144
+## 19   16.43945 7.131341    10.834154 1.0508055  1.309340
+## 20   13.85745 6.464166     9.337347 1.1767395  1.316997
+## 21   13.10019 5.562331     8.513290 1.2815597  1.779686
+## 22   14.94307 7.230840     9.899201 1.3638309  1.501374
+## 23   19.65950 6.920784    10.856195 1.1858397  1.463648
+## 24   22.42078 6.658327    10.129589 1.1149426  1.719375
+## 25   23.06141 8.034940    11.448163 1.0415212  1.413514
+## 26   21.58556 7.892736    11.357501 0.9949824  1.298728
+## 27   20.26523 7.194595    10.250520 1.1020336  1.485760
+## 28   20.91075 7.526270    10.689443 1.5165923  1.746578
+## 29   30.13772 9.008245    13.145219 1.1084881  1.493567
+## 30         NA       NA           NA 1.1084881  1.493567
+## 31   24.22051 7.007662    10.068879 1.1842969  1.729460
+## 32   27.38608 8.144271    12.119474 1.1084881  1.493567</code></pre>
+<pre class="r"><code>surv.years &lt;- unique(surv.dat$Sab$year)
+# But not 2020...
+#surv.years &lt;- surv.years[surv.years != 2020]
+# The w.yst object is exactly proportional to mod.dat$I, there is an offset, but given I need proportions I think this object is perfectly fine to use.
+# SO this mw.per.bin is taking the stratified biomass and dividing it by the stratified numbers in each bin, which gives us the MW in that bin. 
+# There is probably a MW object out there somewhere with this in it, but it should just be the same thing as this.
+mw.per.bin &lt;- data.frame(mw.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst/survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020))
+B.per.bin &lt;- data.frame(B.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020))
+#reorder them
+mw.per.bin &lt;- mw.per.bin[order(mw.per.bin$year),]
+B.per.bin &lt;- B.per.bin[order(B.per.bin$year),]
+# Get the right bins for the FRs
+max.bin &lt;- length(sizes)
+bin.frs.plus &lt;- which(sizes == 1.025):max.bin
+bin.90.plus &lt;- which(sizes == 0.925):max.bin
+bin.rec &lt;- which(sizes == 0.775):min((bin.90.plus-1))
+bin.frs.minus &lt;- min(bin.90.plus):(min(bin.90.plus)+1)
+
+# and the right bins for the recruits
+
+# Now make a new object
+g.proper &lt;- data.frame(year = mw.per.bin$year)
+g.proper$total.abun.90 &lt;- rowSums(B.per.bin[,bin.90.plus])
+g.proper$total.abun.frs &lt;- rowSums(B.per.bin[,bin.frs.plus])
+g.proper$total.rec.abun &lt;- rowSums(B.per.bin[,bin.rec])
+g.proper$total.frs.minus &lt;- rowSums(B.per.bin[,bin.frs.minus])
+# Propotions in each bin, FRs and
+B.prop.per.bin.90 &lt;- B.per.bin[,bin.90.plus]/g.proper$total.abun.90
+B.prop.per.bin.frs &lt;- B.per.bin[,bin.frs.plus]/g.proper$total.abun.frs
+# Recs
+B.prop.per.bin.rec       &lt;- B.per.bin[,bin.rec]/g.proper$total.rec.abun
+B.prop.per.bin.frs.minus &lt;- B.per.bin[,bin.frs.minus]/g.proper$total.frs.minus
+
+# And the average mw in each of the bins of interest, first for the FRs
+g.proper$mw.frs.plus &lt;-  rowSums(mw.per.bin[,bin.frs.plus] * B.prop.per.bin.frs,na.rm=T)
+g.proper$mw.90.plus &lt;-   rowSums(mw.per.bin[,bin.90.plus] * B.prop.per.bin.90,na.rm=T)
+# and for the rec
+g.proper$mw.recs &lt;-      rowSums(mw.per.bin[,bin.rec] * B.prop.per.bin.rec,na.rm=T)
+g.proper$mw.frs.minus &lt;- rowSums(mw.per.bin[,bin.frs.minus] * B.prop.per.bin.frs.minus,na.rm=T)
+
+g.proper$g.proper &lt;- c(g.proper$mw.frs.plus[2:length(g.proper$mw.frs.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA)
+g.proper$gR.proper&lt;- c(g.proper$mw.frs.minus[2:length(g.proper$mw.frs.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA)
+
+
+g.proper[g.proper$year %in% c(1991,2015,2020),-1] &lt;- NA
+g.proper[g.proper$year %in% c(2014,2019),which(names(g.proper) %in% c(&quot;g.proper&quot;,&quot;gR.proper&quot;))] &lt;- NA
+
+# Fill in the mean for the missing years
+g.proper$g.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] &lt;- median(g.proper$g.proper,na.rm=T)
+g.proper$gR.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] &lt;- median(g.proper$gR.proper,na.rm=T)
+
+
+g.proper</code></pre>
+<pre><code>##    year total.abun.90 total.abun.frs total.rec.abun total.frs.minus mw.frs.plus
+## 1  1986            NA             NA             NA              NA     0.00000
+## 2  1987            NA             NA             NA              NA     0.00000
+## 3  1988            NA             NA             NA              NA     0.00000
+## 4  1989            NA             NA             NA              NA     0.00000
+## 5  1990            NA             NA             NA              NA     0.00000
+## 6  1991            NA             NA             NA              NA          NA
+## 7  1992      321.1983       219.9592       79.21433       101.23904    22.91735
+## 8  1993      302.7409       226.3505       98.97537        76.39040    21.82642
+## 9  1994      291.2252       227.2719       70.54022        63.95329    21.61099
+## 10 1995      596.2894       474.6236      108.55086       121.66576    22.98625
+## 11 1996      537.9602       426.1045       83.17056       111.85574    20.70478
+## 12 1997      734.0342       607.2265      126.32062       126.80769    23.73804
+## 13 1998      596.5510       486.5376       92.90034       110.01339    19.17797
+## 14 1999      383.7390       329.3908      112.93703        54.34824    23.21768
+## 15 2000      829.6427       575.0559      212.10767       254.58686    23.55166
+## 16 2001      772.5982       602.8141      104.14210       169.78418    26.68646
+## 17 2002      890.9680       730.6480       97.39174       160.31999    26.04376
+## 18 2003      698.8204       563.0477      123.87178       135.77270    23.62558
+## 19 2004     1064.4412       900.1452      146.57038       164.29592    37.15898
+## 20 2005     1089.8375       798.0606      176.06986       291.77692    29.17858
+## 21 2006      883.5235       718.8096       78.96319       164.71393    23.95520
+## 22 2007      918.2568       768.5225       86.21126       149.73431    24.38937
+## 23 2008     1107.3121      1017.3792       65.08050        89.93288    26.21275
+## 24 2009      868.6337       791.3232       40.43272        77.31048    25.16298
+## 25 2010      850.0571       773.3153      103.20769        76.74174    20.43496
+## 26 2011      594.4095       533.5014       61.16579        60.90805    26.65914
+## 27 2012      619.8871       539.4414       61.94185        80.44568    22.27362
+## 28 2013      581.9257       513.6694       39.31221        68.25629    23.96215
+## 29 2014      609.8016       540.3558       37.03281        69.44579    21.58746
+## 30 2015            NA             NA             NA              NA          NA
+## 31 2016      521.8526       470.4701       76.72732        51.38247    25.90118
+## 32 2017      666.1290       578.7822      137.89136        87.34681    24.36051
+## 33 2018      655.8863       570.6800      146.49476        85.20621    22.04371
+## 34 2019      477.2569       423.0206      166.32061        54.23633    22.93044
+## 35 2020            NA             NA             NA              NA          NA
+## 36 2021      245.7507       217.2380      123.20260        28.51266    20.19864
+## 37 2022      231.8589       214.6089      100.91906        17.25006    25.06041
+##    mw.90.plus  mw.recs mw.frs.minus  g.proper gR.proper
+## 1     0.00000 0.000000     0.000000       NaN       NaN
+## 2     0.00000 0.000000     0.000000       NaN       NaN
+## 3     0.00000 0.000000     0.000000       NaN       NaN
+## 4     0.00000 0.000000     0.000000       NaN       NaN
+## 5     0.00000 0.000000     0.000000       NaN       NaN
+## 6          NA       NA           NA 1.1152058  1.461933
+## 7    18.68576 6.092106     9.491909 1.1680780  1.460454
+## 8    18.56401 5.858769     8.897241 1.1641337  1.720100
+## 9    19.07826 6.704098    10.077668 1.2048394  1.554169
+## 10   20.42211 7.101713    10.419299 1.0138413  1.463412
+## 11   18.56064 6.847209    10.392734 1.2789450  1.450585
+## 12   21.35306 7.172190     9.932458 0.8981366  1.340793
+## 13   17.41467 6.402690     9.616425 1.3332254  1.380653
+## 14   21.18138 5.594195     8.839896 1.1119040  2.046386
+## 15   19.83746 7.958453    11.447883 1.3452559  1.543351
+## 16   23.52112 8.602522    12.282686 1.1072499  1.279233
+## 17   23.33763 7.299974    11.004633 1.0123383  1.583744
+## 18   21.28163 7.978426    11.561289 1.7460589  1.583270
+## 19   33.37325 8.370591    12.632000 0.8743104  1.389558
+## 20   24.48076 8.068559    11.631421 0.9785317  1.398533
+## 21   21.59296 8.018007    11.284149 1.1295056  1.512452
+## 22   22.38980 8.243311    12.126850 1.1707452  1.422165
+## 23   25.03596 7.775625    11.723350 1.0050736  1.372455
+## 24   23.87322 7.616508    10.671698 0.8559784  1.264943
+## 25   19.45991 6.242200     9.634449 1.3699522  1.742003
+## 26   25.04166 7.604880    10.873929 0.8894626  1.282210
+## 27   20.64851 6.711279     9.751050 1.1604783  1.454869
+## 28   22.29680 6.448782     9.764033 0.9681867  1.506016
+## 29   20.23505 7.077343     9.711966 1.1152058  1.461933
+## 30         NA       NA           NA 1.1152058  1.461933
+## 31   24.35205 7.340497    10.167807 1.0003476  1.631558
+## 32   22.73664 8.295420    11.976447 0.9695239  1.225719
+## 33   20.50092 6.440484    10.167853 1.1185076  1.743084
+## 34   21.60036 6.695697    11.226303 1.1152058  1.461933
+## 35         NA       NA           NA 1.1152058  1.461933
+## 36   18.93391 5.495384     9.297989 1.3235726  1.880505
+## 37   23.96479 5.764135    10.334099 1.1152058  1.461933</code></pre>
 </div>
 
 
