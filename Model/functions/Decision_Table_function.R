@@ -106,6 +106,7 @@ decision.table <- data.frame(catch = rep(NA,n.catch.scenarios), exploit = rep(NA
                              Biomass = rep(NA,n.catch.scenarios),per.diff = rep(NA,n.catch.scenarios), B.change = rep(NA,n.catch.scenarios), 
                              prob.decline = rep(NA,n.catch.scenarios))
 
+B.obj <- NULL
 for(i in 1:n.catch.scenarios) 
 {
   #browser()
@@ -119,6 +120,7 @@ for(i in 1:n.catch.scenarios)
   Bst <- (exp(-ms))*gs*(Bs.tot-adj.catch.scenarios[i]) 
   Rst <- (exp(-ms))*gRs*(Rs.tot) 
   B2 <- Bst + Rst
+  B.obj[[i]] <- data.frame(B2 = B2,scenario = rep(catch.scenarios[i],length(B2)))
   # We don't put the adjustment for the Post Survey Landings in the exploitation calculation, as this exploitation is for the following calendar year 
   exploit <- 100* (catch.scenarios[i]/(B2+ catch.scenarios[i])) 
   B.diff <- B2 - exp(B.log) 
@@ -203,9 +205,9 @@ if(!is.null(RR.TRP))
  if(decision.table$Biomass[1] > TRP) ndt <- c(ndt,"Probability exploitation is below RR @ TRP","TRP Removal Reference (%)")
 }
     
-
+B.obj <- do.call("rbind",B.obj)
 names(decision.table) <- ndt
 
-return(list(table = decision.table,Biomass= B2))
+return(list(table = decision.table,Biomass= B.obj))
 
 } # end function

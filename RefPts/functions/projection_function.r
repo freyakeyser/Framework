@@ -349,7 +349,7 @@ if(!is.null(HCR.sim))
           {
             pick <- which(g.res$pred.dat$SSB == round(SSB.init/100)* 100)
             g[j,nn,i] <- rlnorm(1,g.res$pred.dat$g.log[pick],g.res$pred.dat$se[pick]) 
-          } # end if(SSB.for.rec >= min.SSB & SSB.for.rec <= max.SSB)
+          } # end if(SSB.init >= min.SSB & SSB.init <= max.SSB)
         } # end if(rec.mod$type %in% c("lm",'glm','gam'))
         if(g.mod$type == 'cor')
         {

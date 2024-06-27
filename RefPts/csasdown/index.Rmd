@@ -1,8 +1,8 @@
 ---
-title: ""
+title: "Shoulder Bank Reference Points"
 french_title: "En francais"
 author: "DK"
-author_list: "Keith, D., Keyser, F., Raphaél McDonald, Pearo Drew, T. "
+author_list: "Keith, D., Keyser, F., McDonald R, Pearo Drew, T., Sameoto, J.A.  "
 address: |
   Bedford Institute of Oceanography\
      Fisheries and Oceans Canada, 1 Challenger Drive\
@@ -22,12 +22,9 @@ cat_no: ""
 french_region: "Région des Maritimes"
 citation_other_language: "Keith, D., Keyser, F., McDonald, R., et Pearo Drew, T.  L'évaluation de petoncles dans les zones de pêche"
 abstract: |
-  Here is the abstract text. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-  Start new paragraphs after a blank line and with 2 spaces indent. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). Index based Limit Reference Points (LRPs) will be proposed for each of these SFA's and model based LRPs will be proposed for the two areas with approved stock assessment models (SFA 25A and SFA 26A). The biomass indicies used for the development of the LRPs were approved during the first of three meetings which focused on the data inputs for each of these SFAs. The stock assessment models for SFA 25A and SFA 26A were approved at ths second of the three meetings making up this Framework proecess.  In addition to the LRPs, candidate Removal Reference (RR) and Upper Stock Reference (USR) Points will be provided.
 french_abstract: |
-  Voici le texte du résumé. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-  
-  Commencez les nouveaux paragraphes après une ligne blanche et avec un retrait de 2 espaces. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  NULL
   
 header: "Draft working paper --- Do not cite or circulate" # or "" to omit
 output:
@@ -115,16 +112,22 @@ opts_chunk$set(
 
 ```{r load-libraries, echo = FALSE, cache = FALSE, message = FALSE, results = 'hide', warning = FALSE}
 # add other packages here:
-library(dplyr)
+library(collapse)
 library(readr)
 library(tibble)
 library(csasdown)
 require(rosettafish)
 library(sf)
-library(SEBDAM)
 library(tidyverse)
+library(knitr)
+library(tinytex)
+library(kableExtra)
+library(dplyr)
+library(SEBDAM)
 library(ggthemes)
 library(cowplot)
+library(forecast)
+library(zoo)
 
 
 funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
@@ -164,43 +167,50 @@ if(!fr=="") language <- "french"
 #   nickname <- paste0(nickname, "_fr")
 # }
 
+# Here's where I'm sticking the figures
 mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
+fun.loc <-"D:/Github/Framework/RefPts/functions/"
 rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
-num.knots <- 20 
-init.m <- 0.2 
-qR <- 0.33
-g.mod <- 'g_original'
-vary.q <- T
+
+theme_set(theme_few(base_size = 22))
+u.colors <- c("#FFD500","#005BBB")
+
+
+
+# Functions we need to source for this to all work
+source(paste0(fun.loc,"projection_function.r"))
+source(paste0(fun.loc,"Density_dependence_function.R"))
+source(paste0(fun.loc,"breakpoint_function.R"))
+source(paste0(fun.loc,"correlation_function.R"))
+
+# Model run parameters
+years <- 1994:2022
 R.size <- "75"
 FR.size <- "90"
-years <- 1994:2022
-mod.select <- "SEAM"
+num.knots <- 20 # Going to test 10, 15, and 20
+qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+# Various explorations of the g models.
 
-# scenario.10 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",10,"_knots_",'g_original')
-# scenario.20 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",20,"_knots_",'g_original')
-# 
-# # SEAM results
-# sab.10 <- readRDS(paste0(mod.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
-# #sab.20 <- readRDS(paste0(mod.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
-# #bbn.10 <- readRDS(paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE.Rds"))
-# bbn.20 <- readRDS(paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
-# 
-# # Prediction evaluation results
-# bbn.pe <- readRDS(paste0(rp.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
-# 
-# 
-# # Bring in the mesh and prediction grids...
-# 
-# #bbn.mesh.10 <- readRDS(paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_mesh.Rds"))
-# #bbn.grid.10 <- readRDS(paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_predict_grid.Rds"))
-# bbn.mesh.20 <- readRDS(paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_mesh.Rds"))
-# bbn.grid.20 <- readRDS(paste0(mod.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_predict_grid.Rds"))
-# 
-# sab.mesh.10 <- readRDS(paste0(mod.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,"_mesh.Rds"))
-# sab.grid.10 <- readRDS(paste0(mod.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,"_predict_grid.Rds"))
-# #sab.mesh.20 <- readRDS(paste0(mod.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.20,"_mesh.Rds"))
-# #sab.grid.20 <- readRDS(paste0(mod.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.20,"_predict_grid.Rds"))
-# 
-# theme_set(theme_few(base_size = 16))
+# # If running with SEBDAM this is what ya use.
+
+bbn.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
+sab.select <- paste0("Sab_SS_model/R_",R.size,"_FR_",FR.size,"/Sable_SSmodel_results.RData")
+bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/R_75_FR_90/SEAM_",bbn.select,"/")
+sab.plot.loc <- paste0(rp.loc,"Figures/Sab/R_75_FR_90/BSSM/")
+
+bbn.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",bbn.select,".Rds"))
+
+pred.proc.seam <- get_processes(bbn.mod)
+bbn.mod$obj$env$data$g <- bbn.mod$obj$env$data$gI
+bbn.mod$report$totR <-c(bbn.mod$report$totR,NA)
+
+# Now load in the Sable model object, we're using BSSM here recall
+load(paste0(mod.loc,"Results/",sab.select))
+sab.mod <- DD.out
+# Finally, grab the raw survey data so we can use those indices for this.
+
+load(paste0(rp.loc,"Data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata"))
+
+
 
 ```

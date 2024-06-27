@@ -36,7 +36,7 @@ $$ MW_{[100-105)+,t+1} = \sum_{i=[100:105)}^{SH_{max}}{MW_{i,t+1} \frac{ N_{i,t+
 The ratio of these values provides the growth estimate for fully-recruited scallop in year $t$
 
 $$ g_{fr,t} = \frac{MW_{[100-105)+,t+1}}{MW_{[90-95)+,t}} $$
-When used in the model, estimates for the terminal year and years in which data for this calculation are unavailable are required, the median growth rate is assumed for these situations.
+When used in the model, estimates for the terminal year and years in which data for this calculation are unavailable are required, the median growth rate is assumed for these situations. Given this method requires two years of information, in years a survey does not occur results in two years that use the median growth rate is used for the models. In areas in which survey's do not occur annually, this method would not be a feasible means of estimating growth.
 
 <!-- I'm not running this because it is slow and I think we've settled on a method, uncomment to run the code --->
 
@@ -166,7 +166,7 @@ When used in the model, estimates for the terminal year and years in which data 
 
 <!-- g.proper <- rbind(g.proper.sab,g.proper.bbn) -->
 
-<!-- saveRDS(g.proper,file = "D:/Framework/SFA_25_26_2024/Model/Data/new_growth_data_temp.Rds") -->
+<!-- saveRDS(g.proper,file = "D:/Framework/SFA_25_26_2024/Model/Data/revised_growth_data.Rds") -->
 
 <!-- ``` -->
 
@@ -174,7 +174,7 @@ When used in the model, estimates for the terminal year and years in which data 
 
 ```{r g-plt,echo=F,fig.cap="Growth rate of fully recruited (yellow circles) and recruit scallop (blue squares) in SFA 25A (top panel) and SFA 26A (bottom panel)",warning=F,fig.dim=c(8,10)}
 
-g.proper <- readRDS(file = "D:/Framework/SFA_25_26_2024/Model/Data/new_growth_data_temp.Rds")
+g.proper <- readRDS(file = "D:/Framework/SFA_25_26_2024/Model/Data/revised_growth_data.Rds")
 
 
 ggplot(g.proper) + geom_point(aes(x=year,y=g.proper),color="#FFD500",shape =21,size=3,fill="#FFD500") + 
@@ -183,8 +183,5 @@ ggplot(g.proper) + geom_point(aes(x=year,y=g.proper),color="#FFD500",shape =21,s
                    geom_line(aes(x=year,y=gR.proper),color="#005BBB",linewidth=2) + 
                    facet_wrap(~bank,nrow=2,) + ylim(c(0,NA)) +
                    theme_few(base_size = 16) + ylab("Growth rate")
-  
-
-
 ```
 
