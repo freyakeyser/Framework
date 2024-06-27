@@ -84,3 +84,10 @@ markdown/
 #figures
 *.png
 .png
+
+#cache
+.rdx
+.rdb
+*.rdb
+*.rdx
+*.pptx

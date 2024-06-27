@@ -1,3 +1,6 @@
+## This is not used in Res doc anywhere. Just FK trying to understand the condition calculations before developing new method.
+
+require(dplyr)
 # compare cf approaches
 for(b in  c("Mid", "Ban", "Sab", "BBn", "BBs")){
   original <- cf.data[[b]]$CFyrs
@@ -5,7 +8,7 @@ for(b in  c("Mid", "Ban", "Sab", "BBn", "BBs")){
   original$year <- as.numeric(original$year)
   predicted <- data.frame(year=survey.obj[[b]]$model.dat$year, CF=survey.obj[[b]]$model.dat$CF, type="predicted")
   comb <- full_join(original, predicted) %>%
-    select(year, type, CF) %>%
+    dplyr::select(year, type, CF) %>%
     pivot_wider(id_cols = year, values_from = CF, names_from=type)
 
   print(ggplot() + geom_text(data=comb, aes(original, predicted, label=year)) +
@@ -48,7 +51,7 @@ test$CFyrs
 require(ggplot2)
 require(patchwork)
 
-load("C:/Users/keyserf/Documents/temp_data/testing_results_framework.RData")
+load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90.Rdata")
 
 before <- survey.obj
 beforecf <- cf.data

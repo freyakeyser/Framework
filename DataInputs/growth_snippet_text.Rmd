@@ -1,0 +1,37 @@
+---
+title: "Growth"
+author: "David Keith"
+date: "2024-03-19"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Growth
+
+Annual observed growth rates for recruit and fully-recruited size classes are calculated using a combination of the estimated meat weights in each shell height bin (i.e., each 5 mm shell height bin) and the expected growth of the scallop using the vonB relationship. The shell height bins are used to summarize the number of scallop in 5 mm bins, for the below calculations the scallop in each shell height bin are assumed to be at the mid-point of each shell height bin (e.g., for scallop in the 85-90 mm shell height category, the scallop are assumed to be 87.5 mm in height). For the recruit sized scallops (75-89 mm) the meat weight ($MW_{rec,t}$) was estimated using the weighted average of the meat weight in each shell height bin in each year (there are three recruit shell height bins, 75-80, 80-85, and 85-90) which was calculated using the current year meat-weight shell height relationship. 
+
+$$ MW_{rec,t} = \sum_{i=[75:80)}^{[85:90)}{MW_{i,t} \frac{N_{i,t}}{N_{rec,tot,t}}}$$
+Here, $MW_{i,t}$ is the meat weight in the $i^th$ shell height bin in year $t$, $N_{i,t}$ is the estimated abundance in this shell height bin, and $N_{rec,tot,t}$ is the total estimated abundance of recruit scallop in year $t$. Based on the vonB relationship, the majority of recruit sized scallop will grow to be between 90 and 100 mm in size in the following year.  The average MW of scallop observed in the survey in the following year in the 90-100 mm size classes is calculated analogously
+
+
+$$ MW_{[90-100),t+1} = \sum_{i={[90:95)}}^{[95:100)}{MW_{i,t} \frac{N_{i,t}}{N_{[90-100),tot,t}}}$$
+The ratio of these values provides the growth estimate for the recruit sized scallop in a given year.
+
+$$ g_{rec,t} = \frac{MW_{[90-100),t+1}}{MW_{rec,t}} $$
+Fully-recruited growth is calculated in a similar manner.  First the average meat weight of the fully-recruited scallop ($ MW_{fr,t}$) in year $t$ is calculated
+
+
+$$ MW_{fr,t} = \sum_{i=[90:95)}^{SH_{max}}{MW_{i,t} \frac{N_{i,t}}{N_{fr,tot,t}}}$$
+In the following year the average meat weight of these scallop are again calculated.  Given the 90 mm scallop are expected to grow into the 100-105 mm scallop shell height bin, only scallop in the shell height bins of 100 mm and above are used for the MW calculation in the following year.
+
+$$ MW_{100+,t+1} = \sum_{i=[100:105)}^{SH_{max}}{MW_{i,t} \frac{ N_{i,t}}{N_{100+,tot,t}}}$$
+The ratio of these values provides the growth estimate for fully-recruited scallop in a given year.
+
+$$ g_{fr,t} = \frac{MW_{[100+),t+1}}{MW_{fr,t}} $$
+When used in the model, estimates for the terminal year and years in which data for this calculation are unavailable are required, the median growth rate is assumed for these situtations.
+

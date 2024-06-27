@@ -1,14 +1,13 @@
 # This script grabs all the Port sampling data for each year, converts it to long format data, merges it with the appropriate fishery meta-data giving
 # us the beautiful end result of having all the Port Sampling data tied to fishery information and being ready to analyze...
-# What is found in the port sampling data is the individual meat weights of scallop measured.  The port sampling "sample" is different 
+# What is found in the port sampling data is the individual meat weights of scallop measured.  The port sampling "sample" is different
 # from the sample used to calculated the meat count, which if fine.  What we have here is simply a sample of the catch from each day
 # and there is no reason to assume it isn't a represenative sample so we can track the size of scallop meat being landed for the last decade
 # While not perfect information it certainly is useful information!!
 
-# Frist grab the directory to work from 
+# Frist grab the directory to work from
 direct <- "Y:/Offshore/Assessment/"
 direct_fns <- "C:/Users/keyserf/Documents/Github/"
-direct_fns <- "D:/Github/Freya/"
 # Grab the years of port sampling data.  Note that Ginette says the Port Sampling data goes all the way back to 1996
 # I haven't a clue where that data is, but would certainly be interesting to compare the last 20 years of data!!
 years <- 2006:2022
@@ -31,7 +30,7 @@ source(paste(direct_fns,"Assessment_fns/Survey_and_OSAC/shwt.lme.r",sep="")) # T
 
 # And we need the Offshore Scallop fleet name file so we can link the fishery data to these names
 off.fleet <- read.csv(paste0(direct,"Data/Offshore_fleet.csv"))
-
+logs_and_fish(loc = "offshore", year = 2006:2022, get.local = T, get.marfis = F, direct=direct)
 
 ################  Section 1, processing the port sampling meat weight information  --  Section 1 ############################################################
 ################  Section 1, processing the port sampling meat weight information  --  Section 1 ############################################################
@@ -45,84 +44,95 @@ dat <- NULL
 # Run this for all years we have data, this takes about 10 minutes...
 for(i in 1:length(years))
 {
-  # This identifies all the files that for each year of Port Sampling, this should include the vast majority of trips each year, probably would be useful
-  # to have someone check if these are exhaustive lists or not...
-  if(years[i]==2006) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/origportsamplesfiles"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2007) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/OriginalPortSamples2007"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2008) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/OrigianlPortSamples2008"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2009) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/originals"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]==2010) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/Originals2010"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]>2010 & years[i]<2018) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/JoansOriginals"),pattern = "\\.xls", recursive = T, ignore.case = T)
-  }
-  if(years[i]>2017) {
-    files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/JoansOriginals"),pattern = "\\.csv", recursive = T, ignore.case = T)
-  }
-  if(years[i] < 2018) files2 <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.xls", ignore.case = T)
-  if(years[i] > 2017) files2 <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.csv", ignore.case = T)
-  print(years[i])
-  # 
-  if(years[i] < 2018) {
-    files <- gsub(x = tolower(files), pattern=".xlsx", replacement="", fixed=T)
-    files <- gsub(x = tolower(files), pattern=".xls", replacement="", fixed=T)
-    files2 <- gsub(x = tolower(files2), pattern=".xlsx", replacement="", fixed=T)
-    files2 <- gsub(x = tolower(files2), pattern=".xls", replacement="", fixed=T)
-  }
-  if(years[i] > 2017) {
-    files <- gsub(x = tolower(files), pattern=".csv", replacement="", fixed=T)
-    files2 <- gsub(x = tolower(files2), pattern=".csv", replacement="", fixed=T)
-  }
+  # # This identifies all the files that for each year of Port Sampling, this should include the vast majority of trips each year, probably would be useful
+  # # to have someone check if these are exhaustive lists or not...
+  # if(years[i]<2006) {
+  #   files <- list.files(path = paste0(direct,"Data/Archive/PortSampling/", years[i], "/"),pattern = "\\.txt", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2006) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/origportsamplesfiles"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2007) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/OriginalPortSamples2007"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2008) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/OrigianlPortSamples2008"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2009) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/originals"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]==2010) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/Originals2010"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]>2010 & years[i]<2018) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/JoansOriginals"),pattern = "\\.xls", recursive = T, ignore.case = T)
+  # }
+  # if(years[i]>2017) {
+  #   files <- list.files(path = paste0(direct,"Data/PortSampling/PS", years[i], "/JoansOriginals"),pattern = "\\.csv", recursive = T, ignore.case = T)
+  # }
+  # if(years[i] < 2018) files2 <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.xls", ignore.case = T)
+  # if(years[i] > 2017) files2 <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.csv", ignore.case = T)
+  # print(years[i])
+  # #
+  #
+  # # if(years[i] <2006){
+  # #
+  # # }
+  # if(years[i] < 2018 & years[i]>2005) {
+  #   files <- gsub(x = tolower(files), pattern=".xlsx", replacement="", fixed=T)
+  #   files <- gsub(x = tolower(files), pattern=".xls", replacement="", fixed=T)
+  #   files2 <- gsub(x = tolower(files2), pattern=".xlsx", replacement="", fixed=T)
+  #   files2 <- gsub(x = tolower(files2), pattern=".xls", replacement="", fixed=T)
+  # }
+  # if(years[i] > 2017) {
+  #   files <- gsub(x = tolower(files), pattern=".csv", replacement="", fixed=T)
+  #   files2 <- gsub(x = tolower(files2), pattern=".csv", replacement="", fixed=T)
+  # }
+  #
+  # if(any(nchar(files)>8)) files <- str_sub(string = files,-8)
+  #
+  # # names that are in files2 but not in files
+  # files2[which(!files2 %in% files)]
+  #
+  # # names that are in files but not in files2
+  # files[which(!files %in% files2)]
 
-  if(any(nchar(files)>8)) files <- str_sub(string = files,-8)
-
-  # names that are in files2 but not in files
-  files2[which(!files2 %in% files)]
-
-  # names that are in files but not in files2
-  files[which(!files %in% files2)]
-  
 # 2013, COME0613 # this trip doesn't exist?
-
-  if(years[i] < 2018) files <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.xls", ignore.case = T)
+  if(years[i] < 2006) files <- list.files(path = paste0(direct,"Data/Archive/PortSampling/", years[i], "/"),pattern = "\\.txt", ignore.case = T)
+  if(years[i] < 2018 & years[i]>2005) files <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.xls", ignore.case = T)
   if(years[i] > 2017) files <- list.files(path = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/", years[i], "/"),pattern = "\\.csv", ignore.case = T)
   num.files <- length(files)
-  
+
   for(j in 1:num.files)
   {
     print(index)
     index <- index + 1
     #This will pull the data from the Port Sampling file.
-    if(years[i] < 2018) dat[[index]] <- read_excel(path=paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/",years[i],"/", files[j]), sheet = 1)
+    if(years[i] < 2006) dat[[index]] <- read.csv(paste0(direct,"Data/Archive/PortSampling/", years[i], "/", files[j]), sep = "\t", header = F)
+    if(years[i] < 2018 & years[i]>2005) dat[[index]] <- read_excel(path=paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/",years[i],"/", files[j]), sheet = 1)
     if(years[i] > 2017) dat[[index]] <- read.csv(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/",years[i],"/", files[j]))
     # # Make all the variable names lower case as the rest of this works...
     names(dat[[index]]) <- tolower(names(dat[[index]]))
-    # Remove the black columns
-    dat[[index]] <- dat[[index]][,-which(names(dat[[index]]) == "space")]
-    dat[[index]] <- melt(dat[[index]],id.vars = c("date","boat","port","id","fished"))
+    # Remove the blank columns
+    remove <- names(dat[[index]])[which(names(dat[[index]]) == "space")]
+    dat[[index]] <- dat[[index]][,!names(dat[[index]]) %in% remove]
+
+    dat[[index]] <- reshape2::melt(dat[[index]],id.vars = c("date","boat","port","id","fished"))
     # And now reorder the data by ID so the samples all stay together and the 0's come at the end so we can chuck those..
     dat[[index]] <- dat[[index]] %>% arrange(desc(value)) # First order the values from biggest to smallest
     dat[[index]] <- dat[[index]] %>% arrange(id) # Now order the ID's from smallest to largest
-    
+
     # Now we can quickly add a sample ID to these in case we want it later...
     samp.ids <- unique(dat[[index]]$id)
-    n.samp.ids <- length(samp.ids) # This is generally the number of days fished from what I've seen, but in case is varies I won't call it that...
+    n.samp.ids <- length(samp.ids) # The first 1-2 digits of the ID is the day of the trip (i.e. 1 = first day, 2 = second day)
+                                    # The last 2 digits decribe the location of the sample in the tub (i.e. middle/top/bottom/front/back etc.)
     for(r in 1:n.samp.ids)
     {
       dat[[index]]$sample_id[dat[[index]]$id == samp.ids[r]] <- 1:nrow(dat[[index]][dat[[index]]$id == samp.ids[r],])
     } # end for(r in 1:n.samp.ids)
     # And now we can chuck all the 0's
     dat[[index]] <- dat[[index]][which(dat[[index]]$value > 0),]
-    
+
   } # end for(j in 1:num.files)
 } # end the for(i in 1:length(years))
 
@@ -138,8 +148,9 @@ port.dat$boat <- toupper(port.dat$boat)
 port.dat$ps.date <- ymd(port.dat$date)
 port.dat$date <- ymd(port.dat$date) # This will get overwritten later with the fishery log date...
 port.dat$ps.fished <- ymd(port.dat$fished)
+#check dates that failed to parse.
 
-#check dates that failed to parse. 
+head(port.dat)
 
 ### Now we can work on merging the data to fishery log information....
 port.dat$year <- year(port.dat$ps.date)
@@ -149,12 +160,12 @@ port.dat$day <- day(port.dat$ps.fished)
 port.dat$ps.fished <- ymd(paste(port.dat$year,port.dat$month,port.dat$day))
 
 save.image(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_raw_data_2022.RData"))
-#load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_raw_data.RData"))
+#load(paste0("C:/Users/keyserf/Documents/temp_data/Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_raw_data_2022.RData"))
 
 ############  Section 2 - Add in teh fishery data to the port sampling...
 # Now bring in the latest fishery data
 logs_and_fish(loc="offshore",year = years,get.marfis = F, direct = direct, direct_fns=direct_fns)
-# If you get any NA's related warnings it may be something is being treated as a Factor in one of the two files.  
+# If you get any NA's related warnings it may be something is being treated as a Factor in one of the two files.
 # This should combine without any warnings so don't ignore warnings here.
 fish.dat<-merge(new.log.dat,old.log.dat,all=T)
 fish.dat$ID<-1:nrow(fish.dat)
@@ -165,8 +176,12 @@ vessel_ids <- as.character(unique(port.dat$boat))
 num.vessels <- length(vessel_ids)
 # I want to add these columns to the port sampling data from the fishery data....
 fish.df.to.add <- data.frame(date = NA, lon= NA,lat=NA,fleet = NA, ves=NA,vrnum=NA, vesid = NA,bank=NA,pro.repwt = NA,
-                             h = NA, m=NA, hm = NA, kg.h = NA, kg.hm = NA, depth = NA)
+                             h = NA, m=NA, hm = NA, kg.h = NA, kg.hm = NA, depth = NA, tripnum=NA)
 port.dat <- data.frame(port.dat,fish.df.to.add)
+
+head(port.dat)
+
+# look at Port Sampling Report xxxxxx .doc files to get totals on bank for 2006
 
 # Run this for each vessel and each day...
 
@@ -178,13 +193,13 @@ for(k in 1:num.vessels)
   print(paste0("k=",k))
   # Get the vessel of interest
   vessel <- na.omit(off.fleet[off.fleet$ID_alt_Port_Sampling == vessel_ids[k], c("Pre_2008_ID","VMS_old_ID","ID")])
-  # Get all the fishery data for that vessel.
-  ves.fish.dat <- fish.dat[fish.dat$vesid %in% vessel | fish.dat$ves %in% vessel | fish.dat$vrnum %in% vessel,]
-  # Get the port sampling data for this vessel 
+  # Get all the fishery data for that vessel, checking all types of identifiers
+  ves.fish.dat <- fish.dat[fish.dat$vesid %in% unlist(vessel) | fish.dat$ves %in% unlist(vessel) | fish.dat$vrnum %in% unlist(vessel),]
+  # Get the port sampling data for this vessel
   ves.port.dat <- port.dat[port.dat$boat == vessel_ids[k],]
   # Get the dates we port sampling data for this vessel
   dates.ps <- unique(ves.port.dat$ps.fished)
-  # Now I've tried this step with using a merge, but the data isn't tidy enough for it, so I'm going for a for loop and stuffing them together 
+  # Now I've tried this step with using a merge, but the data isn't tidy enough for it, so I'm going for a for loop and stuffing them together
   # the slow way... m =1
   #merged.dat <- NULL
   for(m in 1:length(dates.ps))
@@ -192,8 +207,9 @@ for(k in 1:num.vessels)
     print(paste0("m=",m))
     # Now get the fishery data for this vessel and these dates.
     fishery.data.ps <- ves.fish.dat[ves.fish.dat$date %in% dates.ps[m],names(fish.df.to.add)]
+
     # Now we need to take care of fishery data for when we have multiple entries for a vessel day combination
-    if(nrow(fishery.data.ps) > 1)
+    if(nrow(fishery.data.ps) > 1 && (length(unique(fishery.data.ps$bank))==1)) # 2-4 watches
     {
       # Make a temporary object with the first row of fishery data
       tmp <- fishery.data.ps[1,]
@@ -206,17 +222,45 @@ for(k in 1:num.vessels)
       # And pop that back into the fishery data object which is now just a single line of data... hopefully
       fishery.data.ps <- tmp
     } # end if(nrow(fishery.data.ps) > 1) to deal with multiple observations each day.
+
+    # if the trip fished multiple banks in one day, we drop the PS data because we can't reasonably assign to one bank or the other.
+    if(nrow(fishery.data.ps) > 1 && (length(unique(fishery.data.ps$bank))>1)) # 2-4 watches
+    {
+      # Make a temporary object with the first row of fishery data
+      tmp <- fishery.data.ps[1,]
+      # Now add up catch and effort for each watch
+      tmp[,c("pro.repwt","h","m","hm")] <- NA
+      # Find the centroid of the lat's and lon's..  This may/may not be ideal but seems like a legit way to lump the data into a general area fished...
+      tmp[,c("lat","lon")] <- NA
+      # Calculate the effort by day
+      tmp[,c("kg.h","kg.hm")] <- NA
+      tmp$bank <- NA
+      # And pop that back into the fishery data object which is now just a single line of data... hopefully
+      fishery.data.ps <- tmp
+    }
+
     # We then pump this data back into the port sampling data
     if(nrow(fishery.data.ps) > 0) ves.port.dat[ves.port.dat$ps.fished == dates.ps[m],names(fish.df.to.add)] <- fishery.data.ps
   } # End for(m in 1:length(dates.ps)) to sweep through each date...
   final.dat[[vessel_ids[k]]] <- ves.port.dat
-  
+
 } # end for(k in 1:length(num.vessels))
 
 # And unwrap the data, make sure it is the same size as the "port.dat" object, it's the same thing with data filled in...
 port.sampling <- do.call("rbind",final.dat)
 
-# The below list is vessel port sampling that doesn't have fishing logs associated.  Generally these are cases in which the 
+table(port.sampling$year[!(port.sampling$bank %in% "GBa")])
+
+mia <- unique(port.sampling[is.na(port.sampling$bank),c("ves", "vrnum", "vesid", "ps.date", "ps.fished")])
+
+unique(fish.dat[fish.dat$vesid==mia$vesid[1] & fish.dat$year == year(mia$ps.fished[1]),]$date)
+
+unique(fish.dat[fish.dat$vesid==mia$vesid[1] & fish.dat$date == mia$ps.fished[1],])
+
+table(port.sampling$year, port.sampling$bank)
+
+
+# The below list is vessel port sampling that doesn't have fishing logs associated.  Generally these are cases in which the
 # port sampling dates are not matching the fishing logs, for the most part the port sampling dates are transposed by a day (i.e. log says fishing started
 # on the 21, but the port sampling says 20th, I adjust the port sampling information in these cases.)
 # This list should be empty once I've QA/QC'ed
@@ -227,6 +271,9 @@ port.sampling <- do.call("rbind",final.dat)
 #samples.per.vessel.day <- aggregate(fished~boat+date,port.sampling,length)
 #summary(samples.per.vessel.day$fished)
 #quantile(samples.per.vessel.day$fished,probs=seq(0.01,1,by=0.01))
+
+# table(port.sampling$year, port.sampling$bank)
+
 
 # Convert the individual meat weights into a meat count...
 port.sampling$mc <- 500/(port.sampling$meat_weight)
@@ -245,7 +292,7 @@ save.image(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampli
 ################  End Section 1, processing the port sampling meat weight information  --  End Section 1 ##############################################
 
 
-############### Section 2 - GB Port sampling analysis -- Section 2 ############### 
+############### Section 2 - GB Port sampling analysis -- Section 2 ###############
 load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.rData"))
 
 # For the models to come let's center on the day we believe the ASM's arrive on the scence (May 24, 2010 according to Ginette)
@@ -263,8 +310,8 @@ ggplot(gba.dat,aes(fished,meat_weight,colour=fleet)) + geom_point(size=0.2) + ge
 ggplot(gba.dat,aes(year,meat_weight,colour=fleet)) + geom_point(size=0.02) + geom_smooth() + facet_wrap(~ bank)
 
 #windows(11,11)
-ggplot(gba.dat,aes(ps.fished,mc,colour=fleet)) + geom_point(size=0.02) + geom_smooth() 
-theme_bw() + theme(panel.grid=element_blank()) + scale_color_manual(values=c(alpha("blue",0.5),alpha("grey",0.5),alpha("red",0.5))) 
+ggplot(gba.dat,aes(ps.fished,mc,colour=fleet)) + geom_point(size=0.02) + geom_smooth()
+theme_bw() + theme(panel.grid=element_blank()) + scale_color_manual(values=c(alpha("blue",0.5),alpha("grey",0.5),alpha("red",0.5)))
 
 mc.by.year.fleet <- aggregate(mc~year+fleet,gba.dat,median)
 mc.by.year.fleet
@@ -281,11 +328,11 @@ ggplot(gba.dat,aes(mc,fill=fleet)) + geom_histogram() + facet_wrap(~month)+#,sca
 
 # First the simple model, is there a linear trend in meat counts over time...
 mod.1 <- lm(mc~mod.day,gba.dat)
-# quick diagnostics check, can see that overall there is a trend toward smaller scallop, think this would 
+# quick diagnostics check, can see that overall there is a trend toward smaller scallop, think this would
 # be slightly more straightforward to interpret if the date wasn't a date but was numeric...
 summary(mod.1) # SO on May 24 2010 this says the mc was 28.82 and that is has declined by 0.046 every 100 days since...
 
-# The right skew of the data is somewhat evident in the Normal Q-Q plot, given these are strictly positive 
+# The right skew of the data is somewhat evident in the Normal Q-Q plot, given these are strictly positive
 # it might make sense to go glm with a gamma, poisson, or quasipoisson.
 #windows(11,11)
 par(mfrow=c(2,2))
@@ -324,23 +371,23 @@ par(mfrow=c(3,1))
 plot(mod.3$gam,ylim=c(-10,10))
 windows(11,11)
 par(mfrow=c(3,1))
-plot(mod.3$lme) 
+plot(mod.3$lme)
 
-#par(mfrow = c(2,2), mar = c(5,5,2,2))    
+#par(mfrow = c(2,2), mar = c(5,5,2,2))
 E1 <- resid(mod.3$lme, type ="n")
 F1 <- fitted(mod.3$lme)
 
 windows(11,11)
 par(mfrow = c(2,2))
-plot(x = F1,  
-     y = E1, 
-     xlab = "Fitted values", 
+plot(x = F1,
+     y = E1,
+     xlab = "Fitted values",
      ylab ="Residuals",cex=0.01)
 abline(h=0, lty=2)
 
-plot(x = gba.dat$mod.day, 
-     y = E1, 
-     xlab = "time", 
+plot(x = gba.dat$mod.day,
+     y = E1,
+     xlab = "time",
      ylab = "Residuals",cex=0.01)
 abline(h = 0, lty = 2)
 
@@ -352,10 +399,10 @@ abline(h = 0, lty = 2)
 range(port.sampling$date)
 pred.dates <- ymd(paste0(sort(rep(2006:2017,12)),"-",rep(1:12,12),"-",rep(0,144),rep(1,144)))
 mod.pred.day <- as.numeric(pred.dates - as.Date("2010-05-24"))/100
-pred.dat <- ddply(gba.dat, 
-                .(fleet), 
+pred.dat <- ddply(gba.dat,
+                .(fleet),
                 summarize,
-                mod.day = seq(min(mod.pred.day), 
+                mod.day = seq(min(mod.pred.day),
                               max(mod.pred.day),
                               length = length(mod.pred.day)),
                 date = pred.dates)
@@ -377,8 +424,8 @@ pred.dat <- pred.dat[-which(pred.dat$fleet == "ASM" & pred.dat$date < "2010-06-0
 head(pred.dat)
 
 windows(11,11)
-ggplot(pred.dat, aes(date,mc,colour=fleet))  + theme(text = element_text(size=16)) + theme_bw() + 
-           geom_point(data = gba.dat, aes(y = mc, x = date,colour = fleet),shape = 16, size = 0.01,alpha=0.05)+ 
+ggplot(pred.dat, aes(date,mc,colour=fleet))  + theme(text = element_text(size=16)) + theme_bw() +
+           geom_point(data = gba.dat, aes(y = mc, x = date,colour = fleet),shape = 16, size = 0.01,alpha=0.05)+
            geom_line()  + ylim(5,60) + ylab("Meat count") + scale_x_date(date_breaks="1 year") + xlab("") +
            geom_ribbon(data = pred.dat, aes(x = date, ymax = ub, ymin = lb, fill = fleet, color = fleet), alpha = 0.5)
 ggsave(paste0(direct,"2018/Framework/Port_sampling/Fleet_port_sampling.png"),width=11,height=8.5)
@@ -391,10 +438,10 @@ ggsave(paste0(direct,"2018/Framework/Port_sampling/Fleet_port_sampling.png"),wid
 #     "signifcant" we can figure out I think.
 # 2:  This meat-weight shell height relationship holds for the whole bank during this time, so using the May/August MW-SH relationship and the port sampling
 #     meat weights we can determine what size (i.e. shell hieghts) that the fleets are targeting during these 2 months.
-# 3:  IF the shell heights targeted by each fleet in May and August don't differ significantly WE CAN MAKE THE ASSUMPTION that the fleet, on average, is likely 
+# 3:  IF the shell heights targeted by each fleet in May and August don't differ significantly WE CAN MAKE THE ASSUMPTION that the fleet, on average, is likely
 #     targeting the same size scallop all year
-# 4:  With this assumption in place (and given the data it does appear this is a reasonable assumption) we can make MW-SH models 
-#     at a finer temporal scale (e.g. calclate the average MW by fleet for each month) and estimate condition at these finer temporal scales. 
+# 4:  With this assumption in place (and given the data it does appear this is a reasonable assumption) we can make MW-SH models
+#     at a finer temporal scale (e.g. calclate the average MW by fleet for each month) and estimate condition at these finer temporal scales.
 #     now we have an estimate of how condition varies over the year and if condition varies between fleets (though I'm not sure if the fleet question makes sense)
 
 # First off I'll need to load in the survey results....
@@ -438,12 +485,12 @@ for(i in 1:length(years))
                                                                                     a.aug$a[a.aug$year == years[i]])^(1/3)
   pred.dat$sh.ub[month(pred.dat$date) == 8 & year(pred.dat$date) == years[i]] <- 100*(pred.dat$mw.ub[month(pred.dat$date) == 8 & year(pred.dat$date) == years[i]] /
                                                                                     a.aug$a[a.aug$year == years[i]])^(1/3)
-  
+
 }
 
 # Now plot up the results...
 lab <- as_labeller(c('5'= "May",'8' ="August"))
-ggplot(pred.dat[month(pred.dat$date) %in% c(5,8),],aes(date,sh,colour=fleet)) + geom_point() + geom_line() + 
+ggplot(pred.dat[month(pred.dat$date) %in% c(5,8),],aes(date,sh,colour=fleet)) + geom_point() + geom_line() +
              facet_wrap(~month(date),labeller = lab) +
              theme(text = element_text(size=16)) + theme_bw() + ylim(95,115) + ylab("Shell height") + scale_x_date(date_breaks="2 years") + xlab("")  +
              geom_ribbon(aes(x = date, ymax = sh.ub, ymin = sh.lb, fill = fleet, color = fleet), alpha = 0.5)
@@ -500,15 +547,15 @@ summary(mod.1) # yep
 mod.2 <- lm(cond~month*fleet,ps.mw.sh)
 summary(mod.2)
 
-# And confirmed that adding in fleet isn't helpful here, basically we can see a difference 
+# And confirmed that adding in fleet isn't helpful here, basically we can see a difference
 AIC(mod.1,mod.2)
 
-############### End Section 2 - GB Port sampling analysis -- End Section 2 ############### 
-############### End Section 2 - GB Port sampling analysis -- End Section 2 ############### 
+############### End Section 2 - GB Port sampling analysis -- End Section 2 ###############
+############### End Section 2 - GB Port sampling analysis -- End Section 2 ###############
 
 
 
-############### Section 3 - BBn and Sable Port sampling analysis -- Section 3############### 
+############### Section 3 - BBn and Sable Port sampling analysis -- Section 3###############
 
 
 load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.rData"))
@@ -548,23 +595,23 @@ par(mfrow=c(3,1))
 plot(bbn.mod$gam,ylim=c(-10,10))
 windows(11,11)
 par(mfrow=c(3,1))
-plot(bbn.mod$lme) 
+plot(bbn.mod$lme)
 
-#par(mfrow = c(2,2), mar = c(5,5,2,2))    
+#par(mfrow = c(2,2), mar = c(5,5,2,2))
 E1 <- resid(bbn.mod$lme, type ="n")
 F1 <- fitted(bbn.mod$lme)
 
 windows(11,11)
 par(mfrow = c(2,2))
-plot(x = F1,  
-     y = E1, 
-     xlab = "Fitted values", 
+plot(x = F1,
+     y = E1,
+     xlab = "Fitted values",
      ylab ="Residuals",cex=0.01)
 abline(h=0, lty=2)
 
-plot(x = bbn.dat$mod.day, 
-     y = E1, 
-     xlab = "time", 
+plot(x = bbn.dat$mod.day,
+     y = E1,
+     xlab = "time",
      ylab = "Residuals",cex=0.01)
 abline(h = 0, lty = 2)
 
@@ -581,10 +628,10 @@ ggplot(bbn.dat,aes(mc,fill=fleet)) + geom_histogram() + facet_wrap(~month)+#,sca
 pred.dates <- ymd(paste0(sort(rep(2006:2022,12)),"-",rep(1:12,12),"-",rep(0,144),rep(1,144)))
 # For the models to come let's center on the day we believe the ASM's arrive on the scence (May 24, 2010 according to Ginette)
 mod.pred.day <- as.numeric(pred.dates - as.Date("2010-05-24"))/100
-pred.dat <- ddply(bbn.dat, 
-                  .(fleet), 
+pred.dat <- ddply(bbn.dat,
+                  .(fleet),
                   summarize,
-                  mod.day = seq(min(mod.pred.day), 
+                  mod.day = seq(min(mod.pred.day),
                                 max(mod.pred.day),
                                 length = length(mod.pred.day)),
                   date = pred.dates)
@@ -606,8 +653,8 @@ pred.dat <- pred.dat[-which(pred.dat$fleet == "ASM" & pred.dat$date < "2010-06-0
 head(pred.dat)
 
 windows(11,11)
-ggplot(pred.dat, aes(date,mc,colour=fleet))  + theme(text = element_text(size=16)) + theme_bw() + 
-  geom_point(data = bbn.dat, aes(y = mc, x = date,colour = fleet),shape = 16, size = 0.01,alpha=0.05)+ 
+ggplot(pred.dat, aes(date,mc,colour=fleet))  + theme(text = element_text(size=16)) + theme_bw() +
+  geom_point(data = bbn.dat, aes(y = mc, x = date,colour = fleet),shape = 16, size = 0.01,alpha=0.05)+
   geom_line()  + ylim(5,60) + ylab("Meat count") + scale_x_date(date_breaks="1 year") + xlab("") +
   geom_ribbon(data = pred.dat, aes(x = date, ymax = ub, ymin = lb, fill = fleet, color = fleet), alpha = 0.5)
 #ggsave(paste0(direct,"2018/Framework/Port_sampling/Fleet_port_sampling.png"),width=11,height=8.5)
@@ -631,7 +678,7 @@ a.may <- data.frame(a = rep(NA,length(years)), year = years)
 
 for(i in 1:length(years))
 {
-  
+
   may.mws[[as.character(years[i])]] <-  na.omit(mw[["BBn"]][mw[["BBn"]]$year == years[i],]) # get BBn and chuck the na's
   may.mws[[as.character(years[i])]]$sh_3 <- (may.mws[[as.character(years[i])]]$sh/100)^3 # cube the SH's
   may.mws[[as.character(years[i])]]$sh <- (may.mws[[as.character(years[i])]]$sh/100) # sh in decimeters
@@ -648,9 +695,9 @@ for(i in 1:length(years))
 
 # Now plot up the results...
 lab <- as_labeller(c('5'= "May"))
-ggplot(pred.dat[month(pred.dat$date) %in% c(5),],aes(date,sh,colour=fleet)) + geom_point() + geom_line() + 
-                                              theme(text = element_text(size=16)) + theme_bw() + ylim(95,115) + 
-                                              scale_x_date(date_breaks="2 years") + xlab("") + ylab("Shell height") + 
+ggplot(pred.dat[month(pred.dat$date) %in% c(5),],aes(date,sh,colour=fleet)) + geom_point() + geom_line() +
+                                              theme(text = element_text(size=16)) + theme_bw() + ylim(95,115) +
+                                              scale_x_date(date_breaks="2 years") + xlab("") + ylab("Shell height") +
                                               geom_ribbon(aes(x = date, ymax = sh.ub, ymin = sh.lb, fill = fleet, color = fleet), alpha = 0.5)
 #ggsave(paste0(direct,"2018/Framework/Port_sampling/sh_targeted.png"),width=11,height=8.5)
 
@@ -720,7 +767,7 @@ for(i in 1:length(years))
   bbn.dat$sh[bbn.dat$year == years[i]] <- 100*(bbn.dat$meat_weight[bbn.dat$year == years[i]]/ a.may$a[i])^(1/3)
 }
 
-sh.plt <- ggplot(bbn.dat,aes(date,sh,colour=fleet)) + geom_point(alpha = 0.05,size=0.2) + 
+sh.plt <- ggplot(bbn.dat,aes(date,sh,colour=fleet)) + geom_point(alpha = 0.05,size=0.2) +
                                                       theme(text = element_text(size=16)) + theme_bw() + geom_smooth(method = 'gam')+
                                                       scale_x_date(date_breaks="2 years") + scale_y_continuous(breaks = seq(0,200,by=5)) +
                                                       xlab("") + ylab("Shell height") + geom_hline(yintercept = 95, linetype = 'dashed',linewidth=1.5,color="grey")
@@ -735,7 +782,7 @@ prop.bl.100 <- left_join(n.bl.100,n.all.bbn,'year')
 prop.bl.100$prop <- prop.bl.100$n100 / prop.bl.100$tot
 
 windows(11,11)
-ggplot(data = prop.bl.100,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 100 mm") + 
+ggplot(data = prop.bl.100,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 100 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 
@@ -744,7 +791,7 @@ prop.bl.95 <- left_join(n.bl.95,n.all.bbn,'year')
 prop.bl.95$prop <- prop.bl.95$n95 / prop.bl.95$tot
 
 windows(11,11)
-ggplot(data = prop.bl.95,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 95 mm") + 
+ggplot(data = prop.bl.95,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 95 mm") +
                                                theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 # Based on Ageing info, we think 75-90 mm is the best option, that would be ≈ 3-4 year olds.
@@ -754,7 +801,7 @@ prop.bl.90$prop <- prop.bl.90$n90 / prop.bl.90$tot
 
 # This is basically under 1%, which I think will be fine.
 windows(11,11)
-ggplot(data = prop.bl.90,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
+ggplot(data = prop.bl.90,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 
@@ -764,7 +811,7 @@ prop.bl.85$prop <- prop.bl.85$n85 / prop.bl.85$tot
 
 # So there is basically 0 catch coming from < 85 mm, well under 1%
 windows(11,11)
-ggplot(data = prop.bl.85,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
+ggplot(data = prop.bl.85,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 # Just look at spring-summer, going with April-August as in theory condition should be fairly stable during this period.
@@ -777,7 +824,7 @@ prop.bl.90.ss$prop <- prop.bl.90.ss$n90 / prop.bl.90.ss$tot
 
 # This is basically under 1%, which I think will be fine.
 windows(11,11)
-ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
+ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 
@@ -804,7 +851,7 @@ a.may <- data.frame(a = rep(NA,length(years)), year = years)
 
 for(i in 1:length(years))
 {
-  
+
   may.mws[[as.character(years[i])]] <-  na.omit(mw[["Sab"]][mw[["Sab"]]$year == years[i],]) # get BBn and chuck the na's
   may.mws[[as.character(years[i])]]$sh_3 <- (may.mws[[as.character(years[i])]]$sh/100)^3 # cube the SH's
   may.mws[[as.character(years[i])]]$sh <- (may.mws[[as.character(years[i])]]$sh/100) # sh in decimeters
@@ -820,9 +867,9 @@ for(i in 1:length(years))
 }
 
 # Now plot up the results...
-ggplot(pred.dat[month(pred.dat$date) %in% c(5),],aes(date,sh,colour=fleet)) + geom_point() + geom_line() + 
-  theme(text = element_text(size=16)) + theme_bw() + ylim(95,115) + 
-  scale_x_date(date_breaks="2 years") + xlab("") + ylab("Shell height") + 
+ggplot(pred.dat[month(pred.dat$date) %in% c(5),],aes(date,sh,colour=fleet)) + geom_point() + geom_line() +
+  theme(text = element_text(size=16)) + theme_bw() + ylim(95,115) +
+  scale_x_date(date_breaks="2 years") + xlab("") + ylab("Shell height") +
   geom_ribbon(aes(x = date, ymax = sh.ub, ymin = sh.lb, fill = fleet, color = fleet), alpha = 0.5)
 #ggsave(paste0(direct,"2018/Framework/Port_sampling/sh_targeted.png"),width=11,height=8.5)
 
@@ -893,7 +940,7 @@ for(i in 1:length(years))
 }
 
 # I don't know what is up with these data, but the smooths are a disaster aand a lm is dumb.
-sh.plt <- ggplot(sab.dat,aes(date,sh,colour=fleet)) + geom_point(alpha = 0.05,size=0.2) + 
+sh.plt <- ggplot(sab.dat,aes(date,sh,colour=fleet)) + geom_point(alpha = 0.05,size=0.2) +
   theme(text = element_text(size=16)) + theme_bw() +# geom_smooth(method = 'lm')+
   scale_x_date(date_breaks="2 years") + scale_y_continuous(breaks = seq(0,200,by=5)) +
   xlab("") + ylab("Shell height") + geom_hline(yintercept = 90, linetype = 'dashed',linewidth=1.5,color="grey")
@@ -908,7 +955,7 @@ prop.bl.100 <- left_join(n.bl.100,n.all.sab,'year')
 prop.bl.100$prop <- prop.bl.100$n100 / prop.bl.100$tot
 
 windows(11,11)
-ggplot(data = prop.bl.100,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 100 mm") + 
+ggplot(data = prop.bl.100,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 100 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 
@@ -918,7 +965,7 @@ prop.bl.95 <- left_join(n.bl.95,n.all.sab,'year')
 prop.bl.95$prop <- prop.bl.95$n95 / prop.bl.95$tot
 
 windows(11,11)
-ggplot(data = prop.bl.95,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 95 mm") + 
+ggplot(data = prop.bl.95,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 95 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 n.bl.90 <- sab.dat %>% dplyr::group_by(year,.drop=F) %>% dplyr::filter(sh < 90) %>% dplyr::summarise(n90 = length(sh))
@@ -926,7 +973,7 @@ prop.bl.90 <- left_join(n.bl.90,n.all.sab,'year')
 prop.bl.90$prop <- prop.bl.90$n90 / prop.bl.90$tot
 
 windows(11,11)
-ggplot(data = prop.bl.90,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
+ggplot(data = prop.bl.90,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 
@@ -936,7 +983,7 @@ prop.bl.85$prop <- prop.bl.85$n85 / prop.bl.85$tot
 
 # So there is basically 0 catch coming from < 85 mm, well under 1%
 windows(11,11)
-ggplot(data = prop.bl.85,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
+ggplot(data = prop.bl.85,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 # Just look at spring-summer, going with April-August as in theory condition should be fairly stable during this period.
@@ -949,7 +996,7 @@ prop.bl.90.ss$prop <- prop.bl.90.ss$n90 / prop.bl.90.ss$tot
 
 # This is basically under 1%, which I think will be fine.
 windows(11,11)
-ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") + 
+ggplot(data = prop.bl.90.ss,aes(x=year,y=prop)) + geom_point() + ylab("Proportion of meats below 90 mm") +
   theme(text = element_text(size=22)) + scale_x_continuous(breaks = seq(2000,2030,by=2))
 
 # So I guess the next thing is to figure out what proportion the 90-95 mm size bins is of the Fully Recruited population?
