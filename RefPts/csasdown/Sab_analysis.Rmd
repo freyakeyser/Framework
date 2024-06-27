@@ -1,72 +1,8 @@
----
-title: "BBn and Sable Reference Point exploration"
-author: "DK based on RM"
-date: "Fall 2022"
-output:
-  bookdown::pdf_document2: 
-    extra_dependencies: ["subfig","float"]
-    citation_package: natbib
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
-```
-
-
-```{r global-crap,include=F}
-library(tidyverse)
-library(knitr)
-library(tinytex)
-library(kableExtra)
-library(dplyr)
-library(SEBDAM)
-library(ggthemes)
-library(cowplot)
-library(forecast)
-
-theme_set(theme_few(base_size = 22))
-u.colors <- c("#FFD500","#005BBB")
-
-# Here's where I'm sticking the figures
-mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
-fun.loc <-"D:/Github/Framework/RefPts/functions/"
-rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
-
-# Functions we need to source for this to all work
-source(paste0(fun.loc,"projection_function.r"))
-source(paste0(fun.loc,"Density_dependence_function.R"))
-source(paste0(fun.loc,"breakpoint_function.R"))
-source(paste0(fun.loc,"correlation_function.R"))
-# Load the Sable model resuls.
-sab.mod <- readRDS(paste0(mod.loc,"Results/Sab_SS_model/R_75_FR_90/Sab_SS_mod_output.Rds"))
-
-
-```
 
 ```{r productivity-analysis,include=F}
 
-# Setup...
-num.knots <- length(seam.mod$obj$env$data$area)
-years <- 1994:2023
-NY <- length(years)
-matYear<-c(rep(years,each=num.knots))
-knots<-rep(1:num.knots,NY)
-
-# TLM version
-# prod.dat <- data.frame(Year = 1991:2022,
-#                         B = tlm.mod$report$totB[-length(tlm.mod$report$totB)],
-#                         R = tlm.mod$report$totR[-length(tlm.mod$report$totR)], # For some reason the SEBDAM run needs a NA at the end here.
-#                         SSB = tlm.mod$report$totB[-length(tlm.mod$report$totB)] + tlm.mod$report$totR[-length(tlm.mod$report$totR)],
-#                         m = tlm.mod$report$mean_m[-length(tlm.mod$report$mean_m)],
-#                         g = tlm.mod$obj$env$data$g[],
-#                         gR = tlm.mod$obj$env$data$gR[])#,
-#                         CF = cond.dat$CF)
-#plot.url <- paste0("D:/Github/BBn_model/Results/Figures/Sab/Ref_points/",tlm.select,"/")
-
-### ENd TLM Productivity Data
-
-# SEAMly version
+# BSSM productivity import
 prod.dat <- data.frame(Year = years[-NY],
                         B = seam.mod$report$totB[-length(seam.mod$report$totB)],
                         R = seam.mod$report$totR[-length(seam.mod$report$totR)], # For some reason the SEBDAM run needs a NA at the end here.

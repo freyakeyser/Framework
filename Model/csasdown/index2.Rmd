@@ -1,6 +1,5 @@
 ---
-title: |
-    "Framework Development for Scallop Fishing Areas 25A, 25B, 26A, 26B, 26C, and 27B: Stock Assessment Models for SFAs 25A and 26A"
+title: "Framework Development for Scallop Fishing Areas 25a, 25b, 26a, 26b, 26c, and 27b: Stock Assessment Models for SFAs 25 and 26"
 french_title: "En francais"
 author: |
   David Keith
@@ -29,8 +28,8 @@ cat_no: ""
 french_region: "Région des Maritimes"
 citation_other_language: "Keith, D.M., Keyser, F., McDonald, R., Pearo Drew, T., et Sameoto, J.A.  L'évaluation de petoncles dans les zones de pêche"
 abstract: |
-  This research document focuses on the development of new stock assessment methodologies for the stocks in Scallop Fishing Area (SFA) 25A (Sable Bank) and SFA 26A (Browns Bank North). A Bayesian State-Space Delay difference model (BSSM) has been used to assess the status of SFA 26A for over a decade, but no analytical models have ever been implemented for SFA 25A. A modified version of the BSSM currently used for the SFA 26A assessments is used to model the population dynamics for these two stocks. In addition, the population dynamics of these two stocks are modelled using a Spatially Explicit Assessment Model (SEAM); this model takes advantage of advances in computing power and the development of new statistical methods while retaining the same conceptual delay-difference population dynamics framework. Overall the two modelling frameworks provided broadly similar results, but there were differences in the productivity parameters between the models; these differences were more notable in SFA 25A.  The exploitation rate in SFA 25A has been low throughout the timeframe covered by the model and the fishery appears to have had little impact on stock dynamics.  In SFA 26A, there was evidence that the fishery impacted the stock dynamics, for this stock the fully-recruited biomass generally declined when the exploitation rate exceeded approximately 10%. For both stocks, the retrospective patterns indicated that fully-recruited biomass predictions were not strongly influenced by the inclusion of additional years of data. The analyses of the process error, residuals, and, for SEAM, the random fields, indicated that the process component of these models tended to overestimate fully-recruited biomass in recent years, but the models were largely able to compensate for this through their error structures. The prediction evaluation results indicated that default parameterizations for the one-year ahead fully-recruited biomass projections tended to over-estimate the realized biomass, but this bias could be substantially reduced by using methods which made different assumptions about the productivity of the stocks. Overall, the results indicated that, for both stocks, BSSM and SEAM provided reasonable approaches for modelling the stock dynamics given the available data and either of these approaches could be used to provide science advice. In SFA 25A, we recommend using BSSM to provide science advice with the *no fully-recruited growth* method used for projections. In SFA 26A, we recommend using SEAM to provide science advice with the *previous year* method used for projections.
-  
+  This research document focuses on the development of new stock assessment methodologies for the stocks in Scallop Fishing Area (SFA) 25a and SFA 26a. A Bayesian State-Space Delay difference model (BSSM) has been used to assess the status of SFA 26a for over a decade, but no analytical models have ever been developed for SFA 25a. A modified version of the BSSM currently used for the SFA 26a asessments has been developed for these two stocks. Advances in computing power and the availability of new statistical methods has enabled the development of a Spatially Explicit Assessment Model (SEAM) that is also based on the same conceptual delay-difference modelling framework. The results for both types of model will be shown for comparative purposes, while model diagnostics such as retrospective analyses and visualization of residual patterns will be shown for the SEAM models. Overall the two modelling frameworks provide broadly similar results, but there are differences in the productivity parameters between the models; these differences are more notable in SFA 25a.  The exploitation rate in SFA 25a has been low throughout the timeframe covered by the model and the fishery appears to have had little impact on the stock dynamics in SFA 25a.  In SFA 26a, there is evidence that the fishery does impact the stock dynamics, for this stock the fully-recruited biomass has always declined when the exploitation rate exceeds approximately 8%. For both stocks, the retrospective patterns for the SEAM models indicate that fully-recruited biomass estimates are not strongly influenced by the addition of additional years of data, while the natural mortality and recruit biomasses are more variable as new data are included in the model. The analyses of the random fields, process error, and residuals, all indicate that the process component of SEAM would tend to overestimate fully-recruited biomass, but the model is able to compensate for this through the random fields when survey data are available. The prediction evaluation results indicate that one-year ahead fully-recruited biomass projections tend to over-estimate the realized biomass unless the productivity parameters for the projections are reduced. The results generally indicate that for both stocks SEAM is an appropriate framework for modelling the stock dyanamics given the available data and can be used as a platform to provide science advice required for these stocks. 
+
 french_abstract: |
   Null
   
@@ -60,9 +59,8 @@ output:
    line_nums: true
    line_nums_mod: 1
    lot_lof: false
-   draft_watermark: true
+   draft_watermark: false
    include_section_nums: true
-   global_numbering: true
    # highlight is the theme to use for code output. Must be one of the list given by:
    # which are:
    # the csasdown library 'themes' directory, this directory on your machine:
@@ -114,14 +112,12 @@ opts_chunk$set(
   dev = fig_out_type,
   dpi = fig_dpi,
   fig.align = fig_align,
-  fig.pos = fig_pos,
-  fig.cap.sep = ". ",
-  tab.cap.sep = ". "
+  fig.pos = fig_pos
   
 )
 ```
 
-```{r load-libraries, echo = FALSE, message = FALSE, results = 'hide', warning = FALSE, cache = F}
+```{r load-libraries, echo = FALSE, cache = FALSE, message = FALSE, results = 'hide', warning = FALSE}
 # add other packages here:
 library(dplyr)
 library(readr)
@@ -134,12 +130,6 @@ library(tidyverse)
 library(ggthemes)
 library(cowplot)
 library(collapse)
-library(officedown)
-library(officer)
-require(tidyverse)
-require(kableExtra)
-require(flextable)
-
 
 
 funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
@@ -178,84 +168,81 @@ if(!fr=="") language <- "french"
 # if(french == T) {
 #   nickname <- paste0(nickname, "_fr")
 # }
-# # For the rendering, do this in your console
- setwd("D:/Github/Framework/Model/csasdown/")
-# For the analysis
+
 repo.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 num.knots <- 20 
 init.m <- 0.2 
 qR <- 0.33
-#g.mod <- 'g_original'
-#g.mod <- 'g_1'
-#vary.q <- T
+g.mod <- 'g_original'
+vary.q <- T
 R.size <- "75"
 FR.size <- "90"
 years <- 1994:2022
 mod.select <- "SEAM"
 
-scenario.10 <- paste0(min(years),"_",max(years),"_qR_",qR,"_",10,"_knots")
-scenario.20 <- paste0(min(years),"_",max(years),"_qR_",qR,"_",20,"_knots")
+scenario.10 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",10,"_knots_",'g_original')
+scenario.20 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",20,"_knots_",'g_original')
 
 # SEAM results
 sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
 sab.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
-bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,".Rds"))
-bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,".Rds"))
+bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE.Rds"))
+bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
 # SEAM processed results...
 
 # BBN Processed
 Bdiff.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_B_differnce.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_B_differnce.Rds"))
 # Annual exploitation
 F.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_annual.exploit.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_annual.exploit.Rds"))
 # The nicely summarized model object
 pred.proc.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_pred_proc.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_pred_proc.Rds"))
 # The summarized spatial bits.
 F.spat.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_F_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_F_spatial.Rds"))
 F.spat.bbn.20$F.na <- -log(1-F.spat.bbn.20$exp.na)
 
 # q spatial
 q.spat.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_q_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_q_spatial.Rds"))
 # m spatial
 m.spat.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_m_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_m_spatial.Rds"))
 # R spatial
 r.spat.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_R_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_R_spatial.Rds"))
 # B spatial
 b.spat.bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.20,"_B_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_B_spatial.Rds"))
 
 # BBn 10 knots....
 Bdiff.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_B_differnce.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_B_differnce.Rds"))
 # Annual exploitation
 F.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_annual.exploit.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_annual.exploit.Rds"))
 # The nicely summarized model object
 pred.proc.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_pred_proc.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_pred_proc.Rds"))
 # The summarized spatial bits.
 F.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_F_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_F_spatial.Rds"))
 F.spat.bbn.10$F.na <- -log(1-F.spat.bbn.10$exp.na)
 
 # q spatial
 q.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_q_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_q_spatial.Rds"))
 # m spatial
 m.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_m_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_m_spatial.Rds"))
 # R spatial
 r.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_R_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_R_spatial.Rds"))
 # B spatial
 b.spat.bbn.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",
-                               mod.select,"_model_output_",scenario.10,"_B_spatial.Rds"))
+                               mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_B_spatial.Rds"))
 
 ##########Sab Processes SEAM 
 # Sab 20
@@ -290,7 +277,6 @@ Bdiff.sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"
 # Annual exploitation
 F.sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
                                mod.select,"_model_output_",scenario.10,"_annual.exploit.Rds"))
-
 # The nicely summarized model object
 pred.proc.sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",
                                mod.select,"_model_output_",scenario.10,"_pred_proc.Rds"))
@@ -314,9 +300,6 @@ b.spat.sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,
 # BSSM results
 sab.bssm <- readRDS(file = paste0(repo.loc,"/Results/Sab_SS_model/R_75_FR_90/B_R_M_F_summarized.Rds"))
 bbn.bssm <- readRDS(file = paste0(repo.loc,"/Results/BBn_SS_model/R_75_FR_90/B_R_M_F_summarized.Rds"))
-# The model output directly...
-sab.bssm.mod.out <- readRDS(file = paste0(repo.loc,"/Results/Sab_SS_model/R_75_FR_90/Sab_SS_mod_output.Rds"))
-bbn.bssm.mod.out <- readRDS(file = paste0(repo.loc,"/Results/BBn_SS_model/R_75_FR_90/BBn_SS_mod_output.Rds"))
 # BSSM model catchability posterior...
 sab.bssm.q <- readRDS(file = paste0(repo.loc,"/Results/Sab_SS_model/R_75_FR_90/q_posterior.Rds"))
 sab.bssm.q <- data.frame(q = sab.bssm.q)
@@ -324,36 +307,21 @@ bbn.bssm.q <- readRDS(file = paste0(repo.loc,"/Results/BBn_SS_model/R_75_FR_90/q
 bbn.bssm.q <- data.frame(q = bbn.bssm.q)
 
 # Retro results
-# First up is BSSM
-# Sable
-mr.bssm.sab <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_mohns_rose_SSModel.Rds"))
-retro.bssm.sab <-readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_retro_SSModel.Rds"))
-bias.bssm.sab <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_bias_SSModel.Rds"))
-
-# BBn
-mr.bssm.bbn <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_mohns_rose_SSModel.Rds"))
-retro.bssm.bbn <-readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_retro_SSModel.Rds"))
-bias.bssm.bbn <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_bias_SSModel.Rds"))
-# Now SEAM
+mr.bbn <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_mohns_rose_",mod.select,"_",scenario.20,"_vary_q=TRUE.Rds"))
+retro.bbn <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_retro_",mod.select,"_",scenario.20,"_vary_q=TRUE.Rds"))
+bias.bbn <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_bias_",mod.select,"_",scenario.20,"_vary_q=TRUE.Rds"))
+retro.bbn$retro.year[retro.bbn$retro.year == 'Base model'] <- "Full model"
 # Sable
 mr.sab <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_mohns_rose_",mod.select,"_",scenario.10,".Rds"))
 retro.sab <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_retro_",mod.select,"_",scenario.10,".Rds"))
 bias.sab <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Retros/Sab_bias_",mod.select,"_",scenario.10,".Rds"))
 retro.sab$retro.year[retro.sab$retro.year == 'Base model'] <- "Full model"
-# BBn
-mr.bbn <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_mohns_rose_",mod.select,"_",scenario.20,".Rds"))
-retro.bbn <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_retro_",mod.select,"_",scenario.20,".Rds"))
-bias.bbn <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/Retros/BBn_bias_",mod.select,"_",scenario.20,".Rds"))
-retro.bbn$retro.year[retro.bbn$retro.year == 'Base model'] <- "Full model"
-
-
-
 # Bring in the mesh and prediction grids...
 
-bbn.mesh.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_mesh.Rds"))
-bbn.grid.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_predict_grid.Rds"))
-bbn.mesh.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_mesh.Rds"))
-bbn.grid.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_predict_grid.Rds"))
+bbn.mesh.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_mesh.Rds"))
+bbn.grid.10 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.10,"_vary_q=TRUE_predict_grid.Rds"))
+bbn.mesh.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_mesh.Rds"))
+bbn.grid.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_predict_grid.Rds"))
 
 sab.mesh.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,"_mesh.Rds"))
 sab.grid.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,"_predict_grid.Rds"))
@@ -362,7 +330,7 @@ sab.grid.20 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/
 
 # The model inputs...
 sab.10.mod.input <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,"_model_input.Rds"))
-bbn.20.mod.input <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_model_input.Rds"))
+bbn.20.mod.input <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE_model_input.Rds"))
 # Also want the BSSM model inputs...
 sab.bssm.mod.input <- readRDS(paste0(repo.loc,"Data/Sab_BSSM_model.dat.RDS"))
 bbn.bssm.mod.input <- readRDS(paste0(repo.loc,"Data/BBn_BSSM_model.dat.RDS"))
@@ -372,27 +340,14 @@ sab.fish <-   readRDS(paste0(repo.loc,"Data/Sab_fish.dat.RDS"))
 bbn.fish <-    readRDS(paste0(repo.loc,"Data/BBn_fish.dat.RDS"))
 
 # Prediction evaluation data
-# First for BSSM
 
-bbn.bssm.pred.eval <- readRDS(paste0(repo.loc,"Results/BBn_SS_model/R_75_FR_90/BBn_prediction_evaluation.Rds"))
-sab.bssm.pred.eval <- readRDS(paste0(repo.loc,"Results/Sab_SS_model/R_75_FR_90/Sab_prediction_evaluation.Rds"))
-
-# Then for SEAM
-bbn.pred.eval <- readRDS(paste0(repo.loc,"Results/BBn/R_75_FR_90/Pred_eval/SEAM_",scenario.20,"/Biomass_difference.Rds"))
+bbn.pred.eval <- readRDS(paste0(repo.loc,"Results/BBn/R_75_FR_90/Pred_eval/SEAM_",scenario.20,"_vary_q=TRUE/Biomass_difference.Rds"))
 sab.pred.eval <- readRDS(paste0(repo.loc,"Results/Sab/R_75_FR_90/Pred_eval/SEAM_",scenario.10,"/Biomass_difference.Rds"))
 
 # Decision Tables.
-# First for BSSM
-bbn.bssm.dt <- readRDS(paste0(repo.loc,"Results/BBn_SS_model/R_75_FR_90/BBn_Decision_Table.Rds"))
-sab.bssm.dt <- readRDS(paste0(repo.loc,"Results/Sab_SS_model/R_75_FR_90/Sab_Decision_Table.Rds"))
 
-# Then for SEAM
-sab.dt <- readRDS(paste0(repo.loc,"Results/Sab/R_75_FR_90/SEAM_",scenario.10,"/Decision_Table/TRP_",NULL,"_USR_",NULL,"_LRP_",NULL,"_RR_",NULL,"_g_adj_",0,"_gR_adj_",1,".Rds"))
-bbn.dt <- readRDS(paste0(repo.loc,"Results/BBn/R_75_FR_90/SEAM_",scenario.20,"/Decision_Table/TRP_",NULL,"_USR_",NULL,"_LRP_",NULL,"_RR_",NULL,"_g_adj_",1,"_gR_adj_",1,".Rds"))
-
-# Finally, we need to pull out the Process error and Residuals for BSSM
-sab.bssm.pe.resids <- readRDS(paste0(repo.loc,"Results/Sab_SS_model/R_75_FR_90/PE_and_resids.Rds"))
-bbn.bssm.pe.resids <- readRDS(paste0(repo.loc,"Results/BBn_SS_model/R_75_FR_90/PE_and_resids.Rds"))
+sab.dt <- readRDS(paste0(repo.loc,"Results/Sab/R_75_FR_90/SEAM_",scenario.10,"/Decision_Table/TRP_",NULL,"_USR_",NULL,"_LRP_",NULL,"_RR_",NULL,"_g_adj_",0,"_gR_adj_",0,".Rds"))
+bbn.dt <- readRDS(paste0(repo.loc,"Results/BBn/R_75_FR_90/SEAM_",scenario.20,"_vary_q=TRUE/Decision_Table/TRP_",NULL,"_USR_",NULL,"_LRP_",NULL,"_RR_",NULL,"_g_adj_",0,"_gR_adj_",0,".Rds"))
 
 theme_set(theme_few(base_size = 16))
 

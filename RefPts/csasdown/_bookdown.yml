@@ -1,4 +1,4 @@
-book_filename: "resdoc"
+book_filename: "ref-points"
 rmd_files: ["index.Rmd",
             "analysis.Rmd",
             "01-text.Rmd",

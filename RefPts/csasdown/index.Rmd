@@ -1,0 +1,216 @@
+---
+title: "Shoulder Bank Reference Points"
+french_title: "En francais"
+author: "DK"
+author_list: "Keith, D., Keyser, F., McDonald R, Pearo Drew, T., Sameoto, J.A.  "
+address: |
+  Bedford Institute of Oceanography\
+     Fisheries and Oceans Canada, 1 Challenger Drive\
+     Dartmouth, Nova Scotia, Canada, B2Y 4A2\
+french_address: |
+  ^1^Station biologique du Pacifique\
+     Pêches et Océans Canada, 3190 Hammond Bay Road\
+     Nanaimo, Colombie-Britannique, V9T 6N7, Canada\
+     Une autre galaxie
+month: "Month"
+french_month: "Mois"
+year: 2023
+report_number: nnn
+region: "Maritimes Region"
+isbn: ""
+cat_no: ""
+french_region: "Région des Maritimes"
+citation_other_language: "Keith, D., Keyser, F., McDonald, R., et Pearo Drew, T.  L'évaluation de petoncles dans les zones de pêche"
+abstract: |
+  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). Index based Limit Reference Points (LRPs) will be proposed for each of these SFA's and model based LRPs will be proposed for the two areas with approved stock assessment models (SFA 25A and SFA 26A). The biomass indicies used for the development of the LRPs were approved during the first of three meetings which focused on the data inputs for each of these SFAs. The stock assessment models for SFA 25A and SFA 26A were approved at ths second of the three meetings making up this Framework proecess.  In addition to the LRPs, candidate Removal Reference (RR) and Upper Stock Reference (USR) Points will be provided.
+french_abstract: |
+  NULL
+  
+header: "Draft working paper --- Do not cite or circulate" # or "" to omit
+output:
+ csasdown::resdoc_word:
+   # copy_sty is a toggle to copy the style file from the csasdown package every time you compile
+   # the document. If false, any changes you have made to the style file in your project
+   # will remain between compilations. If true, your changes will be lost when you compile
+   # line_nums is a toggle to show line numbers on the left side of the page. 
+   # line_nums_mod represents showing every Nth line if line_nums is true
+   # lot_lof is a toggle to show/not show the lists of tables and figures at the
+   # beginning of the document
+   # draft_watermark is a toggle to show/not show a DRAFT watermark across every page
+   # include_section_nums, if true includes section numbering in the document body,
+   # if false, no numbering in the document budy but the TOC will still show numbering
+   # pandoc --list-highlight-styles
+   # pygments, tango, espresso, zenburn, kate, monochrome, breezedark, haddock
+   # or the name of a custom *.latex file which is most easily made by copying one from 
+   # file.path(.libPaths(), "csasdown", "themes")
+   # to your working directory (the one containing index.Rmd)
+   # To change the foreground text color, change the RGB value in the line containing
+   # 'DefineVerbatimEnvironment'
+   # To change background color, change the RGB values in the line containing 'shadecolor'
+   french: false
+   copy_sty: true
+   line_nums: true
+   line_nums_mod: 1
+   lot_lof: false
+   draft_watermark: false
+   include_section_nums: true
+   # highlight is the theme to use for code output. Must be one of the list given by:
+   # which are:
+   # the csasdown library 'themes' directory, this directory on your machine:
+   highlight: tango
+knit: (function(input, ...) {
+       csasdown::render('_bookdown.yml')
+      })
+link-citations: true
+bibliography: Y:/Zotero/MAR_SABHU.bib
+#
+# Any extra LaTeX code for the header:
+header-includes:
+ - \usepackage{tikz}
+ - \usepackage{amssymb}
+ - \usepackage{accents}
+---
+
+```{r setup, echo=FALSE, cache=FALSE, message=FALSE, results='hide', warning=FALSE}
+library(knitr)
+if (is_latex_output()) {
+  knitr_figs_dir <- "knitr-figs-pdf/"
+  knitr_cache_dir <- "knitr-cache-pdf/"
+  fig_out_type <- "png"
+} else {
+  knitr_figs_dir <- "knitr-figs-docx/"
+  knitr_cache_dir <- "knitr-cache-docx/"
+  fig_out_type <- "png"
+}
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos
+  
+)
+```
+
+```{r load-libraries, echo = FALSE, cache = FALSE, message = FALSE, results = 'hide', warning = FALSE}
+# add other packages here:
+library(collapse)
+library(readr)
+library(tibble)
+library(csasdown)
+require(rosettafish)
+library(sf)
+library(tidyverse)
+library(knitr)
+library(tinytex)
+library(kableExtra)
+library(dplyr)
+library(SEBDAM)
+library(ggthemes)
+library(cowplot)
+library(forecast)
+library(zoo)
+
+
+funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs) 
+{
+  download.file(fun,destfile = basename(fun))
+  rosetta_terms <- read.csv(paste0(getwd(),"/",basename(fun)), encoding = "UTF-8")
+  file.remove(paste0(getwd(),"/",basename(fun)))
+}
+# A not rosetta loop
+funs <- c("https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/pectinid_projector_sf.R",
+          "https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/convert_inla_mesh_to_sf.R"
+          )
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs) 
+{
+  download.file(fun,destfile = basename(fun))
+  source(paste0(getwd(),"/",basename(fun)))
+  file.remove(paste0(getwd(),"/",basename(fun)))
+}
+
+params <- NULL
+params$bank <- c("Sab", "BBn")
+params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022)
+params$bankname <- c("Sable Bank", "Browns Bank North")
+params$banknum <- 1:length(params$bank)
+
+fr <- ""
+#fr <- "_fr"
+if(fr=="") language <- "english"
+if(!fr=="") language <- "french"
+# nickname <- "framework3"
+# 
+# french <- F # set to T for french
+# if(french == T) {
+#   nickname <- paste0(nickname, "_fr")
+# }
+
+# Here's where I'm sticking the figures
+mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
+fun.loc <-"D:/Github/Framework/RefPts/functions/"
+rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
+
+theme_set(theme_few(base_size = 22))
+u.colors <- c("#FFD500","#005BBB")
+
+
+
+# Functions we need to source for this to all work
+source(paste0(fun.loc,"projection_function.r"))
+source(paste0(fun.loc,"Density_dependence_function.R"))
+source(paste0(fun.loc,"breakpoint_function.R"))
+source(paste0(fun.loc,"correlation_function.R"))
+
+# Model run parameters
+years <- 1994:2022
+R.size <- "75"
+FR.size <- "90"
+num.knots <- 20 # Going to test 10, 15, and 20
+qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+# Various explorations of the g models.
+
+# # If running with SEBDAM this is what ya use.
+
+bbn.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
+sab.select <- paste0("Sab_SS_model/R_",R.size,"_FR_",FR.size,"/Sable_SSmodel_results.RData")
+bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/R_75_FR_90/SEAM_",bbn.select,"/")
+sab.plot.loc <- paste0(rp.loc,"Figures/Sab/R_75_FR_90/BSSM/")
+
+bbn.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",bbn.select,".Rds"))
+
+pred.proc.seam <- get_processes(bbn.mod)
+bbn.mod$obj$env$data$g <- bbn.mod$obj$env$data$gI
+bbn.mod$report$totR <-c(bbn.mod$report$totR,NA)
+
+# Now load in the Sable model object, we're using BSSM here recall
+load(paste0(mod.loc,"Results/",sab.select))
+sab.mod <- DD.out
+# Finally, grab the raw survey data so we can use those indices for this.
+
+load(paste0(rp.loc,"Data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata"))
+
+
+
+```

@@ -1,0 +1,145 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+
+\newpage
+# Introduction
+
+This is the third and final research document stemming from a Framework process focused on Scallop Fishing Area (SFA) 25, SFA 26, and SFA 27B. The first research document was focused on data inputs [@keyserFrameworkDevelopmentScallop2020] while the second document developed new assessment models for SFA 25A and SFA 26A [@keithFrameworkDevelopmentScallop2020].  The SFA 26 management unit also includes Browns Bank South (26B) and German Bank (26C), while SFA 27 includes both Georges Bank 'a' (27A) and Georges Bank 'b' (27B), and SFA 25, known as the Eastern Scotian Shelf is split into SFA 25A, which includes Sable (25A-Sab) and Middle Bank (25A-Mid), and the Banquereau Bank in SFA 25B [see Table 1 in @keyserFrameworkDevelopmentScallop2020].
+
+A history of the survey and fishery in SFA 25, SFA 26, and SFA 27B can be found in @keyserFrameworkDevelopmentScallop2020. The primary fishing area within SFA 26 is SFA 26A, while the Sable Bank portion of SFA 25A (referred to SFA 25A hereafter) has been the most consistently fished area within SFA 25 [@keyserFrameworkDevelopmentScallop2020]. A Bayesian State-Space Delay difference model (BSSM) has been adopted for SFA 25A, while a new Spatially Explicit Stock Assessment Model (SEAM) has been adopted for SFA 26A [@keithFrameworkDevelopmentScallop2020]. In addition, to minimize prediction bias, the parameters used to project biomass into future years differed between these two areas, however in both areas the projections used the same non-spatial version of the delay difference model [@keithFrameworkDevelopmentScallop2020]. In SFA 25A the projection method utilizes three of productivity parameters (natural mortality, recruitment, and recruit growth), while setting the fully-recruited growth term to one (effectively the projections are assuming no full-recruited growth). In SFA 26A, all four productivity parameters are used to predict fully-recruited growth, for the productivity parameters which are estimated spatially (Natural mortality and Recruitment) the annual area-wide estimates are used [@keithFrameworkDevelopmentScallop2020].
+
+This research document focuses on the development of limit reference points (LRPs) for the Sable portion of SFA 25A, SFA 26A, SFA 26C, and SFA 27B.  For each of these four areas, LRPs are developed based the survey biomass indices, while for the two areas with approved assessment models, additional model based LRPs are developed.  In addition to the LRPs, guidance on candidate Removal Reference (RR) and Upper Stock Reference (USR) Points will be provided, where appropriate.
+
+The objectives of this document are:
+
+-   Propose and adopt limit reference points for SFAs 25A, 26A, 26C, and 27B 
+-   Provide guidance on Removal Reference Points and Harvest Control Rules, where appropriate
+
+# Methods
+
+## Survey Derived Indices
+
+The four areas (SFA 25A, 26A, 26C, and 27B) in which survey biomass index based LRPs were developed were covered by surveys which are scheduled to occur annually. For the survey biomass indices, observation error leads to uncertainty around any single year biomass estimate, while the state-space models account for this uncertainty, it is challenging to quantify the magnitude of this uncertainty outside of a state-space modelling framework. Therefore, the current biomass estimate for the survey-derived indices was based on the three-year geometric mean using the most recent three-years with available data [cf., @dfoMaritimesResearchVessel2024]. To align with the model results, the first year used for the index based methods will be 1994 for SFA 25A, 26A, and 27B. For SFA 26C, a liner was added to the gear in 2008, given changes in the gear selectivity this can induce the analyses for this area were limited to 2008 and onwards.
+
+These areas tended to be fished annually as well, making it possible to develop a relative exploitation metric in most years in these areas. See  @keyserFrameworkDevelopmentScallop2020 for more details on the methods underlying the development of both these indices. 
+
+### Biomass Reference Points
+
+Using the survey time series LRPs can be developed using either the maximum observed biomass (a proxy for the stocks carrying capacity or unfished biomass $B_0$) or the geometric mean of the time series (a proxy for the biomass at maximum sustainable yield ($B_{MSY}$)).  For modelled fisheries with reference points, LRPs based on $B_0$ are commonly set at 20% of the estimated $B_0$ [CITE SOMEONE, MAYBE RAY H and CARL?], we follow this convention here, although we estimated $B_0$ using the highest three-year geometric mean found in the time series. Similarly, the LRP is typically set at either 30% or 40% of $B_{MSY}$, both of these values are provided for the survey index derived LRPs [CITE SOMEONE, MAYBE RAY H and CARL?]. For the Upper Stock Reference Point (USR) we follow similar fisheries science convention and suggest using either a USR of 40% of $B_0$ or 80% of $B_{MSY}$.
+
+### Removal Reference 
+
+In non-modeled areas (SFA 26C and SFA 27B) the guidance on removal reference points used the relative indices and a semi-quantitative method (GEM - Generalized Exploitation Method) that compared the change in the relative survey biomass index ($\Delta B_r$) to the relative exploitation rate ($E_r$) for each year this information was available.  JEM assumed a linear relationship between the change survey index biomass and the relative explotation rate.
+
+$$
+\Delta B_{r_i} \sim N(0,\sigma^2_{i}) \\
+E(\Delta B_{r_i}) = \mu_{i} \\
+\mu_{i} =  E_{r_i}\\ 
+
+$$
+
+Where $\Delta B_r$ is the expected value of $mu$ and it is assumed to be normally distributed with a variance of $\sigma$; $i$ represents each observation. A significantly negative slope would provide evidence that the fishery does influence the biomass in the region, and the x-intercept provides an estimate of the relative exploitation rate above which the biomass trends tended to decline.
+
+## Model Derived Indices
+
+In SFA 25A and SFA 26A model based Reference Points can be developed using a simulation approach based using the observed productivity patterns in these two areas. Here, $B_{MSY}$ and $B_0$ were based on the simulation results. $B_0$ was the median biomass of the final 25 years from the simulation in which fishing mortality was set to 0.  $B_{MSY}$ was the median biomass of the final 25 years from the simulation in which the fishing mortality resulted in the maximum long-term yield from the fishery (MSY).
+
+The criteria for the proposed LRP's and suggested USR's will also be based on $B_0$ and $B_{MSY}$. As with the survey indices, a proposed LRP was set at 20% and USR at 40% of $B_0$, while proposed LRP's of 30% and 40% and a USR of 80% were proposed based on $B_{MSY}$.  In addition to these reference points, the utility of developing a biomass based Target Reference Point (TRP) was explored [CITE NEW PA STUFF]. For simplicity, the TRP was set to $B_{MSY}$ and the impact of various harvest control rules on the total long-term average removals and the probability of the stock declining below the USR and LRP were quantified.
+
+The Removal Reference Point (RR) was estimated using two methods. Similar to the non-modelled areas, JEM was used to provide a semi-quantitative estimate of the exploitation rate above which the biomass trends tended to decline; the model estimated biomass and exploitation methods were used. The second method was based on the results of the simulations and the RR was estimated to be the explotation rate that produced the maximum long-term yield from the fishery (MSY) from the simulations.
+
+## Projections
+
+The projection simulations are based on the observed productivity parameters from the models used for SFA 25A and SFA 26A, The underlying model for the projection simulations is based on the non-spatial delay difference model used in @keithFrameworkDevelopmentScallop2020.
+
+$$
+B_{t} = e^{-m_{fr}} g_{fr,t} (B_{t-1} - C_{t-1}) + e^{-m_{r}} g_{r,t} R_{t-1}
+$$
+
+The fully-recruited biomass is $B$, natural mortality is $m$, growth is $g$, landings are $C$, the recruit biomass is $R$, and the $t$ index represents the annual time step, which goes from 1 to the number of years in the simulation.  Where applicable, fully-recruited scallops are given the subscript $fr$, while recruits have the subscript $r$. Recruit sized scallop were defined to be 75-89 mm, and fully-recruited scallop were defined as being greater or equal to 90 mm [@keyserFrameworkDevelopmentScallop2020]. In SFA 25A, the fully-recruited growth term ($g_{fr,t}$) parameter is set to one for the projections, while in SFA 26A the recruit natural mortality ($m_{r}$) is the same as the fully-recruited natural mortality [$m_{fr}$, @keithFrameworkDevelopmentScallop2020].
+
+### Density Dependence
+
+Evidence for density dependence in the productivity parameters was explored using both quantitative and qualitative methods.  For both the natural mortality terms and the growth terms the productivity parameters were visually compared to the fully-recruited biomass estimates from the model. Using the visual method, discontinuous non-linear changes in the relationship were identified (MAKE A FIGURE). This *breakpoint* method was used to identify biomass levels in which the productivity changed in a non-linear fashion and in which on either side of the *breakpoint*  there was no clear relationship between the productivity parameter and biomass (MAKE A FIGURE). In addition, the relationship between the productivity parameter and fully-recruited biomass were evaluated using simple linear models.
+
+The *breakpoint* and *linear* methods were also used to explore the relationship between recruitment and biomass, but because of the nature of the recruitment process two additional steps were required before these methods could be applied. Recruits in both SFA 25A and 26A were between 75 and 90 mm in size.  The von Bertalanffy equation suggests that recruit sized scallop in SFA 25A are approximately 4 years old, while in SFA 26A faster growth results in most recruit size scallop being approximately 3 years old. The recruits in each SFA are thus offset by 3 (SFA 26A) or 4 (SFA 25A) years to align with the biomass of mature scallop that produced them (e.g., recruits on SFA 25A in 2020 were assumed to be 4 years old, thus these scallop were 'born' in 2016, and thus were aligned with scallop biomass in 2016 which produced them). Here we assume that the mature biomass includes both the recruit and fully-recruited scallop, as a result of this, we are ignoring the potential contribution of scallop with a shell height of < 75 mm to recruit biomass. We expect the contribution to recruitment to be minor for scallop under 75 mm in size [@parsonsIntraannualLongtermPatterns1992; @mcgarveySpatialParentAgeAnalysis1993].
+
+In addition, we explored density dependence in recruitment on a 'per-capita' basis; the biomass of recruits was divided by the biomass of fully-recruited scallop to determine the biomass of recruits produced per unit biomass of fully-recruited scallop to get a recruits per spawner (RPS) metric. When RPS is log transformed and compared to biomass the relationship is a linearization of the Ricker stock-recruit relationship.
+
+$$
+R_t = \alpha A_te^{-\beta A_t}
+$$
+
+This can be linearized as
+
+$$
+log(\frac{R_t}{A_t}) = \alpha - \beta A_t
+$$
+where $R_t$ is the biomass of recruits, $A_t$ is the biomass of adult scallop, $\alpha$ and $\beta$ are the intercept and slope of the linearized relationship. RPS is calculated as $\frac{R_t}{A_t}$, in the simulations this value is multiplied by the simulated biomass in the appropriate year to estimate the recruit biomass.
+
+### Correlation
+
+The strength of autocorrelation in each productivity parameter was estimated using standard autocorrelation functions. Where there was evidence for a linear trend in the productivity parameter, the autocorrelation was tested using detrended data (using the residuals from a linear model fit to the productivity time series). There was no evidence of autocorrelation in the growth parameters and there was no further correlation analysis used for the growth parameters.
+
+RPS and fully-recruited natural mortality are both model estimated values and there is the potential for these parameters to be cross-correlated given that the model can have challenges independently estimating both of these parameters [@mcdonaldExplicitIncorporationSpatial2021]. A cross-correlation analysis focused on 'significant' correlation at time legs of less than 5 years between these two parameters. When this correlation was incorporated it followed an auto-regressive integrated moving average (ARIMA) framework, but using only the first two auto-regressive components with the error structure represented by the observed covariance structure.
+
+### Simulation Procedure
+
+The results of the density dependence and correlation analyses were used to determine how the parameters would be sampled for the simulations. In cases in which there was no evidence of either density dependence or correlation the parameters estimates for each year required in the simulation were sampled from a log-normal distribution with the mean (MEDIAN?) and standard deviation taken from the observed time series for that productivity parameter. When the *breakpoint* method was used, the above sampling procedure was followed, but the sampling occurred using the data within a breakpoint bin. For example, if a single breakpoint was identified, when the simulated biomass for a year was below the breakpoint the mean (MEDIAN) and standard deviation of the productivity data below the breakpoint were used to sample from a log-normal distribution to obtain a value for that productivity parameter for that year in the simulation. The linear method would use the observed linear model and its uncertainty to predict the productivity at a given biomass, however, the linear method was not used in these analyses. In part, this was due to the relationships rarely being linear in nature, but also because the variability of the data was much larger than the uncertainty from the linear model would allow, as a result the linear model method led to the parameter estimates having far less variability than observed. When density dependence was observed the *breakpoint* method was preferred as it tended to provide simulated parameter values that aligned with the observed historical values.
+
+When the simulation estimated a biomass below the lowest observed value historically we assumed the relationship was the same as when the biomass was at the lowest value.  However, when the simulation estimated a biomass above the highest observed value, the productivity of the system was forced to be negative.  This was achieved by setting the growth terms to vary around one (with a standard deviation of 0.1), the RPS was set to vary around 10% of the lowest RPS value, and the natural mortality varied around two times the highest observed natural mortality estimate. This effectively induced a carrying capacity into the population dynamics below the maximum observed biomass, while respecting the observed population dynamics when the population was at low biomass.
+
+The exploitation rate scenarios tested differed between SFA 25A and 26A. In SFA 25A, the exploitation rate scenarios tested ranged from 0 to XX in steps of XX, while for SFA 26A, the exploitation rate scenarios ranged from 0 to XX in steps of YY. There was no variability in the exploitation rate for a given scenario, e.g., the exploitation rate scenario of 0.1 removed 10% of the fully-recruited biomass in every simulated year.  The simulations were run for XXX years with XXX simulations for each exploitation rate scenario.
+
+### Harvest Control Rules
+
+More complex Harvest Control Rules (HCRs) were also be explored using these methods. There are innumerable HCRs that could be tested and an optimal strategy is dependent on the management objectives. While defining an optimal strategy is beyond the scope of this framework, we do provide an example for each of SFA 25A and SFA 26A to elucidate the utility of this methodology. An interactive tool has also been developed which can be used by both managers and stakeholders to explore the impact of harvest control rules on various population metrics, this includes exploration of the potential impact of a Target Reference Point (TRP) for these stocks [DO WHAT I DID FOR THE SPATIAL MODEL SHIT].
+
+In SFA 25A, the harvest control rule simulation example set the explotation rate a) to YY above the TRP (XXXX tonnes), b) to ZZ above the USR (XXXX tonnes) and below the TRP, c) to decline linearly from ZZ at the USR, to 0 at the LRP (XXXX tonnes) when below the USR but above the LRP , d) to 0 below the LRP. Similarly, in SFA 26A, the harvest control rule simulation example set the explotation rate to a) YY above the TRP (XXXX tonnes), b) ZZ above the USR (XXXX tonnes) and below the TRP, c) decline linearly from ZZ at the USR, to 0 at the LRP (XXXX tonnes) when below the USR but above the LRP , d) 0 below the LRP.
+
+# Results
+
+## Productivity and Density Dependence
+
+### SFA 25A
+
+Also show in here that the model biomass is highly correlated to the index biomass, especially in 25A.
+
+### SFA 26A
+
+Is the model biomass highly correlated to the stratified index biomass in 26A?
+
+
+## Reference Points
+
+### Survey Biomass Indices
+
+A paragraph about LRPs
+
+A paragraph about USRs
+
+A paragraph about Removal Reference Points (using GEMs)
+
+### Model Biomass
+
+A paragraph about LRPs
+
+A paragraph about USRs
+
+A paragraph about Removal Reference Points
+
+Showing that the USR
+
+## Harvest Control Rules
+
+
+
+
+
+# Conclusions
+
+The methods used here were focused on fishery-independent metrics. Reference Points can be developed using fishery-dependent data, but we were not comfortable using fishery-dependent data because of the rapid increase in fishery efficiency over the last two decades along with the increasing adoption of larger more powerful vessels during this period.  Fishery dependent methods generally rely on using some measure of Catch per unit effort as being proportional to the biomass of the population, unfortunately when changes in fishing efficiency are driven by technological change it precludes these from being used for these types of analyses.
+

@@ -1,91 +1,4 @@
----
-title: "BBn and Sable Reference Point exploration"
-author: "DK based on RM"
-date: "Fall 2022"
-output:
-  bookdown::pdf_document2: 
-    extra_dependencies: ["subfig","float"]
-    citation_package: natbib
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
-```
-
-
-```{r global-crap,include=F}
-library(tidyverse)
-library(knitr)
-library(tinytex)
-library(kableExtra)
-library(dplyr)
-library(SEBDAM)
-library(ggthemes)
-library(cowplot)
-library(forecast)
-
-theme_set(theme_few(base_size = 22))
-u.colors <- c("#FFD500","#005BBB")
-
-# Here's where I'm sticking the figures
-mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
-fun.loc <-"D:/Github/Framework/RefPts/functions/"
-rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
-
-# Functions we need to source for this to all work
-source(paste0(fun.loc,"projection_function.r"))
-source(paste0(fun.loc,"Density_dependence_function.R"))
-source(paste0(fun.loc,"breakpoint_function.R"))
-source(paste0(fun.loc,"correlation_function.R"))
-
-# Model run parameters
-years <- 1994:2022
-R.size <- "75"
-FR.size <- "90"
-num.knots <- 20 # Going to test 10, 15, and 20
-qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
-#init.m <- 0.2 # This is for SEAM, sets first year natural mortality, going to test 0.4, 0.15, and 0.05
-# Various explorations of the g models.
-#g.mod <- 'g_original'
-#g.mod <- 'alt_g'
-#g.mod <- 'proper_g'
-
-
-#Loading the output from TLM BBN model
-# tlm.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",g.mod)
-# tlm.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_TLM_model_output_",tlm.select,".Rds"))
-# pred.proc.tlm <- get_processes(tlm.mod)
-# 
-# tlm.mod$report$totB <- tlm.mod$report$B
-# tlm.mod$report$totR <- tlm.mod$report$R
-# tlm.mod$report$mean_m <- tlm.mod$report$m
-# 
-# #get_parameters(tlm.mod)
-#tlm.mod$report$gI <- tlm.mod$report$g
-
-
-# # If running with SEBDAM this is what ya use.
-#seam.select <- "1994_2022_vary_m_m0_0.4_R0_1_15_knots"
-seam.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
-
-#seam.select <- "1994_2022_vary_m_m0_2_qR_0.5_10_knots"
-seam.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",seam.select,".Rds"))
-
-pred.proc.seam <- get_processes(seam.mod)
-seam.mod$obj$env$data$g <- seam.mod$obj$env$data$gI
-seam.mod$report$totR <-c(seam.mod$report$totR,NA)
-# Condition data... This isn't really necessary as I only do an acf on Condition, but whatevs.
-load("Y:/Offshore/Assessment/Data/Model/2022/BBn/Model_input_mixed.RData")
-cond.dat <- mod.dat$BBn %>% dplyr::select(year,CF) 
-# For now we need to get a 2022 growth term (once we run the BBn model I can update this with the latest data), just recycling the growth for 2021 for the moment
-cond.dat <- rbind(cond.dat,data.frame(year = 2022, CF =13.4))
-#cond.dat <- cond.dat %>% dplyr::filter(year %in% 1991:2022)
-
-
-
-
-```
 
 ```{r productivity-analysis,include=F}
 
@@ -95,20 +8,6 @@ years <- 1994:2023
 NY <- length(years)
 matYear<-c(rep(years,each=num.knots))
 knots<-rep(1:num.knots,NY)
-
-
-
-# TLM version
-# prod.dat <- data.frame(Year = 1991:2022,
-#                         B = tlm.mod$report$totB[-length(tlm.mod$report$totB)],
-#                         R = tlm.mod$report$totR[-length(tlm.mod$report$totR)], # For some reason the SEBDAM run needs a NA at the end here.
-#                         SSB = tlm.mod$report$totB[-length(tlm.mod$report$totB)] + tlm.mod$report$totR[-length(tlm.mod$report$totR)],
-#                         m = tlm.mod$report$mean_m[-length(tlm.mod$report$mean_m)],
-#                         g = tlm.mod$obj$env$data$g[],
-#                         gR = tlm.mod$obj$env$data$gR[],
-#                         CF = cond.dat$CF)
-#plot.url <- paste0("D:/Github/BBn_model/Results/Figures/BBn/Ref_points/",tlm.select,"/")
-### ENd TLM Productivity Data
 
 
 # SEAMly version

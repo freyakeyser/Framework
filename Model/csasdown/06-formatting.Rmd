@@ -10,4 +10,8 @@
 - DRAFT watermark
 - Bullets
 - Body text style
-- Crop old survey design figures  
+- make olex, ageing & CF-ts plots 80% size
+- landscape page for strata table per https://www.abdn.ac.uk/toolkit/documents/uploads/msword_landscapeheadersfooters.pdf
+- delete extra space above Appendix section
+- equation citations (add #(N) to get number)
+- make references hanging

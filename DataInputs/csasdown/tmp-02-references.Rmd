@@ -3,5 +3,3 @@
 \clearpage
 
 # REFERENCES {-}
-
-<div id="refs"></div>

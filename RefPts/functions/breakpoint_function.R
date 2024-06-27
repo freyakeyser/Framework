@@ -12,7 +12,7 @@
 
 bp.function <- function(B = 0, dat = prod.dat$g,ssb.ts= prod.dat$SSB, type = 'sample',sd = NULL,bp = 0,max.B =1e99,mn.at.max = 1,sd.at.max = 0.05)
 {
-  #browser()
+  #browser() 
   # Split the data into low and high values, not the most computationally efficient way to do this as I'm making this happen a billion times... but makes code tidy...
   low.dat <- na.omit(dat[ssb.ts < bp])
   hi.dat <- na.omit(dat[ssb.ts >= bp])

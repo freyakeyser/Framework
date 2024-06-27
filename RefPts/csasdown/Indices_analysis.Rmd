@@ -1,0 +1,159 @@
+```{r indices-analysis,include=F,warning=F}
+
+# Get the median, maximum, and maximum 3 year rolling mean, then get the LRP and USR from those
+
+# SFA 25A
+surv.25a <- survey.obj$Sab$model.dat
+surv.25a <- surv.25a |> collapse::fsubset(year >=1994)
+surv.25a <- rbind(surv.25a,c(2020,rep(NA,ncol(surv.25a)-1)))
+surv.25a <- rbind(surv.25a,c(2015,rep(NA,ncol(surv.25a)-1)))
+surv.25a <- surv.25a[order(surv.25a$year),] # get the years ordered correctly for the rolling mean
+gmean.25a <- exp(mean(log(surv.25a$I),na.rm=T))
+max.25a <- max(surv.25a$I,na.rm=T)
+# Geometric rolling mean
+ma.three.mean.25a <- exp(c(na.omit(rollmean(log(na.omit(surv.25a$I)),3,'center'))))
+max.three.25a <- max(ma.three.mean.25a,na.rm=T)
+# Doing this with the last 3 years of data available, so if missing a survey we go back and use the information from the year before that
+
+bm.last.3.25a <- ma.three.mean.25a[length(ma.three.mean.25a)]
+ratio.25a <- gmean.25a/max.three.25a
+LRP.med.3.25a <- round(0.3*gmean.25a,digits = 0)
+LRP.med.4.25a <- round(0.4*gmean.25a,digits = 0)
+LRP.max.2.25a <- round(0.2*max.three.25a,digits = 0)
+USR.med.8.25a <- round(0.8*gmean.25a,digits = 0)
+USR.max.4.25a <- round(0.4*max.three.25a,digits = 0)
+
+# SFA 26A
+surv.26a <- survey.obj$BBn$model.dat
+surv.26a <- rbind(surv.26a,c(2020,rep(NA,ncol(surv.26a)-1)))
+surv.26a <- surv.26a |> collapse::fsubset(year >=1994)
+surv.26a <- surv.26a[order(surv.26a$year),] # get the years ordered correctly for the rolling mean
+gmean.26a <- exp(mean(log(surv.26a$I),na.rm=T))
+max.26a <- max(surv.26a$I,na.rm=T)
+# Geometric rolling mean
+ma.three.mean.26a <- exp(c(na.omit(rollmean(log(na.omit(surv.26a$I)),3,'center'))))
+max.three.26a <- max(ma.three.mean.26a,na.rm=T)
+# Current 3 year geometric mean biomass
+bm.last.3.26a <- ma.three.mean.26a[length(ma.three.mean.26a)]
+ratio.26a <- gmean.26a/max.three.26a
+LRP.med.3.26a <- round(0.3*gmean.26a,digits = 0)
+LRP.med.4.26a <- round(0.4*gmean.26a,digits = 0)
+LRP.max.2.26a <- round(0.2*max.three.26a,digits = 0)
+USR.med.8.26a <- round(0.8*gmean.26a,digits = 0)
+USR.max.4.26a <- round(0.4*max.three.26a,digits = 0)
+
+
+# SFA 26C
+surv.26c <- lined.survey.obj$model.dat # Has NA's for missing 2020 so good to use as is
+surv.26c <- surv.26c |> collapse::fsubset(year >=1994)
+gmean.26c <- exp(mean(log(surv.26c$I),na.rm=T))
+max.26c <- max(surv.26c$I,na.rm=T)
+# Geometric rolling mean
+ma.three.mean.26c <- exp(na.omit(c(rollmean(log(na.omit(surv.26c$I)),3,'center'))))
+max.three.26c <- max(ma.three.mean.26c,na.rm=T)
+# Current 3 year geometric mean biomass
+bm.last.3.26c <- ma.three.mean.26c[length(ma.three.mean.26c)]
+ratio.26c <- gmean.26c/max.three.26c
+LRP.med.3.26c <- round(0.3*gmean.26c,digits = 0)
+LRP.med.4.26c <- round(0.4*gmean.26c,digits = 0)
+LRP.max.2.26c <- round(0.2*max.three.26c,digits = 0)
+USR.med.8.26c <- round(0.8*gmean.26c,digits = 0)
+USR.max.4.26c <- round(0.4*max.three.26c,digits = 0)
+
+# SFA 27B
+surv.27b <- survey.obj$GBb$model.dat # Need to add missing 2020 survey in here.
+surv.27b <- rbind(surv.27b,c(2020,rep(NA,ncol(surv.27b)-1)))
+surv.27b <- surv.27b |> collapse::fsubset(year >=1994)
+surv.27b <- surv.27b[order(surv.27b$year),] # get the years ordered correctly for the rolling mean
+gmean.27b <- exp(mean(log(surv.27b$I),na.rm=T))
+max.27b <- max(surv.27b$I,na.rm=T)
+ma.three.mean.27b <- exp(c(na.omit(rollmean(log(na.omit(surv.27b$I)),3,'center'))))
+max.three.27b <- max(ma.three.mean.27b,na.rm=T)
+# Current 3 year geometric mean biomass
+bm.last.3.27b <- ma.three.mean.27b[length(ma.three.mean.27b)]
+ratio.27b <- gmean.27b/max.three.27b
+LRP.med.3.27b <- round(0.3*gmean.27b,digits = 0)
+LRP.med.4.27b <- round(0.4*gmean.27b,digits = 0)
+LRP.max.2.27b <- round(0.2*max.three.27b,digits = 0)
+USR.med.8.27b <- round(0.8*gmean.27b,digits = 0)
+USR.max.4.27b <- round(0.4*max.three.27b,digits = 0)
+
+# Old German data, curious what the median/max ratio was...
+gmean.unlined.26c <- median(survey.obj$Ger$model.dat$I,na.rm=T)
+max.unlined.26c <- max(survey.obj$Ger$model.dat$I,na.rm=T)
+ma.three.mean.unlined.26c <- c(na.omit(rollmean(survey.obj$Ger$model.dat$I,3,'center')))
+max.three.unlined.26c <- max(ma.three.mean.unlined.26c,na.rm=T)
+ratio.unlined.26c <- gmean.unlined.26c/max.three.unlined.26c
+
+```
+
+```{r indices-figures,include=F,warning=F}
+
+# The simple reference point figures
+plt.dat.25a <- data.frame(year =2020:2022,cur.bm = bm.last.3.25a,
+                          lrp.2 = LRP.max.2.25a,lrp.3 = LRP.med.3.25a,lrp.4 = LRP.med.4.25a,
+                          usr.4 = USR.max.4.25a,usr.8 = USR.med.8.25a)
+                          
+plt.25a <- ggplot(surv.25a) + geom_line(aes(x=year,y=I)) + 
+                              geom_line(data= plt.dat.25a,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.25a$lrp.2[1],color='firebrick2',linetype='solid') +
+                              geom_hline(yintercept = plt.dat.25a$lrp.3[1],color='firebrick2',linetype = 'dashed') +
+                              geom_hline(yintercept = plt.dat.25a$lrp.4[1],color='firebrick2',linetype='dotted') +
+                              geom_hline(yintercept = plt.dat.25a$usr.4[1],color=u.colors[2],linetype = 'solid') +
+                              geom_hline(yintercept = plt.dat.25a$usr.8[1],color=u.colors[2],linetype='dashed') +
+                              scale_x_continuous(name = '',breaks = seq(1994,2025,by=3),limits = c(1994,2022)) +
+                              scale_y_continuous(name = "Survey Biomass Index (tonnes)",limits=c(0,2500))
+
+# Now BBn
+plt.dat.26a <- data.frame(year =2020:2022,cur.bm = bm.last.3.26a,
+                          lrp.2 = LRP.max.2.26a,lrp.3 = LRP.med.3.26a,lrp.4 = LRP.med.4.26a,
+                          usr.4 = USR.max.4.26a,usr.8 = USR.med.8.26a)
+                          
+plt.26a <- ggplot(surv.26a) + geom_line(aes(x=year,y=I)) + 
+                              geom_line(data= plt.dat.26a,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.26a$lrp.2[1],color='firebrick2',linetype='solid') +
+                              geom_hline(yintercept = plt.dat.26a$lrp.3[1],color='firebrick2',linetype = 'dashed') +
+                              geom_hline(yintercept = plt.dat.26a$lrp.4[1],color='firebrick2',linetype='dotted') +
+                              geom_hline(yintercept = plt.dat.26a$usr.4[1],color=u.colors[2],linetype = 'solid') +
+                              geom_hline(yintercept = plt.dat.26a$usr.8[1],color=u.colors[2],linetype='dashed') +
+                              scale_x_continuous(name = '',breaks = seq(1994,2025,by=3),limits = c(1994,2022)) +
+                              scale_y_continuous(name = "Survey Biomass Index (tonnes)",limits=c(0,6500))
+# Now german
+plt.dat.26c <- data.frame(year =2020:2022,cur.bm = bm.last.3.26c,
+                          lrp.2 = LRP.max.2.26c,lrp.3 = LRP.med.3.26c,lrp.4 = LRP.med.4.26c,
+                          usr.4 = USR.max.4.26c,usr.8 = USR.med.8.26c)
+                          
+plt.26c <- ggplot(surv.26c) + geom_line(aes(x=year,y=I)) + 
+                              geom_line(data= plt.dat.26c,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.26c$lrp.2[1],color='firebrick2',linetype='solid') +
+                              geom_hline(yintercept = plt.dat.26c$lrp.3[1],color='firebrick2',linetype = 'dashed') +
+                              geom_hline(yintercept = plt.dat.26c$lrp.4[1],color='firebrick2',linetype='dotted') +
+                              geom_hline(yintercept = plt.dat.26c$usr.4[1],color=u.colors[2],linetype = 'solid') +
+                              geom_hline(yintercept = plt.dat.26c$usr.8[1],color=u.colors[2],linetype='dashed') +
+                              scale_x_continuous(name = '',breaks = seq(1994,2025,by=3),limits = c(2008,2022)) +
+                              scale_y_continuous(name = "Survey Biomass Index (tonnes)",limits=c(0,2000))
+
+# Now GGb
+plt.dat.27b <- data.frame(year =2020:2022,cur.bm = bm.last.3.27b,
+                          lrp.2 = LRP.max.2.27b,lrp.3 = LRP.med.3.27b,lrp.4 = LRP.med.4.27b,
+                          usr.4 = USR.max.4.27b,usr.8 = USR.med.8.27b)
+                          
+plt.27b <- ggplot(surv.27b) + geom_line(aes(x=year,y=I)) + geom_point(aes(x=year,y=I),size=3) +
+                              geom_line(data= plt.dat.27b,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.27b$lrp.2[1],color='firebrick2',linetype='solid') +
+                              geom_hline(yintercept = plt.dat.27b$lrp.3[1],color='firebrick2',linetype = 'dashed') +
+                              geom_hline(yintercept = plt.dat.27b$lrp.4[1],color='firebrick2',linetype='dotted') +
+                              geom_hline(yintercept = plt.dat.27b$usr.4[1],color=u.colors[2],linetype = 'solid') +
+                              geom_hline(yintercept = plt.dat.27b$usr.8[1],color=u.colors[2],linetype='dashed') +
+                              scale_x_continuous(name = '',breaks = seq(1994,2025,by=3),limits = c(1994,2022)) +
+                              scale_y_continuous(name = "Survey Biomass Index (tonnes)",limits=c(0,2000))
+
+
+
+
+```
+
+
+
+
+

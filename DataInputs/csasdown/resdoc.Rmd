@@ -1,0 +1,644 @@
+---
+title: ""
+french_title: "En francais"
+author: |
+  Freya Keyser,
+  Tricia Pearo Drew,
+  Amy Glass, and
+  David Keith
+author_list: "Keyser, F., Pearo Drew, T., Glass, A., Keith, D."
+address: |
+  Bedford Institute of Oceanography\
+     Fisheries and Oceans Canada, 1 Challenger Drive\
+     Dartmouth, Nova Scotia, Canada, B2Y 4A2\
+french_address: |
+  ^1^Station biologique du Pacifique\
+     Pêches et Océans Canada, 3190 Hammond Bay Road\
+     Nanaimo, Colombie-Britannique, V9T 6N7, Canada\
+     Une autre galaxie
+month: "Month"
+french_month: "Mois"
+year: 2023
+report_number: nnn
+region: "Maritimes Region"
+isbn: "978-0-660-43102-4"
+cat_no: "Fs70-5/2022-006E-PDF"
+french_region: "Région des Maritimes"
+citation_other_language: "Keyser, F., Pearo Drew, T., Glass, A., et Keith, D. L'évaluation de petoncles dans les zones de pêche"
+abstract: |
+  Here is the abstract text. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  Start new paragraphs after a blank line and with 2 spaces indent. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+french_abstract: |
+  Voici le texte du résumé. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  
+  Commencez les nouveaux paragraphes après une ligne blanche et avec un retrait de 2 espaces. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  
+header: "Draft working paper --- Do not cite or circulate" # or "" to omit
+output:
+ csasdown::resdoc_word:
+   # copy_sty is a toggle to copy the style file from the csasdown package every time you compile
+   # the document. If false, any changes you have made to the style file in your project
+   # will remain between compilations. If true, your changes will be lost when you compile
+   # line_nums is a toggle to show line numbers on the left side of the page. 
+   # line_nums_mod represents showing every Nth line if line_nums is true
+   # lot_lof is a toggle to show/not show the lists of tables and figures at the
+   # beginning of the document
+   # draft_watermark is a toggle to show/not show a DRAFT watermark across every page
+   # include_section_nums, if true includes section numbering in the document body,
+   # if false, no numbering in the document budy but the TOC will still show numbering
+   # pandoc --list-highlight-styles
+   # pygments, tango, espresso, zenburn, kate, monochrome, breezedark, haddock
+   # or the name of a custom *.latex file which is most easily made by copying one from 
+   # file.path(.libPaths(), "csasdown", "themes")
+   # to your working directory (the one containing index.Rmd)
+   # To change the foreground text color, change the RGB value in the line containing
+   # 'DefineVerbatimEnvironment'
+   # To change background color, change the RGB values in the line containing 'shadecolor'
+   french: false
+   copy_sty: true
+   line_nums: true
+   line_nums_mod: 1
+   lot_lof: false
+   draft_watermark: false
+   include_section_nums: true
+   # highlight is the theme to use for code output. Must be one of the list given by:
+   # which are:
+   # the csasdown library 'themes' directory, this directory on your machine:
+   highlight: tango
+knit: (function(input, ...) {
+       csasdown::render('_bookdown.yml')
+      })
+link-citations: true
+bibliography: MAR_SABHU.bib
+# Any extra LaTeX code for the header:
+# header-includes:
+# - \usepackage{tikz}
+---
+
+```{r setup, echo=FALSE, cache=FALSE, message=FALSE, results='hide', warning=FALSE}
+library(knitr)
+if (is_latex_output()) {
+  knitr_figs_dir <- "knitr-figs-pdf/"
+  knitr_cache_dir <- "knitr-cache-pdf/"
+  fig_out_type <- "png"
+} else {
+  knitr_figs_dir <- "knitr-figs-docx/"
+  knitr_cache_dir <- "knitr-cache-docx/"
+  fig_out_type <- "png"
+}
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos
+)
+```
+
+```{r load-libraries, echo = FALSE, cache = FALSE, message = FALSE, results = 'hide', warning = FALSE}
+# add other packages here:
+library(dplyr)
+library(readr)
+library(tibble)
+library(csasdown)
+
+params <- NULL
+params$bank <- c("Ban", "Mid", 
+  "Sab", "Ger", "BBs", "BBn")
+params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022)
+params$bankname <- c("Banquereau", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North")
+params$banknum <- 1:length(params$bank)
+
+fr <- ""
+#fr <- "_fr"
+if(fr=="") language <- "english"
+if(!fr=="") language <- "french"
+nickname <- "framework3"
+```
+```{r bilingual-code, cache=FALSE}
+options(
+  # Prevent xtable from adding a timestamp comment to the table code it produces
+  xtable.comment = FALSE,
+  # Do not allow kableExtra to load packages, we add them manually in csasdown
+  kableExtra.latex.load_packages = FALSE,
+  # Stop chunk output (echo) running into the margins
+  width = 80,
+  # Do not use scientific notation (stops tables from showing 1.2e3, etc.)
+  scipen = 999)
+
+meta <- rmarkdown::metadata
+meta_out <- rmarkdown::metadata$output
+csl <- "csl/csas.csl"
+options(OutDec = ".")
+if (is.null(getOption("french"))) {
+  stop("`french` was not set up correctly in YAML header in index.Rmd. ",
+       "It must be true or false",
+       call. = FALSE)
+}
+if (getOption("french")) {
+  csl <- "csl/csas-french.csl"
+  options(OutDec = ",")
+}
+
+french <- isTRUE(getOption("french")) # for backwards compatibility
+
+# This hook simplifies document translation for the author.
+# When building in French, it draws a box around paragraphs contained in chunks
+#  which have the option `needs_trans = TRUE`. It also labels
+#  the box with a "Needs translation" tag in red and the chunk label in blue.
+# You need to change the `needs_trans` option to `FALSE` for a chunk once you
+#  have inserted the translated text into it. You will get a utf-8 error if
+#  you leave it as `TRUE` and there is French in the chunk.
+#  This function assumes you are translating from English to French.
+#  If you wrote your document in French and want to translate to English,
+#  put a ! before `getOption("french")` below and add the `need_trans`
+#  chunk options to your English paragraph chunks instead of the French ones.
+#  
+#  IMPORTANT NOTES
+#  - Use `csasdown::render()` to render the document. This runs a
+#    pre-processing step which ensures any inline R chunks
+#    `r print("Like this one")` are taken care of correctly and that all
+#    backslash variables (eg. \pi, \alpha, \@ref, \cite) are all processed
+#    correctly.
+#  - French latex places a space before the colon by default so if you need a colon
+#    with no space before it, use \\hc .
+knit_hooks$set(needs_trans = function(before, options){
+  if(getOption("french") && options$needs_trans){
+    if (before){
+      paste0("\\
+   \\begin{lrbox}{\\userinput}
+   \\begin{minipage}{\\dimexpr\\linewidth-2\\fboxsep-2\\fboxrule}
+   \\textcolor{red}{\\textbf{Needs translation - \\textcolor{blue}{knitr chunk: ", options$label, "}}}
+   \\begin{lstlisting}
+  ")
+    } else {
+      "
+   \\end{lstlisting}
+   \\end{minipage}
+   \\end{lrbox}
+   \\noindent
+   \\fbox{\\usebox{\\userinput}}
+  "
+    }
+  }
+})
+```
+
+---
+title: `r ifelse(fr(), meta$french_title, meta$title)`
+month: `r ifelse(fr(), meta$french_month, meta$month)`
+region: `r ifelse(fr(), meta$french_region, meta$region)`
+csl: `r csl`
+---
+
+<!--chapter:end:tmp-index.Rmd-->
+
+# Introduction
+
+Scallop fishery description. Introduce SFAs and management scheme. The last full assessment for the Offshore Scallop fishery occurred in 2013, and focused on Georges Bank 'a' and Browns Bank north, which are part of SFA 27 and 26, respectively. Annual updates for these two stocks have occurred since***. However, the offshore scallop fishery consists of 9 management units in total. SFA 26 also includes Browns Bank South and German Bank, SFA 27 includes Georges Bank 'b', and SFA 25, known as the eastern scotian shelf, includes management units 25 (Sable and Middle Bank), and 25b (Banquereau Bank). An annual review of fishery and survey data summaries for all 9 stocks occurs as part of the OSAC process, however, the methodology underlying the current fishery and survey summaries has not been peer-reviewed. Furthermore, stock status information has not been published since 2001 for the Eastern Scotian Shelf stocks (Sable and Middle Banks) and 1997 for German Bank; Browns Bank South and Banquereau Bank have not been published before.
+
+## Species biology
+
+
+## Framework objectives
+
+The objectives of this framework are:  
+
+- To describe the fishery, survey, and biological data informing the assessment of SFAs 25 and 26 (Part 1, this document)
+- To evaluate the analysis methodology used to summarize the above data for SFAs 25 and 26 (Part 2, separate document)
+- To propose reference points for SFAs 25 and 26 (Part 2, separate document)  
+
+This Data Inputs review document will:  
+
+- Summarize and review the sampling protocols used during the surveys of SFA 25 and 26 over time
+- Review the statistical design(s) of the surveys of SFA 25 and 26 over time
+- Review the fishery data collected for trips occurring in SFA 25 and 26 (process, volume of data, quality and validation)
+- Review the methods used to summarize survey and fishery data into Science advice
+- Present the summarized survey and fishery data for each management unit
+
+notes
+
+- tow-by-tow summary. station locations over time?
+- clappers only for sable and north
+- ts figures for all banks (fishery, abund, biomass, cond)
+- survey map for all banks... example for german
+
+
+# Fishery
+
+- Fishery independent data
+- Logbooks
+
+
+## Fishery history
+
+- Fleet dynamic
+- Management
+
+
+## Fishery data
+
+- Footprint
+- CPUE
+- Port sampling
+
+
+# Survey
+
+The Offshore Scallop Survey Database (SCALOFF) contains data collected through Collaborative Agreements (formerly Joint Project Agreements) between DFO Science and the Seafood Producers Association of Nova Scotia (SPANS). The Offshore Scallop Survey collects data on the stocks of Sea Scallop (*Placopecten magellanicus*) on the Scotian Shelf and the Canadian side of Georges Bank, as well as Iceland Scallop (*Chlamys islandica*) on Banquereau Bank. These stocks correspond to the DFO management units known as Scallop Fishing Areas (SFA) 25, 26, and 27, and the survey data are the primary source of fishery-independent information used in the Maritimes Region scallop stock assessments. Under the Collaborative Agreement, survey responsibilities are shared by DFO and SPANS. At-sea survey activities are directed by the DFO Chief Scientist aboard the survey vessel. SPANS coordinates the provision the survey vessel as well as the necessary crew complement to conduct the survey activities. DFO Science designs the survey, provides and manages scientific equipment, and validates, archives, and analyzes survey data. 
+
+## Survey history  
+
+The Offshore Scallop Survey has occurred between May and September annually since 1978 with few exceptions, but spatial coverage and survey designs have changed over time (see Survey Design).  
+
+## Sampling protocols  
+
+Regardless of survey design, the same sampling protocol is followed: At each survey station, the 8-ft scallop dredge lined with 38 mm mesh is towed for 10 minutes, and every scallop is counted and assigned to a 5 mm shell height bin (ranging from 0-200 mm). Detailed sampling occurs at a selection of the stations, where the exact shell heights and meat weights are measured for a sub-sample of the scallops caught. Bottom temperature data has also been collected on the Offshore Scallop survey since 2011.  
+
+## Survey design  
+
+- by bank
+- stratification  
+
+## Ageing
+
+
+
+
+<!--chapter:end:tmp-01-text.Rmd-->
+
+<!-- Do not edit this file! -->
+
+\clearpage
+
+# REFERENCES {-}
+
+<!--chapter:end:tmp-02-references.Rmd-->
+
+\clearpage
+
+# Tables {-}
+
+```{r include=F, echo=F}
+require(tidyverse)
+require(csasdown)
+require(kableExtra)
+require(officedown)
+require(officer)
+require(flextable)
+strata <- readxl::read_excel("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/survey_design.xlsx")
+strata$`Area (km^2)` <- round(x=as.numeric(strata$`Area (km^2)`), digits=2)
+strata <- strata[1:17,]
+opts <- options(knitr.kable.NA = "")
+strata
+# strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
+#   kableExtra::collapse_rows(columns = 1:4, valign = "top")
+
+ageing_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/summary_stats.csv")
+ageing_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/summary_stats.csv")
+ageing_bbn$`Management Unit` <- "Browns Bank North"
+ageing_sab$`Management Unit` <- "Sable Bank"
+ageing <- rbind(ageing_sab, ageing_bbn)
+ageing <- dplyr::select(ageing, -X)
+ageing <- data.frame(ageing$`Management Unit`, ageing[,1:(ncol(ageing)-1)])
+names(ageing)[1:2] <- c("Management Unit", "Model")
+ageing1 <- unique(dplyr::select(ageing, Model, Formula))
+ageing2 <- dplyr::select(ageing, -Formula)
+ageing2$AIC <- round(ageing2$AIC, 0)
+ageing2$r.sq <- round(ageing2$r.sq, 3)
+ageing2$scale.est <- round(ageing2$scale.est, 2)
+ageing2[,c("H10", "H5", "H2", "K_maxR", "K_avgFR", "K_2_to_5")] <- round(ageing2[,c("H10", "H5", "H2", "K_maxR", "K_avgFR", "K_2_to_5")], 1)
+ageing2$`Management Unit`[ageing2$`Management Unit`=="Sable Bank"] <- c("Sable Bank", NA, NA)
+ageing2$`Management Unit`[ageing2$`Management Unit`=="Browns Bank North" & !is.na(ageing2$`Management Unit`)] <- c("Browns Bank North", NA, NA)
+ageing3 <- ageing2[,c(1:2,9:7)]
+ageing4 <- ageing2[,c(1:2,10:15)]
+ageing2 <- ageing2[,c(1:6)]
+
+opts <- options(knitr.kable.NA = "")
+
+```
+
+
+
+```{r echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0,bold=TRUE)
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+```{r echo=F, message=F, eval=F}
+### IGNORE THIS CHUNK. FOR PRESENTATION ONLY
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+# csas_table(ageing1, caption ="Growth model specification.") %>% kableExtra::row_spec(0,bold=TRUE)
+# #qflextable(strata)
+# 
+# csas_table(ageing2, caption ="Growth model evaluation.") %>% kableExtra::row_spec(0,bold=TRUE)
+# 
+# csas_table(ageing3, caption ="Shell heights at age 2, 5, and 10 for aged scallops, from three models.") %>% kableExtra::row_spec(0,bold=TRUE)
+# 
+# csas_table(ageing4, caption ="Comparative growth metrics for aged scallops, from three models. A_avgFR is the age of an average fully-recruited scallop, A_maxR is the age of a scallop at maximum recruit size, and A_minR is the age of a scallop at the minimum recruit size. K values represent growth (in mm) in the year prior to reaching average fully-recruited shell height (K_avgFR) and maximum recruit size (K_maxR), and from ages 2 to 5 (K_2-5).") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+
+<!--chapter:end:tmp-03-tables.Rmd-->
+
+---
+output:
+  pdf_document:
+    fig_caption: yes
+    extra_dependencies: float
+linkcolor: blue
+params:
+  bank: NA
+  banknum: NA
+  surv.year: NA
+header-includes: \usepackage{float}
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include=F, echo=F}
+# knitr::opts_knit$set(eval.after = "fig.cap")
+# knitr::opts_chunk$set(fig.pos = 'H')
+# options(knitr.kable.NA = '')
+require(tidyverse)
+options(tinytex.verbose = TRUE)
+
+direct_fns <- "C:/Users/keyserf/Documents/Github/Assessment_fns/"
+
+year <- 2022
+
+load("data/summary4.Rdata")
+source(paste0(direct_fns, "/Other_functions/ScallopRound.R"))
+
+ntows <- summary_data$ntows
+highlights <- summary_data$highlights
+sizes <- summary_data$sizes
+dates <- summary_data$dates
+yeartable <- summary_data$yeartable
+spatial.sum.stats <- summary_data$spatial.sum.stats
+
+bank <- data.frame(lab = c("Ban", "BanIce", "Mid", "Sab", "Ger", "BBn", "BBs", "GB", "GBa", "GBb"), name=NA)
+bank$name[bank$lab=="Ban"] <- "Banquereau (Sea scallop)"
+bank$name[bank$lab=="BanIce"] <- "Banquereau (Icelandic scallop)"
+bank$name[bank$lab=="Mid"] <- "Middle Bank"
+bank$name[bank$lab=="Sab"] <- "Sable Bank"
+bank$name[bank$lab=="Ger"] <- "German Bank"
+bank$name[bank$lab=="BBn"] <- "Browns Bank North"
+bank$name[bank$lab=="BBs"] <- "Browns Bank South"
+bank$name[bank$lab=="GB"] <- "Georges Bank (monitoring stations)"
+bank$name[bank$lab=="GBa"] <- "Georges Bank 'a'"
+bank$name[bank$lab=="GBb"] <- "Georges Bank 'b'"
+
+```
+
+\clearpage
+
+# Figures {-}
+
+```{r, echo=F, fig.cap="Catch, effort, and catch per unit effort for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/2023/Updates/GBa//Figures_and_tables/",language, "/Offshore_banks.png"))
+```
+
+```{r, echo=F, fig.cap="Catch, effort, and catch per unit effort for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/fishery_25_", nickname, ".png"))
+```
+
+```{r, echo=F, fig.cap="Catch, effort, and catch per unit effort for SFA 26 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/fishery_26_", nickname, ".png"))
+```
+
+```{r, echo=F, fig.cap="Spatial distribution of commerical catch (tonnes) in 10km^2 cells for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/footprint_25_", nickname, ".png"))
+```
+
+```{r, echo=F, fig.cap="Spatial distribution of commercial catch (tonnes) in 10km^2 cells for SFA 26 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/footprint_26_", nickname, ".png"))
+```
+
+
+
+
+
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[1], " survey design in ", params$surv.year[1], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[1], "/Presentations/Survey_summary/", params$bank[1], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[2], " survey design in ", params$surv.year[2], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[2], "/Presentations/Survey_summary/", params$bank[2], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[3], " survey design in ", params$surv.year[3], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[3], "/Presentations/Survey_summary/", params$bank[3], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[4], " survey design in ", params$surv.year[4], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[4], "/Presentations/Survey_summary/", params$bank[4], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[5], " survey design in ", params$surv.year[5], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[5], "/Presentations/Survey_summary/", params$bank[5], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+```{r, echo=F, message=F, out.height="55.778%", out.width="100%", fig.cap=paste0(params$bankname[6], " survey design in ", params$surv.year[6], ".")}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/", params$surv.year[6], "/Presentations/Survey_summary/", params$bank[6], "/survey_strata.png"))
+# print(paste0("Figure ", params$banknum, ". Example survey design for ", params$bankname))
+```
+
+
+
+
+
+```{r, echo=FALSE, message=F,fig.align="center", fig.cap="Ages and shell heights of scallops collected on Sable Bank in 2012 (points), and the von Bertallanfy growth model (line) with parameters."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/fit_vb", fr, ".png"))
+#8 in * 8 in
+# out.width=400, out.height=400,
+```
+
+```{r, echo=FALSE, message=F,  fig.align="center", fig.cap="Residuals of the von Bertallanfy growth model for Sable Bank in 2012 (points), the corresponding linear relationship (line), and confidence interval (shading)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/resid_vb", fr, ".png"))
+#2100*2100
+#out.width=400, out.height=400,
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Growth (mm) in the previous year for scallops on Sable Bank in 2012 as predicted by the von Bertallanfy model, by age and by current shell height (mm)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/growth_vb", fr, ".png"))
+#4200W * 2100H
+```
+
+```{r, echo=FALSE, message=F,fig.align="center", fig.cap="Ages and shell heights of scallops collected on Browns Bank North in 2011 and 2012 (points), and the von Bertallanfy growth model (line) with parameters."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/fit_vb", fr, ".png"))
+# out.width=400, out.height=400,
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Residuals of the von Bertallanfy growth model for Browns Bank North in 2011 and 2012 (points), the corresponding linear relationship (line), and confidence interval (shading)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/resid_vb", fr, ".png"))
+#out.width=400, out.height=400,
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Growth (mm) in the previous year for scallops on Browns Bank North in 2011 and 2012 as predicted by the von Bertallanfy model, by age and by current shell height (mm)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/growth_vb", fr, ".png"))
+```
+
+
+
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number of recruit scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of recruit scallop per standardized tow (y-axis) for SFA 25 management units using different recruit size ranges (shapes)."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_25_compare", fr, ".png"))
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number of recruit scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of recruit scallop per standardized tow (y-axis) for SFA 26 management units using different recruit size ranges (shapes)"}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_26_compare", fr, ".png"))
+```
+
+
+
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number of scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of scallop per standardized tow (y-axis) for SFA 25 management units. Recruit size is 75-90mm."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_25_", nickname, fr, ".png"))
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series for pre-recuit, recruit, and fully-recruited scallop, represented by number of scallop per standardized tow (y-axis) and biomass (right) time series represented by grams of scallop per standardized tow (y-axis) for SFA 26 management units. Recruit size is 75-90mm for Browns Bank north and south, and 95-105mm on German Bank."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/timeseries_26_", nickname, fr, ".png"))
+```
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 25 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/cfts_25_", nickname, fr, ".png"))
+```
+
+
+```{r, echo=FALSE, message=F, fig.align="center", fig.cap="Condition ($g/dm^3$) time series for SFA 26 management units."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/cfts_26_", nickname, fr, ".png"))
+```
+
+
+
+<!--chapter:end:tmp-04-figures.Rmd-->
+
+<!-- The following code should appear at the beginning of the first appendix.
+After that, all subsequent sections will be turned into appendices. -->
+
+`r if(knitr:::is_latex_output()) '\\Appendices'`
+
+`r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'`
+
+# THE FIRST APPENDIX {#app:a}
+
+Content here.
+
+## a-1 {#app:a-1}
+
+Content here.
+
+### a-1-1 {#app:a-1-1}
+
+Content here.
+
+#### a-1-1-1 {#app:a-1-1-1}
+
+Content here.
+
+#### a-1-1-2 {#app:a-1-1-2}
+
+Content here.
+
+### a-1-2 {#app:a-1-2}
+
+Content here.
+
+
+## a-2 {#app:a-2}
+
+Content here.
+
+### a-2-1 {#app:a-2-1}
+
+Content here.
+
+#### a-2-1-1 {#app:a-2-1-1}
+
+Content here.
+
+### a-2-2 {#app:a-2-2}
+
+Content here.
+
+
+# THE SECOND APPENDIX, FOR FUN {#app:b}
+
+More content.
+
+## b-1 {#app:b-1}
+
+Content here.
+
+
+## b-2 {#app:b-2}
+
+Content here.
+
+
+
+<!--chapter:end:tmp-05-appendix.Rmd-->
+
+## Formatting to-do
+
+- caption styles
+- change colons in captions to periods
+- bold table headers
+- delete TOC
+- move abstract up
+- add title, author, etc.
+- citation
+- DRAFT watermark
+- Bullets
+- Body text style
+- Crop old survey design figures  
+
+<!--chapter:end:tmp-06-formatting.Rmd-->
+
