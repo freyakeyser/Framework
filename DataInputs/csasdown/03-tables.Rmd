@@ -1,3 +1,10 @@
+---
+output:
+  word_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
 \clearpage
 
 # Tables {-}
@@ -6,44 +13,196 @@
 require(tidyverse)
 require(csasdown)
 require(kableExtra)
-require(officedown)
+#require(officedown)
 require(officer)
-require(flextable)
+# require(flextable)
+require(dplyr)
 strata <- readxl::read_excel("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/survey_design.xlsx")
 strata$`Area (km^2)` <- round(x=as.numeric(strata$`Area (km^2)`), digits=2)
-strata <- strata[1:17,]
-opts <- options(knitr.kable.NA = "")
-strata
+strata <- strata[c(1:17, 25:29),] # to exclude GBa
+names(strata)[which(names(strata)=="Area (km^2)")] <- "Area (km^2^)"
+names(strata)[which(names(strata)=="Management Unit")] <- "Stock"
+strata$`Stock`[strata$`Stock`=="Sab"] <- "25A-Sab"
+strata$`Stock`[strata$`Stock`=="Mid"] <- "25A-Mid"
+strata$`Stock`[strata$`Stock`=="Ban"] <- "25B-Ban"
+strata$`Stock`[strata$`Stock`=="BBn"] <- "26A-BBn"
+strata$`Stock`[strata$`Stock`=="BBs"] <- "26B-BBs"
+strata$`Stock`[strata$`Stock`=="Ger"] <- "26C-Ger"
+strata$`Stock`[strata$`Stock`=="GBb"] <- "27B-GBb"
+strata$`Area (km^2^)`[is.na(strata$`Area (km^2^)`)] <- "NA"
+
+
 # strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
 #   kableExtra::collapse_rows(columns = 1:4, valign = "top")
 
+ps_tab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/ps_tab.csv")
+ps_tab <- dplyr::select(ps_tab, -X, -main)
+names(ps_tab) <- c("SFA", "Stock", "Number of samples", "Number of years with PS data", "Most recent year with PS data", "Number of months with PS data, all years combined (to a maximum of 12)", "Long term median MW (g)", "Standard deviation MW (g)", "Minimum MW (g)", "Maximum MW (g)")
+
+ps_tab$`Bank`[ps_tab$`Stock`=="Sab"] <- "Sable Bank"
+ps_tab$`Bank`[ps_tab$`Stock`=="Mid"] <- "Middle Bank"
+ps_tab$`Bank`[ps_tab$`Stock`=="Ban"] <- "Banquereau Bank"
+ps_tab$`Bank`[ps_tab$`Stock`=="BBn"] <- "Browns Bank North"
+ps_tab$`Bank`[ps_tab$`Stock`=="BBs"] <- "Browns Bank South"
+ps_tab$`Bank`[ps_tab$`Stock`=="Ger"] <- "German Bank"
+ps_tab$`Bank`[ps_tab$`Stock`=="GBb"] <- "Georges Bank 'b'"
+
+ps_tab$`Label`[ps_tab$`Stock`=="Sab"] <- "25A-Sab"
+ps_tab$`Label`[ps_tab$`Stock`=="Mid"] <- "25A-Mid"
+ps_tab$`Label`[ps_tab$`Stock`=="Ban"] <- "25B"
+ps_tab$`Label`[ps_tab$`Stock`=="BBn"] <- "26A"
+ps_tab$`Label`[ps_tab$`Stock`=="BBs"] <- "26B"
+ps_tab$`Label`[ps_tab$`Stock`=="Ger"] <- "26C"
+ps_tab$`Label`[ps_tab$`Stock`=="GBb"] <- "27B"
+
+ps_tab$`Stock`[ps_tab$`Stock`=="Sab"] <- "25A"
+ps_tab$`Stock`[ps_tab$`Stock`=="Mid"] <- "25A"
+ps_tab$`Stock`[ps_tab$`Stock`=="Ban"] <- "25B"
+ps_tab$`Stock`[ps_tab$`Stock`=="BBn"] <- "26A"
+ps_tab$`Stock`[ps_tab$`Stock`=="BBs"] <- "26B"
+ps_tab$`Stock`[ps_tab$`Stock`=="Ger"] <- "26C"
+ps_tab$`Stock`[ps_tab$`Stock`=="GBb"] <- "27B"
+
+ps_tab <- dplyr::select(ps_tab, SFA, `Stock`, Bank, Label, 3:10)
+ps_tab <- arrange(ps_tab, Label)
+ps_tab$`Long term median MW (g)` <- round(ps_tab$`Long term median MW (g)`, 1)
+ps_tab$`Standard deviation MW (g)` <- round(ps_tab$`Standard deviation MW (g)`, 1)
+ps_tab$`Minimum MW (g)` <- round(ps_tab$`Minimum MW (g)`, 1)
+ps_tab$`Maximum MW (g)` <- round(ps_tab$`Maximum MW (g)`, 1)
+
+mwsh_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/AICtable.csv")
+mwsh_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/AICtable.csv")
+mwsh_bbn$`Management Unit` <- "Browns Bank North"
+mwsh_sab$`Management Unit` <- "Sable Bank"
+mwsh <- rbind(mwsh_sab, mwsh_bbn)
+mwsh <- dplyr::select(mwsh, -X)
+mwsh <- data.frame(mwsh$`Management Unit`, mwsh[,1:(ncol(mwsh)-1)])
+names(mwsh) <- c("Stock", "dAIC", "df", "Model", "Formula")
+mwsh <- unique(dplyr::select(mwsh, `Stock`, Model, Formula, df, dAIC))
+mwsh$`Stock`[mwsh$`Stock`=="Sable Bank"] <- c("Sable Bank", rep(NA, (length(unique(mwsh$Model))-1)))
+mwsh$`Stock`[mwsh$`Stock`=="Browns Bank North" & !is.na(mwsh$`Stock`)] <- c("Browns Bank North", rep(NA, (length(unique(mwsh$Model))-1)))
+mwsh$dAIC <- round(mwsh$dAIC,0)
+mwsh <- dplyr::select(mwsh, -Model)
+mwsh$`Stock`[mwsh$`Stock`=="Sable Bank"] <- "25A-Sab"
+mwsh$`Stock`[mwsh$`Stock`=="Browns Bank North"] <- "26A-BBn"
+
+
 ageing_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/BBn/summary_stats.csv")
 ageing_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/Sab/summary_stats.csv")
-ageing_bbn$`Management Unit` <- "Browns Bank North"
-ageing_sab$`Management Unit` <- "Sable Bank"
+ageing_bbn$`Management Unit` <- "26A-BBn"
+ageing_sab$`Management Unit` <- "25A-Sab"
 ageing <- rbind(ageing_sab, ageing_bbn)
 ageing <- dplyr::select(ageing, -X)
 ageing <- data.frame(ageing$`Management Unit`, ageing[,1:(ncol(ageing)-1)])
-names(ageing)[1:2] <- c("Management Unit", "Model")
+names(ageing)[1:2] <- c("Stock", "Model")
 ageing1 <- unique(dplyr::select(ageing, Model, Formula))
 ageing2 <- dplyr::select(ageing, -Formula)
 ageing2$AIC <- round(ageing2$AIC, 0)
 ageing2$r.sq <- round(ageing2$r.sq, 3)
 ageing2$scale.est <- round(ageing2$scale.est, 2)
 ageing2[,c("H10", "H5", "H2", "K_maxR", "K_avgFR", "K_2_to_5")] <- round(ageing2[,c("H10", "H5", "H2", "K_maxR", "K_avgFR", "K_2_to_5")], 1)
-ageing2$`Management Unit`[ageing2$`Management Unit`=="Sable Bank"] <- c("Sable Bank", NA, NA)
-ageing2$`Management Unit`[ageing2$`Management Unit`=="Browns Bank North" & !is.na(ageing2$`Management Unit`)] <- c("Browns Bank North", NA, NA)
+ageing2$`Stock`[ageing2$`Stock`=="25A-Sab"] <- c("25A-Sab", NA, NA)
+ageing2$`Stock`[ageing2$`Stock`=="26A-BBn" & !is.na(ageing2$`Stock`)] <- c("26A-BBn", NA, NA)
 ageing3 <- ageing2[,c(1:2,9:7)]
 ageing4 <- ageing2[,c(1:2,10:15)]
 ageing2 <- ageing2[,c(1:6)]
+
+inc_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/increments_bbn.csv")
+sum_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/age_summary_bbn.csv")
+inc_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/increments_sab.csv")
+sum_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing/age_summary_sab.csv")
+
+inc <- full_join(inc_bbn, inc_sab)
+inc$height <- paste0(inc$med_height, " (", round(inc$sd_height,2), ")")
+inc <- pivot_wider(dplyr::select(inc, -X), id_cols=AGE, names_from = bank, values_from=c(n_inc, height))
+inc <- inc[,c("AGE", "n_inc_Sab", "height_Sab", "n_inc_BBn", "height_BBn")]
+names(inc) <- c("Age assigned", "Number of increments (25A-Sab)", "Median height (25A-Sab, SD)",  "Number of increments (26A-BBn)", "Median height (26A-BBn, SD)")
+
+age_summary <- full_join(sum_sab, sum_bbn)
+age_summary <- dplyr::select(age_summary, bank, year, tows, shells, increments, -X, -ager)
+age_summary$bank[age_summary$bank=="Sab"] <- "25A-Sab"
+age_summary$bank[age_summary$bank=="BBn"] <- "26A-BBn"
+names(age_summary) <- c("Stock", "Year", "Number of tows", "Number of shells", "Number of increments")
+
+rec_size_old <- read.csv("Y:/Offshore/Assessment/Data/Size_categories_by_bank.csv")
+rec_size_old$range <- paste0(rec_size_old$RS, "--", rec_size_old$CS)
+rec_size_old$Year <- "Previous size range (mm)"
+rec_size_old <- pivot_wider(rec_size_old, id_cols=Bank, values_from=range, names_from=Year)
+rec_size <- read.csv("Y:/Offshore/Assessment/Data/Size_categories_by_bank_75-90.csv")
+rec_size$range <- paste0(rec_size$RS, "--", rec_size$CS)
+rec_size$Year <- "New size range (mm)"
+rec_size <- pivot_wider(rec_size, id_cols=Bank, values_from=range, names_from=Year)
+rec_size <- full_join(rec_size_old, rec_size)
+rec_size$`New size range (mm)`[rec_size$`New size range (mm)`==rec_size$`Previous size range (mm)`] <- "No change"
+rec_size$Stock[rec_size$Bank=="Sab"] <- "25A-Sab"
+rec_size$Stock[rec_size$Bank=="Mid"] <- "25A-Mid"
+rec_size$Stock[rec_size$Bank=="Ban"] <- "25B"
+rec_size$Stock[rec_size$Bank=="BBn"] <- "26A"
+rec_size$Stock[rec_size$Bank=="BBs"] <- "26B"
+rec_size$Stock[rec_size$Bank=="Ger"] <- "26C"
+rec_size$Stock[rec_size$Bank=="GBb"] <- "27B"
+rec_size <- rec_size[!rec_size$Bank %in% c("GBa", "GB"),]
+rec_size <- dplyr::select(rec_size, "Stock", "Previous size range (mm)", "New size range (mm)")
+# banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")
+# ps.prop <- NULL
+# for(i in banks){
+#   ps.props <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/", i, "/boxplot_vals.csv"))
+#   ps.props$bank <- i
+#   ps.props$median.prop. <- round(ps.props$median.prop., 3)
+#   ps.prop <- rbind(ps.prop, ps.props)
+# }
+# ps.prop <- ps.prop[ps.prop$lim == "<90",]
+# ps.prop <- pivot_wider(ps.prop, id_cols = c(bank, lim), names_from = type, values_from=median.prop.) %>%
+#   dplyr::select(-lim) %>%
+#   dplyr::rename(Stock = bank,
+#                 `Year-round` = yearround,
+#                 `Apr--Aug` = ss)
+# ps.prop$Stock[ps.prop$Stock=="Sab"] <- "25A-Sab"
+# ps.prop$Stock[ps.prop$Stock=="Mid"] <- "25A-Mid"
+# ps.prop$Stock[ps.prop$Stock=="Ban"] <- "25B"
+# ps.prop$Stock[ps.prop$Stock=="BBn"] <- "26A"
+# ps.prop$Stock[ps.prop$Stock=="BBs"] <- "26B"
+# ps.prop$Stock[ps.prop$Stock=="Ger"] <- "26C"
+# ps.prop$Stock[ps.prop$Stock=="GBb"] <- "27B"
+# ps.prop$`Apr--Aug`[is.na(ps.prop$`Apr--Aug`)] <- 0
+
+tab_sts <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/surveyIndices.csv")
+tab_sts <- tab_sts %>% mutate(across(c("NPR", "NR", "NFR", "IPR", "IR", "IFR", "clapsPre", "clapsRec", "clapsCom", "CF"), round, 2)) %>%
+  dplyr::select(-X) %>%
+dplyr::rename(Stock = subarea,
+       Gear = liner,
+       `N per tow (PR)` = NPR,
+       `N per tow (R)` = NR,
+       `N per tow (FR)` = NFR,
+       `kg per tow (PR)` = IPR,
+       `kg per tow (R)` = IR,
+       `kg per tow (FR)` = IFR,
+       `% Clap per tow (PR)` = clapsPre,
+       `% Clap per tow (R)` = clapsRec,
+       `% Clap per tow (FR)` = clapsCom,
+       `Condition (100 mm SH)` = CF) %>%
+# rename(A = subarea,
+#        B = liner,
+#        C = NPR,
+#        D = NR,
+#        E = NFR,
+#        F = IPR,
+#        G = IR,
+#        H= IFR,
+#        I = clapsPre,
+#        J = clapsRec,
+#        K = clapsCom,
+#        L = CF) %>%
+  as_tibble()
+
+
 
 opts <- options(knitr.kable.NA = "")
 
 ```
 
 
-
-```{r echo=F, message=F}
+```{r ps-tab, echo=F, message=F}
 #<!---BLOCK_LANDSCAPE_START--->
 # block_section(
 #   prop_section(
@@ -52,11 +211,47 @@ opts <- options(knitr.kable.NA = "")
 #   )
 # )
 
-csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(ps_tab, caption ="Summary of port sampling (PS) data for SFAs 25, 26, and 27B from 2006—2022, describing sampling distribution and meat weights (MW) in grams (g).") %>% 
+  kableExtra::row_spec(0,bold=TRUE) %>% 
+  kableExtra::row_spec(0,bold=ifelse(ps_tab$`Stock`%in% c("26A-BBn", "25A-Sab"), TRUE, FALSE))
+
 #qflextable(strata)
 
 #<!---BLOCK_LANDSCAPE_START--->
 ```
+
+```{r strata-tab, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+csas_table(strata, caption ="Current survey design and allocation information for SFAs 25, 26, and 27B. Stratum areas are provided in square kilometres (km^2^), and Universal Transverse Mercator zones are in the northern hemisphere. Catch rates used for stratification are reported in kilograms per hour-metre (kg/hm). Some columns are not applicable (NA) for certain Stocks.") %>% kableExtra::row_spec(0,bold=TRUE)
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+```{r mwsh-tab, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+# csas_table(mwsh, caption ="Meat weight-shell height model specifications for SFA 25A Sable Bank and SFA 26A Browns Bank North. The response variable in all models was wet meat weight (wmw). Explanatory variables tested include shell height (log-transformed and centred; log.sh.cen), year, and depth (centred; depth.cen). Comparisons were based on degrees of freedom (df) and the difference in Akaike’s Information Criterion (dAIC).") %>% 
+#   kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
 
 ```{r echo=F, message=F, eval=F}
 ### IGNORE THIS CHUNK. FOR PRESENTATION ONLY
@@ -79,4 +274,67 @@ csas_table(strata, caption ="Survey design details.") %>% kableExtra::row_spec(0
 
 #<!---BLOCK_LANDSCAPE_START--->
 ```
+
+```{r age-summary, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+csas_table(age_summary, caption ="Tow, shell, and increment counts associated with age analysis for SFA 25A Sable Bank and SFA 26A Browns Bank North.") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+```{r age-inc, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+csas_table(inc, caption ="Summary of age assignments and measurements for SFA 25A Sable Bank and SFA 26A Browns Bank North. Median increment height is measured in millimetres (mm). Standard deviation (SD) in increment height is provided in parentheses.") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+```{r rec-size, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+
+csas_table(rec_size, caption ="Recruit size ranges (mm) for SFAs 25, 26, and 27B used to calculate survey indices.") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
+```{r tab-sts, echo=F, message=F}
+#<!---BLOCK_LANDSCAPE_START--->
+# block_section(
+#   prop_section(
+#     page_size = page_size(orient = "landscape"),
+#     type="continuous"
+#   )
+# )
+csas_table(tab_sts, caption ="Long term medians for survey indices by stock of abundance (N) per tow, biomass (kg) per tow, percent (%) clappers (Clap) per tow, and condition (weight (g) of a 100 mm shell height scallop). Indices are categorized by size class: pre-recruit (PR), recruit (R), and fully-recruited (FR). For abundance and clappers per tow, the long term medians include data from 1985--2022 for SFA 25A-Mid, 1986--2022 for SFA 25A-Sab, 1985--2019 for SFA 25B, 1991--2022 for SFA 26A, 1996--2021 for SFA 26B, 1985--2022 for SFA 26C, and 1984--2022 for SFA 27B. Biomass per tow and condition long term medians exclude years with fewer than two tows of detailed sampling data.") %>% kableExtra::row_spec(0,bold=TRUE)
+
+#qflextable(strata)
+
+#<!---BLOCK_LANDSCAPE_START--->
+```
+
 

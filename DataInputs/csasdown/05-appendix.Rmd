@@ -1,63 +1,181 @@
+---
+output:
+  officedown::rdocx_document:
+    reference_docx: templates/RES2021-eng-frontmatter.docx
+    tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      topcaption: true
+      tab.lp: 'tab:'
+      caption:
+        style: Table Caption
+        pre: 'Table '
+        sep: '. '
+        tnd: 0
+        tns: '-'
+        fp_text: !expr officer::fp_text_lite(bold = FALSE)
+      conditional:
+        first_row: true
+        first_column: false
+        last_row: false
+        last_column: false
+        no_hband: false
+        no_vband: true
+    plots:
+      style: Normal
+      align: center
+      fig.lp: 'fig:'
+      topcaption: false
+      caption:
+        style: Image Caption
+        pre: 'Figure A'
+        sep: '. '
+        tnd: 0
+        tns: '-'
+        fp_text: !expr officer::fp_text_lite(bold = FALSE)
+    reference_num: true
+---
 <!-- The following code should appear at the beginning of the first appendix.
 After that, all subsequent sections will be turned into appendices. -->
 
-`r if(knitr:::is_latex_output()) '\\Appendices'`
+<!-- `r if(knitr:::is_latex_output()) '\\Appendices'` -->
 
-`r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'`
+<!-- `r if(!knitr:::is_latex_output()) '# Appendix {-}'` -->
 
-# THE FIRST APPENDIX {#app:a}
+```{r setup, echo=FALSE, cache=FALSE, message=FALSE, results='hide', warning=FALSE}
+library(knitr)
+# if (is_latex_output()) {
+#   knitr_figs_dir <- "knitr-figs-pdf/"
+#   knitr_cache_dir <- "knitr-cache-pdf/"
+#   fig_out_type <- "png"
+# } else {
+#   knitr_figs_dir <- "knitr-figs-docx/"
+#   knitr_cache_dir <- "knitr-cache-docx/"
+#   fig_out_type <- "png"
+# }
+# fig_asp <- 0.618
+# fig_width <- 9
+# fig_out_width <- "6in"
+# fig_dpi <- 180
+# fig_align <- "center"
+# fig_pos <- "htb"
+opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  # fig.path = knitr_figs_dir,
+  # cache.path = knitr_cache_dir,
+  # fig.asp = fig_asp,
+  # fig.width = fig_width,
+  # out.width = fig_out_width,
+  echo = FALSE#,
+  # #  autodep = TRUE,
+  # #  cache = TRUE,
+  # cache.comments = FALSE,
+  # dev = fig_out_type,
+  # dpi = fig_dpi,
+  # fig.align = fig_align,
+  # fig.pos = fig_pos
+)
+nickname <- 'framework5'
+fr <- ""
 
-Content here.
+```
 
-## a-1 {#app:a-1}
+```{r, eval=TRUE, echo=FALSE}
+# First chunk to fetch the image size and calculate its aspect ratio
+img <- magick::image_read("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/framework5/shf_survey_75plus_Sab.png") # read the image using the magic library
+img.asp <- magick::image_info(img)$height /  magick::image_info(img)$width # calculate the figures aspect ratio
 
-Content here.
+img <- magick::image_read("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/framework5/stations_Mid.png") # read the image using the magic library
+img.asp.map <- magick::image_info(img)$height /  magick::image_info(img)$width # calculate the figures aspect ratio
+#fig.asp=img.asp.map, fig.width=6
 
-### a-1-1 {#app:a-1-1}
+img <- magick::image_read("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_selectivity_cumulative.png") # read the image using the magic library
+img.asp.sel <- magick::image_info(img)$height /  magick::image_info(img)$width # calculate the figures aspect ratio
+#fig.asp=img.asp.sel, fig.width=6
 
-Content here.
+```
 
-#### a-1-1-1 {#app:a-1-1-1}
+# APPENDIX {#app:a}
 
-Content here.
+```{r stations-mid, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 25A-Mid by year."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Mid", fr, ".png"))
+```
 
-#### a-1-1-2 {#app:a-1-1-2}
+```{r stations-sab, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 25A-Sab by year."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Sab", fr, ".png"))
+```
 
-Content here.
+```{r stations-ban, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 25B by year."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Ban", fr, ".png"))
+```
 
-### a-1-2 {#app:a-1-2}
+```{r stations-bbn, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 26A by year."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_BBn", fr, ".png"))
+```
 
-Content here.
+```{r stations-bbs, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 26B by year."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_BBs", fr, ".png"))
+```
+
+```{r stations-ger, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 26C by year."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Ger", fr, ".png"))
+```
+
+```{r stations-gbb, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 27B by year."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_GBb", fr, ".png"))
+```
+
+```{r sh-sel-mid-cum, echo=FALSE, message=F, fig.asp=img.asp.sel, fig.width=6, fig.align="center", fig.cap="Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 25A-Mid collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25A-Mid survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/shf_selectivity_cumulative", fr, ".png"))
+```
+
+```{r sh-sel-ban-cum, echo=FALSE, message=F, fig.asp=img.asp.sel, fig.width=6, fig.align="center", fig.cap="Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 25B collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25B survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/shf_selectivity_cumulative", fr, ".png"))
+```
+
+```{r sh-sel-bbs-cum, echo=FALSE, message=F, fig.asp=img.asp.sel, fig.width=6, fig.align="center", fig.cap="Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 26B collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26B survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/shf_selectivity_cumulative", fr, ".png"))
+```
+
+```{r sh-sel-ger-cum, echo=FALSE, message=F, fig.asp=img.asp.sel, fig.width=6, fig.align="center", fig.cap="Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 26C collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26C survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/shf_selectivity_cumulative", fr, ".png"))
+```
+
+```{r sh-sel-gbb-cum, echo=FALSE, message=F, fig.asp=img.asp.sel, fig.width=6, fig.align="center", fig.cap="Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 27B collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 27B survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/shf_selectivity_cumulative", fr, ".png"))
+```
+
+```{r sh-sel-sab-cum, echo=FALSE, message=F, fig.asp=img.asp.sel, fig.width=6, fig.align="center", fig.cap="Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 25A-Sab collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25A-Sab survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/shf_selectivity_cumulative", fr, ".png"))
+```
+
+```{r sh-sel-bbn-cum, echo=FALSE, message=F, fig.asp=img.asp.sel, fig.width=6, fig.align="center", fig.cap="Annual cumulative density of estimated shell heights of meats landed by the commercial fishery in SFA 26A collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26A survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown. Vertical dashed lines define the recruit size range."}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_selectivity_cumulative", fr, ".png"))
+```
 
 
-## a-2 {#app:a-2}
+```{r shf-sab-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 25A Sable Bank in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_75plus_Sab.png"))
+```
 
-Content here.
+```{r shf-bbn-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 26A Browns Bank North in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_75plus_BBn.png"))
+```
 
-### a-2-1 {#app:a-2-1}
+```{r shf-bbs-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 26B Browns Bank South in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_BBs.png"))
+```
 
-Content here.
+```{r shf-ger-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 26C German Bank in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_Ger.png"))
+```
 
-#### a-2-1-1 {#app:a-2-1-1}
-
-Content here.
-
-### a-2-2 {#app:a-2-2}
-
-Content here.
-
-
-# THE SECOND APPENDIX, FOR FUN {#app:b}
-
-More content.
-
-## b-1 {#app:b-1}
-
-Content here.
-
-
-## b-2 {#app:b-2}
-
-Content here.
+```{r shf-gbb-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75--200 mm collected during DFO Maritimes Offshore Scallop Surveys on SFA 27B Georges Bank 'b' in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops.", fig.asp=img.asp, fig.width=6}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_75plus_GBb.png"))
+```
 
 

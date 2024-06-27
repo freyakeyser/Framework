@@ -6,7 +6,7 @@ author: |
   Tricia Pearo Drew,
   Amy Glass, and
   David Keith
-author_list: "Keyser, F., Pearo Drew, T., Glass, A., Keith, D."
+author_list: "Keyser, F., Glass, A., Keith, D., McDonald, R., Pearo Drew, T., Sameoto, J."
 address: |
   Bedford Institute of Oceanography\
      Fisheries and Oceans Canada, 1 Challenger Drive\
@@ -26,8 +26,7 @@ cat_no: "Fs70-5/2022-006E-PDF"
 french_region: "Région des Maritimes"
 citation_other_language: "Keyser, F., Pearo Drew, T., Glass, A., et Keith, D. L'évaluation de petoncles dans les zones de pêche"
 abstract: |
-  Here is the abstract text. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-  Start new paragraphs after a blank line and with 2 spaces indent. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  This document summarizes the data used for the provision of stock assessment advice in Scallop Fishing Areas 25, 26, and 27B, as well as the history of the Offshore Scallop fishery in DFO Maritimes Region, and the DFO Maritimes Offshore Scallop Survey. A new meat weight-to-shell height model was developed for use in SFAs 25, 26, and 27B, and was used to calculate biomass and condition of stocks in these management units. New shell height-at-age data were available for SFA 25A-Sab (Sable Bank) and SFA 26A (Browns Bank North), and were used to develop new growth curves for these two stocks. Port sampling and survey data were used to estimate the size classes of scallop targeted by the fishery, resulting in changes to the recruit and fully-recruited sizes for SFA 25A-Sab and SFA 26A. Stock indicators (abundance, biomass and condition) were provided for each of the stocks. For the stocks with survey data collected annually, the survey is able to track the growth of scallop from pre-recruits over 40 mm in shell height to fully-recruited scallop and the indicators presented here can be used to provide science advice.
 french_abstract: |
   Voici le texte du résumé. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
   
@@ -59,8 +58,9 @@ output:
    line_nums: true
    line_nums_mod: 1
    lot_lof: false
-   draft_watermark: false
+   draft_watermark: true
    include_section_nums: true
+   global_numbering: true
    # highlight is the theme to use for code output. Must be one of the list given by:
    # which are:
    # the csasdown library 'themes' directory, this directory on your machine:
@@ -109,7 +109,9 @@ opts_chunk$set(
   dev = fig_out_type,
   dpi = fig_dpi,
   fig.align = fig_align,
-  fig.pos = fig_pos
+  fig.pos = fig_pos,
+  fig.cap.sep = ". ",
+  tab.cap.sep = ". "
 )
 ```
 
@@ -122,14 +124,18 @@ library(csasdown)
 
 params <- NULL
 params$bank <- c("Ban", "Mid", 
-  "Sab", "Ger", "BBs", "BBn")
-params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022)
-params$bankname <- c("Banquereau", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North")
+  "Sab", "Ger", "BBs", "BBn", "GBb")
+params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022, 2022)
+params$bankname <- c("Banquereau Bank", "Middle Bank", "Sable Bank", "German Bank", "Browns Bank South", "Browns Bank North", "Georges Bank 'b'")
 params$banknum <- 1:length(params$bank)
 
 fr <- ""
 #fr <- "_fr"
 if(fr=="") language <- "english"
 if(!fr=="") language <- "french"
-nickname <- "framework3"
+nickname <<- "framework5"
+
+if(nickname=="framework5") MWSH <- "_newMWSH"
+if(nickname=="framework2") MWSH <- "_oldMWSH"
+
 ```
