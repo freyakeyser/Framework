@@ -1,6 +1,8 @@
 book_filename: "ref-points"
 rmd_files: ["index.Rmd",
-            "analysis.Rmd",
+            "Indices_analysis.Rmd",
+            "Sab_analysis.Rmd",
+            "BBn_analysis.Rmd",
             "01-text.Rmd",
             "02-references.Rmd",
             "03-tables.Rmd",

@@ -13,7 +13,7 @@ cor.fun <- function(ts1 = list(mn = 0.5,var=0.1),
   
 {
   #browser()
-  require("mvtnorm")
+
   # This gets the covariance strcutre for the 'error'.  Note I put it on a log scale.
   # Get the correlation matrix   
   corr.mat <- matrix(c(1,arima$cross.cor,arima$cross.cor,1),nrow = 2)

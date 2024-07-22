@@ -128,7 +128,8 @@ library(ggthemes)
 library(cowplot)
 library(forecast)
 library(zoo)
-
+library(robustbase)
+library("mvtnorm")
 
 funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
 # Now run through a quick loop to load each one, just be sure that your working directory is read/write!
@@ -140,7 +141,8 @@ for(fun in funs)
 }
 # A not rosetta loop
 funs <- c("https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/pectinid_projector_sf.R",
-          "https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/convert_inla_mesh_to_sf.R"
+          "https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/convert_inla_mesh_to_sf.R",
+          "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/github_spatial_import.R"
           )
 # Now run through a quick loop to load each one, just be sure that your working directory is read/write!
 for(fun in funs) 
@@ -149,6 +151,7 @@ for(fun in funs)
   source(paste0(getwd(),"/",basename(fun)))
   file.remove(paste0(getwd(),"/",basename(fun)))
 }
+
 
 params <- NULL
 params$bank <- c("Sab", "BBn")
@@ -172,31 +175,46 @@ mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 fun.loc <-"D:/Github/Framework/RefPts/functions/"
 rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
 
-theme_set(theme_few(base_size = 22))
-u.colors <- c("#FFD500","#005BBB")
-
-
-
+# These here while testing...
 # Functions we need to source for this to all work
 source(paste0(fun.loc,"projection_function.r"))
 source(paste0(fun.loc,"Density_dependence_function.R"))
 source(paste0(fun.loc,"breakpoint_function.R"))
 source(paste0(fun.loc,"correlation_function.R"))
 
+# Plot locations
+#years <- 1994:2022 # need this twice b/c of overwritting...
+plot.index.loc <- paste0(rp.loc,"Figures/Indices/") # For the biomass index methods
+plot.sab.rp.mod.loc <- paste0(rp.loc,"Figures/Sab/")
+res.sab.rp.mod.loc <- paste0(rp.loc,"Results/Sab/")
+plot.bbn.rp.mod.loc <- paste0(rp.loc,"Figures/BBn/")
+res.bbn.rp.mod.loc <- paste0(rp.loc,"Results/BBn/")
+
+load(paste0(rp.loc,"Data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata"))
+
+# Load in the fishery data, might wanna tweak where this lives, but does need to be not anywhere public
+load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
+
 # Model run parameters
 years <- 1994:2022
+bbn.model.yrs <- years
+sab.model.yrs <- years
 R.size <- "75"
 FR.size <- "90"
 num.knots <- 20 # Going to test 10, 15, and 20
 qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
-# Various explorations of the g models.
-
-# # If running with SEBDAM this is what ya use.
-
+# For the simulations
+n_y <- 200
+n_sims <- 5000 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
+# Run the simulations or load existing results
+run.sims <- F
+# How far back into the time series do you want to use for summarizing RP and HCR. Using 25 would take the last 25 years of the simulations to do this.
+last.yrs <- 25
 bbn.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
 sab.select <- paste0("Sab_SS_model/R_",R.size,"_FR_",FR.size,"/Sable_SSmodel_results.RData")
-bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/R_75_FR_90/SEAM_",bbn.select,"/")
-sab.plot.loc <- paste0(rp.loc,"Figures/Sab/R_75_FR_90/BSSM/")
+#bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/R_75_FR_90/SEAM_",bbn.select,"/")
+theme_set(theme_few(base_size = 18))
+u.colors <- c("#FFD500","#005BBB")
 
 bbn.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",bbn.select,".Rds"))
 
@@ -209,8 +227,13 @@ load(paste0(mod.loc,"Results/",sab.select))
 sab.mod <- DD.out
 # Finally, grab the raw survey data so we can use those indices for this.
 
-load(paste0(rp.loc,"Data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata"))
+# Need these here b/c of data object loading causing pain
+sab.plot.loc <- paste0(rp.loc,"Figures/Sab/")
+bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/")
 
+
+
+# The Sable HCRs
 
 
 ```
