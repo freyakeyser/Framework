@@ -1,0 +1,15 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+\clearpage
+
+# Tables {-}
+
+```{r include=F, echo=F}
+
+```
+
+
+

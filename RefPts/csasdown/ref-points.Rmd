@@ -1,0 +1,2393 @@
+---
+title: "Shoulder Bank Reference Points"
+french_title: "En francais"
+author: "DK"
+author_list: "Keith, D., Keyser, F., McDonald R, Pearo Drew, T., Sameoto, J.A.  "
+address: |
+  Bedford Institute of Oceanography\
+     Fisheries and Oceans Canada, 1 Challenger Drive\
+     Dartmouth, Nova Scotia, Canada, B2Y 4A2\
+french_address: |
+  ^1^Station biologique du Pacifique\
+     Pêches et Océans Canada, 3190 Hammond Bay Road\
+     Nanaimo, Colombie-Britannique, V9T 6N7, Canada\
+     Une autre galaxie
+month: "Month"
+french_month: "Mois"
+year: 2023
+report_number: nnn
+region: "Maritimes Region"
+isbn: ""
+cat_no: ""
+french_region: "Région des Maritimes"
+citation_other_language: "Keith, D., Keyser, F., McDonald, R., et Pearo Drew, T.  L'évaluation de petoncles dans les zones de pêche"
+abstract: |
+  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). Index based Limit Reference Points (LRPs) were proposed for each of these SFA's and model based LRPs were proposed for the two areas with approved stock assessment models (SFA 25A and SFA 26A). The biomass indicies used for the development of the LRPs were approved during the first of three meetings which focused on the data inputs for each of these SFAs. The stock assessment models for SFA 25A and SFA 26A were approved at ths second of the three meetings making up this Framework proecess.  In addition to the LRPs, candidate Removal Reference (RR) and Upper Stock Reference (USR) Points were provided where appropriate. In the modelled areas, the potential benefits of developing more complex harvest control rules (HCRs), which included the development of the Target Reference Point (TRP), were discussed. An example HCR was compared to the more traditional approaches, the HCR approach resulted in an increase in the long-term removals from the areas while reducing the probability of the stock being below the LRP (compared to using a static removal reference point above the USR).
+french_abstract: |
+  NULL
+  
+header: "Draft working paper --- Do not cite or circulate" # or "" to omit
+output:
+ csasdown::resdoc_word:
+   # copy_sty is a toggle to copy the style file from the csasdown package every time you compile
+   # the document. If false, any changes you have made to the style file in your project
+   # will remain between compilations. If true, your changes will be lost when you compile
+   # line_nums is a toggle to show line numbers on the left side of the page. 
+   # line_nums_mod represents showing every Nth line if line_nums is true
+   # lot_lof is a toggle to show/not show the lists of tables and figures at the
+   # beginning of the document
+   # draft_watermark is a toggle to show/not show a DRAFT watermark across every page
+   # include_section_nums, if true includes section numbering in the document body,
+   # if false, no numbering in the document budy but the TOC will still show numbering
+   # pandoc --list-highlight-styles
+   # pygments, tango, espresso, zenburn, kate, monochrome, breezedark, haddock
+   # or the name of a custom *.latex file which is most easily made by copying one from 
+   # file.path(.libPaths(), "csasdown", "themes")
+   # to your working directory (the one containing index.Rmd)
+   # To change the foreground text color, change the RGB value in the line containing
+   # 'DefineVerbatimEnvironment'
+   # To change background color, change the RGB values in the line containing 'shadecolor'
+   french: false
+   copy_sty: true
+   line_nums: true
+   line_nums_mod: 1
+   lot_lof: false
+   draft_watermark: false
+   include_section_nums: true
+   # highlight is the theme to use for code output. Must be one of the list given by:
+   # which are:
+   # the csasdown library 'themes' directory, this directory on your machine:
+   highlight: tango
+knit: (function(input, ...) {
+       csasdown::render('_bookdown.yml')
+      })
+link-citations: true
+bibliography: Y:/Zotero/MAR_SABHU.bib
+#
+# Any extra LaTeX code for the header:
+header-includes:
+ - \usepackage{tikz}
+ - \usepackage{amssymb}
+ - \usepackage{accents}
+---
+
+```{r setup, echo=FALSE, cache=FALSE, message=FALSE, results='hide', warning=FALSE}
+library(knitr)
+if (is_latex_output()) {
+  knitr_figs_dir <- "knitr-figs-pdf/"
+  knitr_cache_dir <- "knitr-cache-pdf/"
+  fig_out_type <- "png"
+} else {
+  knitr_figs_dir <- "knitr-figs-docx/"
+  knitr_cache_dir <- "knitr-cache-docx/"
+  fig_out_type <- "png"
+}
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos
+  
+)
+```
+
+```{r load-libraries, echo = FALSE, cache = FALSE, message = FALSE, results = 'hide', warning = FALSE}
+# add other packages here:
+library(collapse)
+library(readr)
+library(tibble)
+library(csasdown)
+require(rosettafish)
+library(sf)
+library(tidyverse)
+library(knitr)
+library(tinytex)
+library(kableExtra)
+library(dplyr)
+library(SEBDAM)
+library(ggthemes)
+library(cowplot)
+library(forecast)
+library(zoo)
+library(robustbase)
+library("mvtnorm")
+
+funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs) 
+{
+  download.file(fun,destfile = basename(fun))
+  rosetta_terms <- read.csv(paste0(getwd(),"/",basename(fun)), encoding = "UTF-8")
+  file.remove(paste0(getwd(),"/",basename(fun)))
+}
+# A not rosetta loop
+funs <- c("https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/pectinid_projector_sf.R",
+          "https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/convert_inla_mesh_to_sf.R",
+          "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/github_spatial_import.R"
+          )
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs) 
+{
+  download.file(fun,destfile = basename(fun))
+  source(paste0(getwd(),"/",basename(fun)))
+  file.remove(paste0(getwd(),"/",basename(fun)))
+}
+
+
+params <- NULL
+params$bank <- c("Sab", "BBn")
+params$surv.year <- c(2019, 2022, 2022, 2022, 2021, 2022)
+params$bankname <- c("Sable Bank", "Browns Bank North")
+params$banknum <- 1:length(params$bank)
+
+fr <- ""
+#fr <- "_fr"
+if(fr=="") language <- "english"
+if(!fr=="") language <- "french"
+# nickname <- "framework3"
+# 
+# french <- F # set to T for french
+# if(french == T) {
+#   nickname <- paste0(nickname, "_fr")
+# }
+
+# Here's where I'm sticking the figures
+mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
+fun.loc <-"D:/Github/Framework/RefPts/functions/"
+rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
+
+# These here while testing...
+# Functions we need to source for this to all work
+source(paste0(fun.loc,"projection_function.r"))
+source(paste0(fun.loc,"Density_dependence_function.R"))
+source(paste0(fun.loc,"breakpoint_function.R"))
+source(paste0(fun.loc,"correlation_function.R"))
+
+# Plot locations
+#years <- 1994:2022 # need this twice b/c of overwritting...
+plot.index.loc <- paste0(rp.loc,"Figures/Indices/") # For the biomass index methods
+plot.sab.rp.mod.loc <- paste0(rp.loc,"Figures/Sab/")
+res.sab.rp.mod.loc <- paste0(rp.loc,"Results/Sab/")
+plot.bbn.rp.mod.loc <- paste0(rp.loc,"Figures/BBn/")
+res.bbn.rp.mod.loc <- paste0(rp.loc,"Results/BBn/")
+
+load(paste0(rp.loc,"Data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata"))
+
+# Load in the fishery data, might wanna tweak where this lives, but does need to be not anywhere public
+load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
+
+# Model run parameters
+years <- 1994:2022
+bbn.model.yrs <- years
+sab.model.yrs <- years
+R.size <- "75"
+FR.size <- "90"
+num.knots <- 20 # Going to test 10, 15, and 20
+qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+# For the simulations
+n_y <- 200
+n_sims <- 5000 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
+# Run the simulations or load existing results
+run.sims <- F
+# How far back into the time series do you want to use for summarizing RP and HCR. Using 25 would take the last 25 years of the simulations to do this.
+last.yrs <- 25
+bbn.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
+sab.select <- paste0("Sab_SS_model/R_",R.size,"_FR_",FR.size,"/Sable_SSmodel_results.RData")
+#bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/R_75_FR_90/SEAM_",bbn.select,"/")
+theme_set(theme_few(base_size = 18))
+u.colors <- c("#FFD500","#005BBB")
+
+bbn.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",bbn.select,".Rds"))
+
+pred.proc.seam <- get_processes(bbn.mod)
+bbn.mod$obj$env$data$g <- bbn.mod$obj$env$data$gI
+bbn.mod$report$totR <-c(bbn.mod$report$totR,NA)
+
+# Now load in the Sable model object, we're using BSSM here recall
+load(paste0(mod.loc,"Results/",sab.select))
+sab.mod <- DD.out
+# Finally, grab the raw survey data so we can use those indices for this.
+
+# Need these here b/c of data object loading causing pain
+sab.plot.loc <- paste0(rp.loc,"Figures/Sab/")
+bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/")
+
+
+
+# The Sable HCRs
+
+
+```
+```{r bilingual-code, cache=FALSE}
+options(
+  # Prevent xtable from adding a timestamp comment to the table code it produces
+  xtable.comment = FALSE,
+  # Do not allow kableExtra to load packages, we add them manually in csasdown
+  kableExtra.latex.load_packages = FALSE,
+  # Stop chunk output (echo) running into the margins
+  width = 80,
+  # Do not use scientific notation (stops tables from showing 1.2e3, etc.)
+  scipen = 999)
+
+meta <- rmarkdown::metadata
+meta_out <- rmarkdown::metadata$output
+csl <- "csl/csas.csl"
+options(OutDec = ".")
+if (is.null(getOption("french"))) {
+  stop("`french` was not set up correctly in YAML header in index.Rmd. ",
+       "It must be true or false",
+       call. = FALSE)
+}
+if (getOption("french")) {
+  csl <- "csl/csas-french.csl"
+  options(OutDec = ",")
+}
+
+french <- isTRUE(getOption("french")) # for backwards compatibility
+
+# This hook simplifies document translation for the author.
+# When building in French, it draws a box around paragraphs contained in chunks
+#  which have the option `needs_trans = TRUE`. It also labels
+#  the box with a "Needs translation" tag in red and the chunk label in blue.
+# You need to change the `needs_trans` option to `FALSE` for a chunk once you
+#  have inserted the translated text into it. You will get a utf-8 error if
+#  you leave it as `TRUE` and there is French in the chunk.
+#  This function assumes you are translating from English to French.
+#  If you wrote your document in French and want to translate to English,
+#  put a ! before `getOption("french")` below and add the `need_trans`
+#  chunk options to your English paragraph chunks instead of the French ones.
+#  
+#  IMPORTANT NOTES
+#  - Use `csasdown::render()` to render the document. This runs a
+#    pre-processing step which ensures any inline R chunks
+#    `r print("Like this one")` are taken care of correctly and that all
+#    backslash variables (eg. \pi, \alpha, \@ref, \cite) are all processed
+#    correctly.
+#  - French latex places a space before the colon by default so if you need a colon
+#    with no space before it, use \\hc .
+knit_hooks$set(needs_trans = function(before, options){
+  if(getOption("french") && options$needs_trans){
+    if (before){
+      paste0("\\
+   \\begin{lrbox}{\\userinput}
+   \\begin{minipage}{\\dimexpr\\linewidth-2\\fboxsep-2\\fboxrule}
+   \\textcolor{red}{\\textbf{Needs translation - \\textcolor{blue}{knitr chunk: ", options$label, "}}}
+   \\begin{lstlisting}
+  ")
+    } else {
+      "
+   \\end{lstlisting}
+   \\end{minipage}
+   \\end{lrbox}
+   \\noindent
+   \\fbox{\\usebox{\\userinput}}
+  "
+    }
+  }
+})
+```
+
+---
+title: `r ifelse(fr(), meta$french_title, meta$title)`
+month: `r ifelse(fr(), meta$french_month, meta$month)`
+region: `r ifelse(fr(), meta$french_region, meta$region)`
+csl: `r csl`
+---
+
+<!--chapter:end:tmp-index.Rmd-->
+
+```{r indices-analysis,include=F,warning=F}
+# Get the median, maximum, and maximum 3 year rolling mean, then get the LRP and USR from those
+
+# SFA 25A
+surv.25a <- survey.obj$Sab$model.dat
+surv.25a <- surv.25a |> collapse::fsubset(year >=1994)
+surv.25a <- rbind(surv.25a,c(2020,rep(NA,ncol(surv.25a)-1)))
+surv.25a <- rbind(surv.25a,c(2015,rep(NA,ncol(surv.25a)-1)))
+surv.25a <- surv.25a[order(surv.25a$year),] # get the years ordered correctly for the rolling mean
+gmean.25a <- exp(mean(log(surv.25a$I),na.rm=T))
+max.25a <- max(surv.25a$I,na.rm=T)
+# Geometric rolling mean
+ma.three.mean.25a <- exp(c(na.omit(rollmean(log(na.omit(surv.25a$I)),3,'center'))))
+max.three.25a <- max(ma.three.mean.25a,na.rm=T)
+# Doing this with the last 3 years of data available, so if missing a survey we go back and use the information from the year before that
+
+bm.last.3.25a <- round(ma.three.mean.25a[length(ma.three.mean.25a)],digits=0)
+ratio.25a <- gmean.25a/max.three.25a
+LRP.med.3.25a <- round(0.3*gmean.25a,digits = 0)
+LRP.med.4.25a <- round(0.4*gmean.25a,digits = 0)
+LRP.max.2.25a <- round(0.2*max.three.25a,digits = 0)
+USR.med.8.25a <- round(0.8*gmean.25a,digits = 0)
+USR.max.4.25a <- round(0.4*max.three.25a,digits = 0)
+
+# SFA 26A
+surv.26a <- survey.obj$BBn$model.dat
+surv.26a <- rbind(surv.26a,c(2020,rep(NA,ncol(surv.26a)-1)))
+surv.26a <- surv.26a |> collapse::fsubset(year >=1994)
+surv.26a <- surv.26a[order(surv.26a$year),] # get the years ordered correctly for the rolling mean
+gmean.26a <- exp(mean(log(surv.26a$I),na.rm=T))
+max.26a <- max(surv.26a$I,na.rm=T)
+# Geometric rolling mean
+ma.three.mean.26a <- exp(c(na.omit(rollmean(log(na.omit(surv.26a$I)),3,'center'))))
+max.three.26a <- max(ma.three.mean.26a,na.rm=T)
+# Current 3 year geometric mean biomass
+bm.last.3.26a <- round(ma.three.mean.26a[length(ma.three.mean.26a)],digits=0)
+ratio.26a <- gmean.26a/max.three.26a
+LRP.med.3.26a <- round(0.3*gmean.26a,digits = 0)
+LRP.med.4.26a <- round(0.4*gmean.26a,digits = 0)
+LRP.max.2.26a <- round(0.2*max.three.26a,digits = 0)
+USR.med.8.26a <- round(0.8*gmean.26a,digits = 0)
+USR.max.4.26a <- round(0.4*max.three.26a,digits = 0)
+
+
+# SFA 26C
+surv.26c <- lined.survey.obj$model.dat # Has NA's for missing 2020 so good to use as is
+surv.26c <- surv.26c |> collapse::fsubset(year >=1994)
+gmean.26c <- exp(mean(log(surv.26c$I),na.rm=T))
+max.26c <- max(surv.26c$I,na.rm=T)
+# Geometric rolling mean
+ma.three.mean.26c <- exp(na.omit(c(rollmean(log(na.omit(surv.26c$I)),3,'center'))))
+max.three.26c <- max(ma.three.mean.26c,na.rm=T)
+# Current 3 year geometric mean biomass
+bm.last.3.26c <- round(ma.three.mean.26c[length(ma.three.mean.26c)],digits=0)
+ratio.26c <- gmean.26c/max.three.26c
+LRP.med.3.26c <- round(0.3*gmean.26c,digits = 0)
+LRP.med.4.26c <- round(0.4*gmean.26c,digits = 0)
+LRP.max.2.26c <- round(0.2*max.three.26c,digits = 0)
+USR.med.8.26c <- round(0.8*gmean.26c,digits = 0)
+USR.max.4.26c <- round(0.4*max.three.26c,digits = 0)
+
+# SFA 27B
+surv.27b <- survey.obj$GBb$model.dat # Need to add missing 2020 survey in here.
+surv.27b <- rbind(surv.27b,c(2020,rep(NA,ncol(surv.27b)-1)))
+surv.27b <- surv.27b |> collapse::fsubset(year >=1994)
+surv.27b <- surv.27b[order(surv.27b$year),] # get the years ordered correctly for the rolling mean
+gmean.27b <- exp(mean(log(surv.27b$I),na.rm=T))
+max.27b <- max(surv.27b$I,na.rm=T)
+ma.three.mean.27b <- exp(c(na.omit(rollmean(log(na.omit(surv.27b$I)),3,'center'))))
+max.three.27b <- max(ma.three.mean.27b,na.rm=T)
+# Current 3 year geometric mean biomass
+bm.last.3.27b <- round(ma.three.mean.27b[length(ma.three.mean.27b)],digits=0)
+ratio.27b <- gmean.27b/max.three.27b
+LRP.med.3.27b <- round(0.3*gmean.27b,digits = 0)
+LRP.med.4.27b <- round(0.4*gmean.27b,digits = 0)
+LRP.max.2.27b <- round(0.2*max.three.27b,digits = 0)
+USR.med.8.27b <- round(0.8*gmean.27b,digits = 0)
+USR.max.4.27b <- round(0.4*max.three.27b,digits = 0)
+
+# Old German data, curious what the median/max ratio was...
+gmean.unlined.26c <- median(survey.obj$Ger$model.dat$I,na.rm=T)
+max.unlined.26c <- max(survey.obj$Ger$model.dat$I,na.rm=T)
+ma.three.mean.unlined.26c <- c(na.omit(rollmean(survey.obj$Ger$model.dat$I,3,'center')))
+max.three.unlined.26c <- max(ma.three.mean.unlined.26c,na.rm=T)
+ratio.unlined.26c <- gmean.unlined.26c/max.three.unlined.26c
+
+# Next up getting the relative F's right
+
+fish.dat <- fish.dat[!is.na(fish.dat$lon),]
+fish.dat <- fish.dat[!is.na(fish.dat$lat),]
+fish.dat <- fish.dat[!fish.dat$lon==0,]
+fish.dat <- fish.dat[!fish.dat$lat==0,]
+# bbn.fish_dk$month <- lubridate::month(bbn.fish_dk$date)
+fish.dat$month <- lubridate::month(lubridate::ymd(fish.dat$date))
+fish.dat$sfa[grep(x=fish.dat$sfa, "25")] <- 25
+fish.dat$sfa[grep(x=fish.dat$sfa, "26")] <- 26
+fish.dat$sfa[grep(x=fish.dat$sfa, "27")] <- 27
+fish.dat$sfa[fish.dat$bank %in% c("Ban", "Sab","Mid")] <- 25
+fish.dat$sfa[fish.dat$bank %in% c("BBn", "BBs", "Ger")] <- 26
+fish.dat$sfa[fish.dat$bank %in% c("GBb")] <- 27
+
+fish.dat$surv.year <- fish.dat$year 
+fish.dat$surv.year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26]-1
+fish.dat$surv.year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27]-1
+
+strata <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
+fish_sf2 <- st_as_sf(fish.dat, coords=c("lon", "lat"), remove=F, crs=4326) %>% st_transform(32619)
+fish_sf2 <- st_intersection(fish_sf2, st_transform(strata, 32619))
+fish.dat2 <- fish.dat #safekeeping
+fish.dat <- fish_sf2
+#st_geometry(fish.dat) <- NULL
+
+by.sy <- fish.dat %>% data.frame() %>%  group_by(bank, surv.year)%>%   summarize(sum = sum(pro.repwt/1000))
+
+by.sy[by.sy$bank=="BBn" & by.sy$surv.year>1990,]
+
+# fish.dat$surv.year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 6:12 & fish.dat$sfa %in% 25:26]+1
+# fish.dat$surv.year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 9:12 & fish.dat$sfa %in% 27]+1
+
+#tail(fish.dat[, c("fished", "month", "year", "surv.year")], 50)
+survey.yr <- fish.dat %>%
+  group_by(surv.year, bank, sfa) %>%
+  summarize(mt = sum(pro.repwt)/1000) %>%
+  mutate(year=surv.year)
+
+fishing.yr <- fish.dat %>%
+  group_by(year, bank, sfa) %>%
+  summarize(mt = sum(pro.repwt)/1000) 
+  
+
+banks <- c("Sab", "BBn", "Ger", "GBb")
+relative.F <- NULL
+for(b in banks) {
+  # if(b=="Sab/Mid"){
+  #   sab <- cbind(survey.obj[["Sab"]]$model.dat[, c("year", "I")], bank="Sab")
+  #   mid <- cbind(survey.obj[["Mid"]]$model.dat[, c("year", "I")], bank="Mid")
+  #   sabmid <- full_join(sab, mid) %>%
+  #     group_by(year) %>%
+  #     summarize(I=sum(I, na.rm=T)) #/0.35) # survey catchability (between 0.2 and 0.5), using this would mean "q-corrected", don't do this
+  #   fishing <- survey.yr %>%
+  #     filter(bank %in% c("Sab", "Mid")) %>%
+  #     group_by(year) %>%
+  #     summarize(mt=sum(mt)) %>%
+  #     mutate(bank="Sab/Mid")
+  #   compare <- full_join(sabmid, fishing[,c("year", "bank", "mt")])
+  # }
+
+  #if(!b=="Sab/Mid"){
+    if(b=="Ger") compare <- full_join(merged.survey.obj[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
+    if(!b=="Ger") compare <- full_join(survey.obj[[b]]$model.dat[, c("year", "I")], survey.yr[survey.yr$bank==b &!is.na(survey.yr$bank),c("year", "bank", "mt")])
+ # }
+  compare$relative.F <- compare$mt / (compare$I) #/0.35) # survey catchability? don't use this
+  relative.F <- rbind(relative.F, compare)
+}
+relFyrs <- expand.grid(year=min(relative.F$year, na.rm=T):max(relative.F$year, na.rm=T), bank=banks)
+relative.F <- left_join(relFyrs, relative.F)
+#relative.F <- relative.F[!is.na(relative.F$mt),]
+#relative.F[relative.F$relative.F==Inf & !is.na(relative.F$relative.F),]$relative.F <- NA
+relative.F$sfa[relative.F$bank %in% c("BBn", "BBs", "Ger", "BBn/BBs")] <- as.numeric(26)
+relative.F$sfa[relative.F$bank %in% c("Ban", "Ban/Sab/Mid", "Sab/Mid", "Sab", "Mid")] <- as.numeric(25)
+relative.F$sfa[relative.F$bank %in% c("GBb")] <- as.numeric(27)
+relative.F$subarea[relative.F$bank=="Sab"] <- "25A-Sab"
+relative.F$subarea[relative.F$bank=="BBn"] <- "26A"
+relative.F$subarea[relative.F$bank=="Ger"] <- "26C"
+relative.F$subarea[relative.F$bank=="GBb"] <- "27B"
+
+# now limit it to be 2024 onwards
+relative.F <- relative.F |> collapse::fsubset(year >= 1994)
+# now I want to compare F to change in biomass...
+rf.25a <- relative.F |> collapse::fsubset(bank == "Sab")
+# Sable is missing 2022 for some reason, so adding by hand...
+rf.25a$relative.F[rf.25a$year == 2022] <- 0 # There was no fishing in 2022
+# not clear why this dropped, but it's in the object so adding in..
+rf.25a$I[rf.25a$year == 2022] <- survey.obj$Sab$model.dat$I[survey.obj$Sab$model.dat$year == 2022]
+rf.26a <- relative.F |> collapse::fsubset(bank == "BBn")
+rf.26c <- relative.F |> collapse::fsubset(bank == "Ger")
+rf.27b <- relative.F |> collapse::fsubset(bank == "GBb")
+# This is lined up so that the change in size from 1994-1995 is called 1994, which lines up with fishing being survey year where June 1994 - May 1995 
+# is called 1994.
+rf.25a$DB <- c(rf.25a$I[2:nrow(rf.25a)]-rf.25a$I[1:(nrow(rf.25a)-1)],NA)
+rf.26a$DB <- c(rf.26a$I[2:nrow(rf.26a)]-rf.26a$I[1:(nrow(rf.26a)-1)],NA)
+rf.26c$DB <- c(rf.26c$I[2:nrow(rf.26c)]-rf.26c$I[1:(nrow(rf.26c)-1)],NA)
+rf.27b$DB <- c(rf.27b$I[2:nrow(rf.27b)]-rf.27b$I[1:(nrow(rf.27b)-1)],NA)
+# Now percent change
+rf.25a$prop.DB <- 100*rf.25a$DB/rf.25a$I
+rf.26a$prop.DB <- 100*rf.26a$DB/rf.26a$I
+rf.26c$prop.DB <- 100*rf.26c$DB/rf.26c$I
+rf.27b$prop.DB <- 100*rf.27b$DB/rf.27b$I
+
+# In 26a we can get a relative removal reference point from the GEM method, just need to make the linear model and extract the x-intercept from it.
+rr.new.dat <- data.frame(relative.F = seq(0,1,by=0.001))
+rr.rf.26a.mod <- lm(prop.DB~relative.F,data=rf.26a)
+rr.new.dat$prop.DB <- predict(rr.rf.26a.mod,newdata = rr.new.dat)
+closest <- which(abs(rr.new.dat$prop.DB) == min(abs(rr.new.dat$prop.DB)))[1]
+rr.rf.26a <- round(rr.new.dat$relative.F[closest],digits=2)
+
+```
+
+```{r indices-figures,include=F,warning=F}
+
+# The simple reference point figures
+plt.dat.25a <- data.frame(year =2020:2022,cur.bm = bm.last.3.25a,
+                          lrp.2 = LRP.max.2.25a,lrp.3 = LRP.med.3.25a,lrp.4 = LRP.med.4.25a,
+                          usr.4 = USR.max.4.25a,usr.8 = USR.med.8.25a)
+                          
+plt.25a.bmi.ts <- ggplot(surv.25a) + geom_line(aes(x=year,y=I)) + 
+                              geom_line(data= plt.dat.25a,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.25a$lrp.2[1],color='firebrick2',linetype='solid') +
+                              geom_hline(yintercept = plt.dat.25a$lrp.3[1],color='firebrick2',linetype = 'dotted') +
+                              geom_hline(yintercept = plt.dat.25a$lrp.4[1],color='firebrick2',linetype='dashed') +
+                              geom_hline(yintercept = plt.dat.25a$usr.4[1],color=u.colors[2],linetype = 'solid') +
+                              geom_hline(yintercept = plt.dat.25a$usr.8[1],color=u.colors[2],linetype='dashed') +
+                              scale_x_continuous(name = '',breaks = seq(1995,2025,by=5),limits = c(1994,2022),labels = NULL) +
+                              scale_y_continuous(name = "",limits=c(0,2500)) #+
+                              #theme(axis.title.y = element_text(hjust = 4))
+
+
+# Now BBn
+plt.dat.26a <- data.frame(year =2020:2022,cur.bm = bm.last.3.26a,
+                          lrp.2 = LRP.max.2.26a,lrp.3 = LRP.med.3.26a,lrp.4 = LRP.med.4.26a,
+                          usr.4 = USR.max.4.26a,usr.8 = USR.med.8.26a)
+                          
+plt.26a.bmi.ts <- ggplot(surv.26a) + geom_line(aes(x=year,y=I)) + 
+                              geom_line(data= plt.dat.26a,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.26a$lrp.2[1],color='firebrick2',linetype='solid') +
+                              geom_hline(yintercept = plt.dat.26a$lrp.3[1],color='firebrick2',linetype = 'dotted') +
+                              geom_hline(yintercept = plt.dat.26a$lrp.4[1],color='firebrick2',linetype='dashed') +
+                              geom_hline(yintercept = plt.dat.26a$usr.4[1],color=u.colors[2],linetype = 'solid') +
+                              geom_hline(yintercept = plt.dat.26a$usr.8[1],color=u.colors[2],linetype='dashed') +
+                              scale_x_continuous(name = '',breaks = seq(1995,2025,by=5),limits = c(1994,2022),labels = NULL) +
+                              scale_y_continuous(name = "",limits=c(0,6500))
+# Now german
+plt.dat.26c <- data.frame(year =2020:2022,cur.bm = bm.last.3.26c,
+                          lrp.2 = LRP.max.2.26c,lrp.3 = LRP.med.3.26c,lrp.4 = LRP.med.4.26c,
+                          usr.4 = USR.max.4.26c,usr.8 = USR.med.8.26c)
+                          
+plt.26c.bmi.ts <- ggplot(surv.26c) + geom_line(aes(x=year,y=I)) + 
+                              geom_line(data= plt.dat.26c,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.26c$lrp.2[1],color='firebrick2',linetype='solid') +
+                              geom_hline(yintercept = plt.dat.26c$lrp.3[1],color='firebrick2',linetype = 'dotted') +
+                              geom_hline(yintercept = plt.dat.26c$lrp.4[1],color='firebrick2',linetype='dashed') +
+                              geom_hline(yintercept = plt.dat.26c$usr.4[1],color=u.colors[2],linetype = 'solid') +
+                              geom_hline(yintercept = plt.dat.26c$usr.8[1],color=u.colors[2],linetype='dashed') +
+                              scale_x_continuous(name = '',breaks = seq(1995,2025,by=5),limits = c(1994,2022)) +
+                              scale_y_continuous(name = "",limits=c(0,2000))
+
+# Now GGb
+plt.dat.27b <- data.frame(year =2020:2022,cur.bm = bm.last.3.27b,
+                          lrp.2 = LRP.max.2.27b,lrp.3 = LRP.med.3.27b,lrp.4 = LRP.med.4.27b,
+                          usr.4 = USR.max.4.27b,usr.8 = USR.med.8.27b)
+                          
+plt.27b.bmi.ts <- ggplot(surv.27b) + geom_line(aes(x=year,y=I)) + #geom_point(aes(x=year,y=I),size=3) +
+                              geom_line(data= plt.dat.27b,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.27b$lrp.2[1],color='firebrick2',linetype='solid') +
+                              geom_hline(yintercept = plt.dat.27b$lrp.3[1],color='firebrick2',linetype = 'dotted') +
+                              geom_hline(yintercept = plt.dat.27b$lrp.4[1],color='firebrick2',linetype='dashed') +
+                              geom_hline(yintercept = plt.dat.27b$usr.4[1],color=u.colors[2],linetype = 'solid') +
+                              geom_hline(yintercept = plt.dat.27b$usr.8[1],color=u.colors[2],linetype='dashed') +
+                              scale_x_continuous(name = '',breaks = seq(1995,2025,by=5),limits = c(1994,2022)) +
+                              scale_y_continuous(name = "",limits=c(0,2000))
+
+# We can make these a nice 4 by 4 plot...
+plt.bmi.ts <- plot_grid(plt.25a.bmi.ts,plt.26a.bmi.ts,plt.26c.bmi.ts,plt.27b.bmi.ts,ncol=2,labels = c("SFA 25A","SFA 26A","SFA 26C","SFA 27B"),label_size=14,label_y=0.95,label_x=0.15) + theme(plot.margin = margin(0, 0, -275, 0))
+
+plt.bmi.ts <- add_sub(plt.bmi.ts, "Survey Biomass Index (tonnes)",angle=90,y=2.25,x=0.01,size=18)
+plt.bmi.ts <- ggdraw(plt.bmi.ts)
+save_plot(plt.bmi.ts,file =paste0(plot.index.loc,"RPs_BM_Indices.png"),base_height = 8,base_width = 11)
+
+
+
+# We can also make those KOBE plots for the areas using the relative indices, which aren't really showing anything
+plt.25a.kobe.indx <-  ggplot(rf.25a,aes(y=relative.F,x=I)) +  geom_text(aes(label=substr(year,3,4))) + 
+                                                              geom_path() + 
+                                                              scale_y_continuous(name="",limits = c(0,NA)) +
+                                                              scale_x_continuous(name="",limits = c(0,NA)) 
+
+plt.26a.kobe.indx <-  ggplot(rf.26a,aes(y=relative.F,x=I)) +  geom_text(aes(label=substr(year,3,4))) + 
+                                                              geom_path() + 
+                                                              scale_y_continuous(name="",limits = c(0,NA)) +
+                                                              scale_x_continuous(name="",limits = c(0,NA)) 
+
+plt.26c.kobe.indx <-  ggplot(rf.26c,aes(y=relative.F,x=I)) +  geom_text(aes(label=substr(year,3,4))) + 
+                                                              geom_path() + 
+                                                              scale_y_continuous(name="",limits = c(0,NA)) +
+                                                              scale_x_continuous(name="",limits = c(0,NA)) 
+
+plt.27b.kobe.indx <-  ggplot(rf.27b,aes(y=relative.F,x=I)) +  geom_text(aes(label=substr(year,3,4))) + 
+                                                              geom_path() + 
+                                                              scale_y_continuous(name="",limits = c(0,NA)) +
+                                                              scale_x_continuous(name="",limits = c(0,NA)) 
+
+
+plt.bmi.kobe <- plot_grid(plt.25a.kobe.indx,plt.26a.kobe.indx,plt.26c.kobe.indx,plt.27b.kobe.indx,ncol=2,labels = c("SFA 25A","SFA 26A","SFA 26C","SFA 27B"),label_size=14,label_y=0.95,label_x=0.15) + theme(plot.margin = margin(0, 0, -200, 0))
+
+plt.bmi.kobe <- add_sub(plt.bmi.kobe, "Survey Biomass Index (tonnes)",angle=0,y=1.25,x=0.55,size=18)
+plt.bmi.kobe <- add_sub(plt.bmi.kobe, "Relative fishing mortality",angle=90,y=2.5,x=0.01,size=18)
+
+#plt.bmi.ts <- ggdraw(plt.bmi.ts)
+save_plot(plt.bmi.kobe,file =paste0(plot.index.loc,"Kobe_BM_Indices.png"),base_height = 8,base_width = 11)
+
+
+
+
+# The Biomass change vs relative F figures (GEM plots)
+
+# So there is no evidence of anything for these areas other than BBn so there's really no information about removal reference points
+# that Science can provide using this method.
+plt.25a.gem.indx <- ggplot(rf.25a,aes(x=relative.F,y=prop.DB)) +  geom_text(aes(label=substr(year,3,4))) + 
+                                                                  geom_smooth(method='lm') + 
+                                                                  geom_hline(yintercept = 0,linetype='dashed',size=1.25)+
+                                                                  scale_x_continuous(name="",limits=c(0,NA)) +
+                                                                  scale_y_continuous(name="") 
+
+plt.26a.gem.indx <- ggplot(rf.26a,aes(x=relative.F,y=prop.DB)) +  geom_text(aes(label=substr(year,3,4))) + 
+                                                                  geom_smooth(method='lm') + 
+                                                                  geom_hline(yintercept = 0,linetype='dashed',size=1.25)+
+                                                                  scale_x_continuous(name="",limits=c(0,NA)) +
+                                                                  scale_y_continuous(name="") 
+
+plt.26c.gem.indx <- ggplot(rf.26c,aes(x=relative.F,y=prop.DB)) +  geom_text(aes(label=substr(year,3,4))) + 
+                                                                  geom_smooth(method='lm') + 
+                                                                  geom_hline(yintercept = 0,linetype='dashed',size=1.25)+
+                                                                  scale_x_continuous(name="",limits=c(0,NA)) +
+                                                                  scale_y_continuous(name="") 
+
+plt.27b.gem.indx <- ggplot(rf.27b,aes(x=relative.F,y=prop.DB)) +  geom_text(aes(label=substr(year,3,4))) + 
+                                                                  geom_smooth(method='lm') + 
+                                                                  geom_hline(yintercept = 0,linetype='dashed',size=1.25)+
+                                                                  scale_x_continuous(name="",limits=c(0,NA)) +
+                                                                  scale_y_continuous(name="") 
+
+
+plt.bmi.gem <- plot_grid(plt.25a.gem.indx,plt.26a.gem.indx,plt.26c.gem.indx,plt.27b.gem.indx,ncol=2,labels = c("SFA 25A","SFA 26A","SFA 26C","SFA 27B"),label_size=14,label_y=0.93,label_x=0.12) + theme(plot.margin = margin(0, 0, -270, 0))
+
+plt.bmi.gem <- add_sub(plt.bmi.gem, "Relative fishing mortality",angle=0,y=1.25,x=0.55,size=18)
+plt.bmi.gem <- add_sub(plt.bmi.gem, "Change in Biomass Index (%)",angle=90,y=2.5,x=0.01,size=18)
+
+#plt.bmi.ts <- ggdraw(plt.bmi.ts)
+save_plot(plt.bmi.gem,file =paste0(plot.index.loc,"GEM_BM_Indices.png"),base_height = 8,base_width = 11)
+
+
+
+
+```
+
+
+
+
+
+
+<!--chapter:end:tmp-Indices_analysis.Rmd-->
+
+
+
+```{r sab-productivity-analysis,include=F}
+
+# BSSM productivity import
+#years <- 1994:2022 # Make sure we are using the right years!!
+sab.prod.dat <- data.frame(Year = years,
+                           B = DD.out$median$B,
+                           R = DD.out$median$R,
+                           SSB = DD.out$median$B + DD.out$median$R,
+                           m = DD.out$median$m,
+                           mr = DD.out$median$mR,
+                           g = DD.out$data$g,
+                           gR = DD.out$data$gR)
+
+#sab.prod.dat[sab.prod.dat$Year %in% c(2015,2020),-1] <- NA
+
+
+# Recruits on sable average about 4 years old (75 = 3.5 and 90 = 4.5), so we'll roll with RPS4 for the recruits.
+sab.rec.age <- 4
+sab.prod.dat$R4 <- c(sab.prod.dat$R[(sab.rec.age+1):nrow(sab.prod.dat)],rep(NA,sab.rec.age))
+sab.prod.dat$RPS4 <- sab.prod.dat$R4/sab.prod.dat$SSB 
+
+# Now we can make some figures...
+p.rps.ts <- ggplot(sab.prod.dat, aes(x=Year,y=RPS4))  + geom_point() + 
+                                                    xlab("'Birth' year") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
+                                                    geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 7))+
+                                                    scale_y_log10() +  
+                                                    scale_x_continuous(breaks = c(seq(1980,2080,by=5)))# Definitely a signal here
+save_plot(paste0(sab.plot.loc,"RPS_ts.png"),p.rps.ts,base_height =6,base_width = 10)                                               
+                       
+# Density dependence, clear trend with increasing RPS as SSB declines.
+# Breakpoints are
+sab.rps.bp1 <- 4300
+sab.rps.bp2 <- 7000
+p.rps.ssb <- ggplot(sab.prod.dat,aes(y=RPS4,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3) + 
+                                                  xlab("Adult Biomass (tonnes)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
+                                                  geom_smooth(method = 'lm') +
+                                                  scale_y_log10() + 
+                                                  geom_vline(xintercept = c(sab.rps.bp2),size=0.5,color='firebrick2',linetype='dashed')  + 
+                                                  scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))# Definitely a signal here
+save_plot(paste0(sab.plot.loc,"RPS_vs_SSB.png"),p.rps.ssb,base_height =6,base_width = 10)        
+
+# Recruits vs SSB
+p.rec.ssb <- ggplot(sab.prod.dat,aes(y=R4,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3)  +
+                                                xlab("Spawning Stock Biomass (tonnes)") + ylab("Recruits (tonnes)") +
+                                                geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +scale_y_log10() +
+                                                geom_vline(xintercept = c(sab.rps.bp2),size=0.5,color='firebrick2',linetype='dashed')  + 
+                                                scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
+save_plot(paste0(sab.plot.loc,"Rec_vs_SSB.png"),p.rec.ssb,base_height =6,base_width = 10)    
+
+# What does a robust regression glook like...
+# tst <- lmrob(log(RPS4) ~ SSB,data=sab.prod.dat)
+# tst2 <- lm(log(RPS4) ~ SSB,data=sab.prod.dat)
+# summary(tst)
+# summary(tst2)
+# 
+# new.dat <- data.frame(SSB = seq(2000,10000,by=100))
+# 
+# pred.rob <- predict(tst,newdata = new.dat,se=T)
+# pred.lm <- predict(tst2,newdata = new.dat,se=T)
+# 
+# new.dat$RPS.rob <- pred.rob$fit
+# new.dat$RPS.lm <- pred.lm$fit
+# new.dat$UCI.rob <- new.dat$RPS.rob + 2*pred.rob$se.fit
+# new.dat$LCI.rob <- new.dat$RPS.rob - 2*pred.rob$se.fit
+# new.dat$UCI.lm <- new.dat$RPS.lm + 2*pred.lm$se.fit
+# new.dat$LCI.lm <- new.dat$RPS.lm - 2*pred.lm$se.fit
+# 
+# # The robust models actually have narrower CIs!!
+# ggplot(new.dat) + geom_line(aes(x=SSB,y=RPS.rob)) + geom_line(aes(x=SSB,y=RPS.lm),color='blue') +
+#                   geom_ribbon(aes(x=SSB,ymax=UCI.rob,ymin=LCI.rob),alpha=0.2) +
+#                   geom_ribbon(aes(x=SSB,ymax=UCI.lm,ymin=LCI.lm),alpha=0.2,color='blue')
+
+# Next is there any evidence of Density dependence with growth?
+# Absolutely no evidence of DD!
+
+
+
+# No relationship between g and SSB.
+p.g.ssb <- ggplot(sab.prod.dat,aes(y=g,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
+                                             xlab("") + ylab("Growth (Fully Recruited)") +
+                                             geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
+                                             #geom_vline(xintercept = 9000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1000),labels = NA))
+
+p.gR.ssb <- ggplot(sab.prod.dat,aes(y=gR,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
+                                             xlab("Adult Biomass (tonnes)") + ylab("Growth (Recruits)") +
+                                             geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
+                                             #geom_vline(xintercept = 9000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
+
+p.gs.ssb <-  cowplot::plot_grid(p.g.ssb,p.gR.ssb,nrow=2)
+
+save_plot(paste0(sab.plot.loc,"Growth_vs_SSB.png"),p.gs.ssb,base_height =12,base_width = 10)  
+
+# Naturnal mortality and SSB, not really anything IMHO.
+sab.m.bp <- 0
+p.m.ssb <- ggplot(sab.prod.dat,aes(y=m,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))+ 
+                                             xlab("") + ylab("FR Natural Mortality (instantaneous)") +
+                                             geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
+                                             #geom_vline(xintercept = 10000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1000)),labels=NULL)
+
+p.mr.ssb <- ggplot(sab.prod.dat,aes(y=mr,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))+ 
+                                             xlab("Adult Biomass (tonnes)") + ylab("Recruit Natural Mortality (instantaneous)") +
+                                             geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
+                                             #geom_vline(xintercept = 10000,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
+
+p.mort.ssb <-  cowplot::plot_grid(p.m.ssb,p.mr.ssb,nrow=2)
+
+save_plot(paste0(sab.plot.loc,"M_vs_SSB.png"),p.mort.ssb,base_height =11,base_width = 8)                
+
+
+# Step 2.... Correlation
+# Next thing you should consider is whether there are correlations in your productivity parameters, first look to autocorrelated time series
+# Then you want to look for cross-correlations between mortality and recruitment
+# First let's look for acf in our time series...
+# Starting with recruitment we see there is a strong autocorrlation in the total number of recruits
+p.rec.acf <- ggAcf(na.omit(sab.prod.dat$R),lag.max = 10) + ggtitle("")+ ylab("ACF Recruits")
+save_plot(paste0(sab.plot.loc,"ACF_Rec.png"),p.rec.acf,base_height =6,base_width = 10)                
+# But is this simply due to the underlying trend in R over time... possible, but really what is there is a very strong long cycle rather than a linear trend so ignoring this...
+rec.mod <- lm(R ~ I(Year-1994),data=sab.prod.dat)
+summary(rec.mod)
+# So probably better to look at per capita recruitment and see if that is a better acf'er...
+# And here we do see the correlation remains.
+p.rps.acf <- ggAcf(na.omit(log(sab.prod.dat$RPS4)),lag.max = 10) + ggtitle("") + ylab("ACF log(RPS)")
+save_plot(paste0(sab.plot.loc,"ACF_RPS.png"),p.rps.acf,base_height =6,base_width = 10)                
+
+
+# pacf shows us that we could approximate the RPS time series as an AR1, though there is a teaser of the 2 year negative correlation similar to what we found on BBn.
+# could easily enough model as an AR2 and use that. Also a 5 year correlation there, which I think is that longer term cycle.  But ignoring that...
+p.rps.pacf <- ggPacf(na.omit(log(sab.prod.dat$RPS4)),lag.max = 10) + ggtitle("") + ylab("PACF log(RPS)")
+# The RPS value for the text and for the sims later
+sab.rps.lag <- 1
+sab.rps.cor.1 <- round(p.rps.pacf$data$Freq[sab.rps.lag],digits=2)
+sab.rps.cor.2 <- 0.01 # Make it a very small number if it is 0.
+save_plot(paste0(sab.plot.loc,"PACF_RPS.png"),p.rps.pacf,base_height =6,base_width = 10)   
+
+# On the log scale we see there is no trend in the data
+rps.mod <- lm(log(RPS4) ~ I(Year-1994),data=sab.prod.dat)
+summary(rps.mod) # Indeed there is...
+
+
+# How about growth, nope nothing.
+p.g.pacf <- ggPacf(sab.prod.dat$g,lag.max = 10) + ggtitle("") + ylab("ACF Growth (FR)")# No autocorrelation in Condition
+p.gR.pacf <- ggPacf(sab.prod.dat$gR,lag.max = 10) + ggtitle("") + ylab("ACF Growth (Recruits)")# No autocorrelation in Condition
+p.gs.pacf <-  cowplot::plot_grid(p.g.pacf,p.gR.pacf,nrow=2)
+
+save_plot(paste0(sab.plot.loc,"PACF_growths.png"),p.gs.pacf,base_height =12,base_width = 10)                
+
+# Natural morality correlation? Curious, no correlation at 1 lag, but a negative correlation at lag 2, suggesting the m is flipping every couple years I think?
+p.m.acf <- ggAcf(sab.prod.dat$m,lag.max = 10) + ggtitle("") + ylab("ACF FR Natural Mortality") + xlab("") + scale_x_continuous(breaks = 1:14,labels=NULL) # Not significant
+p.m.pacf <- ggPacf(sab.prod.dat$m,lag.max = 10) + ggtitle("") + ylab("PACF FR Natural Mortality")# Just barely significant
+sab.m.lag <- 2
+sab.m.cor.2 <- round(p.m.pacf$data$Freq[sab.m.lag],digits=2)
+sab.m.cor.1 <- 0.01 # Make it a very small number if it is 0.
+# Recruit mortality, no autocorrelation.
+p.mr.acf <- ggAcf(sab.prod.dat$mr,lag.max = 10) + ggtitle("") + ylab("ACF Recruit Natural Mortality") + xlab("") + scale_x_continuous(breaks = 1:14,labels=NULL) # No autocorrelation in 
+p.mr.pacf <- ggPacf(sab.prod.dat$mr,lag.max = 10) + ggtitle("") + ylab("PACF Recuit Natural Mortality")# No autocorrelation in Condition
+
+
+p.m.pacfs <-  cowplot::plot_grid(p.m.pacf,p.mr.pacf,nrow=2)
+save_plot(paste0(sab.plot.loc,"PACF_m.png"),p.m.pacfs,base_height =12,base_width = 10)                
+
+# So check if there is a linear trend, and there isn't
+mod.m <- lm(m~I(Year-1993),data=sab.prod.dat)
+summary(mod.m) # No trend
+
+
+# So next up lets look for evidence of correlation between your productivity parameters, specifically RPS and m
+# We offset the RPS for this to the year they show up in the time series
+sab.prod.dat$RPS4_offset <- c(rep(NA,sab.rec.age),sab.prod.dat$RPS4[-((length(sab.prod.dat$RPS4)-(sab.rec.age-1)):length(sab.prod.dat$RPS4))])
+ggplot(sab.prod.dat,aes(x=Year,y=RPS4)) + geom_point() + geom_line(size=2) + geom_point(aes(y = m)) + geom_line(aes(y = m),color='blue') 
+ggplot(sab.prod.dat,aes(x=m,y=RPS4)) + geom_text(aes(label = substr(Year,3,4))) + geom_smooth(method = 'gam')
+# If we offset the RPS to the year they are actually showing up, might be some weak correlation, but can't say it's anything more than noise, so we can ignore this I think.
+p.rpsoff.m <- ggplot(sab.prod.dat,aes(x=Year,y=RPS4_offset)) + geom_text(aes(label = substr(Year-4,3,4)))  + 
+                                                           xlab("") +
+                                                           ylab("RPS (kg\u00B9\u22C5kg\u207B\u00B9) & Natural mortality (Inst)") +
+                                                           geom_line(aes(y = m),color='firebrick2',size=1,linetype='dashed')
+p.rps.m.ccf <- ggCcf(sab.prod.dat$RPS4_offset,sab.prod.dat$m,lag.max = 10) + ggtitle("")
+# Peak cross correlation...
+sab.m.rps.lag <- p.rps.m.ccf$data$lag[which(abs(p.rps.m.ccf$data$Freq) == abs(max(p.rps.m.ccf$data$Freq)))]
+sab.m.rps.cor <- round(p.rps.m.ccf$data$Freq[p.rps.m.ccf$data$lag == sab.m.rps.lag],digits=2)
+
+p.rps.m.ccf.combo <-  cowplot::plot_grid(p.rpsoff.m,p.rps.m.ccf,nrow=2)
+save_plot(paste0(sab.plot.loc,"CCF_ts_RPS_offset_m.png"),p.rps.m.ccf.combo,base_height =12,base_width = 10)                
+      
+# The final plot I want to show here is the correlation between the model estimate and the survey index.
+# These will be aligned so don't need to get too fancy
+mod.index.bm <- data.frame(year = sab.prod.dat$Year,mod.bm = sab.prod.dat$B,index.bm = surv.25a$I/mod.out$BUGSoutput$median$q)
+mod.index.bm 
+
+p.sab.mod.ind.bm <-ggplot(mod.index.bm) + geom_text(aes(x=index.bm,y=mod.bm,label = substr(year,3,4))) +
+                                          scale_x_continuous(name="Q-corrected Survey Biomass Index (tonnes)") +
+                                          scale_y_continuous(name="Model Biomass (tonnes)") +
+                                          geom_abline(slope=1,intercept=0)
+save_plot(paste0(sab.plot.loc,"Model_vs_index_biomass.png"),p.sab.mod.ind.bm,base_height =6,base_width = 10)   
+
+
+
+
+# PICK IT UP FROM HERE.
+
+
+
+
+
+
+```
+
+```{r sab-productivity-simulations,include=F}
+# Set the seed so we can repeat these simulations!
+set.seed(2)
+g.strat <- list(type = "bp",strat = 'dist',bp=1e99,cen.tend = "mean",set.g=1)#,mn.mx = 1 sd.mx = 0.05)
+
+r.strat <- list(type = "cor",strat = 'dist', bp = c(sab.rps.bp2), rec.age=sab.rec.age, cen.tend='mean',
+                      ar1=sab.rps.cor.1,ar2=sab.rps.cor.2,rps.m.cor = sab.m.rps.cor,rps.m.lag = sab.m.rps.lag,
+                      mn.at.max = min(sab.prod.dat$RPS4,na.rm=T),sd.at.max = 0.1) 
+m.strat <- list(type = "cor",strat = 'dist', bp = 1e99, cen.tend = 'median',
+                      ar1=sab.m.cor.1,ar2=sab.m.cor.2)#mn.at.max =  max(sab.prod.dat$m,na.rm=T),sd.at.max = 0.1) #
+mod.4.sab = "BSSM"
+sab.exp.scenario <- seq(0,0.1,0.005)
+#sab.model.yrs <- years
+sab.max.SSB <- floor(max(sab.prod.dat$SSB/100,na.rm=T)) * 100
+
+# Run projection
+if(run.sims == T)
+{
+# Run projection
+sab.res <- proj.mod(mods = list(bssm.mod = sab.mod),n_sim=n_sims,n_y = n_y,model=mod.4.sab,model.yrs = sab.model.yrs,
+                plot_url = plot.sab.rp.mod.loc, run = 'no_model_error', 
+                res_url = res.sab.rp.mod.loc,save.results = T, 
+                exp.scenario=sab.exp.scenario, 
+                g.mod =   list(type = g.strat$type,bp.strategy = g.strat$strat,bp= g.strat$bp,set.g = g.strat$set.g,cen.tend = g.strat$cen.tend),
+                               #mn.at.max = g.strat$mn.at.max,sd.at.max =g.strat$sd.at.max), 
+                rec.mod = list(type = r.strat$type,bp.strategy = r.strat$strat,bp= r.strat$bp, 
+                               rec.age = r.strat$rec.age,rps.m.cor = r.strat$rps.m.cor,rps.m.lag = r.strat$rps.m.lag,cen.tend = r.strat$cen.tend,
+                               ar1=r.strat$ar1,ar2=r.strat$ar2,
+                               mn.at.max = r.strat$mn.at.max,sd.at.max =r.strat$sd.at.max), 
+                m.mod =   list(type = m.strat$type,bp.strategy = m.strat$strat,bp= m.strat$bp, cen.tend = m.strat$cen.tend,#mn.at.max = m.strat$mn.mx,sd.at.max = m.strat$sd.mx,
+                                ar1=m.strat$ar1,ar2=m.strat$ar2))#,
+                               #mn.at.max = m.strat$mn.at.max,sd.at.max =m.strat$sd.at.max))
+saveRDS(sab.res,paste0(res.sab.rp.mod.loc,"full_bmsy_sims_",min(sab.model.yrs),"-",max(sab.model.yrs)))
+} # end if run.sims == T
+if(run.sims == F) sab.res <- readRDS(paste0(res.sab.rp.mod.loc,"full_bmsy_sims_",min(sab.model.yrs),"-",max(sab.model.yrs)))
+
+#Exp.res <- readRDS("D:/Framework/SFA_25_26_2024/RefPts/Results/Sab/R_75_FR_90/SEAM_1994_2022_vary_m_m0_0.2_qR_0.33_10_knots_g_original/RPs/SEAM_g_sv_0_1_dist_1_0.05_r_bp_dist_4500__0.032_0.24_m_bp_dist_10000__0.34_0.1.Rds")
+
+sab.Exp.res <- sab.res$Exp.res
+
+sab.RPs <- sab.Exp.res %>% dplyr::filter(year >= n_y-25) %>% dplyr::group_by(F.scenario) %>% dplyr::summarise(med.B = median(B,na.rm=T),
+                                                                                                       med.C = median(Catch,na.rm=T))  
+
+sab.c.at.msy <- max(sab.RPs$med.C)
+sab.rr <- sab.RPs$F.scenario[sab.RPs$med.C == sab.c.at.msy] # Nobody would argue with 9% either...
+sab.bmsy <- round(sab.RPs$med.B[sab.RPs$med.C == sab.c.at.msy],digits=-2)
+sab.b0 <- round(sab.RPs$med.B[sab.RPs$F.scenario==0],digits=-2)
+
+sab.c.at.msy <- round(sab.c.at.msy,digits=0)
+
+# So our LRP options
+sab.lrp.b0 <- 0.2 * sab.b0
+sab.lrp.3.bmsy <- 0.3 * sab.bmsy
+sab.lrp.4.bmsy <- 0.4 * sab.bmsy
+# USR and TRP 
+sab.usr.b0 <- 0.4 * sab.b0
+sab.usr.bmsy <- 0.8 * sab.bmsy
+sab.trp.bmsy <- sab.bmsy
+sab.trp.b0 <- 0.8 * sab.b0
+
+
+
+sab.res.at.rr.last.yrs <- sab.Exp.res[sab.Exp.res$F.scenario==sab.rr & sab.Exp.res$year > (n_y-last.yrs),]
+# We can estimate the proportion of the time the stocks are in the critical, cautious, and healthy zones in the last 25 years of the simulations
+sab.prop.yrs.critical <- round(100*length(which(sab.res.at.rr.last.yrs$B < sab.lrp.b0))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.cautious <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.lrp.b0 & sab.res.at.rr.last.yrs$B < sab.usr.b0))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.healthy <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.usr.b0))/n_sims/last.yrs,digits=1)
+
+# How long does it take to 'rebuild'
+
+sim.years <- sort(unique(sab.Exp.res$year))
+F.scenario <- sort(unique(sab.Exp.res$F.scenario))
+
+time.grid <- expand.grid(scenario = F.scenario,years = sim.years)
+time.to <- data.frame(time.grid,Biomass = NA, T.msy = F,T.usr = F, T.lrp=F,T.trp = F)
+for(i in sim.years)
+{
+B.now <- sab.Exp.res %>% dplyr::filter(year %in% i) %>% dplyr::group_by(F.scenario) %>% dplyr::summarise(med.B = median(B,na.rm=T))
+time.to$Biomass[time.to$years == i] <- B.now$med.B
+# This feels way clunky...
+if(any(B.now$med.B >= sab.bmsy)) 
+{
+  trues <- which(B.now$med.B >= sab.bmsy)
+  tmp <- time.to$T.msy[time.to$years == i]
+  tmp[trues] <- T
+  time.to$T.msy[time.to$years == i] <- tmp
+}
+if(any(B.now$med.B >= sab.usr.b0))
+{
+   trues <- which(B.now$med.B >= sab.usr.b0)
+  tmp <- time.to$T.usr[time.to$years == i]
+  tmp[trues] <- T
+  time.to$T.usr[time.to$years == i] <- tmp
+}
+if(any(B.now$med.B >= sab.lrp.b0))
+{
+  trues <- which(B.now$med.B >= sab.lrp.b0)
+  tmp <- time.to$T.lrp[time.to$years == i]
+  tmp[trues] <- T
+  time.to$T.lrp[time.to$years == i] <- tmp
+}
+if(any(B.now$med.B >= sab.trp.b0))
+{
+  trues <- which(B.now$med.B >= sab.trp.b0)
+  tmp <- time.to$T.trp[time.to$years == i]
+  tmp[trues] <- T
+  time.to$T.trp[time.to$years == i] <- tmp
+}
+}
+
+
+# If the stock is currently above the reference point you want these to =F, if it's below the reference point you want these to = T
+sab.res.T.msy <- time.to |> collapse::fsubset(T.msy == T) |> collapse::fgroup_by(scenario) |> collapse::fselect(scenario,years,Biomass,T.msy) 
+sab.res.T.usr <- time.to |> collapse::fsubset(T.usr == F) |> collapse::fgroup_by(scenario) |> collapse::fselect(scenario,years,Biomass,T.usr) 
+sab.res.T.lrp <- time.to |> collapse::fsubset(T.lrp == F) |> collapse::fgroup_by(scenario) |> collapse::fselect(scenario,years,Biomass,T.lrp) 
+sab.res.T.trp <- time.to |> collapse::fsubset(T.trp == T) |> collapse::fgroup_by(scenario) |> collapse::fselect(scenario,years,Biomass,T.trp) 
+# So now summarize these...
+
+sab.T.msy <- sab.res.T.msy %>% collapse::fgroup_by(scenario) %>% collapse::fsummarize(T.msy = min(years))
+sab.T.usr <- sab.res.T.usr %>% collapse::fgroup_by(scenario) %>% collapse::fsummarize(T.usr = min(years))
+sab.T.lrp <- sab.res.T.lrp %>% collapse::fgroup_by(scenario) %>% collapse::fsummarize(T.lrp = min(years)) # Hmm...
+sab.T.trp <- sab.res.T.trp %>% collapse::fgroup_by(scenario) %>% collapse::fsummarize(T.trp = min(years)) # This tells me that TRP is really unachievable
+
+# Figures from this...
+
+# Show that the time series we're provided have similar characteristics to the input time series.
+# Given the crazy high volume of these, I show the results for the BMSY scenario.
+sab.res.4.plts <- sab.Exp.res |> collapse::fsubset(F.scenario == sab.rr & Sim <= n_sims)
+
+# Here are the growth time series.
+sab.rp.sim.g.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=g,group=Sim),alpha=0.02)
+sab.rp.sim.gR.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=gR,group=Sim),alpha=0.02)
+sab.rp.sim.m.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=M,group=Sim),alpha=0.02) 
+sab.rp.sim.mr.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=mr,group=Sim),alpha=0.02) 
+sab.rp.sim.rps.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=rps,group=Sim),alpha=1) 
+
+# Extract the lag 1 ACF for each of the productivity parameters... 
+sab.cor.res <- data.frame(g.cor = NA, gr.cor=NA,mr.acf.ar1 = NA,mr.acf.ar2 = NA,m.acf.ar1 = NA,m.acf.ar2 = NA,rps.ar1 = NA,rps.ar2 = NA,rps.m.cor = NA)
+g.acf.all <- gr.acf.all <- m.acf.all <- mr.acf.all <-rps.acf.all <- rps.m.ccf.all <- NULL
+
+max.lag <- 10
+
+for(i in 1:n_sims)
+{
+  rps.dat <- sab.res$rps[,i,which(F.scenario == sab.rr)] # This is using the MSY scenario
+  dat <- sab.res.4.plts |> collapse::fsubset(Sim == i)
+  g.acf.all[[i]] <- ggPacf(dat$g,lag.max = max.lag,plot=F)$acf
+  m.acf.all[[i]] <- ggPacf(dat$M,lag.max = max.lag,plot=F)$acf
+  mr.acf.all[[i]] <- ggPacf(dat$MR,lag.max = max.lag,plot=F)$acf
+  gr.acf.all[[i]] <- ggPacf(dat$gR,lag.max = max.lag,plot=F)$acf
+  rps.acf.all[[i]] <- ggPacf(rps.dat,lag.max = max.lag,plot=F)$acf
+  rps.m.ccf.all[[i]] <- ggCcf(rps.dat,dat$M,lag.max = max.lag,plot=F)$acf
+  g.acf <- g.acf.all[[i]][1]
+  gr.acf <- gr.acf.all[[i]][1]
+  m.acf.ar1 <- m.acf.all[[i]][1]
+  m.acf.ar2 <- m.acf.all[[i]][2]
+  rps.acf.ar1 <- rps.acf.all[[i]][1]
+  rps.acf.ar2 <- rps.acf.all[[i]][2]
+  mr.acf.ar1 <- mr.acf.all[[i]][1]
+  mr.acf.ar2 <- mr.acf.all[[i]][2]
+  rsp.m.ccf <-  rps.m.ccf.all[[i]][max.lag+sab.m.rps.lag+1] # This gets the right lag almost magically.
+
+  
+  tmp <- data.frame(g.cor = g.acf, gr.cor=gr.acf,m.acf.ar1=m.acf.ar1,
+                    mr.acf.ar1 = mr.acf.ar1,mr.acf.ar2 = mr.acf.ar2,
+                    m.acf.ar2 =m.acf.ar2,rps.ar1 = rps.acf.ar1,
+                    rps.ar2 = rps.acf.ar2,rps.m.cor = rsp.m.ccf)
+  sab.cor.res[i,] <- tmp
+} # end for(i in 1:n_sims)
+
+
+g.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',g.acf.all)),lag=1:max.lag)
+gr.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',gr.acf.all)),lag=1:max.lag)
+m.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',m.acf.all)),lag=1:max.lag)
+mr.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',mr.acf.all)),lag=1:max.lag)
+rps.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',rps.acf.all)),lag=1:max.lag)
+rps.m.sim.ccf <- data.frame(dat = colMeans(do.call('rbind',rps.m.ccf.all)),lag=-max.lag:max.lag)
+
+
+# So we retained the correlation structure for the most part, though it was generally weaker than what we observed in the time series.
+sab.cor.sim.summary <- data.frame(t(round(colMeans(as.matrix(sab.cor.res)),digits=2)))
+```
+
+
+
+
+```{r special-sab-prod-sims-figs,include =F}
+# Now I can make the PACF plots for the productivity parameters
+#ggplot(g.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + scale_y_continuous(name = "Mean Partial Auto-correlation",limits = c(-0.5,0.5))
+# Maximum and minimum for the figure, keep it symmetric...
+max.abs <- max(abs(sab.cor.sim.summary),na.rm=T)
+
+sab.m.sim.cor.plt <- ggplot(m.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                              scale_y_continuous(name = "Mean PACF (Fully-recruited M)",limits = c(-max.abs,max.abs)) + 
+                                              scale_x_continuous(name = "",breaks = 1:max.lag,labels=NULL)
+
+sab.mr.sim.cor.plt <- ggplot(mr.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                              scale_y_continuous(name = "Mean PACF (Recruit M)",limits = c(-max.abs,max.abs))+ 
+                                              scale_x_continuous(name = "",breaks = 1:max.lag,labels=NULL)
+
+sab.gr.sim.cor.plt <- ggplot(gr.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                               scale_y_continuous(name = "Mean PACF (Recruit growth)",limits = c(-max.abs,max.abs))+ 
+                                               scale_x_continuous(name = "Lag",breaks = 1:max.lag)
+
+
+sab.rps.sim.cor.plt <- ggplot(rps.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                                scale_y_continuous(name = "Mean PACF (RPS)",limits = c(-max.abs,max.abs))+ 
+                                                scale_x_continuous(name = "Lag",breaks = 1:max.lag)
+
+
+sab.sim.cors.plt <- plot_grid(sab.m.sim.cor.plt,sab.mr.sim.cor.plt,sab.gr.sim.cor.plt,sab.rps.sim.cor.plt)
+
+save_plot(sab.sim.cors.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/PACF_sim_correlation.png"),base_height = 11,base_width=8.5)
+
+
+
+sab.rps.m.sim.cor.plt <- ggplot(rps.m.sim.ccf,mapping=aes(x=lag,y=dat)) +  geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                                scale_y_continuous(name = "Mean CCF (M vs. RPS)",limits = c(-max.abs,max.abs))+ 
+                                                scale_x_continuous(name = "Lag",breaks = -max.lag:max.lag)
+
+save_plot(sab.rps.m.sim.cor.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/CCF_sim_correlation.png"),base_height = 8.5,base_width=8.5)
+
+# The density dependence from the simulations...
+sab.res.4.plts$SSB <- sab.res.4.plts$B + sab.res.4.plts$Rec
+# To get the RPS offset right I need to loop-d-loo
+
+for(i in 1:n_sims)
+{
+  tmp <- sab.res.4.plts[sab.res.4.plts$Sim == i,]
+  tmp$rps.offset <- c(tmp$rps[(sab.rec.age+1):nrow(tmp)],rep(NA,sab.rec.age))
+  sab.res.4.plts$rps.offset[sab.res.4.plts$Sim == i] <- tmp$rps.offset
+}
+
+
+# Set the alpha level for the lines on the figures showing the individual realizations.
+if(n_sims <= 10) alphs <- 0.5
+if(n_sims > 10) alphs <- 0.1
+if(n_sims > 100) alphs <- 1/255 # This is the minimum you can Alpha
+
+sab.prod.sum <- data.frame(mn.gR.obs = mean(sab.prod.dat$gR,na.rm=T),mn.gR.sim = mean(sab.res.4.plts$gR),
+                           med.m.obs = median(sab.prod.dat$m,na.rm=T),med.m.sim = median(sab.res.4.plts$M),
+                           mn.mR.obs = mean(sab.prod.dat$mr,na.rm=T),mn.mR.sim = mean(sab.res.4.plts$MR),
+                           mn.rps.obs = mean(sab.prod.dat$RPS4,na.rm=T),mn.rps.sim = mean(sab.res.4.plts$rps))
+
+
+sab.m.sim.comp.plt <- ggplot(sab.res.4.plts) + geom_point(aes(x=SSB/1000,y=M),alpha=alphs,shape=21,fill='black',stroke=NA) + 
+                         #geom_vline(xintercept = sab.max.SSB/1000,color='red',linetype='solid') +
+                         geom_hline(yintercept = sab.prod.sum$med.m.obs,color='blue',linetype='dashed')+
+                         geom_hline(yintercept = sab.prod.sum$med.m.sim,color='blue',linetype='solid')+
+                         scale_x_continuous(name="",labels = NULL) +
+                         scale_y_continuous(name=("Fully-recruited NM (instantaneous)"))
+
+sab.mr.sim.comp.plt <- ggplot(sab.res.4.plts) + geom_point(aes(x=SSB/1000,y=MR),alpha=alphs,shape=21,fill='black',stroke=NA) +
+                         geom_hline(yintercept = sab.prod.sum$mn.mR.obs,color='blue',linetype='dashed')+
+                         geom_hline(yintercept = sab.prod.sum$mn.mR.sim,color='blue',linetype='solid')+
+                         scale_x_continuous(name="",labels = NULL) +
+                         scale_y_continuous(name=("Recruit NM (instantaneous)"))
+
+sab.gr.sim.comp.plt <- ggplot(sab.res.4.plts) + geom_point(aes(x=SSB/1000,y=gR),alpha=alphs,shape=21,fill='black',stroke=NA)  +
+                         geom_hline(yintercept = sab.prod.sum$mn.gR.obs,color='blue',linetype='dashed')+
+                         geom_hline(yintercept = sab.prod.sum$mn.gR.sim,color='blue',linetype='solid')+
+                         scale_x_continuous(name="") +
+                         scale_y_continuous(name=("Recruit growth"))
+
+# The really low RPS values are because of the correlation, they happen after most of the really large recruitment years, so are due to the large negative lag 2 rps, ha!
+sab.rps.sim.comp.plt <- ggplot(sab.res.4.plts) + geom_point(aes(x=SSB/1000,y=rps.offset),alpha=alphs,shape=21,fill='black',stroke=NA) + 
+                         geom_vline(xintercept = sab.rps.bp2/1000,color='red',linetype='solid') +
+                         geom_hline(yintercept = sab.prod.sum$mn.rps.obs,color='blue',linetype='dashed')+
+                         geom_hline(yintercept = sab.prod.sum$mn.rps.sim,color='blue',linetype='solid')+
+                         scale_x_continuous(name="") +
+                         scale_y_log10(name=("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)"))
+
+
+sab.sim.comps.plt <- plot_grid(sab.m.sim.comp.plt,sab.mr.sim.comp.plt,sab.rps.sim.comp.plt,sab.gr.sim.comp.plt)
+sab.sim.comps.plt2 <- add_sub(sab.sim.comps.plt, "Adult Biomass (tonnes x 1000)",angle=0,y=1.4,x=0.55,size=24)
+
+save_plot(sab.sim.comps.plt2,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_paramter_DD.png"),base_height = 11,base_width=8.5)
+
+
+sab.mod.rp.plt <- ggplot(sab.prod.dat) + geom_line(aes(x=Year,y=B/1000)) + 
+                       geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid') +
+                       geom_hline(yintercept = sab.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
+                       geom_hline(yintercept = sab.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
+                       geom_hline(yintercept = sab.usr.b0/1000,color=u.colors[2],linetype = 'solid') +
+                       geom_hline(yintercept = sab.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
+                       geom_hline(yintercept = sab.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
+                       scale_x_continuous('',breaks=seq(1990,2030,by=3)) +
+                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') 
+
+save_plot(sab.mod.rp.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"),base_height = 8.5,base_width=8.5)
+
+
+sab.mod.real.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
+                       geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
+                       #geom_hline(yintercept = sab.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
+                       #geom_hline(yintercept = sab.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
+                       geom_hline(yintercept = sab.usr.b0/1000,color=u.colors[2],linetype = 'solid',size=1.5) +
+                       #geom_hline(yintercept = sab.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
+                       #geom_hline(yintercept = sab.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
+                       scale_x_continuous('') +
+                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') +
+                       theme(legend.position = "none")
+
+save_plot(sab.mod.real.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"),base_height = 8.5,base_width=8.5)
+
+
+
+```
+
+```{r sab-hcr-sims,include =F}
+
+# HCR specific settings
+set.seed(4)
+sab.trp.exp <- 0.05
+sab.usr.exp <- 0.01
+sab.lrp.exp <- 0
+sab.exp.sd <- 0.1 
+
+
+hcr.strat <-list(TRP = sab.trp.bmsy,TRP.exp = sab.trp.exp,
+                 USR = sab.usr.b0, USR.exp = sab.usr.exp, 
+                 LRP = sab.lrp.b0, LRP.exp = sab.lrp.exp,exp.sd = sab.exp.sd)
+# The g/m/r.strat are in the productivity section...
+# For elsewhere, this is the HCR figure plot directory
+sab.HCR <- paste0("T_",hcr.strat$TRP,"_",hcr.strat$TRP.exp,"_U_",hcr.strat$USR,"_",hcr.strat$USR.exp,"_L_",hcr.strat$LRP,"_",hcr.strat$LRP.exp)
+sab.hcr.plt.loc <- paste0(plot.sab.rp.mod.loc,"HCR/",sab.HCR,"/")
+sab.hcr.res.loc <- paste0(res.sab.rp.mod.loc,"HCR/",sab.HCR,".Rds")
+if(run.sims == T)
+{
+# An HCR model
+sab.hcr <- proj.mod(mods = list(bssm.mod = sab.mod),n_sim=n_sims,n_y = n_y,model=mod.4.sab,
+                run = 'no_model_error',  
+                plot_url = plot.sab.rp.mod.loc,  res_url = res.sab.rp.mod.loc,save.results = T,
+                g.mod =   list(type = g.strat$type,bp.strategy = g.strat$strat,bp= g.strat$bp,set.g = g.strat$set.g,cen.tend = g.strat$cen.tend),
+                               #mn.at.max = g.strat$mn.at.max,sd.at.max =g.strat$sd.at.max), 
+                rec.mod = list(type = r.strat$type,bp.strategy = r.strat$strat,bp= r.strat$bp, 
+                               rec.age = r.strat$rec.age,rps.m.cor = r.strat$rps.m.cor,rps.m.lag = r.strat$rps.m.lag,cen.tend = r.strat$cen.tend,
+                               ar1=r.strat$ar1,ar2=r.strat$ar2,
+                               mn.at.max = r.strat$mn.at.max,sd.at.max =r.strat$sd.at.max), 
+                m.mod =   list(type = m.strat$type,bp.strategy = m.strat$strat,bp= m.strat$bp, cen.tend = m.strat$cen.tend,#mn.at.max = m.strat$mn.mx,sd.at.max = m.strat$sd.mx,
+                                ar1=m.strat$ar1,ar2=m.strat$ar2),
+                HCR.sim = list(TRP = hcr.strat$TRP,TRP.exp = hcr.strat$TRP.exp, USR = hcr.strat$USR, USR.exp = hcr.strat$USR.exp,
+                               LRP = hcr.strat$LRP, LRP.exp = hcr.strat$LRP.exp,exp.sd = hcr.strat$exp.sd))
+sab.hcr <- sab.hcr$Exp.res
+}
+if(run.sims == F) sab.hcr <- readRDS(sab.hcr.res.loc)
+  
+sab.mn.catch.hcr <- round(mean(sab.hcr$Catch,na.rm=T),digits=0)
+sab.med.catch.hcr <- round(median(sab.hcr$Catch,na.rm=T),digits=0)
+sab.med.bm.hcr <- round(median(sab.hcr$B),digits=0)
+
+# For this I need to use the summarized object
+sab.hcr.last.yrs <- sab.hcr[sab.hcr$year > (n_y-last.yrs),]
+sab.prop.yrs.bl.lrp.hcr <- round(100*length(which(sab.hcr.last.yrs$B  < sab.lrp.b0))/n_sims/last.yrs,digits=2)
+sab.prop.yrs.cautious.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.lrp.b0 & sab.hcr.last.yrs$B < sab.usr.b0))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.healthy.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.usr.b0 & sab.hcr.last.yrs$B < sab.trp.bmsy))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.above.trp.hcr <- round(100*length(which(sab.hcr.last.yrs$B > sab.trp.bmsy))/n_sims/last.yrs,digits=1)
+
+sab.min.healthy.zone.catch.hcr <- sab.usr.b0*0.025
+sab.max.healthy.zone.catch.hcr <- sab.trp.bmsy*0.025
+sab.min.trp.catch.hcr <- sab.trp.bmsy*sab.trp.exp
+sab.catch.quants.hcr <- quantile(sab.hcr$Catch,na.rm=T,probs = seq(0,1,by=0.01))
+
+# model catchability...
+sab.q <- round(median(sab.mod$sims.list$q),digits=2)
+
+```
+
+<!--chapter:end:tmp-Sab_analysis.Rmd-->
+
+
+```{r bbn-productivity-analysis,include=F}
+
+# Setup...
+#years <- 1994:2022
+# SEAMly version
+bbn.prod.dat <- data.frame(Year = years,
+                        B = bbn.mod$report$totB[-length(bbn.mod$report$totB)],
+                        R = bbn.mod$report$totR[-length(bbn.mod$report$totR)], # 
+                        #R = bbn.mod$report$totR, # 
+                        SSB = bbn.mod$report$totB[-length(bbn.mod$report$totB)] + bbn.mod$report$totR[-length(bbn.mod$report$totR)],
+                        m = bbn.mod$report$mean_m[-length(bbn.mod$report$mean_m)],
+                        g = c(bbn.mod$obj$env$data$g[-length(bbn.mod$obj$env$data$g)]),
+                        gR = c(bbn.mod$obj$env$data$gR[-length(bbn.mod$obj$env$data$gR)]))
+# Make all things 2020 an NA
+bbn.prod.dat[bbn.prod.dat$Year == 2020,-1] <- NA
+
+
+# Now we can get common Recruitment data R3 assumes recruits are 3 year olds, r4 are 4 year olds etc.
+bbn.rec.age <- 3
+bbn.prod.dat$R3 <- c(bbn.prod.dat$R[(bbn.rec.age+1):nrow(bbn.prod.dat)],rep(NA,bbn.rec.age))
+# Assume Scallop reach recruit size at age 3, will need to check that.
+bbn.prod.dat$RPS3 <- bbn.prod.dat$R3/bbn.prod.dat$SSB 
+
+
+
+
+
+# OK, so we see recruits are probably 3-4 years old based on that von B, 
+# This really does a bang up job of showing the dampened cycles of the recruitment patters, most interesting.
+p.rps.ts <- ggplot(bbn.prod.dat, aes(x=Year,y=RPS3))  + geom_point() + 
+                                                    xlab("'Birth' year") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
+                                                    geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 7))+
+                                                    scale_y_log10() +  
+                                                    scale_x_continuous(breaks = c(seq(1980,2080,by=5)))# Definitely a signal here
+save_plot(paste0(bbn.plot.loc,"RPS_ts.png"),p.rps.ts,base_height =6,base_width = 10)                                               
+                       
+# Density dependence, clear trend with increasing RPS as SSB declines.
+# Breakpoints are
+bbn.rps.bp <- 11500
+#sab.rps.bp2 <- 7000
+p.rps.ssb <- ggplot(bbn.prod.dat,aes(y=RPS3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3) + 
+                                                  xlab("Adult Biomass (tonnes)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
+                                                  geom_smooth(method = 'lm') +
+                                                  scale_y_log10() + 
+                                                  geom_vline(xintercept = bbn.rps.bp,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                                  scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))# Definitely a signal here
+save_plot(paste0(bbn.plot.loc,"RPS_vs_SSB.png"),p.rps.ssb,base_height =6,base_width = 10)                                               
+                       
+# It is DK's opinion that you need to look at recruitment from a 'per capita' perspective to actually understand recruitment density dependence. But you should also look at Recruits against SSB
+# amd when you do that, the most parsimonous model will ALMOST always be a flat line, but worth noting that DOES MEAN there is density dependence in here, because you are getting just as
+# many recruits when the population abundance is low, so a smaller SSB is able to punch out as many recruits as a high SSB, but it DOES NOT MEAN that a traditional SR model will get you anywhere useful.
+p.rec.ssb <- ggplot(bbn.prod.dat,aes(y=R3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3)  +
+                                                xlab("Adult Biomass (tonnes)") + ylab("Recruits (tonnes)") +
+                                                geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +scale_y_log10() +
+                                                geom_vline(xintercept = 11500,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                                scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
+save_plot(paste0(bbn.plot.loc,"Rec_vs_SSB.png"),p.rec.ssb,base_height =6,base_width = 10)                                               
+
+
+# Next is there any evidence of Density dependence with growth?
+# Maybe a tiny bit, we don't see really high growth at high biomass, but otherwise they look similar.
+# I think arguing that growth is never 'great' above 11500 (both g and gR) is a fair takeaway.
+p.g.ssb <- ggplot(bbn.prod.dat,aes(y=g,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
+                                             xlab("") + ylab("Growth (Fully Recruited)") +
+                                             geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
+                                             #geom_vline(xintercept = 11500,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1500),labels = NA))
+
+p.gR.ssb <- ggplot(bbn.prod.dat,aes(y=gR,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
+                                             xlab("Adult Biomass (tonnes)") + ylab("Growth (Recruits)") +
+                                             geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
+                                             #geom_vline(xintercept = 11500,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
+
+p.gs.ssb <-  cowplot::plot_grid(p.g.ssb,p.gR.ssb,nrow=2)
+
+save_plot(paste0(bbn.plot.loc,"Growth_vs_SSB.png"),p.gs.ssb,base_height =12,base_width = 10)                                               
+
+#So natural mortality is never 'low' when the biomass is above either 11500 or 13000 tonnes, depending on your point of view.
+# I think here using 13000 makes more sense as the high m's make a lot of sense temporally.
+bbn.m.bp <- 13000
+p.m.ssb <- ggplot(bbn.prod.dat,aes(y=m,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))+ 
+                                             xlab("Adult Biomass (tonnes)") + ylab("Natural Mortality (instantaneous)") +
+                                             geom_smooth(method = 'lm') +
+                                             #geom_vline(xintercept = bbn.m.bp,size=0.5,color='firebrick2',linetype='dashed')  + 
+                                             scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
+
+save_plot(paste0(bbn.plot.loc,"M_vs_SSB.png"),p.m.ssb,base_height =6,base_width = 10)                
+
+
+
+# So there is the Density dependence analysis, For M and Growth using breakpoints makes the most sense, probably won't have a huge effect on anything 
+# as there isn't a whole lot of change with SSB.  For recruits I think the bp analysis makes the most sense, but one could argue for a linear model log(R/S) ~ SSB, but my personal hot take is the linear model will not give you the large recruitment events which have only been observed
+# when biomass is low... but not too low.
+
+# Step 2.... Correlation
+# Next thing you should consider is whether there are correlations in your productivity parameters, first look to autocorrelated time series
+# Then you want to look for cross-correlations between mortality, recruitment, and growth, for example maybe growth is low in years when M is high
+# This will matter to your simulations, so investigate it.
+# First let's look for acf in our time series...
+# Starting with recruitment we see there is a strong autocorrlation in the total number of recruits
+p.rec.acf <- ggAcf(na.omit(bbn.prod.dat$R),lag.max = 10) + ggtitle("")+ ylab("ACF Recruits")
+save_plot(paste0(bbn.plot.loc,"ACF_Rec.png"),p.rec.acf,base_height =6,base_width = 10)                
+
+# But is this simply due to the underlying trend in R over time... no because there is no trend and it also doesn't make any difference.
+rec.mod <- lm(R ~ I(Year-1993),data=bbn.prod.dat)
+summary(rec.mod)
+# It is not as the correlation holds
+#acf(rec.mod$residuals)
+
+# So probably better to look at per capita recruitment and see if that is a better acf'er...
+# And here we do see the 1 year correlation remains, so we probably should consider some autocorrelation in the 
+# RPS if possible.
+p.rps.acf <- ggAcf(na.omit(log(bbn.prod.dat$RPS3)),lag.max = 10) + ggtitle("") + ylab("ACF log(RPS)")
+save_plot(paste0(bbn.plot.loc,"ACF_RPS.png"),p.rps.acf,base_height =6,base_width = 10)                
+
+
+
+# pacf shows us that we could approximate the RPS time series as an AR2, though interesting that lag 2 is significantly negative, I think that suggest a high frequency cycling of Recruitment
+# so highly correlated with the following year, then it flips 2 years out to be negative for a couple years... interesting.
+p.rps.pacf <- ggPacf(na.omit(log(bbn.prod.dat$RPS3)),lag.max = 10) + ggtitle("") + ylab("PACF log(RPS)")
+bbn.rps.cor.1 <- round(p.rps.pacf$data$Freq[1],digits=2)
+bbn.rps.cor.2 <- round(p.rps.pacf$data$Freq[2],digits=2)
+
+
+save_plot(paste0(bbn.plot.loc,"PACF_RPS.png"),p.rps.pacf,base_height =6,base_width = 10)                
+# On the log scale we see there is no trend in the data, there is a weak trend on the normal scale, but going to go with the log scale
+rps.mod <- lm(log(RPS3) ~ I(Year-1993),data=bbn.prod.dat)
+summary(rps.mod) # Indeed there is...
+
+# How about growth, nope nothing.
+p.g.pacf <- ggPacf(bbn.prod.dat$g,lag.max = 10) + ggtitle("") + ylab("PACF Growth (FR)")# No autocorrelation in growth of FR
+p.gR.pacf <- ggPacf(bbn.prod.dat$g,lag.max = 10) + ggtitle("") + ylab("PACF Growth (Recruits)")# No autocorrelation in growth of Rec
+p.gs.pacf <-  cowplot::plot_grid(p.g.pacf,p.gR.pacf,nrow=2)
+
+save_plot(paste0(bbn.plot.loc,"PACF_growths.png"),p.gs.pacf,base_height =12,base_width = 10)                
+
+# Natural morality correlation? Nothing significant, but weak autocorrelation is there, but not significant so not including it.
+p.m.acf <- ggAcf(bbn.prod.dat$m,lag.max = 10) + ggtitle("") + ylab("ACF Natural Mortality") + xlab("") + scale_x_continuous(breaks = 1:14,labels=NULL) 
+p.m.pacf <- ggPacf(bbn.prod.dat$m,lag.max = 10) + ggtitle("") + ylab("PACF Natural Mortality")
+bbn.m.cor.1 <- 0.01 # Give it a very small value
+bbn.m.cor.2 <- 0.01 # Give it a very small value
+save_plot(paste0(bbn.plot.loc,"PACF_m.png"),p.m.pacf,base_height =6,base_width = 10)                
+# This would be the combo of the two, but I'll just show the PACF.
+#p.m.acfs <-  cowplot::plot_grid(p.m.acf,p.m.pacf,nrow=2)
+
+
+# So check if there is a linear trend, and there is...
+mod.m <- lm(m~I(Year-1993),data=bbn.prod.dat)
+summary(mod.m) # There is a significant trend in m over time, largely due to low m in the last few years, which appears to be part of the cycling we are seeing thus I'd argue the pacf and acf above are fine.
+# # So do the m residuals have acf
+# m.mod.out <-  data.frame(years = c(1994:2019,2021,2022),m.res = mod.m$residuals)
+# # So the correlation in the residuals isn't significant, is absolutely still a signal there, but technically isn't significant.
+# pacf(m.mod.out$m.res)
+# ggplot(m.mod.out,aes(x=years,y=m.res))  + geom_text(aes(label = substr(years,3,4))) + geom_smooth(method = 'loess') + xlab("") + ylab("Natural Mortality (Residual)")
+
+
+
+# I did explore some other 'offsets' but that's a big ol' rabbit hole...
+# So next up lets look for evidence of correlation between your productivity parameters, specifically RPS and m
+# If we offset the RPS to the year they are actually showing up, either the model is trying to kill more over everything when we have a lot of recruits, or there is a real 
+# relationship there.
+bbn.prod.dat$RPS3_offset <- c(rep(NA,3),bbn.prod.dat$RPS3[-((length(bbn.prod.dat$RPS3)-2):length(bbn.prod.dat$RPS3))])
+
+p.rpsoff.m <- ggplot(bbn.prod.dat,aes(x=Year,y=RPS3_offset)) + geom_text(aes(label = substr(Year-5,3,4)))  + 
+                                                           xlab("") +ylab("RPS (kg\u00B9\u22C5kg\u207B\u00B9) & Natural mortality (Inst)") +
+                                                           geom_line(aes(y = m),color='firebrick2',size=1,linetype='dashed')
+# There is clearly a correlation at a lag of 1 year
+p.rps.m.ccf <- ggCcf(bbn.prod.dat$RPS3_offset,bbn.prod.dat$m,lag.max = 10) + ggtitle("") #Needs to be RPS first to align with the simulations
+p.rps.m.ccf.combo <-  cowplot::plot_grid(p.rpsoff.m,p.rps.m.ccf,nrow=2)
+# Peak cross correlation...
+bbn.m.rps.lag <- p.rps.m.ccf$data$lag[which(abs(p.rps.m.ccf$data$Freq) == abs(max(p.rps.m.ccf$data$Freq)))]
+bbn.m.rps.cor <- round(p.rps.m.ccf$data$Freq[p.rps.m.ccf$data$lag == bbn.m.rps.lag],digits=2)
+
+save_plot(paste0(bbn.plot.loc,"CCF_ts_RPS_offset_m.png"),p.rps.m.ccf.combo,base_height =12,base_width = 10)                
+      
+# The final plot I want to show here is the correlation between the model estimate and the survey index.
+# These will be aligned so don't need to get too fancy
+med.q <- median(bbn.mod$report$qI)
+mod.index.bm <- data.frame(year = bbn.prod.dat$Year,mod.bm = bbn.prod.dat$B,index.bm = surv.26a$I/med.q)
+
+
+p.sab.mod.ind.bm <-ggplot(mod.index.bm) + geom_text(aes(x=index.bm,y=mod.bm,label = substr(year,3,4))) +
+                                          scale_x_continuous(name="Q-corrected Survey Biomass Index (tonnes)") +
+                                          scale_y_continuous(name="Model Biomass (tonnes)") +
+                                          geom_abline(slope=1,intercept=0)
+save_plot(paste0(bbn.plot.loc,"Model_vs_index_biomass.png"),p.sab.mod.ind.bm,base_height =6,base_width = 10)   
+```
+
+
+
+
+```{r bbn-productivity-simulations,include=F}
+# Set the seed so we can repeat these simulations!
+set.seed(1)
+g.strat <- list(type = "bp",bp = 1e99, strat = 'dist',cen.tend='mean')#, mn.mx = 1.05, sd.mx = 0.05) 
+r.strat <- list(type = "cor",strat = 'dist', bp = bbn.rps.bp,rec.age=bbn.rec.age, cen.tend = 'mean',
+                              ar1=bbn.rps.cor.1,ar2=bbn.rps.cor.2,rps.m.cor = bbn.m.rps.cor,rps.m.lag = bbn.m.rps.lag,
+                              mn.at.max = min(bbn.prod.dat$RPS3,na.rm=T),sd.at.max = 0.1) 
+m.strat <- list(type = "cor",strat = 'dist', bp = 1e99,ar1=bbn.m.cor.1,ar2=bbn.m.cor.2,cen.tend='median')  
+mod.4.bbn = "SEAM"
+bbn.exp.scenario <- seq(0,0.1,0.005)
+#bbn.model.yrs <- years
+bbn.max.SSB <- floor(max(bbn.prod.dat$SSB/100,na.rm=T)) * 100
+# Run projection
+if(run.sims == T)
+{
+bbn.res <- proj.mod(mods = list(seam.mod = bbn.mod),n_sim=n_sims,n_y = n_y,model=mod.4.bbn,model.yrs = bbn.model.yrs,
+                plot_url = plot.bbn.rp.mod.loc, run = 'no_model_error', res_url = res.bbn.rp.mod.loc,save.results = T, 
+                exp.scenario=bbn.exp.scenario, 
+                g.mod =   list(type = g.strat$type,bp.strategy = g.strat$strat,bp= g.strat$bp,set.g = g.strat$set.g,cen.tend = g.strat$cen.tend),
+                               #mn.at.max = g.strat$mn.at.max,sd.at.max =g.strat$sd.at.max), 
+                rec.mod = list(type = r.strat$type,bp.strategy = r.strat$strat,bp= r.strat$bp, 
+                               rec.age = r.strat$rec.age,rps.m.cor = r.strat$rps.m.cor,rps.m.lag = r.strat$rps.m.lag,cen.tend = r.strat$cen.tend,
+                               ar1=r.strat$ar1,ar2=r.strat$ar2,
+                               mn.at.max = r.strat$mn.at.max,sd.at.max =r.strat$sd.at.max), 
+                m.mod =   list(type = m.strat$type,bp.strategy = m.strat$strat,bp= m.strat$bp, cen.tend = m.strat$cen.tend,#mn.at.max = m.strat$mn.mx,sd.at.max = m.strat$sd.mx,
+                                ar1=m.strat$ar1,ar2=m.strat$ar2))#,
+saveRDS(bbn.res,paste0(res.bbn.rp.mod.loc,"full_bmsy_sims_",min(bbn.model.yrs),"-",max(bbn.model.yrs)))
+} # end if run.sims == T
+if(run.sims == F) bbn.res <- readRDS(paste0(res.bbn.rp.mod.loc,"full_bmsy_sims_",min(bbn.model.yrs),"-",max(bbn.model.yrs)))
+
+bbn.Exp.res <- bbn.res$Exp.res
+# End RUNME
+# Here are our reference point options
+# Exp.res <- readRDS("D:/Framework/SFA_25_26_2024/RefPts/Results/BBn/R_75_FR_90/SEAM_1994_2022_vary_m_m0_0.2_qR_0.33_20_knots_g_original_vary_q=TRUE/RPs/SEAM_g_sv__1_dist_1_0.05_r_bp_dist_11500__0.00041_0.23_m_bp_dist_11500__0.184_0.1.Rds")
+# summary(bbn.prod.dat$R)
+# summary(c(Res$Rec[,1:10,1]))
+# summary(bbn.prod.dat$m)
+# summary(c(Res$mort[,1:5,1]))
+# summary(c(Res$rps[,1:5,1]))
+# summary(bbn.prod.dat$RPS3)
+# 
+# 
+# plot(Res$rps[,1,1],Res$rps.cor.ts[,1,1])
+# plot(Res$mort[,1,1],Res$m.cor.ts[,1,1])
+# Res$B[,1,1]
+# plot(Res$Rec[,1,1],type='l')
+# plot(Res$mort[,1,1],type='l')
+# ccf(Res$rps[,3,1],Res$mort[,3,1])
+# pacf(Res$rps[,2,1])
+# pacf(Res$rps[,1,1])
+# 
+# plot(Res$m.cor.ts[,10,1],Res$rps[,10,1])
+# plot(bbn.prod.dat$RPS3,bbn.prod.dat$m)
+# 
+# plot(y=bbn.prod.dat$RPS3,x=bbn.prod.dat$SSB)
+# plot(y=Res$rps[4:100,5,1], x=Res$B[1:97,5,1]+Res$R[1:97,5,1],type='p')
+
+bbn.RPs <- bbn.Exp.res |>collapse::fsubset(year >= n_y-25) |> collapse::fgroup_by(F.scenario) |> collapse::fsummarize(med.B = median(B,na.rm=T),
+                                                                                                       med.C = median(Catch,na.rm=T))  
+
+bbn.c.at.msy <- max(bbn.RPs$med.C)
+
+# Numbers for the paper
+bbn.rr <- bbn.RPs$F.scenario[bbn.RPs$med.C == bbn.c.at.msy] 
+bbn.bmsy <- round(bbn.RPs$med.B[bbn.RPs$med.C == bbn.c.at.msy],digits=-2)
+bbn.b0 <- round(bbn.RPs$med.B[bbn.RPs$F.scenario==0],digits=-2)
+
+# I could round this up to 200, but will leave it at 195...
+bbn.c.at.msy <- round(bbn.c.at.msy,digits=0)
+# So our LRP options
+bbn.lrp.b0 <- 0.2 * bbn.b0
+bbn.lrp.3.bmsy <- 0.3 * bbn.bmsy
+bbn.lrp.4.bmsy <- 0.4 * bbn.bmsy
+# USR and TRP 
+bbn.usr.b0 <- 0.4 * bbn.b0
+bbn.usr.bmsy <- 0.8 * bbn.bmsy
+bbn.trp.bmsy <- bbn.bmsy
+bbn.trp.b0 <- 0.8 * bbn.b0
+
+
+bbn.res.at.rr.last.yrs <- bbn.Exp.res[bbn.Exp.res$F.scenario==bbn.rr & bbn.Exp.res$year > (n_y-last.yrs),]
+# We can estimate the proportion of the time the stocks are in the critical, cautious, and healthy zones in the last 25 years of the simulations
+bbn.prop.yrs.critical <- round(100*length(which(bbn.res.at.rr.last.yrs$B < bbn.lrp.b0))/n_sims/last.yrs,digits=1)
+bbn.prop.yrs.cautious <- round(100*length(which(bbn.res.at.rr.last.yrs$B >= bbn.lrp.b0 & bbn.res.at.rr.last.yrs$B < bbn.usr.b0))/n_sims/last.yrs,digits=1)
+bbn.prop.yrs.healthy <- round(100*length(which(bbn.res.at.rr.last.yrs$B >= bbn.usr.b0))/n_sims/last.yrs,digits=1)
+
+# How long does it take to 'rebuild'
+
+sim.years <- sort(unique(bbn.Exp.res$year))
+F.scenario <- sort(unique(bbn.Exp.res$F.scenario))
+
+time.grid <- expand.grid(scenario = F.scenario,years = sim.years)
+time.to <- data.frame(time.grid,Biomass = NA, T.msy = F,T.usr = F, T.lrp=F,T.trp = F)
+for(i in sim.years)
+{
+B.now <- bbn.Exp.res %>% dplyr::filter(year %in% i) %>% collapse::fgroup_by(F.scenario) %>% collapse::fsummarize(med.B = median(B,na.rm=T))
+time.to$Biomass[time.to$years == i] <- B.now$med.B
+# This feels way clunky...
+if(any(B.now$med.B >= bbn.bmsy)) 
+{
+  trues <- which(B.now$med.B >= bbn.bmsy)
+  tmp <- time.to$T.msy[time.to$years == i]
+  tmp[trues] <- T
+  time.to$T.msy[time.to$years == i] <- tmp
+}
+if(any(B.now$med.B >= bbn.usr.b0))
+{
+  trues <- which(B.now$med.B >= bbn.usr.bmsy)
+  tmp <- time.to$T.usr[time.to$years == i]
+  tmp[trues] <- T
+  time.to$T.usr[time.to$years == i] <- tmp
+}
+if(any(B.now$med.B >= bbn.lrp.b0))
+{
+  trues <- which(B.now$med.B >= bbn.lrp.b0)
+  tmp <- time.to$T.lrp[time.to$years == i]
+  tmp[trues] <- T
+  time.to$T.lrp[time.to$years == i] <- tmp
+}
+if(any(B.now$med.B >= bbn.trp.b0))
+{
+  trues <- which(B.now$med.B >= bbn.trp.b0)
+  tmp <- time.to$T.trp[time.to$years == i]
+  tmp[trues] <- T
+  time.to$T.trp[time.to$years == i] <- tmp
+}
+}
+
+# If the stock is currently above the reference point you want these to =F, if it's below the reference point you want these to = T
+bbn.res.T.msy <- time.to |> collapse::fsubset(T.msy == F) |> collapse::fgroup_by(scenario) |> collapse::fselect(scenario,years,Biomass,T.msy) 
+bbn.res.T.usr <- time.to |> collapse::fsubset(T.usr == F) |> collapse::fgroup_by(scenario) |> collapse::fselect(scenario,years,Biomass,T.usr) 
+bbn.res.T.lrp <- time.to |> collapse::fsubset(T.lrp == F) |> collapse::fgroup_by(scenario) |> collapse::fselect(scenario,years,Biomass,T.lrp) 
+bbn.res.T.trp <- time.to |> collapse::fsubset(T.trp == T) |> collapse::fgroup_by(scenario) |> collapse::fselect(scenario,years,Biomass,T.trp) 
+# So now summarize these...
+
+bbn.T.msy <- bbn.res.T.msy %>% collapse::fgroup_by(scenario) %>% collapse::fsummarize(T.msy = min(years))
+bbn.T.usr <- bbn.res.T.usr %>% collapse::fgroup_by(scenario) %>% collapse::fsummarize(T.usr = min(years))
+bbn.T.lrp <- bbn.res.T.lrp %>% collapse::fgroup_by(scenario) %>% collapse::fsummarize(T.lrp = min(years)) # Hmm...
+bbn.T.trp <- bbn.res.T.trp %>% collapse::fgroup_by(scenario) %>% collapse::fsummarize(T.trp = min(years)) # This tells me that TRP is really unachievable
+
+# Figures from this...
+
+# Show that the time series we're provided have similar characteristics to the input time series.
+# Given the crazy high volume of these, I show the results for the BMSY scenario.
+bbn.res.4.plts <- bbn.Exp.res |> collapse::fsubset(F.scenario == bbn.rr & Sim <= n_sims)
+
+# Here are the growth time series.
+bbn.rp.sim.g.plt <- ggplot(bbn.res.4.plts) + geom_line(aes(x=year,y=g,group=Sim),alpha=0.02)
+bbn.rp.sim.gR.plt <- ggplot(bbn.res.4.plts) + geom_line(aes(x=year,y=gR,group=Sim),alpha=0.02)
+bbn.rp.sim.m.plt <- ggplot(bbn.res.4.plts) + geom_line(aes(x=year,y=M,group=Sim),alpha=0.02) 
+
+# Extract the lag 1 ACF for each of the productivity parameters... 
+bbn.cor.res <- data.frame(g.cor = NA, gr.cor=NA,m.acf.ar1 = NA,m.acf.ar2 = NA,rps.ar1 = NA,rps.ar2 = NA,rps.m.cor = NA)
+g.acf.all <- gr.acf.all <- m.acf.all <- rps.acf.all <- rps.m.ccf.all <- NULL
+max.lag <- 10
+for(i in 1:n_sims)
+{
+  rps.dat <- bbn.res$rps[,i,which(F.scenario == bbn.rr)]
+  dat <- bbn.res.4.plts |> collapse::fsubset(Sim == i)
+  g.acf.all[[i]] <- ggPacf(dat$g,lag.max = max.lag,plot=F)$acf
+  m.acf.all[[i]] <- ggPacf(dat$M,lag.max = max.lag,plot=F)$acf
+  gr.acf.all[[i]] <- ggPacf(dat$gR,lag.max = max.lag,plot=F)$acf
+  rps.acf.all[[i]] <- ggPacf(rps.dat,lag.max = max.lag,plot=F)$acf
+  rps.m.ccf.all[[i]] <- ggCcf(rps.dat,dat$M,lag.max = max.lag,plot=F)$acf
+  g.acf <- g.acf.all[[i]][1]
+  gr.acf <- gr.acf.all[[i]][1]
+  m.acf.ar1 <- m.acf.all[[i]][1]
+  m.acf.ar2 <- m.acf.all[[i]][2]
+  rps.acf.ar1 <- rps.acf.all[[i]][1]
+  rps.acf.ar2 <- rps.acf.all[[i]][2]
+  rsp.m.ccf <-  rps.m.ccf.all[[i]][max.lag+bbn.m.rps.lag+1] # This gets the right lag almost magically.
+  
+  tmp <- data.frame(g.cor = g.acf, gr.cor=gr.acf,m.acf.ar1=m.acf.ar1,m.acf.ar2 =m.acf.ar2,rps.ar1 = rps.acf.ar1,rps.ar2 = rps.acf.ar2,rps.m.cor = rsp.m.ccf)
+  bbn.cor.res[i,] <- tmp
+}
+
+g.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',g.acf.all)),lag=1:max.lag)
+gr.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',gr.acf.all)),lag=1:max.lag)
+m.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',m.acf.all)),lag=1:max.lag)
+rps.sim.pacf <- data.frame(dat = colMeans(do.call('rbind',rps.acf.all)),lag=1:max.lag)
+rps.m.sim.ccf <- data.frame(dat = colMeans(do.call('rbind',rps.m.ccf.all)),lag=-max.lag:max.lag)
+
+# So we retained the correlation structure for the most part, though it was generally weaker than what we observed in the time series.
+bbn.cor.sim.summary <- data.frame(t(round(colMeans(as.matrix(bbn.cor.res)),digits=2)))
+
+```
+
+
+
+
+```{r special-bbn-prod-sims-figs,include =F}
+# PACF plots for the productivity parameters from the simulations.
+max.abs <- max(abs(bbn.cor.sim.summary),na.rm=T)
+bbn.g.sim.cor.plt <- ggplot(g.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                              scale_y_continuous(name = "Mean PACF (fully-recruited growth)",limits = c(-max.abs,max.abs))+ 
+                                              scale_x_continuous(name = "",breaks = 1:max.lag,labels = NULL)
+bbn.gr.sim.cor.plt <-ggplot(gr.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                               scale_y_continuous(name = "Mean PACF (Recruit growth)",limits = c(-max.abs,max.abs))+ 
+                                               scale_x_continuous(name = "",breaks = 1:max.lag,labels = NULL)
+
+bbn.m.sim.cor.plt <-ggplot(m.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                              scale_y_continuous(name = "Mean PACF (Natural mortality)",limits = c(-max.abs,max.abs))+ 
+                                              scale_x_continuous(name = "Lag",breaks = 1:max.lag)
+
+bbn.rps.sim.cor.plt <-ggplot(rps.sim.pacf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                                scale_y_continuous(name = "Mean PACF (RPS)",limits = c(-max.abs,max.abs))+ 
+                                                scale_x_continuous(name = "Lag",breaks = 1:max.lag)
+
+bbn.sim.cors.plt <- plot_grid(bbn.g.sim.cor.plt,bbn.gr.sim.cor.plt,bbn.m.sim.cor.plt,bbn.rps.sim.cor.plt)
+save_plot(bbn.sim.cors.plt,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/PACF_sim_correlation.png"),base_height = 11,base_width=8.5)
+
+# The cross correlations is it's own figure.
+bbn.rps.m.sim.cor.plt <-ggplot(rps.m.sim.ccf,mapping=aes(x=lag,y=dat)) + geom_segment(mapping=aes(xend=lag,yend=0)) + geom_hline(yintercept=0) + 
+                                                scale_y_continuous(name = "Mean CCF (M vs. RPS)",limits = c(-max.abs,max.abs))+ 
+                                                scale_x_continuous(name = "Lag",breaks = -max.lag:max.lag)
+save_plot(bbn.rps.m.sim.cor.plt,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/CCF_sim_correlation.png"),base_height = 8.5,base_width=8.5)
+
+
+
+# The density dependence from the simulations...
+bbn.res.4.plts$SSB <- bbn.res.4.plts$B + bbn.res.4.plts$Rec
+
+
+# To get the RPS offset right I need to loop-d-loo
+
+for(i in 1:n_sims)
+{
+  tmp <- bbn.res.4.plts[bbn.res.4.plts$Sim == i,]
+  tmp$rps.offset <- c(tmp$rps[(bbn.rec.age+1):nrow(tmp)],rep(NA,bbn.rec.age))
+  bbn.res.4.plts$rps.offset[bbn.res.4.plts$Sim == i] <- tmp$rps.offset
+}
+
+# Set the alpha level for the lines on the figures showing the individual realizations.
+if(n_sims <= 10) alphs <- 0.5
+if(n_sims > 10) alphs <- 0.1
+if(n_sims > 100) alphs <- 1/255
+
+#Figures
+bbn.prod.sum <- data.frame(mn.g.obs = mean(bbn.prod.dat$g,na.rm=T),mn.g.sim = mean(bbn.res.4.plts$g),
+                           mn.gR.obs = mean(bbn.prod.dat$gR,na.rm=T),mn.gR.sim = mean(bbn.res.4.plts$gR),
+                           med.m.obs = median(bbn.prod.dat$m,na.rm=T),med.m.sim = median(bbn.res.4.plts$M),
+                           mn.rps.obs = mean(bbn.prod.dat$RPS3,na.rm=T),mn.rps.sim = mean(bbn.res.4.plts$rps))
+
+bbn.g.sim.comp.plt <- ggplot(bbn.res.4.plts) + geom_point(aes(x=SSB/1000,y=g),alpha=alphs,shape=21,fill='black',stroke=NA)  +
+                         geom_hline(yintercept = bbn.prod.sum$mn.g.obs,color='blue',linetype='dashed')+
+                         geom_hline(yintercept = bbn.prod.sum$mn.g.sim,color='blue',linetype='solid')+
+                         scale_x_continuous(name="",labels = NULL,limits=c(0,25)) +
+                         scale_y_continuous(name=("Fully-recruited growth"))
+
+bbn.gr.sim.comp.plt <- ggplot(bbn.res.4.plts) + geom_point(aes(x=SSB/1000,y=gR),alpha=alphs,shape=21,fill='black',stroke=NA) +
+                         geom_hline(yintercept = bbn.prod.sum$mn.gR.obs,color='blue',linetype='dashed')+
+                         geom_hline(yintercept = bbn.prod.sum$mn.gR.sim,color='blue',linetype='solid')+
+                         scale_x_continuous(name="",labels = NULL,limits=c(0,25)) +
+                         scale_y_continuous(name=("Recruit growth"))
+
+# The really low RPS values are because of the correlation, they happen after most of the really large recruitment years, so are due to the large negative lag 2 rps, ha!
+bbn.rps.sim.comp.plt <- ggplot(bbn.res.4.plts) + geom_point(aes(x=SSB/1000,y=rps.offset),alpha=alphs,shape=21,fill='black',stroke=NA) + 
+                         geom_vline(xintercept = bbn.rps.bp/1000,color='firebrick2',linetype='solid') +
+                         geom_hline(yintercept = bbn.prod.sum$mn.rps.obs,color='blue',linetype='dashed')+
+                         geom_hline(yintercept = bbn.prod.sum$mn.rps.sim,color='blue',linetype='solid')+
+                         scale_x_continuous(name="",limits=c(0,25)) +
+                         scale_y_log10(name=("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)"))
+
+bbn.m.sim.comp.plt <- ggplot(bbn.res.4.plts) + geom_point(aes(x=SSB/1000,y=M),alpha=alphs,shape=21,fill='black',stroke=NA) + 
+                         #geom_vline(xintercept = bbn.max.SSB/1000,color='red',linetype='solid') +
+                         geom_hline(yintercept = bbn.prod.sum$med.m.obs,color='blue',linetype='dashed')+
+                         geom_hline(yintercept = bbn.prod.sum$med.m.sim,color='blue',linetype='solid')+
+                         scale_x_continuous(name="",limits=c(0,25)) +
+                         scale_y_continuous(name=("Natural mortality (instantaneous)"))
+
+bbn.sim.comps.plt <- plot_grid(bbn.g.sim.comp.plt,bbn.gr.sim.comp.plt,bbn.rps.sim.comp.plt,bbn.m.sim.comp.plt)
+bbn.sim.comps.plt2 <- add_sub(bbn.sim.comps.plt, "Adult Biomass (tonnes x 1000)",angle=0,y=1.4,x=0.55,size=24)
+
+save_plot(bbn.sim.comps.plt2,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_paramter_DD.png"),base_height = 11,base_width=8.5)
+
+# Figure showing the model reference points and the biomass trends from the model.
+
+bbn.mod.rp.plt <- ggplot(bbn.prod.dat) + geom_line(aes(x=Year,y=B/1000)) + 
+                       geom_hline(yintercept = bbn.lrp.b0/1000,color='firebrick2',linetype='solid') +
+                       geom_hline(yintercept = bbn.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
+                       geom_hline(yintercept = bbn.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
+                       geom_hline(yintercept = bbn.usr.b0/1000,color=u.colors[2],linetype = 'solid') +
+                       geom_hline(yintercept = bbn.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
+                       geom_hline(yintercept = bbn.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
+                       scale_x_continuous('',breaks=seq(1990,2030,by=3)) +
+                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') 
+
+save_plot(bbn.mod.rp.plt,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_RPs.png"),base_height = 8.5,base_width=8.5)
+
+
+  
+bbn.mod.real.plt <- ggplot(bbn.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
+                       geom_hline(yintercept = bbn.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
+                       #geom_hline(yintercept = bbn.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
+                       #geom_hline(yintercept = bbn.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
+                       geom_hline(yintercept = bbn.usr.b0/1000,color=u.colors[2],linetype = 'solid',size=1.5) +
+                       #geom_hline(yintercept = bbn.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
+                       #geom_hline(yintercept = bbn.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
+                       scale_x_continuous('') +
+                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') +
+                       theme(legend.position = "none")
+
+save_plot(bbn.mod.real.plt,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_reals_w_RPS.png"),base_height = 8.5,base_width=8.5)
+
+
+
+```
+
+
+
+
+
+
+```{r bbn-hcr-sims,include =F}
+
+# HCR specific settings
+set.seed(3)
+bbn.trp.exp <- 0.055
+bbn.usr.exp <- 0.02
+bbn.lrp.exp <- 0
+bbn.exp.sd <- 0.1
+
+hcr.strat <-list(TRP = bbn.trp.bmsy,TRP.exp = bbn.trp.exp,
+                 USR = bbn.usr.b0, USR.exp = bbn.usr.exp, 
+                 LRP = bbn.lrp.b0, LRP.exp = bbn.lrp.exp,exp.sd = bbn.exp.sd)
+bbn.HCR <- paste0("T_",hcr.strat$TRP,"_",hcr.strat$TRP.exp,"_U_",hcr.strat$USR,"_",hcr.strat$USR.exp,"_L_",hcr.strat$LRP,"_",hcr.strat$LRP.exp)
+bbn.hcr.plt.loc <- paste0(plot.bbn.rp.mod.loc,"HCR/",bbn.HCR,"/")
+bbn.hcr.res.loc <- paste0(res.bbn.rp.mod.loc,"HCR/",bbn.HCR,".Rds")
+
+# An HCR model
+if(run.sims == T)
+{
+bbn.hcr <- proj.mod(mods = list(seam.mod = bbn.mod),n_sim=n_sims,n_y = n_y,model=mod.4.bbn, run = 'no_model_error',
+                plot_url = plot.bbn.rp.mod.loc,  res_url = res.bbn.rp.mod.loc,save.results = T,
+                g.mod =   list(type = g.strat$type,bp.strategy = g.strat$strat,bp= g.strat$bp,set.g = g.strat$set.g,cen.tend = g.strat$cen.tend),
+                               #mn.at.max = g.strat$mn.at.max,sd.at.max =g.strat$sd.at.max), 
+                rec.mod = list(type = r.strat$type,bp.strategy = r.strat$strat,bp= r.strat$bp, 
+                               rec.age = r.strat$rec.age,rps.m.cor = r.strat$rps.m.cor,rps.m.lag = r.strat$rps.m.lag,cen.tend = r.strat$cen.tend,
+                               ar1=r.strat$ar1,ar2=r.strat$ar2,
+                               mn.at.max = r.strat$mn.at.max,sd.at.max =r.strat$sd.at.max), 
+                m.mod =   list(type = m.strat$type,bp.strategy = m.strat$strat,bp= m.strat$bp, cen.tend = m.strat$cen.tend,#mn.at.max = m.strat$mn.mx,sd.at.max = m.strat$sd.mx,
+                                ar1=m.strat$ar1,ar2=m.strat$ar2),
+                HCR.sim = list(TRP = hcr.strat$TRP,TRP.exp = hcr.strat$TRP.exp, USR = hcr.strat$USR, USR.exp = hcr.strat$USR.exp,
+                                    LRP = hcr.strat$LRP, LRP.exp = hcr.strat$LRP.exp,exp.sd = hcr.strat$exp.sd))
+bbn.hcr <- bbn.hcr$Exp.res
+
+}
+if(run.sims == F) bbn.hcr <- readRDS(bbn.hcr.res.loc)
+
+bbn.mn.catch.hcr <- round(mean(bbn.hcr$Catch,na.rm=T),digits=0)
+bbn.med.catch.hcr <- round(median(bbn.hcr$Catch,na.rm=T),digits=0)
+bbn.med.bm.hcr <- round(median(bbn.hcr$B),digits=0)
+
+
+# For this I need to use the summarized object
+bbn.hcr.last.yrs <- bbn.hcr[bbn.hcr$year > (n_y-last.yrs),]
+bbn.prop.yrs.bl.lrp.hcr <- round(100*length(which(bbn.hcr.last.yrs$B < bbn.lrp.b0))/n_sims/last.yrs,digits=1)
+bbn.prop.yrs.cautious.hcr <- round(100*length(which(bbn.hcr.last.yrs$B >= bbn.lrp.b0 & bbn.hcr.last.yrs$B < bbn.usr.b0))/n_sims/last.yrs,digits=1)
+bbn.prop.yrs.healthy.hcr <- round(100*length(which(bbn.hcr.last.yrs$B >= bbn.usr.b0 & bbn.hcr.last.yrs$B < bbn.trp.bmsy))/n_sims/last.yrs,digits=1)
+bbn.prop.yrs.above.trp.hcr <- 100*length(which(bbn.hcr.last.yrs$B > bbn.trp.bmsy))/n_sims/last.yrs
+
+bbn.min.healthy.zone.catch.hcr <- bbn.usr.b0*bbn.usr.exp
+bbn.max.healthy.zone.catch.hcr <- bbn.trp.bmsy*bbn.usr.exp
+bbn.min.trp.catch.hcr <- bbn.trp.bmsy*bbn.trp.exp
+bbn.catch.quants.hcr <- quantile(bbn.hcr$Catch,na.rm=T,probs = seq(0,1,by=0.01))
+
+```
+
+
+
+<!--chapter:end:tmp-BBn_analysis.Rmd-->
+
+---
+output:
+  word_document: default
+  html_document: default
+---
+
+\newpage
+# Introduction
+
+This is the third and final research document stemming from a Framework process focused on Scallop Fishing Area (SFA) 25, SFA 26, and SFA 27B. The first research document was focused on data inputs [@keyserFrameworkDevelopmentScallop2020] while the second document developed new assessment models for SFA 25A and SFA 26A [@keithFrameworkDevelopmentScallop2020].  The SFA 26 management unit also includes Browns Bank South (26B) and German Bank (26C), while SFA 27 includes both Georges Bank 'a' (27A) and Georges Bank 'b' (27B), and SFA 25, known as the Eastern Scotian Shelf is split into SFA 25A, which includes Sable (25A-Sab) and Middle Bank (25A-Mid), and the Banquereau Bank in SFA 25B [see Table 1 in @keyserFrameworkDevelopmentScallop2020].
+
+A history of the survey and fishery in SFA 25, SFA 26, and SFA 27B can be found in @keyserFrameworkDevelopmentScallop2020. The primary fishing area within SFA 26 is SFA 26A, while the Sable Bank portion of SFA 25A (referred to SFA 25A hereafter) has been the most consistently fished area within SFA 25 [@keyserFrameworkDevelopmentScallop2020]. A Bayesian State-Space Delay difference model (BSSM) has been adopted for SFA 25A, while a new Spatially Explicit Stock Assessment Model (SEAM) has been adopted for SFA 26A [@keithFrameworkDevelopmentScallop2020]. In addition, to minimize prediction bias, the parameters used to project biomass into future years differed between these two areas, however in both areas the projections used the same non-spatial version of the delay difference model [@keithFrameworkDevelopmentScallop2020]. In SFA 25A the projection method utilizes three of productivity parameters (natural mortality, recruitment, and recruit growth), while setting the fully-recruited growth term to one (effectively the projections are assuming no full-recruited growth). In SFA 26A, all four productivity parameters are used to predict fully-recruited growth, for the productivity parameters which are estimated spatially (Natural mortality and Recruitment) the annual area-wide estimates are used [@keithFrameworkDevelopmentScallop2020].
+
+This research document focuses on the development of limit reference points (LRPs) for the Sable portion of SFA 25A, SFA 26A, SFA 26C, and SFA 27B. SFA 27A was not included in this process as it already has established reference points, while areas such as SFA 25B and SFA 26B were not included as there was insufficient survey and fishery information in these areas to inform the development of reference points. For each of the four areas included in this analysis, the LRPs are developed based the survey biomass indices, while for the two areas with approved assessment models (SFA 25A and SFA 26A), additional model based LRPs are developed.  In addition to the LRPs, guidance on candidate Removal Reference (RR) and Upper Stock Reference (USR) Points will be provided, where appropriate.
+
+The objectives of this document are:
+
+-   Propose limit reference points for SFAs 25A, 26A, 26C, and 27B 
+-   Where appropriate, provide guidance on the Upper Stock Reference Point, Removal Reference Points, and/or Harvest Control Rules
+
+# Methods
+
+## Survey Derived Indices
+
+The four areas (SFA 25A, 26A, 26C, and 27B) in which survey biomass index based LRPs were developed were covered by surveys which are scheduled to occur annually. For the survey biomass indices, observation error results in uncertainty around any single year biomass estimate, while the state-space models account for this uncertainty, it is challenging to quantify the magnitude of this uncertainty outside of a state-space modelling framework. To reduce the influence of any single year biomass index, the biomass index used to represent the current stock status for the survey-derived indices was based on the three-year geometric mean using the most recent three-years with available data [c.f., @dfoMaritimesResearchVessel2024]. To align with the model results, the first year used for the index based methods will be 1994 for SFA 25A, 26A, and 27B. For SFA 26C, a liner was added to the gear in 2008, given changes in the gear selectivity this can induce the analyses for this area were limited to 2008 onward. In addition, these areas tended to be fished annually, making it possible to utilize the relative exploitation rate index to explore the development of a relative removal reference point. See  @keyserFrameworkDevelopmentScallop2020 for more details on the methods underlying the development of the relative explotation rate index and biomass index. 
+
+### Biomass Reference Points
+
+Using the survey time series LRPs were developed using the maximum observed biomass (a proxy for the stocks carrying capacity or unfished biomass $B_0$) and the geometric mean of the time series (a proxy for the biomass at maximum sustainable yield ($B_{MSY}$)).  For modelled fisheries with reference points, LRPs based on $B_0$ often use 20% of the estimated $B_0$ [@marentetteCrossJurisdictionalReviewInternational2020; @dfoScienceAdvicePrecautionary2021; @dfoScienceAdviceGuidance2023], we followed this convention here, although we estimated $B_0$ using the highest three-year geometric mean found in the time series. Similarly, the LRP based on $B_{MSY}$ often use 30% or 40% of $B_{MSY}$ and both of these values were provided for the survey index derived LRPs [@dfoFisheryDecisionmakingFramework2009; @dfoScienceAdvicePrecautionary2021, @dfoScienceAdviceGuidance2023]. For the Upper Stock Reference Point (USR) we followed a similar convention and suggest using either a USR of 40% of $B_0$ or 80% of $B_{MSY}$ [@dfoFisheryDecisionmakingFramework2009; @marentetteCrossJurisdictionalReviewInternational2020].
+
+### Removal Reference 
+
+A semi-quantitative method (GEM - Generalized Exploitation Method) that compared the change in the relative survey biomass index ($\Delta B_r$) to the relative exploitation rate ($E_r$) was used to provide information relevant to removal reference points using indices.  GEM assumed a linear relationship between the change survey index biomass and the relative explotation rate.
+
+
+\begin{align}
+\Delta B_{r_i} \sim N(0,\sigma^2_{i}) \\
+E(\Delta B_{r_i}) = \mu_{i} \\
+\mu_{i} =  E_{r_i}\\ 
+\end{align}
+
+
+Where $\Delta B_r$ was the expected value of $mu$ and it was assumed to be normally distributed with a variance of $\sigma^2$; $i$ represented each observation. A significantly negative slope provides evidence that the fishery has influenced the biomass in the region, and the x-intercept provided an estimate of the relative exploitation rate above which the biomass trends tended to decline.
+
+## Model Based Projections
+
+The projection simulations are based on the observed productivity parameters from the models used for SFA 25A and SFA 26A, The underlying model for the projection simulations is based on the non-spatial delay difference model used in @keithFrameworkDevelopmentScallop2020.
+
+$$
+B_{t} = e^{-m_{fr}} g_{fr,t} (B_{t-1} - C_{t-1}) + e^{-m_{r}} g_{r,t} R_{t-1}
+$$
+
+The fully-recruited biomass is $B$, natural mortality is $m$, growth is $g$, landings are $C$, the recruit biomass is $R$, and the $t$ index represents the annual time step, which goes from 1 to the number of years in the simulation.  Where applicable, fully-recruited scallops are given the subscript $fr$, while recruits have the subscript $r$. Recruit sized scallop were defined to be 75-89 mm, and fully-recruited scallop were defined as being $\ge$ 90 mm [@keyserFrameworkDevelopmentScallop2020]. In SFA 25A, the fully-recruited growth term ($g_{fr,t}$) parameter is set to one for the simulations, while in SFA 26A the recruit natural mortality ($m_{r}$) is the same as the fully-recruited natural mortality [$m_{fr}$, @keithFrameworkDevelopmentScallop2020].
+
+### Density Dependence
+
+Here we assume that the adult biomass includes both the recruit and fully-recruited scallop, as a result of this, we are ignoring the potential contribution of scallop with a shell height of < 75 mm on recruitment. We expect the contribution to recruitment to be minor for scallop under 75 mm in size [@parsonsIntraannualLongtermPatterns1992; @mcgarveySpatialParentAgeAnalysis1993].
+
+Evidence for density dependence in the productivity parameters was explored using both quantitative and qualitative methods. For both the natural mortality terms and the growth terms, the productivity parameters were compared to the adult biomass  estimates from the model were evaluated using simple linear models (e.g., the blue line with confidence interval in Figure sab-g-ssb-fig). In addition, a qualitative visual method was also used to identify discontinuous non-linear changes in the relationship (e.g., the red dashed vertical line in Figure sab-rps-ssb-fig). This qualitative method is referred to hereafter as the *breakpoint* method, and was used to identify biomass levels in which the productivity changed in a non-linear fashion.
+
+The *breakpoint* and *linear* methods were also used to explore the relationship between recruitment and biomass, but because of the nature of the recruitment process two additional steps were required before these methods could be applied. Recruits in both SFA 25A and 26A were between 75 and 89 mm in size.  The results of the von Bertalanffy analyses suggests that recruit sized scallop in SFA 25A are approximately 4 years old, while in SFA 26A faster growth results in most recruit size scallop being approximately 3 years old [@keyserFrameworkDevelopmentScallop2020]. The recruits in each SFA are thus offset by 3 (SFA 26A) or 4 (SFA 25A) years to align with the biomass of mature scallop that produced them (e.g., recruits in SFA 25A in 2020 were assumed to be 4 years old, thus these scallop were 'born' in 2016, and thus were aligned with adult biomass in 2016 which produced them). 
+
+In addition, we explored density dependence in recruitment on a 'per-capita' basis; the biomass of recruits was divided by the biomass of fully-recruited scallop to determine the biomass of recruits produced per unit biomass of fully-recruited scallop to get a recruits per spawner (RPS) metric. When RPS is log transformed and compared to biomass the relationship is a linearization of the Ricker stock-recruit relationship.
+
+
+
+$$
+R_t = \alpha A_te^{-\beta A_t}
+$$
+
+This can be linearized as
+
+$$
+log(\frac{R_t}{A_t}) = \alpha - \beta A_t
+$$
+
+where $R_t$ is the biomass of recruits, $A_t$ is the biomass of adult scallop, $\alpha$ and $\beta$ are the intercept and slope of the linearized relationship. RPS is calculated as $\frac{R_t}{A_t}$, in the simulations this value is multiplied by the simulated biomass in the appropriate year to estimate the recruit biomass.
+
+### Correlation
+
+The strength of autocorrelation in each productivity parameter was estimated using standard autocorrelation techniques [i.e., the *acf*, *pacf*, and *ccf* functions from the *stats* package in R version 4.2.2, @rcoreteamLanguageEnvironmentStatistical2023]. Where there was evidence for a linear trend in the productivity parameter, the autocorrelation was tested using detrended data (using the residuals from a linear model fit to the productivity time series). There was no evidence of autocorrelation in the growth and most of natural mortality parameters and thus no auto-correlation was modeled for these parameters, the exception was a marginally significant relationship for the fully-recruited natural mortality term for lag 2 in SFA 25A.
+
+There was auto-correlation observed in the RPS time series in both areas, along with cross-correlation between RPS and fully-recruited natural mortality, this cross-correlation may be related to the challenges these models may have in independently estimating values of both parameters [@mcdonaldExplicitIncorporationSpatial2021]. A cross-correlation analysis focused the peak correlation at time legs of less than five years between these two parameters. The RPS auto-correlation was incorporated using an auto-regressive integrated moving average (ARIMA) framework [i.e., using the *arima.sim* function from the *stats* package, and the *rmvnorm* function from the *mvtnorm* package, R version 4.2.2, @rcoreteamLanguageEnvironmentStatistical2023], using the first two auto-regressive components. The cross correlation was modeled using the cross-correlation and time-lag to develop a covariance matrix and simulate two correlated time series. These time series were then used within and ARIMA framework to simulate RPS and natural mortality time series to retain the characteristics of the observed RPS and natural mortality time series.
+
+### Simulation Procedure
+
+The results of the density dependence and correlation analyses were used to determine how the parameters would be sampled for the simulations. In cases in which there was no evidence of either density dependence or correlation the parameters estimates for each year required in the simulation were sampled from a log-normal distribution with the mean (the median was used for natural mortality as the mean resulted in the simulations having multiple years with fully-recruited natural mortality rates in excess of 90%) and standard deviation taken from the observed time series for that productivity parameter. When the *breakpoint* method was used without correlation, the above sampling procedure was followed, but the sampling occurred using the data within a the appropriate breakpoint bin. For example, if a single breakpoint was identified, when the simulated biomass for a year was below the breakpoint the mean (median for $m$) and standard deviation of the productivity data below the breakpoint were used to sample from a log-normal distribution to obtain a value for that productivity parameter for that year in the simulation. 
+
+The linear method was explored, this method would use the observed relationship between the productivity parameter and adult biomass using a linear model and its uncertainty to predict the productivity at a given biomass. However, the linear method was not used in these analyses, in part, this was due to the relationships rarely being linear, but also because the variability of the data was much larger than the uncertainty from the linear model would allow. As a result, the linear model method led to the parameter estimates having far less variability than historically observed. We also explored using robust regression techniques to better account for the variability in these data, but these methods did not overcome this challenge.  
+
+Where correlation and density dependence were both observed in the time series both of these characteristics were incorporated into the breakpoint analysis. While the time series developed using the auto-and cross correlation parameters had the appropriate correlation structure and quantified the variability in productivity appropriately, they did not account for any observed density dependence structure. In these simulations used herein, the correlated time series data were developed using the data in which the adult biomass was below the *breakpoint* as these contained the majority of the data. When the adult biomass was above the *breakpoint* the productivity estimate was calculated using a log-normal distribution with a mean and standard deviation estimated using the observed productivity data above the  *breakpoint*. For RPS this procedure was followed in both SFA 25A and SFA 26A. This procedure somewhat weakened the strength of the correlation in the final time series, but resulted in time series in which the general correlation structure and density dependence relationships of the original productivity time series were retained. 
+
+<!-- Didn't need to do this.... However, when the simulation estimated a biomass above the highest observed value, the net productivity of the system was forced to be negative.  This was achieved by setting the growth terms to vary around one, the RPS was set to vary around 10% of the lowest RPS value, and the natural mortality varied around two times the highest observed natural mortality estimate, in each of these cases the standard deviation was set to 0.1 and samples were simulated using a log normal distribution. This effectively induced a carrying capacity into the population dynamics below the maximum observed biomass, while respecting the observed population dynamics when the population was at low biomass. -->
+
+In addition, to constrain the simulations from reaching unrealistically high biomass estimates, whenever the fully-recruited biomass exceeded the maximum observed fully-recruited biomass, RPS was resampled using a log-normal distribution where the mean RPS was set to the minimum observed RPS and the standard deviation was set to 0.1.  The exploitation rate scenarios testing in both SFA 25A and SFA 26A ranged from 0 to `r max(bbn.exp.scenario)` in steps of `r bbn.exp.scenario[2]`.  There was no variability in the exploitation rate for a given scenario, e.g., the exploitation rate scenario of 0.1 removed 10% of the fully-recruited biomass in every simulated year.  The simulations were run for `r n_y` years with `r n_sims` simulations for each exploitation rate scenario. The biomass indicators and reference points were calculated using the final 25 years of data from the simulations.
+
+### Model Derived Indices
+
+$B_{MSY}$ and $B_0$ were estimated from the simulation results. $B_0$ was calculated as median biomass of the final `r last.yrs` years from the simulations in which the exploitation rate was set to 0.  $B_{MSY}$  was calculated as the median biomass of the final `r last.yrs` years of the simulations using the exploitation rate that resulted in the average yield from the fishery being maximized (MSY) using the final `r last.yrs` years of simulated data. The explotation rate at $B_{MSY}$ was provided as a candidate Removal Reference point (RR).
+
+As with the index based methods, the criteria for the proposed LRPs and suggested USRs were based on $B_0$ and $B_{MSY}$. Proposed LRPs were set at 20% $B_0$ and 30% and 40% of $B_{MSY}$, while candidate USRs at 40% of $B_0$ and at 80% of $B_{MSY}$ were provided. 
+
+### Harvest Control Rules
+
+In addition to these reference points, the utility of implementing a biomass based Target Reference Point (TRP) was explored [@dfoFisheryDecisionmakingFramework2009; @marentetteCrossJurisdictionalReviewInternational2020] by developing more complex Harvest Control Rules (HCRs). There are innumerable HCRs that could be tested and an optimal strategy is dependent on the management objectives. While defining an optimal strategy was beyond the scope of this framework, we provided an example for each of SFA 25A and SFA 26A to elucidate the utility of this methodology. An interactive tool has also been developed which can be used by both managers and stakeholders to explore the impact of HCRs on various population metrics [IT HAS NOT BEEN DEVELOPED, BUT I'LL WORK ON IT].
+
+In SFA 25A, the HCR simulation example set the explotation rate TO a) `r sab.trp.exp` above the TRP (`r sab.trp.bmsy` tonnes), b)  `r sab.usr.exp` above the USR (`r sab.usr.b0` tonnes) but below the TRP, c) decline linearly from `r sab.usr.exp` at the USR, to 0 at the LRP (`r sab.lrp.b0` tonnes) when below the USR but above the LRP , d) 0 below the LRP. Similarly, in SFA 26A, the harvest control rule simulation example set the explotation rate to a) `r bbn.trp.exp`  above the TRP (`r bbn.trp.bmsy`  tonnes), b) `r bbn.usr.exp` above the USR (`r bbn.usr.b0` tonnes) and below the TRP, c) decline linearly from `r bbn.usr.exp` at the USR, to 0 at the LRP (`r bbn.lrp.b0` tonnes) when below the USR but above the LRP, d) 0 below the LRP.
+
+# Results
+
+## Productivity and Density Dependence
+
+### SFA 25A
+
+There is clear evidence for density dependence in recruitment, with RPS increasing as biomass declines (Figure \@ref(fig:sab-rps-ssb-fig)). The general relationship follows the expectation of a Ricker model (Figure \@ref(fig:sab-rps-ssb-fig)). However, there are two challenges with using the Ricker model, 1) it would tend to underestimate the observed RPS when the adult biomass was below approximately `r sab.rps.bp2` tonnes, and 2) it does not fully account for the variability in the observed data (e.g., 11 of the 25 RPS values were outside the 95% CI). Therefore, the *breakpoint* method was used. The breakpoint used occurred when the adult biomass was above `r sab.rps.bp2` tonnes RPS tended to be the lowest observed in the time series (Figure \@ref(fig:sab-rps-ssb-fig)). A second potential *breakpoint* was identified at `r sab.rps.bp1` tonnes, however simulation testing using this as a breakpoint lead to the stock consistently producing relatively large recruit biomass whenever the stock biomass was below `r sab.rps.bp1` tonnes. This resulted in the simulations using this *breakpoint* supporting exploitation rates that were two to three times higher than has ever been observed in SFA 25A, as a result this breakpoint was not incorporated into the simulations. There was little evidence for density dependence in the growth or natural mortality parameters (Figures \@ref(fig:sab-g-ssb-fig) and \@ref(fig:sab-m-ssb-fig)). There was also no obvious discontinuous breaks in the relationships between growth or natural mortality as adult biomass increased (Figures \@ref(fig:sab-g-ssb-fig) and \@ref(fig:sab-m-ssb-fig)). Therefore, no density dependence was incorporated into the simulations for the growth or natural mortality parameters in the simulations.
+
+There is evidence of autocorrelation in the RPS time series, with a significant positive correlation (`r sab.rps.cor.1`) at a one year lag (Figure  \@ref(fig:sab-pacf-rps-fig)). There was no evidence of correlation in the growth parameters (Figure \@ref(fig:sab-pacf-g-fig)). A weakly significant negative correlation (`r sab.m.cor.2`) was observed at a two year lag for the fully-recruited mortality and this was incorporated into the simulations, while there was no correlation in the recruit mortality time series (Figure \@ref(fig:sab-pacf-m-fig)). Finally, the cross-correlation between RPS (offset to the year the recruits are observed in the time series) and fully-recruited natural mortality was evaluated, a weak but significant correlation was observed in the relationship, the highest correlations were observed between lags of -1 to 1 years, with the peak at `r sab.m.rps.lag` (r = `r sab.m.rps.cor`, Figure \@ref(fig:sab-ccf-m-rps-fig)). This suggests that relatively large (small) recruit biomass events (given the adult biomass that produced the recruits) were observed during periods of high (low) natural mortality. To account for this effect, the simulations included the correlation between fully-recruited natural mortality and RPS at the peak lag.
+
+The survey biomass index (q-corrected) was highly correlated to the model biomass estimate, although there are several years in which the survey biomass index was noticeably different than the resultant model biomass estimate (e.g., 1995, 2010, and 2022) and few of the data fall on the 1:1 line (Figure \@ref(fig:sab-bm-vs-index-fig)). This indicated that the survey biomass index is generally a good proxy for the model biomass, but the two metrics will differ when comparing individual years (Figure \@ref(fig:sab-bm-vs-index-fig)).
+
+### SFA 26A
+
+There is clear evidence for density dependence in recruitment, with RPS increasing as biomass declines (Figure \@ref(fig:bbn-rps-ssb-fig)). The general relationship follows the expectation of a Ricker model (Figure \@ref(fig:bbn-rps-ssb-fig)). However, there are two challenges with using the Ricker model, 1) the highest RPS value tended to occur at intermediate adult biomass but these values were offset by years with moderate RPS values, these high values could not be captured by a linear model and 2) more generally the model is unable to fully account for the variability in the observed data (e.g., 17 of the 25 RPS values were outside the 95% CI). Therefore, the *breakpoint* method was used. A single breakpoint was identified, when the adult biomass was above `r bbn.rps.bp` tonnes RPS tended to be the lowest observed in the time series, while there was no evidence for a trend in RPS with changes in adult biomass below this value (Figure \@ref(fig:bbn-rps-ssb-fig)). There was little evidence for density dependence in the growth or natural mortality parameters (Figures \@ref(fig:bbn-g-ssb-fig) and \@ref(fig:bbn-m-ssb-fig)). There was also no obvious discontinuous breaks in the relationships between growth and adult biomass (Figure \@ref(fig:bbn-g-ssb-fig)), although we note that low values of natural mortality were not observed when the adult biomass was above approximately `r bbn.m.bp` tonnes (Figure \@ref(fig:bbn-m-ssb-fig)). As a result, no density dependence was incorporated into the simulations for growth or natural mortality in the simulations.
+
+There is evidence of autocorrelation in the RPS time series, with a significant positive correlation (`r bbn.rps.cor.1`) at a one year lag and a significant negative correlation at a two year lag (`r bbn.rps.cor.2`, Figure \@ref(fig:bbn-pacf-rps-fig)). There was no significant correlation in the growth or natural mortality time series (Figures \@ref(fig:bbn-pacf-g-fig) and \@ref(fig:bbn-pacf-m-fig)). Finally, the cross-correlation between RPS (offset to the year the recruits are observed in the time series) and fully-recruited natural mortality was evaluated, a significant correlation was observed in the relationship, the highest correlations were observed between lags of 0 to 2 years, with the peak at a lag of `r bbn.m.rps.lag` year (r = `r bbn.m.rps.cor`, Figure \@ref(fig:bbn-ccf-m-rps-fig)). This suggests that relatively large (small) recruit biomass events (given the adult biomass that produced the recruits) were observed during periods of high (low) natural mortality. To account for this effect, the simulations included the correlation between fully-recruited natural mortality and RPS at the peak lag.
+
+The survey biomass index (q-corrected using the median estimated q from the model) was highly correlated to the model biomass estimate, although the survey biomass index does not follow the model biomass estimates as closely as observed in SFA 25A (Figure \@ref(fig:bbn-bm-vs-index-fig)). In several of the early years in the time series (i.e., 1994-1998), the model biomass estimate is notably higher than the survey biomass index, this may be related to the initial conditions required for SEAM  [@keithFrameworkDevelopmentScallop2020]. In general, these results indicated that the survey biomass index is a reasonable proxy for the model biomass, especially in more recent years, but that differences between the two metrics in a particular year can be substantial (Figure \@ref(fig:bbn-bm-vs-index-fig)).
+
+## Reference Points
+
+### Survey Biomass Indices
+
+Three biomass index based LRPs were proposed in each area.  In SFA 25A, the 30% of the geometric mean LRP was `r LRP.med.3.25a` tonnes, the 40% of geometric mean LRP was `r LRP.med.4.25a` tonnes and the 20% of the maximum three-year biomass index LRP was `r LRP.max.2.25a` tonnes, while the most recent three-year average biomass index estimate for SFA 25A was `r bm.last.3.25a`  (Figure \@ref(fig:rp-bmi-fit)). In SFA 26A, the 30% of the geometric mean LRP was `r LRP.med.3.26a` tonnes, the 40% of geometric mean LRP was `r LRP.med.4.26a` tonnes and the 20% of the maximum three-year year biomass index LRP was `r LRP.max.2.26a` tonnes, while the most recent three-year average biomass index estimate for SFA 26A was `r bm.last.3.26a` (Figure \@ref(fig:rp-bmi-fit)). In SFA 26C, the 30% of the geometric mean LRP was `r LRP.med.3.26c` tonnes, the 40% of geometric mean LRP was `r LRP.med.4.26c` tonnes and the 20% of the maximum three-year year biomass index LRP was `r LRP.max.2.26c` tonnes, while the most recent three-year average biomass index estimate for SFA 26C was `r bm.last.3.26c` (Figure \@ref(fig:rp-bmi-fit)). In SFA 27B, the 30% of the geometric mean LRP was `r LRP.med.3.27b` tonnes, the 40% of geometric mean LRP was `r LRP.med.4.27b` tonnes and the 20% of the maximum three-year year biomass index LRP was `r LRP.max.2.27b` tonnes, while the most recent three-year average biomass index estimate for SFA 27B was `r bm.last.3.27b` (Figure \@ref(fig:rp-bmi-fit)). 
+
+Two biomass index based USRs were developed in each area. In SFA 25A, the 80% of the geometric mean USR was `r USR.med.8.25a` tonnes, while the 40% of the maximum three-year year biomass index USR was `r USR.max.4.25a` tonnes (Figure \@ref(fig:rp-bmi-fit)). In SFA 26A, the 80% of the geometric mean USR was `r USR.med.8.26a` tonnes, while the 40% of the maximum three-year year biomass index USR was `r USR.max.4.26a` tonnes  (Figure \@ref(fig:rp-bmi-fit)). In SFA 26C, the 80% of the geometric mean USR was `r USR.med.8.26c` tonnes, while the 40% of the maximum three-year year biomass index USR was `r USR.max.4.26c` tonnes  (Figure \@ref(fig:rp-bmi-fit). In SFA 27B, the 80% of the geometric mean USR was `r USR.med.8.27b` tonnes, while the 40% of the maximum three-year year biomass index USR was `r USR.max.4.27b` tonnes  (Figure \@ref(fig:rp-bmi-fit)).
+
+The phase plots using the relative removal and survey biomass indices indicated that the relative explotation rate did not have a clear relationship to the survey biomass index in any of the areas (Figure \@ref(fig:kobe-bmi-fig)). GEM was unable to identify a relationship between the change in biomass indices and relative exploitation rate in SFA 25A, 26C, or 27B that would facilitate the development of a removal reference point in these areas (Figure \@ref(fig:gem-bmi-fig)). In SFA 26A, the change in the biomass index tended to decline as the relative F increased which facilitated the development of a potential removal reference point using the relative indices, here using a relative removal reference point of approximately `r rr.rf.26a` could be justified (top right panel, Figure \@ref(fig:gem-bmi-fig)).
+
+### Model Simulations
+
+In SFA 25A the simulation time series of the productivity parameters retained similar characteristics to the productivity data, the comparison of the simulated time series' to the observed productivity data was done using the results from the simulations in which the explotation rate was set to `r sab.rr`. The recruit growth and natural mortality parameters from the simulations had minimal auto-correlation (Figure \@ref(fig:sab-sim-acfs-fig)). The simulated RPS time series retained the lag 1 correlation without any notable lag 2 correlation (mean simulation estimates were `r sab.cor.sim.summary$rps.ar1` and `r sab.cor.sim.summary$rps.ar2` respectively, Figure \@ref(fig:sab-sim-acfs-fig)). The fully-recruited natural mortality retained the lag 2 correlation without any notable lag 1 correlation (mean simulation estimate were `r sab.cor.sim.summary$m.acf.ar2` and `r sab.cor.sim.summary$m.acf.ar1` respectively, Figure \@ref(fig:sab-sim-acfs-fig)).  In addition, the peak correlation between natural mortality and RPS is also present in the simulated data at lag 1, however as with the RPS and natural mortality auto-correlation, this value is somewhat lower in the simulations (the mean simulation estimate was `r sab.cor.sim.summary$rps.m.cor`, Figure \@ref(fig:sab-sim-ccf-fig)). The density dependence observed in the RPS data was retained in the simulations, with recruitment being consistently low when the adult biomass exceeded the *breakpoint* (`r sab.rps.bp2` tonnes) and the RPS values below the *breakpoint* were similar to the underlying observed RPS values, no density dependence was observed in the other simulated productivity parameters (Figure \@ref(fig:sab-sim-dd-fig)).
+
+In SFA 25A, the simulation results indicated that the median biomass stabilizes at approximately `r sab.b0` when the exploitation rate is 0, this is hereafter considered the *unfished biomass* ($B_0$) for SFA 25A (Figure \@ref(fig:sab-mn-bm-sim-fig)). The exploitation rate that maximized the removals in the long term was `r sab.rr` (Figure \@ref(fig:sab-mn-fmsy-sim-fig)), this value can be used as the long term average target exploitation rate for SFA 25A based on the historically observed productivity regime.  The median biomass at the target exploitation rate was `r sab.bmsy` tonnes and this was considered the biomass at maximum sustainable yield ($B_{msy}$, Figure \@ref(fig:sab-mn-bmsy-sim-fig)). The median annual removals at $B_{msy}$ were `r sab.c.at.msy` tonnes (Figure \@ref(fig:sab-mn-fmsy-sim-fig)).
+
+Based on these values three LRPs are proposed for SFA 25A, the LRP at 30% of $B_{msy}$ ($LRP_{30}$ = `r sab.lrp.3.bmsy` tonnes), the LRP at 40% of $B_{msy}$ ($LRP_{40}$ = `r sab.lrp.4.bmsy` tonnes), and the LRP at 20% of the $B_0$ ($LRP_{20}$ = `r sab.lrp.b0` tonnes, Figure \@ref(fig:sab-mod-rps-fig)). Two USRs are provided for SFA 25A, a USR at 80% of $B_{msy}$ ($USR_{80}$ = `r sab.usr.bmsy` tonnes) and a USR at 40% of $B_0$ ($USR_{40}$ = `r sab.usr.b0` tonnes, Figure \@ref(fig:sab-mod-rps-fig)). Using the $LRP_{20}$ and $USR_40$ reference points as examples, and when fishing at the the target long-term average exploitation rate of `r sab.rr`, the simulations for SFA 25A resulted in the population being above the USR (i.e., in the "Healthy Zone") `r sab.prop.yrs.healthy`% of the time, below the LRP (i.e., in the "Critical Zone") `r sab.prop.yrs.critical`% of the time, and between the LRP and USR (i.e., in the "Cautious Zone") `r sab.prop.yrs.cautious`% of the time (Figure \@ref(fig:sab-mod-reals-rps-fig)).
+
+In SFA 26A the simulation time series of the productivity parameters retained similar characteristics to the productivity data, the comparison of the simulated time series' to the observed productivity data was done using the results from the simulations in which the explotation rate was set to `r bbn.rr`.  The growth and natural mortality parameters from the simulations have minimal auto-correlation (Figure \@ref(fig:bbn-sim-acfs-fig)). The simulated RPS time series retains both an AR1 and AR2 correlation (mean simulation estimates were `r bbn.cor.sim.summary$rps.ar1` and `r bbn.cor.sim.summary$rps.ar2` respectively; this correlation is somewhat weaker than the observed RPS time series, Figure \@ref(fig:bbn-sim-acfs-fig)).  In addition, the peak correlation between natural mortality and RPS is also present in the simulated data at lag -1, however as with the RPS and natural mortality auto-correlation, this value is somewhat lower in the simulations (the mean simulation estimate was `r bbn.cor.sim.summary$rps.m.cor`, Figure \@ref(fig:bbn-sim-ccf-fig)).  The density dependence of RPS is retained, with it being consistently low when the adult biomass exceeded the *breakpoint* (`r bbn.rps.bp` tonnes) and the value of RPS below the breakpoint being similar to the underlying observed RPS values, no density dependence was observed in the other simulated productivity parameters (Figure \@ref(fig:bbn-sim-dd-fig)).
+
+In SFA 26A, the simulation results indicated that the median biomass stabilizes at approximately `r bbn.b0` when the exploitation rate is 0, this is hereafter considered the *unfished biomass* ($B_0$) for SFA 26A (Figure \@ref(fig:bbn-mn-bm-sim-fig)). The exploitation rate that maximized the removals in the long term was `r bbn.rr` (Figure \@ref(fig:bbn-mn-fmsy-sim-fig)), we suggest this as the long term average target exploitation rate for SFA 26A based on the historically observed productivity regime.  The median biomass at the target exploitation rate was `r bbn.bmsy` tonnes and this was considered the biomass as maximum sustainable yield ($B_{msy}$, Figure \@ref(fig:bbn-mn-bmsy-sim-fig)). The median annual removals at $B_{msy}$ were `r bbn.c.at.msy` tonnes (Figure \@ref(fig:bbn-mn-fmsy-sim-fig)).
+
+Based on these values three LRPs are proposed for SFA 26A, the LRP at 30% of $B_{msy}$ ($LRP_{30}$ = `r bbn.lrp.3.bmsy` tonnes), the LRP at 40% of $B_{msy}$ ($LRP_{40}$ = `r bbn.lrp.4.bmsy` tonnes), and the LRP at 20% of the $B_0$ ($LRP_{20}$ = `r bbn.lrp.b0` tonnes, Figure \@ref(fig:bbn-mod-rps-fig)). Two USRs are provided for SFA 26A, a USR at 80% of $B_{msy}$ ($USR_{80}$ = `r bbn.usr.bmsy` tonnes) and a USR at 40% of $B_0$ ($USR_{40}$ = `r bbn.usr.b0` tonnes, Figure \@ref(fig:bbn-mod-rps-fig)). Using the $LRP_{20}$ and $USR_40$ reference points as examples, and when fishing at the the target long-term average exploitation rate of `r bbn.rr`, the simulations for SFA 26A resulted in the population being above the USR (i.e., in the "Healthy Zone") `r bbn.prop.yrs.healthy`% of the time, below the LRP (i.e., in the "Critical Zone") `r bbn.prop.yrs.critical`% of the time, and between the LRP and USR (i.e., in the "Cautious Zone") `r bbn.prop.yrs.cautious`% of the time (Figure \@ref(fig:bbn-mod-reals-rps-fig)).
+
+## Harvest Control Rules
+
+While model based long-term average exploitation rate targets have been proposed for SFA 25A and SFA 26A, this does not preclude more nuanced HCRs being developed for these areas. The use of more complex HCRs could facilitate the implementation of a Target Reference Point (TRP) for these stocks. The TRP is a value above the USR and is determined by productivity objectives or other biological considerations [@marentetteCrossJurisdictionalReviewInternational2020; @dfoScienceAdvicePrecautionary2021; @dfoScienceAdviceGuidance2023].  Here, we set the TRP at the $B_{msy}$ estimate to illustrate the utility of implementing a TRP, however other candidate TRPs could be identified, such as 80% of $B_0$. The objectives of these analyses are to 1) identify HCRs that maintain the stock at the TRP, 2) increase the long term average removals from the fishery above the estimated long-term median removals when using a static target exploitation rate, and 3) reduce the proportion of time the stock is below the LRP. Numerous other objectives could be explored (e.g., minimizing the probability of dropping below the USR or LRP while maintaining the average removals above a minimum value) but are outside the scope of this framework. For these simulations, when the biomass was below the LRP there was no fishing, while the target explotation rate declined linearly as the biomass declined from the USR to the LRP. The explotation rate in any given year of the simulation was allowed to vary following a log-normal distribution, the standard deviation was set to `r bbn.exp.sd`, while the mean was set at the explotation rate as described below. The results below summarize the final `r last.yrs` years of the `r n_sims` simulated time series.
+
+For the SFA 25A HCR simulation example, the reference points were based on $B_0$ ($LRP_{20}$ =`r sab.lrp.b0` tonnes, $USR_{40}$ = `r sab.usr.b0` tonnes) while $B_{msy}$ was used as the TRP (`r sab.trp.bmsy` tonnes). Above the $TRP$ the explotation rate was set to `r sab.trp.exp`, between the USR and TRP the explotation rate was set to `r sab.usr.exp`. The results of this simulation indicated that the median biomass (`r sab.med.bm.hcr` tonnes) fluctuated around the TRP (Figure \@ref(fig:sab-mn-bm-hcr-fig)).  The average removals were `r sab.mn.catch.hcr` tonnes, while the median removals were `r sab.med.catch.hcr` tonnes (Figure \@ref(fig:sab-mn-c-hcr-fig)). The stock was below the LRP `r test`% of the time, it was in the cautious zone `r sab.prop.yrs.cautious.hcr`% of the time, it was between the USR and the TRP `r sab.prop.yrs.healthy.hcr`% of the time, and was above the TRP `r sab.prop.yrs.above.trp.hcr`% of the time (Figure \@ref(fig:sab-real-bm-hcr-fig)). This results in a bifurcation of the landings, for example, while the stock is above the USR but below the TRP (which happens `r sab.prop.yrs.healthy.hcr`% of the time), landings generally ranged from `r sab.min.healthy.zone.catch.hcr` to `r sab.max.healthy.zone.catch.hcr` tonnes, while above the TRP the landings were usually greater than `r sab.min.trp.catch.hcr` tonnes, and occasionally were more than double this (Figure \@ref(fig:sab-real-c-hcr-fig)).
+
+For the SFA 26A HCR simulation example, the reference points were based on $B_0$ ($LRP_{20}$ =`r bbn.lrp.b0` tonnes, $USR_{40}$ = `r bbn.usr.b0` tonnes) while $B_{msy}$ was used as the TRP (`r bbn.trp.bmsy` tonnes). Above the $TRP$ the explotation rate was set to `r bbn.trp.exp`, between the USR and TRP the explotation rate was set to `r bbn.usr.exp`. The results of this simulation indicated that the median biomass (`r bbn.med.bm.hcr` tonnes) fluctuated around the TRP (Figure \@ref(fig:bbn-mn-bm-hcr-fig)). The mean removals were `r bbn.mn.catch.hcr` tonnes, while the median removals were `r bbn.med.catch.hcr` tonnes (Figure \@ref(fig:bbn-mn-c-hcr-fig)). The stock was below the LRP `r bbn.prop.yrs.bl.lrp.hcr`% of the time, it was in the cautious zone `r bbn.prop.yrs.cautious.hcr`% of the time, it was between the USR and the TRP `r bbn.prop.yrs.healthy.hcr`% of the time, and was above the TRP `r bbn.prop.yrs.above.trp.hcr`% of the time (Figure \@ref(fig:bbn-real-bm-hcr-fig)). This results in a bifurcation of the landings, for example, while the stock is above the USR but below the TRP (which happens `r bbn.prop.yrs.healthy.hcr`% of the time), landings generally ranged from `r bbn.min.healthy.zone.catch.hcr` to `r bbn.max.healthy.zone.catch.hcr` tonnes, while above the TRP the landings were usually greater than `r bbn.min.trp.catch.hcr` tonnes, and occasionally were more than double this (Figure \@ref(fig:bbn-real-c-hcr-fig)).
+
+# Conclusions
+
+For SFA 25A, it is recommended to use the index based LRP of `r LRP.max.2.25a` tonnes (20% of $B_0$) and to monitor the survey biomass index annually to provide guidance on stock status and setting TACs. This course of action is recommend because of the strong correlation between the survey biomass index and the model results, the limited removals from the area, and the lack of a clear relationship between the explotation rate and changes in the biomass in SFA 25A.  The could be achieved using a four-step process, 1) use the three-year geometric mean survey biomass index and the index based reference points to determine the stock status, 2) once developed, use the model based HCRs to determine the appropriate explotation rate given stock status, 3) Divide the three-year geometric mean survey biomass index by the model catchability (`r sab.q`) to get an estimate of the total biomass, 4) multiply this q-corrected survey biomass by the exploitation rate to provide a TAC recommendation. If the three-year geometric mean survey biomass index falls below the LRP there would be no removals in the upcoming year and this would trigger a request for DFO Science to re-run the SFA 25A model and provide updated results.
+
+For SFA 26A, it is recommended to continue with annual updates using a model based LRP, the recommended LRP for this are is `r bbn.lrp.b0` tonnes (20% of $B_0$). We also recommend incorporating a secondary index based LRP and USR for this area. The development of these secondary reference points has two primary benefits, 1) it can help provide guidance during the setting of interim TAC's before the model is run, 2) it can be used in lieu of the model results if there are challenges with running the model in a given year. If a secondary index based LRP is adopted we recommend it to be `r LRP.med.3.26a` tonnes (30% of $B_{msy}$). This value was chosen because the ratio of this LRP to the biomass index is more similar to the same ratio using the model LRP and biomass estimates than the other index based LRPs. As suggested in other areas, the index based RPs should be compared the geometric mean biomass for the last three-years with data.
+
+For SFA 26C, it is recommended to use the index based LRP of `r LRP.max.2.26c` tonnes (20% of $B_0$). The LRP should be compared to the geometric mean biomass for the last three-years with data. The available data do not contain a great deal of information to help inform the setting of an index based Removal Reference Point, however, we do suggest the relative exploitation rate should not exceed the maximum observed relative explotation rate in the area
+
+For SFA 27B, it is recommended to use the index based LRP of `r LRP.max.2.27b` tonnes (20% of $B_0$). The LRP should be compared to the geometric mean biomass for the last three-years with data. The available data do not contain a great deal of information to help inform setting an index based Removal Reference Point, however, we do suggest the relative exploitation rate should not exceed the maximum observed relative explotation rate in the area. While it was not directly addressed within this Framework, the utility of incorporating SFA 27B into the next iteration of models developed within SFA 27 should be a research priority ahead of the next Framework for SFA 27.
+
+The models in SFA 25A and 26A should be subject to re-evaluation to ensure they are capturing the population dynamics of the areas, and to monitor for changes in the productivity. We note that it is challenging to predict when the models should next be re-evaluated as this is a function of ecological, social, and economic factors which cannot be forecast.
+
+The HCR simulation provide evidence for the utility of using a TRP along with more complex harvest strategies in both SFA 25A and 26A. In both areas, the probability of the stock declining below the LRP was lower using the example HCR strategy, while the resultant long-term average harvest levels increased substantially when compared to using a static harvest control rule above the USR. This alternative strategy accomplished this by reducing the exploitation rate in the "Healthy Zone" below the exploitation rate at $B_{msy}$ (which is commonly used as the HCR), while allowing for removals to exceed the exploitation rate at $B_{msy}$ when the biomass was above the TRP. From a regulatory perspective, these more complex HCRs may pose difficulties within the PA approach adopted by DFO in which the harvest control rules are less dynamic than proposed herein. From the perspective of the fishery, the example HCRs lead to much higher inter-annual variability in the removals, with relatively large fishing removals occurring approximately 50% of the time, in addition this would result in relatively low removals in the near term as the biomass in both areas increases towards the TRP. However, the maximum removals that would be recommended when the stocks are above the USR but below the TRP are higher than the recently observed removals in SFA 25A, and are not substantially different from the level of removals observed in SFA 26A in recent years (this also provides additional justification for these HCRs as they broadly align with recently observed management practices in these areas).
+
+Information which can be used to inform the development of USRs, TRPs, and RRs has been provided for each of the four areas. While it is outside the purview of DFO Science to set these values, we can provide some additional guidance for their development. We do not recommend implementing both USRs and TRPs for the index based RPs, the benefit of the TRP occurs when an additional HCR can be set around the TRP. However, there is insufficient information in the data to provide guidance on an appropriate HCR in the index based RP areas. However, if it is deemed necessary to set a TRP for the areas with index based RPs, we suggest using the $B_{msy}$ proxy, or 80% of the $B_{0}$ proxy for the TRP without an additional HCR. For the areas using the index based RPs, no clear relationship between the change in biomass and the relative explotation rate was observed. As a result, setting a relative RR may prove challenging for these areas, however we do suggest that the relative RR does not exceed the maximum relative exploitation rate observed for each area. For the modelled areas, additional exploration of potential HCR strategies would likely be of benefit. However, to undertake this exercise in an efficient manner, the development of quantifiable management objectives for the fishery is necessary.
+
+The methods used here relied on fishery-independent metrics. Reference Points can be developed using fishery-dependent data, but fishery-dependent methods would not be appropriate for these areas because of the rapid increase in fishery efficiency over the last two decades and the adoption of larger more powerful vessels over the last 30 years.  Fishery dependent methods generally rely on using some measure of catch per unit effort (CPUE), the underlying assumption of these methods is that CPUE is proportional to the biomass of the population [@hilbornQuantitativeFisheriesStock1992]. Unfortunately when changes in fishing efficiency are driven by technological change CPUE is not proportional to the population biomass, and this precludes these methods from being used for these types of analyses.
+
+<!--chapter:end:tmp-01-text.Rmd-->
+
+<!-- Do not edit this file! -->
+
+\clearpage
+
+# REFERENCES {-}
+
+<!--chapter:end:tmp-02-references.Rmd-->
+
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+\clearpage
+
+# Tables {-}
+
+```{r include=F, echo=F}
+
+```
+
+
+
+
+<!--chapter:end:tmp-03-tables.Rmd-->
+
+---
+output:
+  pdf_document:
+    fig_caption: yes
+    extra_dependencies: float
+linkcolor: blue
+params:
+  bank: NA
+  banknum: NA
+  surv.year: NA
+header-includes: \usepackage{float}
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include=F, echo=F}
+knitr::opts_knit$set(eval.after = "fig.cap")
+knitr::opts_chunk$set(fig.pos = 'H')
+options(knitr.kable.NA = '')
+require(tidyverse)
+options(tinytex.verbose = TRUE)
+
+```
+
+
+\clearpage
+# Figures {-}
+
+<!-- The first round of figures are the productivity figures, these are only done for 25A and 26A -->
+
+<!-- Sable first -->
+
+```{r sab-rps-ssb-fig, echo=F, fig.cap="Relationship between RPS and adult biomass (tonnes) in SFA 25A. The Ricker model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed line represents the value used for the breakpoint analysis. The numbered points represent the year class of the recruits."}
+if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"RPS_vs_SSB.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"RPS_vs_SSB_fr.png"))
+```
+
+
+\newpage
+```{r sab-g-ssb-fig, echo=F, fig.cap="Relationship between fully recruited growth (top panel) and adult biomass (tonnes) and recruit growth (bottom panel) and adult biomass (tonnes) in SFA 25A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
+if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"Growth_vs_SSB.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"Growth_vs_SSB_fr.png"))
+```
+
+
+\newpage
+```{r sab-m-ssb-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality (top panel) and adult biomass (tonnes) and Recruit natural mortality (bottom panel) and adult biomass (tonnes) in SFA 25A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
+if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"M_vs_SSB.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"M_vs_SSB_fr.png"))
+```
+
+
+\newpage
+```{r sab-pacf-rps-fig, echo=F, fig.cap="Parital autocorrleation for RPS in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"PACF_RPS.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"PACF_RPS_fr.png"))
+```
+
+
+\newpage
+```{r sab-pacf-g-fig, echo=F, fig.cap="Parital autocorrleation for fully recruited growth (top panel) and recruit growth (bottom panel) in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"PACF_growths.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"PACF_growths_fr.png"))
+```
+
+
+\newpage
+```{r sab-pacf-m-fig, echo=F, fig.cap="Parital autocorrleation for fully-recruited natural mortality (top panel) and recruit mortality (bottom panel) in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"PACF_m.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"PACF_m_fr.png"))
+```
+
+
+\newpage
+```{r sab-ccf-m-rps-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality RPS in SFA 25A. The top panel is the time series of fully-recruited natural mortality (red dashed line) and RPS (text points, the years represent the year class of the recruits). The bottom panel is the cross-correlation, here the vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"CCF_ts_RPS_offset_m.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"CCF_ts_RPS_offset_m.png"))
+```
+
+
+\newpage
+```{r sab-bm-vs-index-fig, echo=F, fig.cap="Relationship between the Model biomass (tonnes) and the Q-corrected survey biomass index (tonnes) in SFA 25A. The text points represent the year and the black line is the 1:1 line."}
+if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"Model_vs_index_biomass.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"Model_vs_index_biomass.png"))
+```
+
+
+<!-- Now for 26A -->
+
+
+```{r bbn-rps-ssb-fig, echo=F, fig.cap="Relationship between RPS and adult biomass (tonnes) in SFA 26A. The Ricker model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed line represents the value used for the breakpoint analysis. The numbered points represent the year class of the recruits."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"RPS_vs_SSB.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"RPS_vs_SSB_fr.png"))
+```
+
+
+\newpage
+```{r bbn-g-ssb-fig, echo=F, fig.cap="Relationship between fully recruited growth (top panel) and adult biomass (tonnes) and recruit growth (bottom panel) and adult biomass (tonnes) in SFA 26A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"Growth_vs_SSB.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"Growth_vs_SSB_fr.png"))
+```
+
+
+\newpage
+```{r bbn-m-ssb-fig, echo=F, fig.cap="Relationship between natural mortality and adult biomass (tonnes) in SFA 26A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed lines represent the values used for the breakpoint analysis. The numbered points represent the year."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"M_vs_SSB.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"M_vs_SSB_fr.png"))
+```
+
+
+\newpage
+```{r bbn-pacf-rps-fig, echo=F, fig.cap="Parital autocorrleation for RPS in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_RPS.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_RPS_fr.png"))
+```
+
+
+\newpage
+```{r bbn-pacf-g-fig, echo=F, fig.cap="Parital autocorrleation for fully recruited growth (top panel) and recruit growth (bottom panel) in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_growths.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_growths_fr.png"))
+```
+
+
+\newpage
+```{r bbn-pacf-m-fig, echo=F, fig.cap="Parital autocorrleation for natural mortality in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_m.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_m_fr.png"))
+```
+
+
+\newpage
+```{r bbn-ccf-m-rps-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality RPS in SFA 26A. The top panel is the time series of natural mortality (red dashed line) and RPS (text points, the years represent the year class of the recruits). The bottom panel is the cross-correlation, here the vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"CCF_ts_RPS_offset_m.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"CCF_ts_RPS_offset_m.png"))
+```
+
+
+\newpage
+```{r bbn-bm-vs-index-fig, echo=F, fig.cap="Relationship between the Model biomass (tonnes) and the Q-corrected survey biomass index (tonnes) in SFA 26A. The text points represent the year and the black line is the 1:1 line."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"Model_vs_index_biomass.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"Model_vs_index_biomass.png"))
+```
+
+
+<!--  Here are the 3 figures tied to the Index based reference points-->
+
+
+```{r rp-bmi-fit, echo=F, fig.cap="Survey Biomass index time series (black line) for each of the areas, the geometric mean for the most recent three-years of data is represented by the thick yellow line. For each area the 30\\% of the geometric mean LRP is represented by the red dotted line, the 40\\% of geometric mean LRP was is represented by the dahsed red line, and the 20\\% of the maximum three-year biomass index LRP was represented by the solid red line. The 80\\% of the geometric mean USR is represented by the dashed blue line, while the 40\\% of the maximum three-year year biomass index USR was represented by the solid blue line."}
+if(language== 'english') knitr::include_graphics(paste0(plot.index.loc,"RPs_BM_Indices.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.index.loc,"RPs_BM_Indices_fr.png"))
+```
+
+
+\newpage
+```{r kobe-bmi-fig, echo=F, fig.cap="Phase plot for each of the areas. The relative fishing mortality is on the y-axis and suvey biomass index is on the x-axis. The numbers on the plot represent the year."}
+if(language== 'english') knitr::include_graphics(paste0(plot.index.loc,"Kobe_BM_Indices.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.index.loc,"Kobe_BM_Indices.png"))
+```
+
+
+\newpage
+```{r gem-bmi-fig, echo=F, fig.cap="Percent change in the survey biomass index versus the relative fishing mortality for each area. The numbers on the plot represent the year (e.g., 14 is the change in biomass from 2014-2015 and the associated exploitation rate)."}
+if(language== 'english') knitr::include_graphics(paste0(plot.index.loc,"GEM_BM_Indices.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.index.loc,"GEM_BM_Indices.png"))
+```
+
+
+<!-- 25A The simulation correlation and density depdendence figures -->
+
+
+\newpage
+```{r sab-sim-acfs-fig, echo=F, fig.cap="Mean estimate of the parital autocorrleation from the simulated time series in SFA 25A using the $$B_{msy}$$ simulation run. Shown are fully-recruited natural mortality (top left), recruit natural mortality (top right),  recruit growth (bottom left), and RPS (bottom right). The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(years),"-",max(years),"/PACF_sim_correlation.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(years),"-",max(years),"/PACF_sim_correlation.png"))
+```
+
+
+\newpage
+```{r sab-sim-ccf-fig, echo=F, fig.cap="Mean estimate of the cross-coreelation of RPS and fully-recruited natural mortality from the simulated time series in SFA 25A using the $$B_{msy}$$ simulation run. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(years),"-",max(years),"/CCF_sim_correlation.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(years),"-",max(years),"/CCF_sim_correlation.png"))
+```
+
+
+\newpage
+```{r sab-sim-dd-fig, echo=F, fig.cap="Relationship between the simulated parameter values and the simulated adult biomass estimates for SFA 25A using the $$B_{msy}$$ simulation run. The blue solid horiztonal line is the mean (median for the natural mortalities) value from the simulations, while the blue dashed line is the mean (median for the natural mortalities) estimated historcal parameter estimate. The red vertical line on the lower left figure (RPS) representats the breakpoint."}
+if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_paramter_DD.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_paramter_DD.png"))
+```
+
+<!-- 25A Main Simulation Results -->
+
+\newpage
+```{r sab-mn-bm-sim-fig, echo=F, fig.cap="Median fully-recruited biomass estimates in SFA 25A, with 95\\% confidence interval, for each exploitation rate scenario simulated."}
+if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/B_mn_ts.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/B_mn_ts.png"))
+```
+
+\newpage
+```{r sab-mn-fmsy-sim-fig, echo=F, fig.cap="Median removals estimates in SFA 25A from the final 25 years of the simulations, with 95\\% confidence interval, for each exploitation rate scenario simulated. "}
+if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Catch_equilibrium.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Catch_equilibrium.png"))
+```
+
+
+\newpage
+```{r sab-mn-bmsy-sim-fig, echo=F, fig.cap="Median biomass estimates from the final 25 years of the simulations in SFA 25A, with 95\\% confidence interval, for each exploitation rate scenario simulated."}
+if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/B_equilibrum.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/B_equilibrum.png"))
+```
+
+
+
+\newpage
+```{r sab-mod-rps-fig, echo=F, fig.cap="Suite of potential Biomass Reference Points in SFA 25A. The LRP set at 20\\% of the unfished biomass estimate is the solid red line, the LRP set at 30\\% of the biomass at MSY is the dotted red line, the LRP set at 40\\% of the biomass at MSY is the dashed red line. The USR set at 40\\% of the unfished biomass estimate is the solid blue line and the USR set at 80% of the biomass at MSY is the dahsed blue line. The solid yellow line is the estimated Biomass at MSY. The black line is the historic modelled time series"}
+if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"))
+```
+
+
+\newpage
+```{r sab-mod-reals-rps-fig, echo=F, fig.cap="Simulated time series future projections of the Biomass in SFA 25A when harvesting occurs at the target explotation rate.  The LRP shown (solid red line) is set at 20\\% of the unfished biomass estimate and the USR (solid blue line) is set at 40\\% of the unfished biomass estimate. Each grey line represents one realization of the simulations."}
+if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
+```
+
+
+
+
+
+<!-- 26A The simulation correlation and density depdendence figures -->
+
+
+
+\newpage
+```{r bbn-sim-acfs-fig, echo=F, fig.cap="Mean estimate of the parital autocorrleation from the simulated time series in SFA 26A using the $$B_{msy}$$ simulation run. Shown are the fully-recruited growth (top left), recruit growth (top right),  natural mortality (bottom left), and RPS (bottom right). The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/PACF_sim_correlation.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/PACF_sim_correlation.png"))
+```
+
+
+\newpage
+```{r bbn-sim-ccf-fig, echo=F, fig.cap="Mean estimate of the cross-coreelation of RPS and fully-recruited natural mortality from the simulated time series in SFA 26A using the $$B_{msy}$$ simulation run. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/CCF_sim_correlation.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/CCF_sim_correlation.png"))
+```
+
+
+\newpage
+```{r bbn-sim-dd-fig, echo=F, fig.cap="Relationship between the simulated parameter values and the simulated adult biomass estimates for SFA 26A using the $$B_{msy}$$ simulation run. The blue solid horiztonal line is the mean (median for natural mortality) value from the simulations, while the blue dashed line is the mean (median for natural mortality) estimated historcal parameter estimate. The red vertical line on the lower left figure (RPS) representats the breakpoint."}
+if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_paramter_DD.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_paramter_DD.png"))
+```
+
+
+<!-- 26A Main Simulation Results -->
+
+\newpage
+```{r bbn-mn-bm-sim-fig, echo=F, fig.cap="Median fully-recruited biomass estimates in SFA 26A, with 95\\% confidence interval, for each exploitation rate scenario simulated."}
+if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/B_mn_ts.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/B_mn_ts.png"))
+```
+
+
+\newpage
+```{r bbn-mn-fmsy-sim-fig, echo=F, fig.cap="Median removals estimates in SFA 26A from the final 25 years of the simulations, with 95\\% confidence interval, for each exploitation rate scenario simulated. "}
+if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Catch_equilibrium.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Catch_equilibrium.png"))
+```
+
+
+\newpage
+```{r bbn-mn-bmsy-sim-fig, echo=F, fig.cap="Median biomass estimates from the final 25 years of the simulations in SFA 26A, with 95\\% confidence interval, for each exploitation rate scenario simulated."}
+if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/B_equilibrum.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/B_equilibrum.png"))
+```
+
+
+\newpage
+```{r bbn-mod-rps-fig, echo=F, fig.cap="Suite of potential Biomass Reference Points in SFA 26A. The LRP set at 20\\% of the unfished biomass estimate is the solid red line, the LRP set at 30\\% of the biomass at MSY is the dotted red line, the LRP set at 40\\% of the biomass at MSY is the dashed red line. The USR set at 40\\% of the unfished biomass estimate is the solid blue line and the USR set at 80% of the biomass at MSY is the dahsed blue line. The solid yellow line is the estimated Biomass at MSY. The black line is the historic modelled time series"}
+if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_RPs.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_RPs.png"))
+```
+
+
+\newpage
+```{r bbn-mod-reals-rps-fig, echo=F, fig.cap="Simulated time series future projections of the Biomass in SFA 26A when harvesting occurs at the target explotation rate.  The LRP shown (solid red line) is set at 20\\% of the unfished biomass estimate and the USR (solid blue line) is set at 40\\% of the unfished biomass estimate. Each grey line represents one realization of the simulations."}
+if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_reals_w_RPS.png"))
+if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_reals_w_RPS.png"))
+```
+
+
+<!-- Now for the HCRs in each area  25A to start-->
+
+\newpage
+```{r sab-mn-bm-hcr-fig, echo=F, fig.cap="Median fully-recruited biomass estimates in SFA 25A, with 95\\% confidence interval, for the simulated HCR example."}
+if(language== 'english') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/B_mn_ts.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/B_mn_ts.png"))
+```
+
+
+\newpage
+```{r sab-mn-c-hcr-fig, echo=F, fig.cap="Median removal estimates in SFA 25A, with 95\\% confidence interval, for the simulated HCR example."}
+if(language== 'english') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_mn_ts.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_mn_ts.png"))
+```
+
+
+\newpage
+```{r sab-real-bm-hcr-fig, echo=F, fig.cap="Raw simulated fully-recruited biomass estimates in SFA 25A, with 95\\% confidence interval, for the simulated HCR example.The yellow horiztonal line is the TRP, the blue horizontal line is the USR, and the red horizontal line is the LRP. Each grey line represents one realization of the simulations."}
+if(language== 'english') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/B_reals.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/B_reals.png"))
+```
+
+
+\newpage
+```{r sab-real-c-hcr-fig, echo=F, fig.cap="Raw simulated removal time series in SFA 25A, with 95\\% confidence interval, for the simulated HCR example. Each grey line represents one realization of the simulations."}
+if(language== 'english') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_reals.png"))
+if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_reals.png"))
+```
+
+
+
+<!-- Now to 26A -->
+
+\newpage
+```{r bbn-mn-bm-hcr-fig, echo=F, fig.cap="Median fully-recruited biomass estimates in SFA 26A, with 95\\% confidence interval, for the simulated HCR example."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/B_mn_ts.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/B_mn_ts.png"))
+```
+
+
+\newpage
+```{r bbn-mn-c-hcr-fig, echo=F, fig.cap="Median removal estimates in SFA 25A, with 95\\% confidence interval, for the simulated HCR example."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/C_mn_ts.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/C_mn_ts.png"))
+```
+
+
+\newpage
+```{r bbn-real-bm-hcr-fig, echo=F, fig.cap="Raw simulated fully-recruited biomass estimates in SFA 25A, with 95\\% confidence interval, for the simulated HCR example. The yellow horiztonal line is the TRP, the blue horizontal line is the USR, and the red horizontal line is the LRP. Each grey line represents one realization of the simulations."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/B_reals.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/B_reals.png"))
+```
+
+
+\newpage
+```{r bbn-real-c-hcr-fig, echo=F, fig.cap="Raw simulated removal time series in SFA 25A, with 95\\% confidence interval, for the simulated HCR example. Each grey line represents one realization of the simulations."}
+if(language== 'english') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/C_reals.png"))
+if(language== 'french') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/C_reals.png"))
+```
+
+<!--chapter:end:tmp-04-figures.Rmd-->
+
+## Formatting to-do
+
+- caption styles
+- change colons in captions to periods
+- bold table headers
+- delete TOC
+- move abstract up
+- add title, author, etc.
+- citation
+- DRAFT watermark
+- Bullets
+- Body text style
+- Crop old survey design figures  
+
+<!--chapter:end:tmp-06-formatting.Rmd-->
+
