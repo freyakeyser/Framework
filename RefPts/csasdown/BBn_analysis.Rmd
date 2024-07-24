@@ -550,7 +550,7 @@ bbn.hcr.last.yrs <- bbn.hcr[bbn.hcr$year > (n_y-last.yrs),]
 bbn.prop.yrs.bl.lrp.hcr <- round(100*length(which(bbn.hcr.last.yrs$B < bbn.lrp.b0))/n_sims/last.yrs,digits=1)
 bbn.prop.yrs.cautious.hcr <- round(100*length(which(bbn.hcr.last.yrs$B >= bbn.lrp.b0 & bbn.hcr.last.yrs$B < bbn.usr.b0))/n_sims/last.yrs,digits=1)
 bbn.prop.yrs.healthy.hcr <- round(100*length(which(bbn.hcr.last.yrs$B >= bbn.usr.b0 & bbn.hcr.last.yrs$B < bbn.trp.bmsy))/n_sims/last.yrs,digits=1)
-bbn.prop.yrs.above.trp.hcr <- 100*length(which(bbn.hcr.last.yrs$B > bbn.trp.bmsy))/n_sims/last.yrs
+bbn.prop.yrs.above.trp.hcr <- round(100*length(which(bbn.hcr.last.yrs$B > bbn.trp.bmsy))/n_sims/last.yrs,digits=1)
 
 bbn.min.healthy.zone.catch.hcr <- bbn.usr.b0*bbn.usr.exp
 bbn.max.healthy.zone.catch.hcr <- bbn.trp.bmsy*bbn.usr.exp
