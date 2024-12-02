@@ -254,7 +254,7 @@ sab.RPs <- sab.Exp.res %>% dplyr::filter(year >= n_y-25) %>% dplyr::group_by(F.s
                                                                                                        med.C = median(Catch,na.rm=T))  
 
 sab.c.at.msy <- max(sab.RPs$med.C)
-sab.rr <- sab.RPs$F.scenario[sab.RPs$med.C == sab.c.at.msy] # Nobody would argue with 9% either...
+sab.rr <- sab.RPs$F.scenario[sab.RPs$med.C == sab.c.at.msy] # 
 sab.bmsy <- round(sab.RPs$med.B[sab.RPs$med.C == sab.c.at.msy],digits=-2)
 sab.b0 <- round(sab.RPs$med.B[sab.RPs$F.scenario==0],digits=-2)
 

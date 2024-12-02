@@ -110,7 +110,7 @@ fish.dat2 <- fish.dat #safekeeping
 fish.dat <- fish_sf2
 #st_geometry(fish.dat) <- NULL
 
-by.sy <- fish.dat %>% data.frame() %>%  group_by(bank, surv.year)%>%   summarize(sum = sum(pro.repwt/1000))
+by.sy <- fish.dat %>% data.frame() %>%  dplyr::group_by(bank, surv.year)%>%   dplyr::summarize(sum = sum(pro.repwt/1000))
 
 by.sy[by.sy$bank=="BBn" & by.sy$surv.year>1990,]
 
@@ -119,13 +119,13 @@ by.sy[by.sy$bank=="BBn" & by.sy$surv.year>1990,]
 
 #tail(fish.dat[, c("fished", "month", "year", "surv.year")], 50)
 survey.yr <- fish.dat %>%
-  group_by(surv.year, bank, sfa) %>%
-  summarize(mt = sum(pro.repwt)/1000) %>%
-  mutate(year=surv.year)
+  dplyr::group_by(surv.year, bank, sfa) %>%
+  dplyr::summarize(mt = sum(pro.repwt)/1000) %>%
+  dplyr::mutate(year=surv.year)
 
 fishing.yr <- fish.dat %>%
-  group_by(year, bank, sfa) %>%
-  summarize(mt = sum(pro.repwt)/1000) 
+  dplyr::group_by(year, bank, sfa) %>%
+  dplyr::summarize(mt = sum(pro.repwt)/1000) 
   
 
 banks <- c("Sab", "BBn", "Ger", "GBb")
@@ -166,12 +166,15 @@ relative.F$subarea[relative.F$bank=="GBb"] <- "27B"
 
 # now limit it to be 2024 onwards
 relative.F <- relative.F |> collapse::fsubset(year >= 1994)
+
+# Sable is missing 2022 for some reason, so adding by hand...
+relative.F$relative.F[relative.F$year == 2022 & relative.F$bank == "Sab"] <- 0 # There was no fishing in 2022
+relative.F$mt[relative.F$year == 2022 & relative.F$bank == "Sab"] <- 0 # There was no fishing in 2022
+# not clear why this dropped, but it's in the object so adding in..
+relative.F$I[relative.F$year == 2022 & relative.F$bank == "Sab"] <- survey.obj$Sab$model.dat$I[survey.obj$Sab$model.dat$year == 2022]
+
 # now I want to compare F to change in biomass...
 rf.25a <- relative.F |> collapse::fsubset(bank == "Sab")
-# Sable is missing 2022 for some reason, so adding by hand...
-rf.25a$relative.F[rf.25a$year == 2022] <- 0 # There was no fishing in 2022
-# not clear why this dropped, but it's in the object so adding in..
-rf.25a$I[rf.25a$year == 2022] <- survey.obj$Sab$model.dat$I[survey.obj$Sab$model.dat$year == 2022]
 rf.26a <- relative.F |> collapse::fsubset(bank == "BBn")
 rf.26c <- relative.F |> collapse::fsubset(bank == "Ger")
 rf.27b <- relative.F |> collapse::fsubset(bank == "GBb")
@@ -193,6 +196,58 @@ rr.rf.26a.mod <- lm(prop.DB~relative.F,data=rf.26a)
 rr.new.dat$prop.DB <- predict(rr.rf.26a.mod,newdata = rr.new.dat)
 closest <- which(abs(rr.new.dat$prop.DB) == min(abs(rr.new.dat$prop.DB)))[1]
 rr.rf.26a <- round(rr.new.dat$relative.F[closest],digits=2)
+
+# Here we do the new idea of looking for a period of low variability in the time series and seeing what the relative F was during that time
+# Consider that a measure of the 'target' RR. So we need a rolling variance which can deal with NAs!
+
+# Use a 5 year moving average.
+ny.ma <- 5
+bank.var <- NULL
+for(b in banks)
+  {
+  tmp.dat <- relative.F[relative.F$bank == b,]
+  if(b == "Ger") tmp.dat <- tmp.dat[tmp.dat$year >= 2008,]
+  tmp.yrs <- min(tmp.dat$year):(max(tmp.dat$year)-ny.ma+1)
+  tmp.var <- data.frame(bank = rep(b,length(tmp.yrs)),sd = rep(NA,length(tmp.yrs)),yr.start = rep(NA,length(tmp.yrs)),yr.end = rep(NA,length(tmp.yrs)))
+  # Fill in NA's with average of previous and following year, they all have an NA so really don't need the if...
+  if(any(is.na(tmp.dat)))
+  {
+    nas <- which(is.na(tmp.dat$I))
+    # Works as long as we don't miss two years in a row (i.e., early German.) or the final year is an NA
+    for(i in 1:length(nas)) tmp.dat$I[nas[i]] <- mean(c(tmp.dat$I[nas[i]-1],tmp.dat$I[nas[i]+1]))
+  } # end if(any(is.na(tmp.dat)))
+  c <- 0
+  for(y in tmp.yrs)
+  {
+    c = c+1
+    tmp.var$sd[c] <-   sd(tmp.dat$I[tmp.dat$year %in% y:(y+4)],na.rm=T)
+    tmp.var$yr.start[c] <- y
+    tmp.var$yr.end [c] <- y+ny.ma-1
+  } # end for(y in tmp.yrs)
+  min.var <- which(tmp.var$sd == min(tmp.var$sd))
+  bank.var[[b]] <- tmp.var[min.var,]
+}
+
+low.var <- do.call("rbind",bank.var)
+
+# now we can get the mean for each bank, first for 25A....
+low.25a.yrs <- low.var$yr.start[low.var$bank == "Sab"]:low.var$yr.end[low.var$bank == "Sab"]
+rf.25a.low.var <- rf.25a[rf.25a$year %in% low.25a.yrs,]
+target.rr.25a.index <- signif(median(rf.25a.low.var$relative.F,na.rm=T),digits=2)
+#26A
+low.26a.yrs <- low.var$yr.start[low.var$bank == "BBn"]:low.var$yr.end[low.var$bank == "BBn"]
+rf.26a.low.var <- rf.26a[rf.26a$year %in% low.26a.yrs,]
+target.rr.26a.index <- signif(median(rf.26a.low.var$relative.F,na.rm=T),digits=2)
+# 26C
+low.26c.yrs <- low.var$yr.start[low.var$bank == "Ger"]:low.var$yr.end[low.var$bank == "Ger"]
+rf.26c.low.var <- rf.26c[rf.26c$year %in% low.26c.yrs,]
+target.rr.26c.index <- signif(median(rf.26c.low.var$relative.F,na.rm=T),digits=2)
+# 27B
+low.27b.yrs <- low.var$yr.start[low.var$bank == "GBb"]:low.var$yr.end[low.var$bank == "GBb"]
+rf.27b.low.var <- rf.27b[rf.27b$year %in% low.27b.yrs,]
+target.rr.27b.index <- signif(median(rf.27b.low.var$relative.F,na.rm=T),digits=2)
+
+
 
 ```
 
