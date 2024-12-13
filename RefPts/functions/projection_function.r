@@ -642,7 +642,8 @@ if(save.results == T)
   
   if(is.null(HCR.sim))
   {
-    MSY.summarized <- Exp.res %>% dplyr::group_by(F.scenario,year) %>% 
+    # This is summarizing the final half of the years in the simulations.
+    MSY.summarized <- Exp.res %>% dplyr::filter(year >= n_y/2) %>% dplyr::group_by(F.scenario,year) %>% 
                                    dplyr::summarise(B.mn = median(B,na.rm=T),          B.U90 = quantile(B,probs=0.95,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
                                                                                      B.L90 = quantile(B,probs=0.05,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
                                                     Rec.mn = median(Rec,na.rm=T),      Rec.U90 = quantile(Rec,probs=0.95,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),
@@ -658,7 +659,7 @@ if(save.results == T)
                                                     RPS.mn = median(rps,na.rm=T),      RPS.U90 = quantile(rps,probs=0.95,na.rm=T),       RPS.U50 = quantile(rps,probs=0.75,na.rm=T),
                                                                                       RPS.L90 = quantile(rps,probs=0.05,na.rm=T),       RPS.L50 = quantile(rps,probs=0.25,na.rm=T))
     
-    Equilib.dat <-    MSY.summarized %>% dplyr::filter(year >= last.yrs) %>% dplyr::group_by(F.scenario) %>% 
+    Equilib.dat <-    MSY.summarized %>% dplyr::filter(year >= n_y/2) %>% dplyr::group_by(F.scenario) %>% 
                                          dplyr::summarise(B.mn = median(B.mn,na.rm=T),         B.U90 = median(B.U90,na.rm=T),        B.U50 = median(B.U50,na.rm=T),
                                                                                                B.L90 = median(B.L90,na.rm=T),        B.L50 = median(B.L50,na.rm=T),
                                                           Catch.mn = median(Catch.mn,na.rm=T), Catch.U90 = median(Catch.U90,na.rm=T),Catch.U50 = median(Catch.U50,na.rm=T),
@@ -847,7 +848,8 @@ if(save.results == T)
   {
     # Summarize the data to make a nice time series plot.
     # Note that I want the mean catch here, because that's really what people are interested in for this...
-    HCR.summarized <- Exp.res %>% dplyr::group_by(year) %>% 
+    # This is summarizing the final 100 years of the simulations
+    HCR.summarized <- Exp.res %>% dplyr::filter(year >= n_y/2) %>% dplyr::group_by(year) %>% 
                                   dplyr::summarise(B.mn = median(B,na.rm=T),         B.U90 = quantile(B,probs=0.95,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
                                                                                    B.L90 = quantile(B,probs=0.05,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
                                                   Rec.mn = median(Rec,na.rm=T),      Rec.U90 = quantile(Rec,probs=0.95,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),

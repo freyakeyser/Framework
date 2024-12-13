@@ -220,7 +220,7 @@ if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(s
 
 
 \newpage
-```{r sab-mod-reals-rps-fig, echo=F, fig.cap="MSY simulation time series projections of the biomass in SFA 25A when harvesting occurs at the target exploitation rate.  The 20\\% $B_0$ LRP ($LRP_{20}$) (solid red line) and the 40\\% $B_0$ USR ($USR_{40}$) (solid blue line) are shown for reference. Each grey line represents one realization of the 5000 simulations."}
+```{r sab-mod-reals-rps-fig, echo=F, fig.cap="MSY simulation time series projections of the fully-recruited biomass in SFA 25A when harvesting occurs at the target exploitation rate.  The 20\\% $B_0$ LRP ($LRP_{20}$) (solid red line) and the 40\\% $B_0$ USR ($USR_{40}$) (solid blue line) are shown for reference. Each grey line represents one realization of the 5000 simulations."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
 ```

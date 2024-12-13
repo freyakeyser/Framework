@@ -1,6 +1,5 @@
 ```{r indices-analysis,include=F,warning=F}
 # Get the median, maximum, and maximum 3 year rolling mean, then get the LRP and USR from those
-n_sims <- n_sims
 # SFA 25A
 surv.25a <- survey.obj$Sab$model.dat
 surv.25a <- surv.25a |> collapse::fsubset(year >=1994)

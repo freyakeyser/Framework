@@ -217,7 +217,7 @@ qR <- 0.33#
 n_y <- 200
 n_sims <- 10 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
 # Run the simulations or load existing results
-run.sims <- T
+run.sims <- F
 # How far back into the time series do you want to use for summarizing RP and HCR. Using 25 would take the last 25 years of the simulations to do this.
 last.yrs <- 100
 bbn.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
