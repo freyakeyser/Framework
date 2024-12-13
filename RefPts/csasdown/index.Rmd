@@ -215,6 +215,7 @@ qR <- 0.33#
 
 # For the simulations
 n_y <- 200
+last.yrs <- n_y/2 # Using the second half of the data.
 n_sims <- 10 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
 # Run the simulations or load existing results
 run.sims <- F

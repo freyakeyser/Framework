@@ -481,9 +481,10 @@ bbn.mod.rp.plt <- ggplot(bbn.prod.dat) + geom_line(aes(x=Year,y=B/1000)) +
 
 save_plot(bbn.mod.rp.plt,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_RPs.png"),base_height = 8.5,base_width=8.5)
 
+bbn.med.B.4.plt <- bbn.res.4.plts |> collapse::fgroup_by(year) |> collapse::fsummarise(B.med = median(B,na.rm=T))
 
-  
 bbn.mod.real.plt <- ggplot(bbn.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
+                       geom_line(data = bbn.med.B.4.plt,aes(x=year,y=B.med/1000),color='orange',size=1.25) + 
                        geom_hline(yintercept = bbn.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
                        #geom_hline(yintercept = bbn.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
                        #geom_hline(yintercept = bbn.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
