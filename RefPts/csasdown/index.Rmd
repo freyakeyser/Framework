@@ -209,8 +209,10 @@ bbn.model.yrs <- years
 sab.model.yrs <- years
 R.size <- "75"
 FR.size <- "90"
-num.knots <- 20 # Going to test 10, 15, and 20
-qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+num.knots <- 20 # 
+qR <- 0.33# 
+
+
 # For the simulations
 n_y <- 200
 n_sims <- 10 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)

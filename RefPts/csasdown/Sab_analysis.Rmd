@@ -505,6 +505,8 @@ sab.mod.rp.plt <- ggplot(sab.prod.dat) + geom_line(aes(x=Year,y=B/1000)) +
 save_plot(sab.mod.rp.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"),base_height = 8.5,base_width=8.5)
 
 
+#ADD THE MEDIAN LINE TO THIS FIGURE!!!!!!!
+
 sab.mod.real.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
                        geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
                        #geom_hline(yintercept = sab.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +

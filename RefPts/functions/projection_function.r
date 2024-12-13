@@ -636,9 +636,9 @@ if(save.results == T)
   
   # Now make the figures!
   # Set the alpha level for the lines on the figures showing the individual realizations.
-  if(n_sims <= 10) alphs <- 0.5
-  if(n_sims > 10) alphs <- 0.1
-  if(n_sims > 100) alphs <- 1/255
+  if(n_sim <= 10) alphs <- 0.5
+  if(n_sim > 10) alphs <- 0.1
+  if(n_sim > 100) alphs <- 1/255
   
   if(is.null(HCR.sim))
   {

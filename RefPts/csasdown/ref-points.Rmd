@@ -209,8 +209,10 @@ bbn.model.yrs <- years
 sab.model.yrs <- years
 R.size <- "75"
 FR.size <- "90"
-num.knots <- 20 # Going to test 10, 15, and 20
-qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
+num.knots <- 20 # 
+qR <- 0.33# 
+
+
 # For the simulations
 n_y <- 200
 n_sims <- 10 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
@@ -325,7 +327,7 @@ csl: `r csl`
 
 ```{r indices-analysis,include=F,warning=F}
 # Get the median, maximum, and maximum 3 year rolling mean, then get the LRP and USR from those
-
+n_sims <- n_sims
 # SFA 25A
 surv.25a <- survey.obj$Sab$model.dat
 surv.25a <- surv.25a |> collapse::fsubset(year >=1994)
@@ -1236,6 +1238,8 @@ sab.mod.rp.plt <- ggplot(sab.prod.dat) + geom_line(aes(x=Year,y=B/1000)) +
 
 save_plot(sab.mod.rp.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"),base_height = 8.5,base_width=8.5)
 
+
+#ADD THE MEDIAN LINE TO THIS FIGURE!!!!!!!
 
 sab.mod.real.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
                        geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
@@ -2388,7 +2392,7 @@ if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(s
 
 
 \newpage
-```{r sab-mod-reals-rps-fig, echo=F, fig.cap="MSY simulation time series projections of the biomass in SFA 25A when harvesting occurs at the target exploitation rate.  The 20\\% $B_0$ LRP ($LRP_{20}$) (solid red line) and the 40\\% $B_0$ USR ($USR_{40}$) (solid blue line) are shown for reference. Each grey line represents one realization of the simulations."}
+```{r sab-mod-reals-rps-fig, echo=F, fig.cap="MSY simulation time series projections of the biomass in SFA 25A when harvesting occurs at the target exploitation rate.  The 20\\% $B_0$ LRP ($LRP_{20}$) (solid red line) and the 40\\% $B_0$ USR ($USR_{40}$) (solid blue line) are shown for reference. Each grey line represents one realization of the 5000 simulations."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
 ```
