@@ -139,12 +139,12 @@ opts <- options(knitr.kable.NA = "")
 
 
 ```{r sfa-25-bssm-param-table,include=T,echo=F}
-csas_table(sab.bssm.parm.table,caption="Parameter predictions and their standard errors from BSSM in SFA-25a for parameters which do not vary annually. $K$ is a biomass scaling parameter that is used to assist with model convergence. $S$ is referred to as the 'dissolution rate' for the clapper model. The precision parameter for the fully-recruited clapper process equation is $\\frac{1}{\\kappa_{tau}^2}$, while $\\frac{1}{\\kappa_{rho}^2}$ is the precision parameter for the recruit clapper process equation. The catchabilty is $q$ and the process error standard deviation is $\\sigma$.")
+csas_table(sab.bssm.parm.table,caption="Parameter predictions and their standard errors from BSSM in SFA-25a for parameters which do not vary annually. $K$ is a biomass scaling parameter that is used to assist with model convergence. $S$ is referred to as the 'clapper catchability' for the clapper model. The precision parameter for the fully-recruited clapper process equation is $\\frac{1}{\\kappa_{tau}^2}$, while $\\frac{1}{\\kappa_{rho}^2}$ is the precision parameter for the recruit clapper process equation. The catchabilty is $q$ and the process error standard deviation is $\\sigma$.")
 ```
 
 \newpage
 ```{r sfa-26-bssm-param-table,include=T,echo=F}
-csas_table(bbn.bssm.parm.table,caption="Parameter predictions and their standard errors from BSSM in SFA-65a for parameters which do not vary annually. $K$ is a biomass scaling parameter that is used to assist with model convergence. $S$ is referred to as the 'dissolution rate' for the clapper model. The precision parameter for the fully-recruited clapper process equation is $\\frac{1}{\\kappa_{tau}^2}$, while $\\frac{1}{\\kappa_{rho}^2}$ is the precision parameter for the recruit clapper process equation. The catchabilty is $q$ and the process error standard deviation is $\\sigma$.")
+csas_table(bbn.bssm.parm.table,caption="Parameter predictions and their standard errors from BSSM in SFA-65a for parameters which do not vary annually. $K$ is a biomass scaling parameter that is used to assist with model convergence. $S$ is referred to as the 'clapper catchability' for the clapper model. The precision parameter for the fully-recruited clapper process equation is $\\frac{1}{\\kappa_{tau}^2}$, while $\\frac{1}{\\kappa_{rho}^2}$ is the precision parameter for the recruit clapper process equation. The catchabilty is $q$ and the process error standard deviation is $\\sigma$.")
 ```
 
 

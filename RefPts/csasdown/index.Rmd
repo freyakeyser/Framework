@@ -22,7 +22,8 @@ cat_no: ""
 french_region: "Région des Maritimes"
 citation_other_language: "Keith, D., Keyser, F., McDonald, R., et Pearo Drew, T.  L'évaluation de petoncles dans les zones de pêche"
 abstract: |
-  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). Index based Limit Reference Points (LRPs) will be proposed for each of these SFA's and model based LRPs will be proposed for the two areas with approved stock assessment models (SFA 25A and SFA 26A). The biomass indicies used for the development of the LRPs were approved during the first of three meetings which focused on the data inputs for each of these SFAs. The stock assessment models for SFA 25A and SFA 26A were approved at ths second of the three meetings making up this Framework proecess.  In addition to the LRPs, candidate Removal Reference (RR) and Upper Stock Reference (USR) Points will be provided.
+  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). The survey biomass indices and relative exploitation rates used for the development of the index based reference points were approved during the first of two Canadian Science Advisory Secretariat Regional Peer Review meetings which focused on the data inputs (each of these SFAs) and model development (SFA 25A and SfA 26A). The stock assessment models and the productivity scenarios used for the maximum sustainable yield (MSY) simulations in SFA 25A and SFA 26A were also approved during this initial meeting. Survey biomass index based limit reference points (LRPs) are proposed for each of these SFA's. In addition to the survey index based LRPs, guidance on relative target ($RR_{tar}$) and limit ($RR_{lim}$) removal reference and upper stock reference points (USR) is provided for all the areas based on the survey biomass index and relative exploitation rates. In the two areas with approved stock assessment models (SFA 25A and SFA 26A), MSY simulations are used to obtain model based LRPs. Guidance on target removal reference ($RR_{tar}$) and upper stock reference (USR) points are also provided using the MSY simulations for these two areas. In addition, for the two modelled areas, harvest decision rule (HDR) simulations are developed and their potential use demonstrated using the following example: 1) maintain the stock near the TRP, 2) increase the long term average removals from the fishery above the removals estimated using the optimal MSY simulation, and 3) reduce the proportion of time the stock is below the LRP when compared to the optimal MSY simulation. The HDR simulations are able to identify a scenario in which all three of these management objectives were met, with notable increases in the long-term median removals for both areas and declines in the proportion of the time the stocks are below the LRP. The HDR simulations represent a methodology by which the impact of various management objectives could be explored; this could include the development of limit removal reference (RR_lim) and target reference points (TRP).
+  
 french_abstract: |
   NULL
   
@@ -107,6 +108,7 @@ opts_chunk$set(
   fig.align = fig_align,
   fig.pos = fig_pos
   
+
 )
 ```
 
@@ -128,7 +130,14 @@ library(ggthemes)
 library(cowplot)
 library(forecast)
 library(zoo)
+library(robustbase)
+library(mvtnorm)
+library(zoo)
+library(officer)
 
+# This enables text highlighting
+#ft <- officer::fp_text(shading.color = "yellow")
+#word_spec <- function(x, prop = ft) ftext(text = toString(x) ,prop =  ft)
 
 funs <- c("https://raw.githubusercontent.com/freyakeyser/rosetta_shell/main/terms.csv")
 # Now run through a quick loop to load each one, just be sure that your working directory is read/write!
@@ -140,7 +149,8 @@ for(fun in funs)
 }
 # A not rosetta loop
 funs <- c("https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/pectinid_projector_sf.R",
-          "https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/convert_inla_mesh_to_sf.R"
+          "https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/convert_inla_mesh_to_sf.R",
+          "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/github_spatial_import.R"
           )
 # Now run through a quick loop to load each one, just be sure that your working directory is read/write!
 for(fun in funs) 
@@ -149,6 +159,7 @@ for(fun in funs)
   source(paste0(getwd(),"/",basename(fun)))
   file.remove(paste0(getwd(),"/",basename(fun)))
 }
+
 
 params <- NULL
 params$bank <- c("Sab", "BBn")
@@ -172,31 +183,46 @@ mod.loc <- "D:/Framework/SFA_25_26_2024/Model/"
 fun.loc <-"D:/Github/Framework/RefPts/functions/"
 rp.loc <- "D:/Framework/SFA_25_26_2024/RefPts/"
 
-theme_set(theme_few(base_size = 22))
-u.colors <- c("#FFD500","#005BBB")
-
-
-
+# These here while testing...
 # Functions we need to source for this to all work
 source(paste0(fun.loc,"projection_function.r"))
 source(paste0(fun.loc,"Density_dependence_function.R"))
 source(paste0(fun.loc,"breakpoint_function.R"))
 source(paste0(fun.loc,"correlation_function.R"))
 
+# Plot locations
+#years <- 1994:2022 # need this twice b/c of overwritting...
+plot.index.loc <- paste0(rp.loc,"Figures/Indices/") # For the biomass index methods
+plot.sab.rp.mod.loc <- paste0(rp.loc,"Figures/Sab/")
+res.sab.rp.mod.loc <- paste0(rp.loc,"Results/Sab/")
+plot.bbn.rp.mod.loc <- paste0(rp.loc,"Figures/BBn/")
+res.bbn.rp.mod.loc <- paste0(rp.loc,"Results/BBn/")
+
+load(paste0(rp.loc,"Data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata"))
+
+# Load in the fishery data, might wanna tweak where this lives, but does need to be not anywhere public
+load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
+
 # Model run parameters
 years <- 1994:2022
+bbn.model.yrs <- years
+sab.model.yrs <- years
 R.size <- "75"
 FR.size <- "90"
 num.knots <- 20 # Going to test 10, 15, and 20
 qR <- 0.33# This is for TMB (log recruit catchability) testing catchability of 0.5, test 0.3 and 0.1
-# Various explorations of the g models.
-
-# # If running with SEBDAM this is what ya use.
-
+# For the simulations
+n_y <- 200
+n_sims <- 10 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
+# Run the simulations or load existing results
+run.sims <- T
+# How far back into the time series do you want to use for summarizing RP and HCR. Using 25 would take the last 25 years of the simulations to do this.
+last.yrs <- 100
 bbn.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
 sab.select <- paste0("Sab_SS_model/R_",R.size,"_FR_",FR.size,"/Sable_SSmodel_results.RData")
-bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/R_75_FR_90/SEAM_",bbn.select,"/")
-sab.plot.loc <- paste0(rp.loc,"Figures/Sab/R_75_FR_90/BSSM/")
+#bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/R_75_FR_90/SEAM_",bbn.select,"/")
+theme_set(theme_few(base_size = 18))
+u.colors <- c("#FFD500","#005BBB")
 
 bbn.mod <- readRDS(paste0(mod.loc,"Results/BBn/R_75_FR_90/BBn_SEAM_model_output_",bbn.select,".Rds"))
 
@@ -209,8 +235,13 @@ load(paste0(mod.loc,"Results/",sab.select))
 sab.mod <- DD.out
 # Finally, grab the raw survey data so we can use those indices for this.
 
-load(paste0(rp.loc,"Data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata"))
+# Need these here b/c of data object loading causing pain
+sab.plot.loc <- paste0(rp.loc,"Figures/Sab/")
+bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/")
 
+
+
+# The Sable HCRs
 
 
 ```

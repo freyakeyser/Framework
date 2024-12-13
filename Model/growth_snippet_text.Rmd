@@ -183,5 +183,29 @@ ggplot(g.proper) + geom_point(aes(x=year,y=g.proper),color="#FFD500",shape =21,s
                    geom_line(aes(x=year,y=gR.proper),color="#005BBB",linewidth=2) + 
                    facet_wrap(~bank,nrow=2,) + ylim(c(0,NA)) +
                    theme_few(base_size = 16) + ylab("Growth rate")
+
+# Compare that to the old growth estimates...
+
+old.bbn.mod <- readRDS(file = "D:/Framework/SFA_25_26_2024/Model/Results/BBn/R_75_FR_90/archive/BBn_SEAM_model_output_1994_2022_vary_m_m0_1_qR_0.5_10_knots.Rds")
+old.sab.mod <- readRDS(file = "D:/Framework/SFA_25_26_2024/Model/Results/Sab/R_75_FR_90/archive/Sab_SEAM_model_output_1994_2022_vary_m__qR_0.33_10_knots_g_original.Rds")
+
+g.old.bbn <- data.frame(year = 1994:2022, g.old=c(old.bbn.mod$obj$env$data$gI),gR.old = c(old.bbn.mod$obj$env$data$gR),bank = rep("SFA 26A",length(1994:2022)))
+g.old.sab <- data.frame(year = 1994:2023, g.old=c(old.sab.mod$obj$env$data$gI),gR.old = c(old.sab.mod$obj$env$data$gR),bank = rep("SFA 25A",length(1994:2023)))
+
+g.old <- rbind(g.old.bbn,g.old.sab)
+
+
+g.combo <- left_join(g.proper,g.old,by=c("bank","year"))
+
+g.combo$g.dif <- g.combo$g.old - g.combo$g.proper
+g.combo$g.per.dif <- 100*g.combo$g.dif/g.combo$g.proper
+g.combo$gR.dif <- g.combo$gR.old - g.combo$gR.proper
+g.combo$gR.per.dif <- 100*g.combo$gR.dif/g.combo$gR.proper
+
+
+g.combo |> collapse::fgroup_by(bank) |> collapse::fsummarise(pdiff = mean(g.per.dif,na.rm=T))
+g.combo |> collapse::fgroup_by(bank) |> collapse::fsummarise(pdiff = mean(gR.per.dif,na.rm=T))
+
+
 ```
 
