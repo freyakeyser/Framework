@@ -643,32 +643,28 @@ if(save.results == T)
   if(is.null(HCR.sim))
   {
     MSY.summarized <- Exp.res %>% dplyr::group_by(F.scenario,year) %>% 
-                                   dplyr::summarise(B.mn = median(B,na.rm=T),          B.U95 = quantile(B,probs=0.975,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
-                                                                                     B.L95 = quantile(B,probs=0.025,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
-                                                    Rec.mn = median(Rec,na.rm=T),      Rec.U95 = quantile(Rec,probs=0.975,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),
-                                                                                     Rec.L95 = quantile(Rec,probs=0.025,na.rm=T),       Rec.L50 = quantile(Rec,probs=0.25,na.rm=T),
-                                                    Catch.mn = median(Catch,na.rm=T),  Catch.U95 = quantile(Catch,probs=0.975,na.rm=T),   Catch.U50 = quantile(Catch,probs=0.75,na.rm=T),
-                                                                                     Catch.L95 = quantile(Catch,probs=0.025,na.rm=T),   Catch.L50 = quantile(Catch,probs=0.25,na.rm=T),
-                                                    M.mn = median(M,na.rm=T),          M.U95 = quantile(M,probs=0.975,na.rm=T),           M.U50 = quantile(M,probs=0.75,na.rm=T),
-                                                                                     M.L95 = quantile(M,probs=0.025,na.rm=T),           M.L50 = quantile(M,probs=0.25,na.rm=T),
-                                                    F.mn = median(F.dec.table,na.rm=T),F.U95 = quantile(F.dec.table,probs=0.975,na.rm=T), M.U50 = quantile(F.dec.table,probs=0.75,na.rm=T),
-                                                                                     F.L95 = quantile(F.dec.table,probs=0.025,na.rm=T), M.L50 = quantile(F.dec.table,probs=0.25,na.rm=T),
-                                                    SP.mn = median(SP,na.rm=T),        SP.U95 = quantile(SP,probs=0.975,na.rm=T),         SP.U50 = quantile(SP,probs=0.75,na.rm=T),
-                                                                                     SP.L95 = quantile(SP,probs=0.025,na.rm=T),         SP.L50 = quantile(SP,probs=0.25,na.rm=T),
-                                                    RPS.mn = median(rps,na.rm=T),      RPS.U95 = quantile(rps,probs=0.975,na.rm=T),       RPS.U50 = quantile(rps,probs=0.75,na.rm=T),
-                                                                                      RPS.L95 = quantile(rps,probs=0.025,na.rm=T),       RPS.L50 = quantile(rps,probs=0.25,na.rm=T))
+                                   dplyr::summarise(B.mn = median(B,na.rm=T),          B.U90 = quantile(B,probs=0.95,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
+                                                                                     B.L90 = quantile(B,probs=0.05,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
+                                                    Rec.mn = median(Rec,na.rm=T),      Rec.U90 = quantile(Rec,probs=0.95,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),
+                                                                                     Rec.L90 = quantile(Rec,probs=0.05,na.rm=T),       Rec.L50 = quantile(Rec,probs=0.25,na.rm=T),
+                                                    Catch.mn = median(Catch,na.rm=T),  Catch.U90 = quantile(Catch,probs=0.95,na.rm=T),   Catch.U50 = quantile(Catch,probs=0.75,na.rm=T),
+                                                                                     Catch.L90 = quantile(Catch,probs=0.05,na.rm=T),   Catch.L50 = quantile(Catch,probs=0.25,na.rm=T),
+                                                    M.mn = median(M,na.rm=T),          M.U90 = quantile(M,probs=0.95,na.rm=T),           M.U50 = quantile(M,probs=0.75,na.rm=T),
+                                                                                       M.L90 = quantile(M,probs=0.05,na.rm=T),           M.L50 = quantile(M,probs=0.25,na.rm=T),
+                                                    F.mn = median(F.dec.table,na.rm=T),F.U90 = quantile(F.dec.table,probs=0.95,na.rm=T), F.U50 = quantile(F.dec.table,probs=0.75,na.rm=T),
+                                                                                       F.L90 = quantile(F.dec.table,probs=0.05,na.rm=T), F.L50 = quantile(F.dec.table,probs=0.25,na.rm=T),
+                                                    SP.mn = median(SP,na.rm=T),        SP.U90 = quantile(SP,probs=0.95,na.rm=T),         SP.U50 = quantile(SP,probs=0.75,na.rm=T),
+                                                                                     SP.L90 = quantile(SP,probs=0.05,na.rm=T),         SP.L50 = quantile(SP,probs=0.25,na.rm=T),
+                                                    RPS.mn = median(rps,na.rm=T),      RPS.U90 = quantile(rps,probs=0.95,na.rm=T),       RPS.U50 = quantile(rps,probs=0.75,na.rm=T),
+                                                                                      RPS.L90 = quantile(rps,probs=0.05,na.rm=T),       RPS.L50 = quantile(rps,probs=0.25,na.rm=T))
     
-    Equilib.dat <-    MSY.summarized %>% dplyr::filter(year >= 75) %>% dplyr::group_by(F.scenario) %>% 
-                                         dplyr::summarise(B.mn = median(B.mn,na.rm=T),         B.U95 = median(B.U95,na.rm=T),        B.U50 = median(B.U50,na.rm=T),
-                                                                                               B.L95 = median(B.L95,na.rm=T),        B.L50 = median(B.L50,na.rm=T),
-                                                          Catch.mn = median(Catch.mn,na.rm=T), Catch.U95 = median(Catch.U95,na.rm=T),Catch.U50 = median(Catch.U50,na.rm=T),
-                                                                                               Catch.L95 = median(Catch.L95,na.rm=T),Catch.L50 = median(Catch.L50,na.rm=T),
-                                                          Rec.mn = median(Rec.mn,na.rm=T),     Rec.U95 = median(Rec.U95,na.rm=T),    Rec.U50 = median(Rec.U50,na.rm=T),
-                                                                                               Rec.L95 = median(Rec.L95,na.rm=T),    Rec.L50 = median(Rec.L50,na.rm=T))
-    
-    
-    
-  
+    Equilib.dat <-    MSY.summarized %>% dplyr::filter(year >= last.yrs) %>% dplyr::group_by(F.scenario) %>% 
+                                         dplyr::summarise(B.mn = median(B.mn,na.rm=T),         B.U90 = median(B.U90,na.rm=T),        B.U50 = median(B.U50,na.rm=T),
+                                                                                               B.L90 = median(B.L90,na.rm=T),        B.L50 = median(B.L50,na.rm=T),
+                                                          Catch.mn = median(Catch.mn,na.rm=T), Catch.U90 = median(Catch.U90,na.rm=T),Catch.U50 = median(Catch.U50,na.rm=T),
+                                                                                               Catch.L90 = median(Catch.L90,na.rm=T),Catch.L50 = median(Catch.L50,na.rm=T),
+                                                          Rec.mn = median(Rec.mn,na.rm=T),     Rec.U90 = median(Rec.U90,na.rm=T),    Rec.U50 = median(Rec.U50,na.rm=T),
+                                                                                               Rec.L90 = median(Rec.L90,na.rm=T),    Rec.L50 = median(Rec.L50,na.rm=T))
     
     # Get Biomass per Recruit and Yield per Recruit
     Equilib.dat$BPR <- Equilib.dat$B.mn/Equilib.dat$Rec.mn
@@ -780,32 +776,38 @@ if(save.results == T)
   ################# estimates with 95% CI bands
   #### Biomass
   B.ts <- ggplot(MSY.summarized,aes(x=year,y=B.mn/1000)) + geom_line() + facet_wrap(~F.scenario) +
-                                                      geom_ribbon(aes(x=year,ymax = B.U50/1000,ymin=B.L50/1000),fill='firebrick2',alpha=0.2) + 
-                                                       xlab("") + ylab("Biomass (metric tonnes x 1000)")
+                                                           geom_ribbon(aes(x=year,ymax = B.U90/1000,ymin=B.L90/1000),fill='firebrick2',alpha=0.2) + 
+                                                           geom_ribbon(aes(x=year,ymax = B.U50/1000,ymin=B.L50/1000),fill='blue',alpha=0.2) +
+                                                           xlab("") + ylab("Biomass (metric tonnes x 1000)")
   ggsave(paste0(plot_sims,"B_mn_ts.png"),plot=B.ts,height=15,width=15)
   # Recruits
   Rec.ts <- ggplot(MSY.summarized,aes(x=year,y=Rec.mn/1000)) + geom_line() + facet_wrap(~F.scenario) +
-                                                          geom_ribbon(aes(x=year,ymax = Rec.U95/1000,ymin=Rec.L95/1000),fill='firebrick2',alpha=0.2) + 
-                                                           xlab("") + ylab("Recruitment (metric tonnes x 1000)")
+                                                               geom_ribbon(aes(x=year,ymax = Rec.U90/1000,ymin=Rec.L90/1000),fill='firebrick2',alpha=0.2) + 
+                                                               geom_ribbon(aes(x=year,ymax = Rec.U50/1000,ymin=Rec.L50/1000),fill='blue',alpha=0.2) + 
+                                                               xlab("") + ylab("Recruitment (metric tonnes x 1000)")
   ggsave(paste0(plot_sims,"R_mn_ts.png"),plot=Rec.ts,height=15,width=15)
   # Catch
   Catch.ts <- ggplot(MSY.summarized,aes(x=year,y=Catch.mn)) + geom_line() + facet_wrap(~F.scenario) +
-                                                              geom_ribbon(aes(x=year,ymax = Catch.U95,ymin=Catch.L95),fill='firebrick2',alpha=0.2) + 
-                                                               xlab("") + ylab("Catch (metric tonnes)")
+                                                              geom_ribbon(aes(x=year,ymax = Catch.U90,ymin=Catch.L90),fill='firebrick2',alpha=0.2) + 
+                                                              geom_ribbon(aes(x=year,ymax = Catch.U50,ymin=Catch.L50),fill='blue',alpha=0.2) + 
+                                                              xlab("") + ylab("Catch (metric tonnes)")
   ggsave(paste0(plot_sims,"Catch_mn_ts.png"),plot=Catch.ts,height=15,width=15)
   # Natural mortality
   M.ts <- ggplot(MSY.summarized,aes(x=year,y=M.mn)) + geom_line() + facet_wrap(~F.scenario) +
-                                                      geom_ribbon(aes(x=year,ymax = M.U95,ymin=M.L95),fill='firebrick2',alpha=0.2) + 
+                                                      geom_ribbon(aes(x=year,ymax = M.U90,ymin=M.L90),fill='firebrick2',alpha=0.2) + 
+                                                      geom_ribbon(aes(x=year,ymax = M.U50,ymin=M.L50),fill='blue',alpha=0.2) + 
                                                        xlab("") + ylab("Natural mortality (instantaneous)")
   ggsave(paste0(plot_sims,"M_mn_ts.png"),plot=M.ts,height=15,width=15)
   # Fishing mortality
   F.ts <- ggplot(MSY.summarized,aes(x=year,y=F.mn)) + geom_line() + facet_wrap(~F.scenario) +
-                                                      geom_ribbon(aes(x=year,ymax = F.U95,ymin=F.L95),fill='firebrick2',alpha=0.2) + 
-                                                       xlab("") + ylab("Fishing mortality (proportional)")
+                                                      geom_ribbon(aes(x=year,ymax = F.U90,ymin=F.L90),fill='firebrick2',alpha=0.2) + 
+                                                      geom_ribbon(aes(x=year,ymax = F.U50,ymin=F.L50),fill='blue',alpha=0.2) + 
+                                                       xlab("") + ylab("Exploitation rate")
   ggsave(paste0(plot_sims,"F_mn_ts.png"),plot=F.ts,height=15,width=15)
   # Surplus Production
   SP.ts <- ggplot(MSY.summarized,aes(x=year,y=SP.mn)) + geom_line() + facet_wrap(~F.scenario) +
-                                                        geom_ribbon(aes(x=year,ymax = SP.U95,ymin=SP.L95),fill='firebrick2',alpha=0.2) + 
+                                                        geom_ribbon(aes(x=year,ymax = SP.U90,ymin=SP.L90),fill='firebrick2',alpha=0.2) + 
+                                                        geom_ribbon(aes(x=year,ymax = SP.U50,ymin=SP.L50),fill='blue',alpha=0.2) + 
                                                          xlab("") + ylab("Surplus Production (metric tonnes)")
   ggsave(paste0(plot_sims,"SP_mn_ts.png"),plot=SP.ts,height=15,width=15)
   
@@ -816,17 +818,19 @@ if(save.results == T)
   
   # Biomass Equilibrium
   B.equil.plt<- ggplot(Equilib.dat,aes(x=F.scenario,y=B.mn/1000)) + geom_point()+ geom_line()+
-                                                               geom_ribbon(aes(x=F.scenario,ymin=B.L95/1000, ymax=B.U95/1000),alpha=0.05,fill='firebrick2') +
-                                                               ylab("Equilibrium Biomass (metric tonnes x 1000)") + xlab("Explotation Rate (proportional)")
+                                                               geom_ribbon(aes(x=F.scenario,ymin=B.L90/1000, ymax=B.U90/1000),alpha=0.05,fill='firebrick2') +
+                                                               geom_ribbon(aes(x=F.scenario,ymin=B.L50/1000, ymax=B.U50/1000),alpha=0.05,fill='blue') +
+                                                               ylab("Equilibrium Biomass (metric tonnes x 1000)") + xlab("Explotation Rate")
   ggsave(paste0(plot_sims,"B_equilibrum.png"),plot=B.equil.plt,height=8,width=12)
   # Catch Equilibrium
   C.equil.plt<-ggplot(Equilib.dat,aes(x=F.scenario,y=Catch.mn)) + geom_point()+ geom_line()+
-                                                                  geom_ribbon(aes(x=F.scenario,ymin=Catch.L95, ymax=Catch.U95),alpha=0.05,fill='firebrick2') +
-                                                                  ylab("Equilibrium Catch (metric tonnes)")  + xlab("Explotation Rate (proportional)")
+                                                                  geom_ribbon(aes(x=F.scenario,ymin=Catch.L90, ymax=Catch.U90),alpha=0.05,fill='firebrick2') +
+                                                                  geom_ribbon(aes(x=F.scenario,ymin=Catch.L50, ymax=Catch.U50),alpha=0.05,fill='blue') +
+                                                                  ylab("Equilibrium Catch (metric tonnes)")  + xlab("Explotation Rate")
   ggsave(paste0(plot_sims,"Catch_equilibrium.png"),plot=C.equil.plt,height=8,width=12)
   # Biomass per Recruit (Biomass)
   BPR.equil.plt<-ggplot(Equilib.dat,aes(x=F.scenario,y=BPR)) + geom_point()+ geom_line()+
-                                                               ylab("Biomass per Recruit (Biomass)")  + xlab("Explotation Rate (proportional)")
+                                                               ylab("Biomass per Recruit (Biomass)")  + xlab("Explotation Rate")
   ggsave(paste0(plot_sims,"BPR_equilibrium.png"),plot=BPR.equil.plt,height=8,width=12)
   
   
@@ -839,23 +843,23 @@ if(save.results == T)
   
   
   
-  if(!is.null(HCR.sim))
+  if(!is.null(HCR.sim)) 
   {
     # Summarize the data to make a nice time series plot.
     # Note that I want the mean catch here, because that's really what people are interested in for this...
     HCR.summarized <- Exp.res %>% dplyr::group_by(year) %>% 
-                                  dplyr::summarise(B.mn = median(B,na.rm=T),         B.U95 = quantile(B,probs=0.975,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
-                                                                                   B.L95 = quantile(B,probs=0.025,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
-                                                  Rec.mn = median(Rec,na.rm=T),      Rec.U95 = quantile(Rec,probs=0.975,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),
-                                                                                   Rec.L95 = quantile(Rec,probs=0.025,na.rm=T),       Rec.L50 = quantile(Rec,probs=0.25,na.rm=T),
-                                                  Catch.mn = mean(Catch,na.rm=T),  Catch.U95 = quantile(Catch,probs=0.975,na.rm=T),   Catch.U50 = quantile(Catch,probs=0.75,na.rm=T),
-                                                                                   Catch.L95 = quantile(Catch,probs=0.025,na.rm=T),   Catch.L50 = quantile(Catch,probs=0.25,na.rm=T),
-                                                  M.mn = median(M,na.rm=T),          M.U95 = quantile(M,probs=0.975,na.rm=T),           M.U50 = quantile(M,probs=0.75,na.rm=T),
-                                                                                   M.L95 = quantile(M,probs=0.025,na.rm=T),           M.L50 = quantile(M,probs=0.25,na.rm=T),
-                                                  F.mn = median(F.dec.table,na.rm=T),F.U95 = quantile(F.dec.table,probs=0.975,na.rm=T), M.U50 = quantile(F.dec.table,probs=0.75,na.rm=T),
-                                                                                   F.L95 = quantile(F.dec.table,probs=0.025,na.rm=T), M.L50 = quantile(F.dec.table,probs=0.25,na.rm=T),
-                                                  SP.mn = median(SP,na.rm=T),        SP.U95 = quantile(SP,probs=0.975,na.rm=T),         SP.U50 = quantile(SP,probs=0.75,na.rm=T),
-                                                                                   SP.L95 = quantile(SP,probs=0.025,na.rm=T),         SP.L50 = quantile(SP,probs=0.25,na.rm=T))
+                                  dplyr::summarise(B.mn = median(B,na.rm=T),         B.U90 = quantile(B,probs=0.95,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
+                                                                                   B.L90 = quantile(B,probs=0.05,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
+                                                  Rec.mn = median(Rec,na.rm=T),      Rec.U90 = quantile(Rec,probs=0.95,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),
+                                                                                   Rec.L90 = quantile(Rec,probs=0.05,na.rm=T),       Rec.L50 = quantile(Rec,probs=0.25,na.rm=T),
+                                                  Catch.mn = mean(Catch,na.rm=T),  Catch.U90 = quantile(Catch,probs=0.95,na.rm=T),   Catch.U50 = quantile(Catch,probs=0.75,na.rm=T),
+                                                                                   Catch.L90 = quantile(Catch,probs=0.05,na.rm=T),   Catch.L50 = quantile(Catch,probs=0.25,na.rm=T),
+                                                  M.mn = median(M,na.rm=T),          M.U90 = quantile(M,probs=0.95,na.rm=T),           M.U50 = quantile(M,probs=0.75,na.rm=T),
+                                                                                   M.L90 = quantile(M,probs=0.05,na.rm=T),           M.L50 = quantile(M,probs=0.25,na.rm=T),
+                                                  F.mn = median(F.dec.table,na.rm=T),F.U90 = quantile(F.dec.table,probs=0.95,na.rm=T), M.U50 = quantile(F.dec.table,probs=0.75,na.rm=T),
+                                                                                   F.L90 = quantile(F.dec.table,probs=0.05,na.rm=T), M.L50 = quantile(F.dec.table,probs=0.25,na.rm=T),
+                                                  SP.mn = median(SP,na.rm=T),        SP.U90 = quantile(SP,probs=0.95,na.rm=T),         SP.U50 = quantile(SP,probs=0.75,na.rm=T),
+                                                                                   SP.L90 = quantile(SP,probs=0.05,na.rm=T),         SP.L50 = quantile(SP,probs=0.25,na.rm=T))
     
     
     # Biomass realizations          
@@ -880,7 +884,8 @@ if(save.results == T)
     
     # Biomass time series
     B.ts <- ggplot(HCR.summarized,aes(x=year,y=B.mn/1000)) + geom_line() + 
-                                                        geom_ribbon(aes(x=year,ymax = B.U95/1000,ymin=B.L95/1000),fill='firebrick2',alpha=0.2) + 
+                                                        geom_ribbon(aes(x=year,ymax = B.U90/1000,ymin=B.L90/1000),fill='firebrick2',alpha=0.2) +
+                                                        geom_ribbon(aes(x=year,ymax = B.U50/1000,ymin=B.L50/1000),fill='blue',alpha=0.2) + 
                                                         geom_hline(yintercept = c(HCR.sim$LRP/1000,HCR.sim$USR/1000,HCR.sim$TRP/1000),
                                                                    color=c('firebrick2',u.colors[2],u.colors[1]),linewidth = 1.5) +
                                                          xlab("") + ylab("Biomass (metric tonnes x 1000)") 
@@ -889,8 +894,9 @@ if(save.results == T)
     
     # Catch time series 
     C.ts <- ggplot(HCR.summarized,aes(x=year,y=Catch.mn)) + geom_line() + 
-                                                            geom_ribbon(aes(x=year,ymax = Catch.U95,ymin=Catch.L95),fill='firebrick2',alpha=0.2) + 
-                                                            #geom_hline(yintercept = c(2700,7200,9000),color=c('firebrick2','green','blue')) +
+                                                            geom_ribbon(aes(x=year,ymax = Catch.U90,ymin=Catch.L90),fill='firebrick2',alpha=0.2) + 
+                                                            geom_ribbon(aes(x=year,ymax = Catch.U50,ymin=Catch.L50),fill='blue',alpha=0.2) + 
+                                                             #geom_hline(yintercept = c(2700,7200,9000),color=c('firebrick2','green','blue')) +
                                                              xlab("") + ylab("Catch (metric tonnes)") 
     ggsave(paste0(plot_sims,"C_mn_ts.png"),plot=C.ts,height=15,width=15)
     

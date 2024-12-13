@@ -45,9 +45,9 @@ fig:bbn-real-bm-hcr-fig
 fig:bbn-real-c-hcr-fig
 introduction
 methods
-reference-points
+background
 index-based-methods
-removal-reference
+relative-removal-reference
 msy-simulations
 density-dependence
 correlation
@@ -58,7 +58,7 @@ results
 productivity-and-density-dependence
 sfa-25a
 sfa-26a
-reference-points-1
+reference-points
 survey-biomass-indices
 msy-simulations-1
 hdr-simulations-1
