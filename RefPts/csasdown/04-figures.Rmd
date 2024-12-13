@@ -220,7 +220,7 @@ if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(s
 
 
 \newpage
-```{r sab-mod-reals-rps-fig, echo=F, fig.cap="MSY simulation time series projections of the fully-recruited biomass in SFA 25A when harvesting occurs at the target exploitation rate.  The 20\\% $B_0$ LRP ($LRP_{20}$) (solid red line) and the 40\\% $B_0$ USR ($USR_{40}$) (solid blue line) are shown for reference. Each grey line represents one realization of the 5000 simulations."}
+```{r sab-mod-reals-rps-fig, echo=F, fig.cap="MSY simulation time series projections of the fully-recruited biomass in SFA 25A when harvesting occurs at the target exploitation rate.  The 20\\% $B_0$ LRP ($LRP_{20}$) (solid red line) and the 40\\% $B_0$ USR ($USR_{40}$) (solid blue line) are shown for reference. Each grey line represents one realization of the 5000 simulations, and the orange line is the median of the time series."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
 ```
@@ -285,7 +285,7 @@ if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(b
 
 
 \newpage
-```{r bbn-mod-reals-rps-fig, echo=F, fig.cap="MSY Simulation time series of biomass projections in SFA 26A when harvesting occurs at the target exploitation rate.  The LRP used (solid red line) was 20\\% $B_0$ ($LRP_{20}$) and the USR (solid blue line) used was the 80\\% $B_{MSY}$ USR ($USR_{80}$). Each grey line represents one realization of the MSY simulations."}
+```{r bbn-mod-reals-rps-fig, echo=F, fig.cap="MSY Simulation time series of fully-recruited biomass projections in SFA 26A when harvesting occurs at the target exploitation rate.  The LRP used (solid red line) was 20\\% $B_0$ ($LRP_{20}$) and the USR (solid blue line) used was the 80\\% $B_{MSY}$ USR ($USR_{80}$).  Each grey line represents one realization of the 5000 simulations, and the orange line is the median of the time series."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_reals_w_RPS.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_reals_w_RPS.png"))
 ```
