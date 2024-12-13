@@ -231,6 +231,7 @@ sab.max.SSB <- floor(max(sab.prod.dat$SSB/100,na.rm=T)) * 100
 # Run projection
 if(run.sims == T)
 {
+
 # Run projection
 sab.res <- proj.mod(mods = list(bssm.mod = sab.mod),n_sim=n_sims,n_y = n_y,model=mod.4.sab,model.yrs = sab.model.yrs,
                 plot_url = plot.sab.rp.mod.loc, run = 'no_model_error', 
@@ -525,7 +526,6 @@ save_plot(sab.mod.real.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),
 ```
 
 ```{r sab-hcr-sims,include =F}
-
 # HCR specific settings
 set.seed(4)
 sab.trp.exp <- 0.05
