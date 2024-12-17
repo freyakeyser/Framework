@@ -30,49 +30,49 @@ options(tinytex.verbose = TRUE)
 
 <!-- Sable first -->
 
-```{r sab-rps-ssb-fig, echo=F, fig.cap="Relationship between RPS and adult biomass (tonnes) in SFA 25A. The Ricker model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed line represents the value used for the breakpoint analysis. The numbered points represent the year class of the recruits."}
+```{r sab-rps-ssb-fig, echo=F, fig.cap="Relationship between RPS and SSB (tonnes) in SFA 25A. The Ricker model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed line represents the value used for the breakpoint analysis. The numbered points represent the year class of the recruits."}
 if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"RPS_vs_SSB.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"RPS_vs_SSB_fr.png"))
 ```
 
 
 \newpage
-```{r sab-g-ssb-fig, echo=F, fig.cap="Relationship between fully recruited growth (top panel) and adult biomass (tonnes) and recruit growth (bottom panel) and adult biomass (tonnes) in SFA 25A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
+```{r sab-g-ssb-fig, echo=F, fig.cap="Relationship between fully recruited growth (top panel) and SSB (tonnes) and recruit growth (bottom panel) and SSB (tonnes) in SFA 25A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
 if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"Growth_vs_SSB.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"Growth_vs_SSB_fr.png"))
 ```
 
 
 \newpage
-```{r sab-m-ssb-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality (top panel) and adult biomass (tonnes) and Recruit natural mortality (bottom panel) and adult biomass (tonnes) in SFA 25A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
+```{r sab-m-ssb-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality (top panel) and SSB (tonnes) and Recruit natural mortality (bottom panel) and SSB (tonnes) in SFA 25A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
 if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"M_vs_SSB.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"M_vs_SSB_fr.png"))
 ```
 
 
 \newpage
-```{r sab-pacf-rps-fig, echo=F, fig.cap="Partial autocorrelation for RPS in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+```{r sab-pacf-rps-fig, echo=F, fig.cap="Autocorrelation for RPS in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the horizontal blue lines represent the 95\\% significance level"}
 if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"PACF_RPS.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"PACF_RPS_fr.png"))
 ```
 
 
 \newpage
-```{r sab-pacf-g-fig, echo=F, fig.cap="Partial autocorrelation for fully recruited growth (top panel) and recruit growth (bottom panel) in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+```{r sab-pacf-g-fig, echo=F, fig.cap="Autocorrelation for fully recruited growth (top panel) and recruit growth (bottom panel) in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the horizontal blue lines represent the 95\\% significance level"}
 if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"PACF_growths.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"PACF_growths_fr.png"))
 ```
 
 
 \newpage
-```{r sab-pacf-m-fig, echo=F, fig.cap="Partial autocorrelation for fully-recruited natural mortality (top panel) and recruit mortality (bottom panel) in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+```{r sab-pacf-m-fig, echo=F, fig.cap="Autocorrelation for fully-recruited natural mortality (top panel) and recruit mortality (bottom panel) in SFA 25A. The vertical black lines represent the strength of the relationship at each lag, the horizontal blue lines represent the 95\\% significance level"}
 if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"PACF_m.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"PACF_m_fr.png"))
 ```
 
 
 \newpage
-```{r sab-ccf-m-rps-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality RPS in SFA 25A. The top panel is the time series of fully-recruited natural mortality (red dashed line) and RPS (text points, the years represent the year class of the recruits). The bottom panel is the cross-correlation, here the vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+```{r sab-ccf-m-rps-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality RPS in SFA 25A. The top panel is the time series of fully-recruited natural mortality (red dashed line) and RPS (text points, the years represent the year class of the recruits). The bottom panel is the cross-correlation, here the vertical black lines represent the strength of the relationship at each lag, the horizontal blue lines represent the 95\\% significance level"}
 if(language== 'english') knitr::include_graphics(paste0(sab.plot.loc,"CCF_ts_RPS_offset_m.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"CCF_ts_RPS_offset_m.png"))
 ```
@@ -88,49 +88,49 @@ if(language== 'french') knitr::include_graphics(paste0(sab.plot.loc,"Model_vs_in
 <!-- Now for 26A -->
 
 
-```{r bbn-rps-ssb-fig, echo=F, fig.cap="Relationship between RPS and adult biomass (tonnes) in SFA 26A. The Ricker model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed line represents the value used for the breakpoint analysis. The numbered points represent the year class of the recruits."}
+```{r bbn-rps-ssb-fig, echo=F, fig.cap="Relationship between RPS and SSB (tonnes) in SFA 26A. The Ricker model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed line represents the value used for the breakpoint analysis. The numbered points represent the year class of the recruits."}
 if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"RPS_vs_SSB.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"RPS_vs_SSB_fr.png"))
 ```
 
 
 \newpage
-```{r bbn-g-ssb-fig, echo=F, fig.cap="Relationship between fully recruited growth (top panel) and adult biomass (tonnes) and recruit growth (bottom panel) and adult biomass (tonnes) in SFA 26A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
+```{r bbn-g-ssb-fig, echo=F, fig.cap="Relationship between fully recruited growth (top panel) and SSB (tonnes) and recruit growth (bottom panel) and SSB (tonnes) in SFA 26A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The numbered points represent the year."}
 if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"Growth_vs_SSB.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"Growth_vs_SSB_fr.png"))
 ```
 
 
 \newpage
-```{r bbn-m-ssb-fig, echo=F, fig.cap="Relationship between natural mortality and adult biomass (tonnes) in SFA 26A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed lines represent the values used for the breakpoint analysis. The numbered points represent the year."}
+```{r bbn-m-ssb-fig, echo=F, fig.cap="Relationship between natural mortality and SSB (tonnes) in SFA 26A. The fit of the linear model is represented by the blue line with shaded 95\\% confidence interval. The vertical red dashed lines represent the values used for the breakpoint analysis. The numbered points represent the year."}
 if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"M_vs_SSB.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"M_vs_SSB_fr.png"))
 ```
 
 
 \newpage
-```{r bbn-pacf-rps-fig, echo=F, fig.cap="Partial autocorrelation for RPS in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+```{r bbn-pacf-rps-fig, echo=F, fig.cap="Autocorrelation for RPS in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the horizontal blue lines represent the 95\\% significance level."}
 if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_RPS.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_RPS_fr.png"))
 ```
 
 
 \newpage
-```{r bbn-pacf-g-fig, echo=F, fig.cap="Partial autocorrelation for fully recruited growth (top panel) and recruit growth (bottom panel) in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+```{r bbn-pacf-g-fig, echo=F, fig.cap="Autocorrelation for fully recruited growth (top panel) and recruit growth (bottom panel) in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the horizontal blue lines represent the 95\\% significance level"}
 if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_growths.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_growths_fr.png"))
 ```
 
 
 \newpage
-```{r bbn-pacf-m-fig, echo=F, fig.cap="Partial autocorrelation for natural mortality in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+```{r bbn-pacf-m-fig, echo=F, fig.cap="Autocorrelation for natural mortality in SFA 26A. The vertical black lines represent the strength of the relationship at each lag, the horizontal blue lines represent the 95\\% significance level"}
 if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_m.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"PACF_m_fr.png"))
 ```
 
 
 \newpage
-```{r bbn-ccf-m-rps-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality RPS in SFA 26A. The top panel is the time series of natural mortality (red dashed line) and RPS (text points, the years represent the year class of the recruits). The bottom panel is the cross-correlation, here the vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level"}
+```{r bbn-ccf-m-rps-fig, echo=F, fig.cap="Relationship between fully-recruited natural mortality RPS in SFA 26A. The top panel is the time series of natural mortality (red dashed line) and RPS (text points, the years represent the year class of the recruits). The bottom panel is the cross-correlation, here the vertical black lines represent the strength of the relationship at each lag, the horizontal blue lines represent the 95\\% significance level."}
 if(language== 'english') knitr::include_graphics(paste0(bbn.plot.loc,"CCF_ts_RPS_offset_m.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"CCF_ts_RPS_offset_m.png"))
 ```
@@ -146,7 +146,7 @@ if(language== 'french') knitr::include_graphics(paste0(bbn.plot.loc,"Model_vs_in
 <!--  Here are the 3 figures tied to the Index based reference points-->
 
 
-```{r rp-bmi-fit, echo=F, fig.cap="Survey Biomass index time series (black line) for each of the areas, the geometric mean for the most recent three-years of data is represented by the thick yellow line. For each area the 30\\% of the geometric mean LRP is represented by the red dotted line, the 40\\% of geometric mean LRP was is represented by the dashed red line, and the 20\\% of the maximum three-year biomass index LRP was represented by the solid red line. The 80\\% of the geometric mean USR is represented by the dashed blue line, while the 40\\% of the maximum three-year year biomass index USR was represented by the solid blue line."}
+```{r rp-bmi-fit, echo=F, fig.cap="Survey biomass index time series (black line) for each of the areas. The geometric mean for the most recent three-years of data is represented by the thick yellow line. The LRPs are represented by the red dotted line ($B_{MSY_{30}}$), the dashed red line ($B_{MSY_{34}}$), and the solid red line ($B_{0_{20}}$). The USRs are represented by the dashed blue line ($B_{MSY_{80}}$) and the solid blue line  ($B_{0_{40}}$)."}
 if(language== 'english') knitr::include_graphics(paste0(plot.index.loc,"RPs_BM_Indices.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.index.loc,"RPs_BM_Indices_fr.png"))
 ```
@@ -170,21 +170,21 @@ if(language== 'french') knitr::include_graphics(paste0(plot.index.loc,"GEM_BM_In
 
 
 \newpage
-```{r sab-sim-acfs-fig, echo=F, fig.cap="Mean estimate of the partial autocorrleation from the MSY simulation time series in SFA 25A using the $$B_{msy}$$ scenario. Shown are fully-recruited natural mortality (top left), recruit natural mortality (top right),  recruit growth (bottom left), and RPS (bottom right). The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+```{r sab-sim-acfs-fig, echo=F, fig.cap="Mean estimate of the autocorrleation from the MSY simulation time series in SFA 25A using the $$B_{msy}$$ scenario. Shown are fully-recruited natural mortality (top left), recruit natural mortality (top right),  recruit growth (bottom left), and RPS (bottom right). The vertical black lines represent the strength of the relationship at each lag."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(years),"-",max(years),"/PACF_sim_correlation.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(years),"-",max(years),"/PACF_sim_correlation.png"))
 ```
 
 
 \newpage
-```{r sab-sim-ccf-fig, echo=F, fig.cap="Mean estimate of the cross-correlation of RPS and fully-recruited natural mortality from the MSY simulation time series in SFA 25A using the $$B_{msy}$$ scenario. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+```{r sab-sim-ccf-fig, echo=F, fig.cap="Mean estimate of the cross-correlation of RPS and fully-recruited natural mortality from the MSY simulation time series in SFA 25A using the $$B_{msy}$$ scenario. The vertical black lines represent the strength of the relationship at each lag."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(years),"-",max(years),"/CCF_sim_correlation.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(years),"-",max(years),"/CCF_sim_correlation.png"))
 ```
 
 
 \newpage
-```{r sab-sim-dd-fig, echo=F, fig.cap="Relationship between the simulated parameter values and the simulated adult biomass estimates for SFA 25A using the MSY simulation $$B_{msy}$$ scenario. The blue solid horizontal line is the mean (median for the natural mortalities) value from the simulations, while the blue dashed line is the mean (median for the natural mortalities) estimated historcal parameter estimate. The red vertical line on the lower left figure (RPS) representats the breakpoint."}
+```{r sab-sim-dd-fig, echo=F, fig.cap="Relationship between the simulated parameter values and the simulated SSB estimates for SFA 25A using the MSY simulation $$B_{msy}$$ scenario. The blue solid horizontal line is the mean (median for the natural mortalities) value from the simulations, while the blue dashed line is the mean (median for the natural mortalities) estimated historcal parameter estimate. The red vertical line on the lower left figure (RPS) represents the breakpoint."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_paramter_DD.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_paramter_DD.png"))
 ```
@@ -192,20 +192,20 @@ if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(s
 <!-- 25A Main Simulation Results -->
 
 \newpage
-```{r sab-mn-bm-sim-fig, echo=F, fig.cap="Median fully-recruited biomass estimates in SFA 25A, with 95\\% confidence interval, for each exploitation rate scenario from the MSY simulations."}
+```{r sab-mn-bm-sim-fig, echo=F, fig.cap="Median fully-recruited biomass estimates from the MSY simulations in SFA 25A, with 50\\% (blue) and 90\\% (grey) confidence intervals, for each exploitation rate scenario from the MSY simulations."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/B_mn_ts.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/B_mn_ts.png"))
 ```
 
 \newpage
-```{r sab-mn-fmsy-sim-fig, echo=F, fig.cap="Median removals estimates in SFA 25A from the final 25 years of the simulations, with 95\\% confidence interval, for each exploitation rate scenario from the MSY simulations."}
+```{r sab-mn-fmsy-sim-fig, echo=F, fig.cap="Median removals estimates in SFA 25A from the final 100 years of the MSY simulations, with 50\\% (blue) and 90\\% (grey) confidence intervals, for each exploitation rate scenario from the MSY simulations."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Catch_equilibrium.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Catch_equilibrium.png"))
 ```
 
 
 \newpage
-```{r sab-mn-bmsy-sim-fig, echo=F, fig.cap="Median biomass estimates from the final 25 years of the simulations in SFA 25A, with 95\\% confidence interval, for each exploitation rate scenario from the MSY simulations."}
+```{r sab-mn-bmsy-sim-fig, echo=F, fig.cap="Median biomass estimates from the final 100 years of the simulations in SFA 25A, , with 50\\% (blue) and 90\\% (grey) confidence intervals, for each exploitation rate scenario from the MSY simulations."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/B_equilibrum.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/B_equilibrum.png"))
 ```
@@ -213,14 +213,14 @@ if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(s
 
 
 \newpage
-```{r sab-mod-rps-fig, echo=F, fig.cap="Suite of potential Biomass Reference Points in SFA 25A developed using the MSY simulations. The 20\\% $B_0$ LRP ($LRP_{20}$) is the solid red line, the 30\\% $B_{MSY}$ LRP ($LRP_{30}) is the dotted red line, the 40\\% $B_{MSY}$ LRP ($LRP_{40}) is the dashed red line. The 40\\% $B_0$ USR ($USR_{40}$) is the solid blue line and 80\\% $B_{MSY}$ USR ($USR_{80}$) is the dashed blue line. The solid yellow line is the estimated Biomass at MSY. The black line is the historic modelled time series"}
+```{r sab-mod-rps-fig, echo=F, fig.cap="The historically modelled fully-recruited biomass time series (black line) relative to a suite of potential reference points in SFA 25A developed using the MSY simulations. The LRPs are represented by the red dotted line ($B_{MSY_{30}}$), the dashed red line ($B_{MSY_{34}}$), and the solid red line ($B_{0_{20}}$). The USRs are represented by the dashed blue line ($B_{MSY_{80}}$) and the solid blue line  ($B_{0_{40}}$). The solid yellow line is the estimated Biomass at MSY."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"))
 ```
 
 
 \newpage
-```{r sab-mod-reals-rps-fig, echo=F, fig.cap="MSY simulation time series projections of the fully-recruited biomass in SFA 25A when harvesting occurs at the target exploitation rate.  The 20\\% $B_0$ LRP ($LRP_{20}$) (solid red line) and the 40\\% $B_0$ USR ($USR_{40}$) (solid blue line) are shown for reference. Each grey line represents one realization of the 5000 simulations, and the orange line is the median of the time series."}
+```{r sab-mod-reals-rps-fig, echo=F, fig.cap="MSY simulation time series projections of the fully-recruited biomass in SFA 25A when harvesting occurs at $RR_{tar}$.  A LRP ($B_{0_{20}}$; solid red line) and USR ($B_{0_{40}}$; solid blue line) are shown for reference. Each grey line represents one of teh 5000 realizations, and the orange line is the median of the time series."}
 if(language== 'english') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_reals_w_RPS.png"))
 ```
@@ -234,21 +234,21 @@ if(language== 'french') knitr::include_graphics(paste0(plot.sab.rp.mod.loc,min(s
 
 
 \newpage
-```{r bbn-sim-acfs-fig, echo=F, fig.cap="Mean estimate of the parital autocorrleation from the MSY simulation time series in SFA 26A using the $$B_{msy}$$ simulation run. Shown are the fully-recruited growth (top left), recruit growth (top right),  natural mortality (bottom left), and RPS (bottom right). The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+```{r bbn-sim-acfs-fig, echo=F, fig.cap="Mean estimate of the autocorrleation from the MSY simulation time series in SFA 26A using the $$B_{msy}$$ simulation run. Shown are the fully-recruited growth (top left), recruit growth (top right),  natural mortality (bottom left), and RPS (bottom right). The vertical black lines represent the strength of the relationship at each lag."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/PACF_sim_correlation.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/PACF_sim_correlation.png"))
 ```
 
 
 \newpage
-```{r bbn-sim-ccf-fig, echo=F, fig.cap="Mean estimate of the cross-coreelation of RPS and fully-recruited natural mortality from the MSY simulation time series in SFA 26A using the $$B_{msy}$$ simulation run. The vertical black lines represent the strength of the relationship at each lag, the vertical blue lines represent the 95\\% significance level."}
+```{r bbn-sim-ccf-fig, echo=F, fig.cap="Mean estimate of the cross-coreelation of RPS and fully-recruited natural mortality from the MSY simulation time series in SFA 26A using the $$B_{msy}$$ simulation run. The vertical black lines represent the strength of the relationship at each lag."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/CCF_sim_correlation.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/CCF_sim_correlation.png"))
 ```
 
 
 \newpage
-```{r bbn-sim-dd-fig, echo=F, fig.cap="Relationship between the simulated parameter values and the simulated adult biomass estimates for SFA 26A using the $$B_{msy}$$ scenario from the MSY simulations. The blue solid horizontal line is the mean (median for natural mortality) value from the simulations, while the blue dashed line is the mean (median for natural mortality) estimated historcal parameter estimate. The red vertical line on the lower left figure (RPS) representats the breakpoint."}
+```{r bbn-sim-dd-fig, echo=F, fig.cap="Relationship between the simulated parameter values and the simulated SSB estimates for SFA 26A using the $$B_{msy}$$ scenario from the MSY simulations. The blue solid horizontal line is the mean (median for natural mortality) value from the simulations, while the blue dashed line is the mean (median for natural mortality) estimated historcal parameter estimate. The red vertical line on the lower left RPS figure represents the breakpoint."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_paramter_DD.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_paramter_DD.png"))
 ```
@@ -257,35 +257,35 @@ if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(b
 <!-- 26A Main Simulation Results -->
 
 \newpage
-```{r bbn-mn-bm-sim-fig, echo=F, fig.cap="Median fully-recruited biomass estimates in SFA 26A, with 95\\% confidence interval, for each exploitation rate scenario simulated using the MSY simulations"}
+```{r bbn-mn-bm-sim-fig, echo=F, fig.cap="Median fully-recruited biomass estimates in SFA 26A for each exploitation rate scenario from the MSY simulations. The blue shading represents the 50\\% confidence interval and the grey shading is the 90\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/B_mn_ts.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/B_mn_ts.png"))
 ```
 
 
 \newpage
-```{r bbn-mn-fmsy-sim-fig, echo=F, fig.cap="Median removals estimates in SFA 26A from the final 25 years of the MSY simulations, with 95\\% confidence interval, for each exploitation rate scenario simulated."}
+```{r bbn-mn-fmsy-sim-fig, echo=F, fig.cap="Median removals estimates in SFA 26A from the final 100 years for each exploitation rate scenario from the MSY simulations. The blue shading represents the 50\\% confidence interval and the grey shading is the 90\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Catch_equilibrium.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Catch_equilibrium.png"))
 ```
 
 
 \newpage
-```{r bbn-mn-bmsy-sim-fig, echo=F, fig.cap="Median biomass estimates from the final 25 years of the MSY simulations in SFA 26A, with 95\\% confidence interval, for each exploitation rate scenario simulated."}
+```{r bbn-mn-bmsy-sim-fig, echo=F, fig.cap="Median biomass estimates from the final 100 years for each exploitation rate scenario from the MSY simulations. The blue shading represents the 50\\% confidence interval and the grey shading is the 90\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/B_equilibrum.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/B_equilibrum.png"))
 ```
 
 
 \newpage
-```{r bbn-mod-rps-fig, echo=F, fig.cap="Suite of potential Biomass Reference Points in SFA 26A using the MSY simulations.  The 20\\% $B_0$ LRP ($LRP_{20}$) is the solid red line, the 30\\% $B_{MSY}$ LRP ($LRP_{30}) is the dotted red line, the 40\\% $B_{MSY}$ LRP ($LRP_{40}) is the dashed red line. The 40\\% $B_0$ USR ($USR_{40}$) is the solid blue line and 80\\% $B_{MSY}$ USR ($USR_{80}$) is the dashed blue line. The solid yellow line is the estimated Biomass at MSY. The black line is the historic modelled time series"}
+```{r bbn-mod-rps-fig, echo=F, fig.cap="The historically modelled fully-recruited biomass time series (black line) relative to a suite of potential reference points in SFA 26A developed using the MSY simulations. The LRPs are represented by the red dotted line ($B_{MSY_{30}}$), the dashed red line ($B_{MSY_{34}}$), and the solid red line ($B_{0_{20}}$). The USRs are represented by the dashed blue line ($B_{MSY_{80}}$) and the solid blue line  ($B_{0_{40}}$). The solid yellow line is the estimated biomass at MSY."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_RPs.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_RPs.png"))
 ```
 
 
 \newpage
-```{r bbn-mod-reals-rps-fig, echo=F, fig.cap="MSY Simulation time series of fully-recruited biomass projections in SFA 26A when harvesting occurs at the target exploitation rate.  The LRP used (solid red line) was 20\\% $B_0$ ($LRP_{20}$) and the USR (solid blue line) used was the 80\\% $B_{MSY}$ USR ($USR_{80}$).  Each grey line represents one realization of the 5000 simulations, and the orange line is the median of the time series."}
+```{r bbn-mod-reals-rps-fig, echo=F, fig.cap="MSY Simulation time series of fully-recruited biomass projections in SFA 26A when harvesting occurs at $RR_{tar}$. A LRP ($B_{0_{20}}$; solid red line) and USR ($B_{0_{40}}$; solid blue line) are shown for reference.  Each grey line represents one of the 5000 realizations, and the orange line is the median."}
 if(language== 'english') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_reals_w_RPS.png"))
 if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_reals_w_RPS.png"))
 ```
@@ -294,28 +294,28 @@ if(language== 'french') knitr::include_graphics(paste0(plot.bbn.rp.mod.loc,min(b
 <!-- Now for the HCRs in each area  25A to start-->
 
 \newpage
-```{r sab-mn-bm-hcr-fig, echo=F, fig.cap="HDR simulated median fully-recruited biomass estimates in SFA 25A, with 95\\% confidence interval"}
+```{r sab-mn-bm-hcr-fig, echo=F, fig.cap="HDR simulated median fully-recruited biomass estimates in SFA 25A. The blue shading represents the 50\\% confidence interval and the grey shading is the 90\\% confidence interval. The reference points used in this scenario are represented by the yellow horizontal line (TRP), the blue horizontal line (USR; $B_{0_{40}}$), and the red horizontal line (LRP; $B_{0_{20}}$)."}
 if(language== 'english') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/B_mn_ts.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/B_mn_ts.png"))
 ```
 
 
 \newpage
-```{r sab-mn-c-hcr-fig, echo=F, fig.cap="HDR simulated median removal estimates in SFA 25A, with 95\\% confidence interval."}
+```{r sab-mn-c-hcr-fig, echo=F, fig.cap="HDR simulated median removal estimates in SFA 25A. The blue shading represents the 50\\% confidence interval and the grey shading is the 90\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_mn_ts.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_mn_ts.png"))
 ```
 
 
 \newpage
-```{r sab-real-bm-hcr-fig, echo=F, fig.cap="HDR simulated raw fully-recruited biomass estimates in SFA 25A, with 95\\% confidence interval. The yellow horizontal line is the TRP, the blue horizontal line is the USR, and the red horizontal line is the LRP. Each grey line represents one realization from the HDR simulation."}
+```{r sab-real-bm-hcr-fig, echo=F, fig.cap="HDR simulated raw fully-recruited biomass estimates in SFA 25A. The reference points used in this scenario are represented by the yellow horizontal line (TRP), the blue horizontal line (USR; $B_{0_{40}}$), and the red horizontal line (LRP; $B_{0_{20}}$). Each grey line represents one of the 5000 realizations."}
 if(language== 'english') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/B_reals.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/B_reals.png"))
 ```
 
 
 \newpage
-```{r sab-real-c-hcr-fig, echo=F, fig.cap="HDR simulated raw removal time series in SFA 25A, with 95\\% confidence interval. Each grey line represents one realization from the HDR simulations."}
+```{r sab-real-c-hcr-fig, echo=F, fig.cap="HDR simulated raw removal time series in SFA 25A. Each grey line represents one of the 5000 realizations."}
 if(language== 'english') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_reals.png"))
 if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_reals.png"))
 ```
@@ -325,28 +325,28 @@ if(language== 'french') knitr::include_graphics(paste0(sab.hcr.plt.loc,"/C_reals
 <!-- Now to 26A -->
 
 \newpage
-```{r bbn-mn-bm-hcr-fig, echo=F, fig.cap="HDR simulated median fully-recruited biomass estimates in SFA 26A, with 95\\% confidence interval."}
+```{r bbn-mn-bm-hcr-fig, echo=F, fig.cap="HDR simulated median fully-recruited biomass estimates in SFA 26A. The blue shading represents the 50\\% confidence interval and the grey shading is the 90\\% confidence interval. The reference points used in this scenario are represented by the yellow horizontal line (TRP), the blue horizontal line (USR; $B_{0_{40}}$), and the red horizontal line (LRP; $B_{0_{20}}$). "}
 if(language== 'english') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/B_mn_ts.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/B_mn_ts.png"))
 ```
 
 
 \newpage
-```{r bbn-mn-c-hcr-fig, echo=F, fig.cap="HDR simulated median removal estimates in SFA 25A, with 95\\% confidence interval."}
+```{r bbn-mn-c-hcr-fig, echo=F, fig.cap="HDR simulated median removal estimates in SFA 26A. The blue shading represents the 50\\% confidence interval and the grey shading is the 90\\% confidence interval."}
 if(language== 'english') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/C_mn_ts.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/C_mn_ts.png"))
 ```
 
 
 \newpage
-```{r bbn-real-bm-hcr-fig, echo=F, fig.cap="HDR simulated raw fully-recruited biomass estimates in SFA 25A, with 95\\% confidence interval. The yellow horizontal line is the TRP, the blue horizontal line is the USR, and the red horizontal line is the LRP. Each grey line represents one realization of the HDR simulations."}
+```{r bbn-real-bm-hcr-fig, echo=F, fig.cap="HDR simulated raw fully-recruited biomass estimates in SFA 26A. The reference points used in this scenario are represented by the yellow horizontal line (TRP), the blue horizontal line (USR; $B_{0_{40}}$), and the red horizontal line (LRP; $B_{0_{20}}$).  Each grey line represents one of the 5000 realizations."}
 if(language== 'english') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/B_reals.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/B_reals.png"))
 ```
 
 
 \newpage
-```{r bbn-real-c-hcr-fig, echo=F, fig.cap="HDR simulated raw removal time series in SFA 25A, with 95\\% confidence interval. Each grey line represents one realization of the HDR simulations."}
+```{r bbn-real-c-hcr-fig, echo=F, fig.cap="HDR simulated raw removal time series in SFA 26A. Each grey line represents one of the 5000 realizations."}
 if(language== 'english') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/C_reals.png"))
 if(language== 'french') knitr::include_graphics(paste0(bbn.hcr.plt.loc,"/C_reals.png"))
 ```

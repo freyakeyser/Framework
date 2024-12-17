@@ -386,8 +386,8 @@ plt.27b.gem.indx <- ggplot(rf.27b,aes(x=relative.F,y=prop.DB)) +  geom_text(aes(
 
 plt.bmi.gem <- plot_grid(plt.25a.gem.indx,plt.26a.gem.indx,plt.26c.gem.indx,plt.27b.gem.indx,ncol=2,labels = c("SFA 25A","SFA 26A","SFA 26C","SFA 27B"),label_size=14,label_y=0.93,label_x=0.12) + theme(plot.margin = margin(0, 0, -270, 0))
 
-plt.bmi.gem <- add_sub(plt.bmi.gem, "Relative fishing mortality",angle=0,y=1.25,x=0.55,size=18)
-plt.bmi.gem <- add_sub(plt.bmi.gem, "Change in Biomass Index (%)",angle=90,y=2.5,x=0.01,size=18)
+plt.bmi.gem <- add_sub(plt.bmi.gem, "Relative exploitation rate",angle=0,y=1.25,x=0.55,size=18)
+plt.bmi.gem <- add_sub(plt.bmi.gem, "Change in survey biomass Index (%)",angle=90,y=2.5,x=0.01,size=18)
 
 #plt.bmi.ts <- ggdraw(plt.bmi.ts)
 save_plot(plt.bmi.gem,file =paste0(plot.index.loc,"GEM_BM_Indices.png"),base_height = 8,base_width = 11)

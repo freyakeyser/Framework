@@ -40,7 +40,7 @@ save_plot(paste0(bbn.plot.loc,"RPS_ts.png"),p.rps.ts,base_height =6,base_width =
 bbn.rps.bp <- 11500
 #sab.rps.bp2 <- 7000
 p.rps.ssb <- ggplot(bbn.prod.dat,aes(y=RPS3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3) + 
-                                                  xlab("Adult Biomass (tonnes)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
+                                                  xlab("SSB (tonnes)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
                                                   geom_smooth(method = 'lm') +
                                                   scale_y_log10() + 
                                                   geom_vline(xintercept = bbn.rps.bp,size=0.5,color='firebrick2',linetype='dashed')  + 
@@ -51,7 +51,7 @@ save_plot(paste0(bbn.plot.loc,"RPS_vs_SSB.png"),p.rps.ssb,base_height =6,base_wi
 # amd when you do that, the most parsimonous model will ALMOST always be a flat line, but worth noting that DOES MEAN there is density dependence in here, because you are getting just as
 # many recruits when the population abundance is low, so a smaller SSB is able to punch out as many recruits as a high SSB, but it DOES NOT MEAN that a traditional SR model will get you anywhere useful.
 p.rec.ssb <- ggplot(bbn.prod.dat,aes(y=R3,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3)  +
-                                                xlab("Adult Biomass (tonnes)") + ylab("Recruits (tonnes)") +
+                                                xlab("SSB (tonnes)") + ylab("Recruits (tonnes)") +
                                                 geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +scale_y_log10() +
                                                 geom_vline(xintercept = 11500,size=0.5,color='firebrick2',linetype='dashed')  + 
                                                 scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
@@ -68,7 +68,7 @@ p.g.ssb <- ggplot(bbn.prod.dat,aes(y=g,x=SSB)) + geom_text(aes(label = substr(Ye
                                              scale_x_continuous(breaks = c(seq(1000,20000,by=1500),labels = NA))
 
 p.gR.ssb <- ggplot(bbn.prod.dat,aes(y=gR,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
-                                             xlab("Adult Biomass (tonnes)") + ylab("Growth (Recruits)") +
+                                             xlab("SSB (tonnes)") + ylab("Growth (Recruits)") +
                                              geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
                                              #geom_vline(xintercept = 11500,size=0.5,color='firebrick2',linetype='dashed')  + 
                                              scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
@@ -81,7 +81,7 @@ save_plot(paste0(bbn.plot.loc,"Growth_vs_SSB.png"),p.gs.ssb,base_height =12,base
 # I think here using 13000 makes more sense as the high m's make a lot of sense temporally.
 bbn.m.bp <- 13000
 p.m.ssb <- ggplot(bbn.prod.dat,aes(y=m,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))+ 
-                                             xlab("Adult Biomass (tonnes)") + ylab("Natural Mortality (instantaneous)") +
+                                             xlab("SSB (tonnes)") + ylab("Natural Mortality (instantaneous)") +
                                              geom_smooth(method = 'lm') +
                                              #geom_vline(xintercept = bbn.m.bp,size=0.5,color='firebrick2',linetype='dashed')  + 
                                              scale_x_continuous(breaks = c(seq(1000,20000,by=1500)))
@@ -463,7 +463,7 @@ bbn.m.sim.comp.plt <- ggplot(bbn.res.4.plts) + geom_point(aes(x=SSB/1000,y=M),al
                          scale_y_continuous(name=("Natural mortality (instantaneous)"))
 
 bbn.sim.comps.plt <- plot_grid(bbn.g.sim.comp.plt,bbn.gr.sim.comp.plt,bbn.rps.sim.comp.plt,bbn.m.sim.comp.plt)
-bbn.sim.comps.plt2 <- add_sub(bbn.sim.comps.plt, "Adult Biomass (tonnes x 1000)",angle=0,y=1.4,x=0.55,size=24)
+bbn.sim.comps.plt2 <- add_sub(bbn.sim.comps.plt, "SSB (tonnes x 1000)",angle=0,y=1.4,x=0.55,size=24)
 
 save_plot(bbn.sim.comps.plt2,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_paramter_DD.png"),base_height = 11,base_width=8.5)
 
@@ -510,8 +510,8 @@ save_plot(bbn.mod.real.plt,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),
 
 # HCR specific settings
 set.seed(3)
-bbn.trp.exp <- 0.055
-bbn.usr.exp <- 0.02
+bbn.trp.exp <- 0.07
+bbn.usr.exp <- 0.03
 bbn.lrp.exp <- 0
 bbn.exp.sd <- 0.1
 
@@ -542,13 +542,11 @@ bbn.hcr <- bbn.hcr$Exp.res
 }
 if(run.sims == F) bbn.hcr <- readRDS(bbn.hcr.res.loc)
 
-bbn.mn.catch.hcr <- round(mean(bbn.hcr$Catch,na.rm=T),digits=0)
-bbn.med.catch.hcr <- round(median(bbn.hcr$Catch,na.rm=T),digits=0)
-bbn.med.bm.hcr <- round(median(bbn.hcr$B),digits=0)
-
-
 # For this I need to use the summarized object
 bbn.hcr.last.yrs <- bbn.hcr[bbn.hcr$year > (n_y-last.yrs),]
+bbn.mn.catch.hcr <- round(mean(bbn.hcr.last.yrs$Catch,na.rm=T),digits=0)
+bbn.med.catch.hcr <- round(median(bbn.hcr.last.yrs$Catch,na.rm=T),digits=0)
+bbn.med.bm.hcr <- round(median(bbn.hcr.last.yrs$B),digits=0)
 bbn.prop.yrs.bl.lrp.hcr <- round(100*length(which(bbn.hcr.last.yrs$B < bbn.lrp.b0))/n_sims/last.yrs,digits=1)
 bbn.prop.yrs.cautious.hcr <- round(100*length(which(bbn.hcr.last.yrs$B >= bbn.lrp.b0 & bbn.hcr.last.yrs$B < bbn.usr.b0))/n_sims/last.yrs,digits=1)
 bbn.prop.yrs.healthy.hcr <- round(100*length(which(bbn.hcr.last.yrs$B >= bbn.usr.b0 & bbn.hcr.last.yrs$B < bbn.trp.bmsy))/n_sims/last.yrs,digits=1)
