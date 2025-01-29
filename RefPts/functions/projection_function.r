@@ -462,6 +462,11 @@ if(model == "BSSM") mod.fit <- mods$bssm.mod
              {
                if(rec.mod$cen.tend == 'median') rps.val <- median(prod.dat$RPS[prod.dat$SSB >= rec.mod$bp],na.rm=T)
                if(rec.mod$cen.tend == 'mean')  rps.val <- mean(prod.dat$RPS[prod.dat$SSB >= rec.mod$bp],na.rm=T)
+               # Test for Dvora way
+               #tster <- 186 # Mean for BBn...
+               #Rec[j,nn,i] <- tster 
+               
+               # Original way
                Rec[j,nn,i] <- SSB.for.rec* rlnorm(1,log(rps.val), sd(prod.dat$RPS[prod.dat$SSB >= rec.mod$bp],na.rm=T))
              }
            } # end if(length(rec.mod$bp) == 1)
@@ -474,7 +479,7 @@ if(model == "BSSM") mod.fit <- mods$bssm.mod
              {
                if(rec.mod$cen.tend == 'median') rps.val <- median(prod.dat$RPS[prod.dat$SSB < min(rec.mod$bp)],na.rm=T)
                if(rec.mod$cen.tend == 'mean')  rps.val <- mean(prod.dat$RPS[prod.dat$SSB < min(rec.mod$bp)],na.rm=T)
-               Rec[j,nn,i] <-SSB.for.rec* rlnorm(1,log(rps.val),
+               Rec[j,nn,i] <- SSB.for.rec* rlnorm(1,log(rps.val),
                                                    sd(prod.dat$RPS[prod.dat$SSB < min(rec.mod$bp)],na.rm=T))
              } # end if(SSB.for.rec < min(rec.mod$bp)) 
              
@@ -871,17 +876,18 @@ if(save.results == T)
     
     
     # Biomass realizations          
-    B.real <- ggplot(Exp.res,aes(x=year,y=B/1000,group = Sim)) + geom_line(alpha = alphs) + #facet_wrap(~F.scenario) +
-                                                                      ylab("Predicted Biomass (metric tonnes x 1000)") + xlab("") + 
+    B.real <- ggplot(Exp.res,aes(x=year,y=B/1000,group = Sim)) + geom_point(alpha = 1/100,shape=19,size=0.1)+
+                                                                      xlab("") + 
                                                                       geom_hline(yintercept = c(HCR.sim$LRP/1000,HCR.sim$USR/1000,HCR.sim$TRP/1000),
                                                                                  color=c('firebrick2',u.colors[2],u.colors[1]),linewidth = 1.5) +
+                                                                      scale_y_continuous(name = "Biomass (metric tonnes x 1000)", limits = c(0,NA)) +
                                                                       #scale_color_viridis_b(alpha=0.4,end = 0.75) +
                                                                        theme(legend.position = 'none')
     
     ggsave(paste0(plot_sims,"B_reals.png"),plot=B.real,height=15,width=15)               
     
     # Catch realizations          
-    C.real <- ggplot(Exp.res,aes(x=year,y=Catch,group = Sim)) + geom_line(alpha = alphs) + #facet_wrap(~F.scenario) +
+    C.real <- ggplot(Exp.res,aes(x=year,y=Catch,group = Sim)) + geom_point(alpha = 1/100,shape=19,size=0.1)+
                                                                           ylab("Predicted Catch (metric tonnes)") + xlab("") + 
                                                                           #geom_hline(yintercept = c(HCR.sim$LRP/1000,HCR.sim$USR/1000,HCR.sim$TRP/1000),color=c('firebrick2','green','blue')) +
                                                                           #scale_color_viridis_b(alpha=0.4,end = 0.75) +
@@ -896,7 +902,8 @@ if(save.results == T)
                                                         geom_ribbon(aes(x=year,ymax = B.U50/1000,ymin=B.L50/1000),fill='blue',alpha = sum.fig.alpha) + 
                                                         geom_hline(yintercept = c(HCR.sim$LRP/1000,HCR.sim$USR/1000,HCR.sim$TRP/1000),
                                                                    color=c('firebrick2',u.colors[2],u.colors[1]),linewidth = 1.5) +
-                                                         xlab("") + ylab("Biomass (metric tonnes x 1000)") 
+                                                         scale_y_continuous(name = "Biomass (metric tonnes x 1000)", limits = c(0,NA)) +
+                                                         xlab("") 
     ggsave(paste0(plot_sims,"B_mn_ts.png"),plot=B.ts,height=15,width=15)
     
     

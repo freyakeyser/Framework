@@ -249,11 +249,13 @@ bbn.Exp.res <- bbn.res$Exp.res
 # plot(y=bbn.prod.dat$RPS3,x=bbn.prod.dat$SSB)
 # plot(y=Res$rps[4:100,5,1], x=Res$B[1:97,5,1]+Res$R[1:97,5,1],type='p')
 
-bbn.RPs <- bbn.Exp.res |>collapse::fsubset(year >= n_y-25) |> collapse::fgroup_by(F.scenario) |> collapse::fsummarize(med.B = median(B,na.rm=T),
-                                                                                                       med.C = median(Catch,na.rm=T))  
+bbn.RPs <- bbn.Exp.res |>collapse::fsubset(year >= n_y-last.yrs) |> collapse::fgroup_by(F.scenario) |> collapse::fsummarize(med.B = median(B,na.rm=T),
+                                                                                                       mn.B = median(B,na.rm=T),
+                                                                                                       med.C = median(Catch,na.rm=T),
+                                                                                                       mn.C = mean(Catch,na.rm=T))  
 
 bbn.c.at.msy <- max(bbn.RPs$med.C)
-
+#bbn.c.at.msy <- max(bbn.RPs$mn.C)
 # Numbers for the paper
 bbn.rr <- bbn.RPs$F.scenario[bbn.RPs$med.C == bbn.c.at.msy] 
 bbn.bmsy <- round(bbn.RPs$med.B[bbn.RPs$med.C == bbn.c.at.msy],digits=-2)
@@ -477,14 +479,14 @@ bbn.mod.rp.plt <- ggplot(bbn.prod.dat) + geom_line(aes(x=Year,y=B/1000)) +
                        geom_hline(yintercept = bbn.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
                        geom_hline(yintercept = bbn.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
                        scale_x_continuous('',breaks=seq(1990,2030,by=3)) +
-                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') 
+                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)',limits=c(0,NA)) 
 
 save_plot(bbn.mod.rp.plt,file = paste0(plot.bbn.rp.mod.loc,min(bbn.model.yrs),"-",max(bbn.model.yrs),"/Sim_RPs.png"),base_height = 8.5,base_width=8.5)
 
 bbn.med.B.4.plt <- bbn.res.4.plts |> collapse::fgroup_by(year) |> collapse::fsummarise(B.med = median(B,na.rm=T))
 
 bbn.mod.real.plt <- ggplot(bbn.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
-                       geom_line(data = bbn.med.B.4.plt,aes(x=year,y=B.med/1000),color='orange',size=1.25) + 
+                       geom_line(data = bbn.med.B.4.plt,aes(x=year,y=B.med/1000),color='black',size=1.25) + 
                        geom_hline(yintercept = bbn.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
                        #geom_hline(yintercept = bbn.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
                        #geom_hline(yintercept = bbn.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
@@ -547,7 +549,9 @@ bbn.hcr.last.yrs <- bbn.hcr[bbn.hcr$year > (n_y-last.yrs),]
 bbn.mn.catch.hcr <- round(mean(bbn.hcr.last.yrs$Catch,na.rm=T),digits=0)
 bbn.med.catch.hcr <- round(median(bbn.hcr.last.yrs$Catch,na.rm=T),digits=0)
 bbn.med.bm.hcr <- round(median(bbn.hcr.last.yrs$B),digits=0)
+bbn.mn.bm.hcr <- round(mean(bbn.hcr.last.yrs$B),digits=0)
 bbn.prop.yrs.bl.lrp.hcr <- round(100*length(which(bbn.hcr.last.yrs$B < bbn.lrp.b0))/n_sims/last.yrs,digits=1)
+
 bbn.prop.yrs.cautious.hcr <- round(100*length(which(bbn.hcr.last.yrs$B >= bbn.lrp.b0 & bbn.hcr.last.yrs$B < bbn.usr.b0))/n_sims/last.yrs,digits=1)
 bbn.prop.yrs.healthy.hcr <- round(100*length(which(bbn.hcr.last.yrs$B >= bbn.usr.b0 & bbn.hcr.last.yrs$B < bbn.trp.bmsy))/n_sims/last.yrs,digits=1)
 bbn.prop.yrs.above.trp.hcr <- round(100*length(which(bbn.hcr.last.yrs$B > bbn.trp.bmsy))/n_sims/last.yrs,digits=1)

@@ -1,4 +1,4 @@
-book_filename: "ref-points"
+book_filename: "resdoc"
 rmd_files: ["index.Rmd",
             "Indices_analysis.Rmd",
             "Sab_analysis.Rmd",
@@ -8,7 +8,7 @@ rmd_files: ["index.Rmd",
             "02-references.Rmd",
             "03-tables.Rmd",
             "04-figures.Rmd",
-            "05-appendix.Rmd",
+            #"05-appendix.Rmd",
             "06-formatting.Rmd"
             ]
 delete_merged_file: true

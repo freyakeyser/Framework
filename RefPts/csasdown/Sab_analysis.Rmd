@@ -254,8 +254,10 @@ if(run.sims == F) sab.res <- readRDS(paste0(res.sab.rp.mod.loc,"full_bmsy_sims_"
 
 sab.Exp.res <- sab.res$Exp.res
 
-sab.RPs <- sab.Exp.res %>% dplyr::filter(year >= n_y-25) %>% dplyr::group_by(F.scenario) %>% dplyr::summarise(med.B = median(B,na.rm=T),
-                                                                                                       med.C = median(Catch,na.rm=T))  
+sab.RPs <- sab.Exp.res %>% dplyr::filter(year >= n_y-last.yrs) %>% dplyr::group_by(F.scenario) %>% dplyr::summarise(med.B = median(B,na.rm=T),
+                                                                                                       mn.B = median(B,na.rm=T),
+                                                                                                       med.C = median(Catch,na.rm=T),
+                                                                                                       mn.C = mean(Catch,na.rm=T))  
 
 sab.c.at.msy <- max(sab.RPs$med.C)
 sab.rr <- sab.RPs$F.scenario[sab.RPs$med.C == sab.c.at.msy] # 
@@ -501,7 +503,7 @@ sab.mod.rp.plt <- ggplot(sab.prod.dat) + geom_line(aes(x=Year,y=B/1000)) +
                        geom_hline(yintercept = sab.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
                        geom_hline(yintercept = sab.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
                        scale_x_continuous('',breaks=seq(1990,2030,by=3)) +
-                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') 
+                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)',limits = c(0,NA)) 
 
 save_plot(sab.mod.rp.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"),base_height = 8.5,base_width=8.5)
 
@@ -510,7 +512,7 @@ save_plot(sab.mod.rp.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-
 sab.med.B.4.plt <- sab.res.4.plts |> collapse::fgroup_by(year) |> collapse::fsummarise(B.med = median(B,na.rm=T))
 
 sab.mod.real.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
-                       geom_line(data = sab.med.B.4.plt,aes(x=year,y=B.med/1000),color='orange',size=1.25) + 
+                       geom_line(data = sab.med.B.4.plt,aes(x=year,y=B.med/1000),color='black',size=1.25) + 
                        geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
                        #geom_hline(yintercept = sab.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
                        #geom_hline(yintercept = sab.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
@@ -531,7 +533,7 @@ save_plot(sab.mod.real.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),
 # HCR specific settings
 set.seed(4)
 sab.trp.exp <- 0.05
-sab.usr.exp <- 0.01
+sab.usr.exp <- 0.02
 sab.lrp.exp <- 0
 sab.exp.sd <- 0.1 
 

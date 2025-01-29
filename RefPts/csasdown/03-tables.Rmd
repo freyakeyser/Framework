@@ -18,8 +18,8 @@ index.rp.tab.dat <- data.frame(lrp30 = c(LRP.med.3.25a,LRP.med.3.26a,LRP.med.3.2
                                tar.rr= c(target.rr.25a.index,target.rr.26a.index,target.rr.26c.index,target.rr.27b.index))
 rownames(index.rp.tab.dat)  <- c("SFA 25A","SFA 26A","SFA 26C","SFA 27B")            
 
-names(index.rp.tab.dat) <- c("$B_{MSY}_{30}$", "$B_{MSY}_{40}$","$B_0_{20}$",
-                             "$B_{MSY}_{80}$","$B_0_{40}$",
+names(index.rp.tab.dat) <- c("$B_{MSY(30)}$", "$B_{MSY(40)}$","$B_{0(20)}$",
+                             "$B_{MSY(80)}$","$B_{0(40)}$",
                              "$RR_{lim}$","$RR_{tar}$")
 
       
@@ -31,17 +31,17 @@ model.rp.tab.dat <-  data.frame(lrp30 = c(sab.lrp.3.bmsy,bbn.lrp.3.bmsy),
                                 tar.rr= c(sab.rr,bbn.rr))
 rownames(model.rp.tab.dat)  <- c("SFA 25A","SFA 26A")            
 
-names(model.rp.tab.dat) <- c("$B_{MSY}_{30}$", "$B_{MSY}_{40}$","$B_0_{20}$",
-                             "$B_{MSY}_{80}$","$B_0_{40}$","$RR_{tar}$")
+names(model.rp.tab.dat) <- c("$B_{MSY(30)}$", "$B_{MSY(40)}$","$B_{0(20)}$",
+                             "$B_{MSY(80)}$","$B_{0(40)}$","$RR_{tar}$")
 
 ```
 
 ```{r survey-index-rp-table,include=T,echo=F}
-csas_table(index.rp.tab.dat,caption="A summary of the reference points for each area calculated using the survey index based methods.  The LRPs include,  30\\% of the median survey biomass index ($B_{MSY}_{30}$), 40\\% of the median survey biomass index ($B_{MSY}_{40}$), and 20\\% of the maximum survey biomass index ($B_0_{20}$). The USRs include, 80\\% of the median survey biomass index ($B_{MSY}_{80}$) and 40\\% of the maximum survey biomass index ($B_0_{40}$). The limit removal reference ($RR_{lim}$) was calculated using the GEM method, while the target removal reference ($RR_{tar}$) was the median removals during the five-year period of time in which the survey biomass index had the least variability.")
+csas_table(index.rp.tab.dat,caption="A summary of the reference points for each area calculated using the survey index based methods.  The LRPs include,  30\\% of the median survey biomass index ($B_{MSY(30)}$), 40\\% of the median survey biomass index ($B_{MSY(40)}$), and 20\\% of the maximum survey biomass index ($B_{0(20)}$). The USRs include, 80\\% of the median survey biomass index ($B_{MSY(80)}$) and 40\\% of the maximum survey biomass index ($B_{0(40)}$). The limit removal reference ($RR_{lim}$) was calculated using the GEM method, while the target removal reference ($RR_{tar}$) was the median removals during the five-year period of time in which the survey biomass index had the least variability.")
 ```
 
 ```{r model-rp-table,include=T,echo=F}
-csas_table(model.rp.tab.dat,caption="A summary of the reference points for SFA 25A and SFA 26A calculated using the MSY simulations.  The LRPs include, 30\\% of the median biomass at the simulation estimate of maximum sustatainable yield ($B_{MSY}_{30}$), 40\\% of the median biomass at the simulation estimate of maximum sustatainable yield ($B_{MSY}_{40}$), and  20\\% of the median biomass using simulations with no fishing ($B_0_{20}$). The USRs include, 80\\% of the median biomass at the simulation estimate of maximum sustatainable yield ($B_{MSY}_{80}$) and 40\\% of the median biomass using simulations with no fishing ($B_0_{40}$). The target removal reference ($RR_{tar}$) was calculated as the exploitation rate which resulted in the maximum sustainable yield.")
+csas_table(model.rp.tab.dat,caption="A summary of the reference points for SFA 25A and SFA 26A calculated using the MSY simulations.  The LRPs include, 30\\% of the median biomass at the simulation estimate of maximum sustatainable yield ($B_{MSY(30)}$), 40\\% of the median biomass at the simulation estimate of maximum sustatainable yield ($B_{MSY(40)}$), and  20\\% of the median biomass using simulations with no fishing ($B_{0(20)}$). The USRs include, 80\\% of the median biomass at the simulation estimate of maximum sustatainable yield ($B_{MSY(80)}$) and 40\\% of the median biomass using simulations with no fishing ($B_{0(40)}$). The target removal reference ($RR_{tar}$) was calculated as the exploitation rate which resulted in the maximum sustainable yield.")
 ```
 
 

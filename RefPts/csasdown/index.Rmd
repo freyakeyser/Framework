@@ -22,7 +22,7 @@ cat_no: ""
 french_region: "Région des Maritimes"
 citation_other_language: "Keith, D., Keyser, F., McDonald, R., et Pearo Drew, T.  L'évaluation de petoncles dans les zones de pêche"
 abstract: |
-  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). The survey biomass indices and relative exploitation rates used for the development of the index based reference points were approved during the first of two Canadian Science Advisory Secretariat Regional Peer Review meetings which focused on the data inputs (each of these SFAs) and model development (SFA 25A and SfA 26A). The stock assessment models and the productivity scenarios used for the maximum sustainable yield (MSY) simulations in SFA 25A and SFA 26A were also approved during this initial meeting. Survey biomass index based limit reference points (LRPs) are proposed for each of these SFA's. In addition to the survey index based LRPs, guidance on relative target ($RR_{tar}$) and limit ($RR_{lim}$) removal reference and upper stock reference points (USR) is provided for all the areas based on the survey biomass index and relative exploitation rates. In the two areas with approved stock assessment models (SFA 25A and SFA 26A), MSY simulations are used to obtain model based LRPs. Guidance on target removal reference ($RR_{tar}$) and upper stock reference (USR) points are also provided using the MSY simulations for these two areas. In addition, for the two modelled areas, harvest decision rule (HDR) simulations are developed and their potential use demonstrated using the following example: 1) maintain the stock near the TRP, 2) increase the long term average removals from the fishery above the removals estimated using the optimal MSY simulation, and 3) reduce the proportion of time the stock is below the LRP when compared to the optimal MSY simulation. The HDR simulations are able to identify a scenario in which all three of these management objectives were met, with notable increases in the long-term median removals for both areas and declines in the proportion of the time the stocks are below the LRP. The HDR simulations represent a methodology by which the impact of various management objectives could be explored; this could include the development of limit removal reference (RR_lim) and target reference points (TRP).
+  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). The survey biomass indices and relative exploitation rates used for the development of the index based reference points were approved during the first of two Canadian Science Advisory Secretariat Regional Peer Review meetings which focused on the data inputs (each of these SFAs) and model development (SFA 25A and SFA 26A). The stock assessment models and the productivity scenarios used for the maximum sustainable yield (MSY) simulations in SFA 25A and SFA 26A were also approved during this initial meeting. Survey biomass index based limit reference points (LRPs) are proposed for each of these SFA's. In addition to the survey index based LRPs, guidance on relative target ($RR_{tar}$) and limit ($RR_{lim}$) removal reference and upper stock reference points (USR) is provided for all the areas based on the survey biomass index and relative exploitation rates. In the two areas with approved stock assessment models (SFA 25A and SFA 26A), MSY simulations are used to obtain model based LRPs. Guidance on target removal reference ($RR_{tar}$) and upper stock reference (USR) points are also provided using the MSY simulations for these two areas. In addition, for the two modelled areas, harvest decision rule (HDR) simulations are developed and their potential use demonstrated using the following example: 1) maintain the stock near the TRP, 2) increase the long term average removals from the fishery above the removals estimated using the optimal MSY simulation, and 3) reduce the proportion of time the stock is below the LRP when compared to the optimal MSY simulation. The HDR simulations are able to identify a scenario in which all three of these management objectives were met, with notable increases in the long-term median removals for both areas and declines in the proportion of the time the stocks are below the LRP. The HDR simulations represent a methodology by which the impact of various management objectives could be explored; this could include the development of limit removal reference ($RR_{lim}$) and target reference points (TRP).
   
 french_abstract: |
   NULL
@@ -213,12 +213,13 @@ num.knots <- 20 #
 qR <- 0.33# 
 
 
+
 # For the simulations
 n_y <- 200
 last.yrs <- n_y/2 # Using the second half of the data.
-n_sims <- 100 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
+n_sims <- 10000 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
 # Run the simulations or load existing results
-run.sims <- T
+run.sims <- F
 # How far back into the time series do you want to use for summarizing RP and HCR. Using 25 would take the last 25 years of the simulations to do this.
 last.yrs <- 100
 bbn.select <- paste0(min(years),"_",max(years),"_qR_",qR,"_",num.knots,"_knots")
@@ -242,9 +243,11 @@ sab.mod <- DD.out
 sab.plot.loc <- paste0(rp.loc,"Figures/Sab/")
 bbn.plot.loc <- paste0(rp.loc,"Figures/BBn/")
 
-
-
-# The Sable HCRs
-
+# Catchability correction for sable and bbn, used for the index based methods. lands on 0.33
+q.sab <- round(sab.mod$median$q,digits=2)
+# Take the mean catchability of the field, basically results in 0.34 using either mean or median
+q.bbn <- round(mean(bbn.mod$report$qI),digits=2)
+# Given these are basically the same, I go with a q of 0.33 to convert the indices
+q.index <- 0.33
 
 ```
