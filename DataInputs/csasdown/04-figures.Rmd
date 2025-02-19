@@ -74,7 +74,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 ```{r mw-annual-25, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams, g) collected from the port sampling program for SFA 25A-Sab (25A-Sab), SFA 25A-Mid (25A-Mid), and SFA 25B (25A-Ban). Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. The blue vertical line segments represent annual median meat weights, with the number of samples collected each year labelled to the left in blue."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, "_25.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/medians_long_vert", fr, "_25.png"))
 ```
 
 ```{r fts-26, echo=F, fig.align="center", fig.cap="Catch (commercial landings, tonnes, t), effort (hour-metre, hm), and catch per unit effort (kilograms per hour-metre, kg/hm) for SFA 26 management units. SFA 26A is shown in black with points, SFA 26B is shown in orange with triangles, and SFA 26C is shown in blue with squares. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
@@ -86,7 +86,7 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 ```{r mw-annual-26, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams, g) collected from the port sampling program for SFA 26A (26A-BBn), SFA 26B (26B-BBs), and SFA 26C (26C-Ger). Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. The blue vertical line segments represent annual median meat weights, with the number of samples collected each year labelled to the left in blue."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, "_26.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/medians_long_vert", fr, "_26.png"))
 ```
 
 ```{r fts-27, echo=F, fig.align="center", fig.cap="Catch (commercial landings, tonnes, t), effort (hour-metre, hm), and catch per unit effort (kilograms per hour-metre, kg/hm) for SFA 27B. Vertical lines in the catch per unit effort panel (bottom) represent the 95% confidence interval using a jackknife estimator (Smith 1980)."}
@@ -98,11 +98,11 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 ```{r mw-annual-27, echo=FALSE, message=F, fig.align="center", fig.cap="Meat weights (mass, in grams, g) collected from the port sampling program for SFA 27B. Black points are monthly medians, and horizontal black lines represent the 95% confidence interval for each month with available data. The blue vertical line segments represent annual median meat weights, with the number of samples collected each year labelled to the left in blue."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_long_vert", fr, "_27.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/medians_long_vert", fr, "_27.png"))
 ```
 
 <!-- ```{r mw-monthly, echo=FALSE, message=F, fig.align="center", fig.cap="Anomalies (the difference between the annual median and same-year monthly median) in meat weights (grams) collected from the port sampling program for Browns Bank North (BBn) and Sable Bank (Sab). The horizontal dashed line represents no difference between the annual and monthly medians. The number of samples collected in each month (across all years) are provided under each boxplot."} -->
-<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/medians_anom", fr, ".png")) -->
+<!-- knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/medians_anom", fr, ".png")) -->
 <!-- ``` -->
 
 ```{r nav-linear, echo=F, message=F, fig.align="center", fig.cap="Tow lengths derived from Olex and Ocean Vision tow tracks, in metres (m). Raw lengths of Olex tracks are shown in black, while lengths following the application of the correction factor are show in orange. Each point corresponds to a specific tow. The solid black and orange lines are linear trendlines for each relationship. The dashed black line represents the 1:1 relationship between Ocean Vision tow lengths and Olex tow lengths."}
@@ -455,118 +455,118 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 
 
 ```{r sh-ps-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 25A-Sab collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 25A-Sab survey data. Shell heights are shown in 5 mm bins for consistency with the survey data. Years with port sampling data and survey detailed sampling data are shown; survey detailed sampling data were not available for 2015 or 2020."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/shf_ps", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Sab/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25A-Sab fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/proportion_boxplot", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Sab/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25A-Sab fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/proportion_boxplot_ss", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Sab/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 
 ```{r sh-ps-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 25A-Mid collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 25A-Mid survey data. Shell heights are shown in 5 mm bins for consistency with the survey data. Years with port sampling data and survey detailed sampling data are shown; survey detailed sampling data were not available for 2007."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/shf_ps", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Mid/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25A-Mid fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/proportion_boxplot", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Mid/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25A-Mid fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/proportion_boxplot_ss", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Mid/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 
 ```{r sh-ps-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 25B collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 25B survey data. Shell heights are shown in 5 mm bins for consistency with the survey data. Years with port sampling data and survey detailed sampling data are shown; survey detailed sampling data were not available for 2007, 2016, 2017, 2018, 2020, or 2022."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/shf_ps", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Ban/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25B fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/proportion_boxplot", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Ban/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 25B fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/proportion_boxplot_ss", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Ban/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 
 ```{r sh-ps-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 26A collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 26A survey data. Shell heights are shown in 5 mm bins for consistency with the survey data. Years with port sampling data and survey detailed sampling data are shown; survey detailed sampling data were not available for 2020."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_ps", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/BBn/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26A fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/proportion_boxplot", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/BBn/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26A fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/proportion_boxplot_ss", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/BBn/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 ```{r sh-ps-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 26B collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 26B survey data. Shell heights are shown in 5 mm bins for consistency with the survey data. Years with port sampling data and survey detailed sampling data are shown; survey detailed sampling data were not available for 2017 or 2019."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/shf_ps", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/BBs/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26B fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/proportion_boxplot", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/BBs/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26B fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/proportion_boxplot_ss", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/BBs/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 ```{r sh-ps-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 26C collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 26C survey data. Shell heights are shown in 5 mm bins for consistency with the survey data. Years with port sampling data and survey detailed sampling data are shown; survey detailed sampling data were not available for 2020."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/shf_ps", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Ger/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26C fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/proportion_boxplot", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Ger/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 26C fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/proportion_boxplot_ss", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Ger/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 ```{r sh-ps-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (in millimetres, mm) of meats landed by the commercial fishery in SFA 27B collected during port sampling, based on the new annual meat weight-shell height relationships derived from SFA 27B survey data. Shell heights are shown in 5 mm bins for consistency with the survey data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/shf_ps", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/GBb/shf_ps", fr, "_new.png"))
 ```
 
 ```{r prop-ps-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 27B fishing trips (year-round) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/proportion_boxplot", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/GBb/proportion_boxplot", fr, "_new.png"))
 ```
 
 ```{r propss-ps-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Proportion of meats from SFA 27B fishing trips (April to August, inclusive) collected during port sampling with estimated shell heights (millimetres, mm) below various shell height levels to examine fully recruited size minimums."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/proportion_boxplot_ss", fr, "_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/GBb/proportion_boxplot_ss", fr, "_new.png"))
 ```
 
 ```{r sh-sel-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 25A-Mid collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25A-Mid survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Mid/shf_selectivity", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Mid/shf_selectivity", fr, ".png"))
 ```
 
 ```{r sh-sel-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 25B collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25B survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ban/shf_selectivity", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Ban/shf_selectivity", fr, ".png"))
 ```
 
 ```{r sh-sel-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 26B collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26B survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBs/shf_selectivity", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/BBs/shf_selectivity", fr, ".png"))
 ```
 
 ```{r sh-sel-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 26C collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26C survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Ger/shf_selectivity", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Ger/shf_selectivity", fr, ".png"))
 ```
 
 ```{r sh-sel-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 27B collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 27B survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/GBb/shf_selectivity", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/GBb/shf_selectivity", fr, ".png"))
 ```
 
 ```{r sh-sel-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 25A-Sab collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 25A-Sab survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/Sab/shf_selectivity", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/Sab/shf_selectivity", fr, ".png"))
 ```
 
 ```{r sh-sel-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Annual density of estimated shell heights (above 65 millimetres, mm) of meats landed by the commercial fishery in SFA 26A collected during port sampling (black line), and of meats collected during the DFO Maritimes Offshore Scallop Survey (blue line), based on the new meat weight-shell height relationship derived from SFA 26A survey data. Shell heights are shown in 5 mm bins for consistency between the two datasets. Only meats landed from April to August (inclusive) are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/BBn/shf_selectivity", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/BBn/shf_selectivity", fr, ".png"))
 ```
 
 ```{r rec-comp-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 25A-Sab using recruit size ranges of 75--90 millimetres (mm, points), and 80--90 mm (triangles)."}
@@ -628,12 +628,8 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_GBb.png"))
 ```
 
-```{r growth-25, echo=FALSE, message=F, fig.align="center", fig.cap="Time series of growth estimates for SFA 25A-Sab for recruit (left) and fully-recruited (right) size classes using growth equations from Hubley et al. (2014)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/growth_Sab.png"))
-```
-
-```{r growth-26, echo=FALSE, message=F, fig.align="center", fig.cap="Time series of growth estimates for SFA 26A using the previous meat weight-shell height model and vonB parameters from Hubley et al. 2014 (in orange triangles) and using the new model and parameters (in black points) for recruit (left) and fully-recruited (right) size classes."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/growth_BBn.png"))
+```{r g-plt,echo=F, message=F, fig.align="centre", fig.cap="Growth rate of fully recruited (yellow circles) and recruit scallop (blue squares) in SFA 25A (top panel) and SFA 26A (bottom panel)",warning=F}
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/", nickname,"/growth_new.png"))
 ```
 
 ```{r cts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Index of clappers (empty, paired and hinged scallop shells) as a percentage of total survey catch per standardized tow for SFA 25 stocks by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). The shell heights associated with each size class for each stock are provided in Table 5. SFA 25A-Mid is shown with black points, SFA 25A-Sab is shown with orange triangles, and SFA 25B is shown with blue squares."}

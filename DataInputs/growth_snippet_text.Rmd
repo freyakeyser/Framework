@@ -1,37 +1,186 @@
 ---
-title: "Growth"
-author: "David Keith"
-date: "2024-03-19"
-output:
-  word_document: default
-  html_document: default
+title: "Revised Growth Rate Calculation Method and Results"
+date: "2024-04-04"
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(collapse)
+library(ggthemes)
 ```
 
 ## Growth
 
-Annual observed growth rates for recruit and fully-recruited size classes are calculated using a combination of the estimated meat weights in each shell height bin (i.e., each 5 mm shell height bin) and the expected growth of the scallop using the vonB relationship. The shell height bins are used to summarize the number of scallop in 5 mm bins, for the below calculations the scallop in each shell height bin are assumed to be at the mid-point of each shell height bin (e.g., for scallop in the 85-90 mm shell height category, the scallop are assumed to be 87.5 mm in height). For the recruit sized scallops (75-89 mm) the meat weight ($MW_{rec,t}$) was estimated using the weighted average of the meat weight in each shell height bin in each year (there are three recruit shell height bins, 75-80, 80-85, and 85-90) which was calculated using the current year meat-weight shell height relationship. 
+Annual observed growth rates for recruit and fully-recruited size classes are calculated using a combination of the estimated meat weights in each shell height bin (i.e., each 5 mm shell height bin) and the expected growth of the scallop using the vonB relationship. The shell height bins are used to summarize the number of scallop in 5 mm bins, for the below calculations the scallop in each shell height bin are assumed to be at the mid-point of each shell height bin (e.g., for scallop in the [85-90) mm shell height category, the scallop are assumed to be 87.5 mm in height). For the recruit sized scallops [75-90 mm) the meat weight ($MW_{[75-90),t}$) was estimated using the weighted average of the meat weight in each shell height bin in year $t$, (recruits are in the [75-80), [80-85), and [85-90) shell height bins). 
 
-$$ MW_{rec,t} = \sum_{i=[75:80)}^{[85:90)}{MW_{i,t} \frac{N_{i,t}}{N_{rec,tot,t}}}$$
-Here, $MW_{i,t}$ is the meat weight in the $i^th$ shell height bin in year $t$, $N_{i,t}$ is the estimated abundance in this shell height bin, and $N_{rec,tot,t}$ is the total estimated abundance of recruit scallop in year $t$. Based on the vonB relationship, the majority of recruit sized scallop will grow to be between 90 and 100 mm in size in the following year.  The average MW of scallop observed in the survey in the following year in the 90-100 mm size classes is calculated analogously
+$$ MW_{[75:90),t} = \sum_{i=[75:80)}^{[85:90)}{MW_{i,t} \frac{N_{i,t}}{N_{[75:90),t}}}$$
+Here, $MW_{i,t}$ is the meat weight in the $i^{th}$ shell height bin in year $t$, $N_{i,t}$ is the estimated abundance in this shell height bin, and $N_{[75:90),t}$ is the total estimated abundance of recruit scallop in year $t$. 
 
-
-$$ MW_{[90-100),t+1} = \sum_{i={[90:95)}}^{[95:100)}{MW_{i,t} \frac{N_{i,t}}{N_{[90-100),tot,t}}}$$
-The ratio of these values provides the growth estimate for the recruit sized scallop in a given year.
-
-$$ g_{rec,t} = \frac{MW_{[90-100),t+1}}{MW_{rec,t}} $$
-Fully-recruited growth is calculated in a similar manner.  First the average meat weight of the fully-recruited scallop ($ MW_{fr,t}$) in year $t$ is calculated
+Based on the vonB relationship, the majority of recruit sized scallop will have a shell height between 90 and 100 mm after one year.  Given this, we calculated the average MW of scallop observed in the survey in the following year in the [90-100) mm size classes
 
 
-$$ MW_{fr,t} = \sum_{i=[90:95)}^{SH_{max}}{MW_{i,t} \frac{N_{i,t}}{N_{fr,tot,t}}}$$
-In the following year the average meat weight of these scallop are again calculated.  Given the 90 mm scallop are expected to grow into the 100-105 mm scallop shell height bin, only scallop in the shell height bins of 100 mm and above are used for the MW calculation in the following year.
+$$ MW_{[90-100),t+1} = \sum_{i={[90:95)}}^{[95:100)}{MW_{i,t+1} \frac{N_{i,t+1}}{N_{[90-100),t+1}}}$$
+The ratio of these values provides the growth estimate for the recruit sized scallop in year $t$.
 
-$$ MW_{100+,t+1} = \sum_{i=[100:105)}^{SH_{max}}{MW_{i,t} \frac{ N_{i,t}}{N_{100+,tot,t}}}$$
-The ratio of these values provides the growth estimate for fully-recruited scallop in a given year.
+$$ g_{rec,t} = \frac{MW_{[90-100),t+1}}{MW_{[75:90),t}} $$
+Fully-recruited growth is calculated in a similar manner.  First, the average meat weight of the fully-recruited scallop ($MW_{[90-95)+,t}$) in year $t$ is calculated 
 
-$$ g_{fr,t} = \frac{MW_{[100+),t+1}}{MW_{fr,t}} $$
-When used in the model, estimates for the terminal year and years in which data for this calculation are unavailable are required, the median growth rate is assumed for these situtations.
+
+$$ MW_{[90-95)+,t} = \sum_{i=[90:95)}^{SH_{max}}{MW_{i,t} \frac{N_{i,t}}{N_{[90-95)+,t}}}$$
+$SH_{max}$ is the maximum observed shell height in year $t$. In the following year, the average meat weight of these scallop are again calculated.  Given a 90 mm scallop is expected to grow into the 100-105 mm scallop shell height bin, only scallop in the shell height bins of [100-105) mm and above are used for the MW calculation for year $t+1$.
+
+$$ MW_{[100-105)+,t+1} = \sum_{i=[100:105)}^{SH_{max}}{MW_{i,t+1} \frac{ N_{i,t+1}}{N_{[100-105)+,t+1}}}$$
+The ratio of these values provides the growth estimate for fully-recruited scallop in year $t$
+
+$$ g_{fr,t} = \frac{MW_{[100-105)+,t+1}}{MW_{[90-95)+,t}} $$
+When used in the model, estimates for the terminal year and years in which data for this calculation are unavailable are required, the median growth rate is assumed for these situations. Given this method requires two years of information, in years a survey does not occur results in two years that use the median growth rate is used for the models. In areas in which survey's do not occur annually, this method would not be a feasible means of estimating growth.
+
+<!-- I'm not running this because it is slow and I think we've settled on a method, uncomment to run the code --->
+
+<!-- ```{r g-code,include=F } -->
+
+<!-- # Load in the data -->
+<!-- load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData") -->
+
+<!-- # The other option is to calculate the growth using w.bar of everything over 100 mm, which will be default exclude the vast majority of the -->
+<!-- # recruits as 90 mm scallop will grow by about 12 cm, so might have a few recruits in there, but tracking the changes in that size class tells -->
+<!-- # us what the realized growth was for the FRs that excludes the recruits -->
+<!-- # So what we do is take the ratio of the w.bar for everything bigger than 100 mm in year 2, to the w.bar for all FR scallop in year one -->
+<!-- # Based on the von.B the vast majority of the scallop in that ratio be the same individuals. -->
+<!-- # So to calculate the 100 mm thing I'll need to use the shf in surv.dat... -->
+<!-- # I can do the same with recruit growth can't I, everything from 90 to 100 were probably recruits last year -->
+<!-- # so look at 75-90 last year and compare with 90 to 100 this year... -->
+
+<!-- sizes <- seq(0.025,2,by=0.05) # So I'd be using the 1.025 bin and everything bigger for the t+1 fully-recruited -->
+<!-- surv.years <- unique(surv.dat$BBn$year) -->
+<!-- # But not 2020... -->
+<!-- surv.years <- surv.years[surv.years != 2020] -->
+<!-- # The w.yst object is exactly proportional to mod.dat$I, there is an offset, but given I need proportions I think this object is perfectly fine to use. -->
+<!-- # SO this mw.per.bin is taking the stratified abundance and dividing it by the stratified numbers in each bin, which gives us the MW in that bin. -->
+<!-- # There is probably a MW object out there somewhere with this in it, but it should just be the same thing as this. -->
+<!-- mw.per.bin <- data.frame(mw.per.bin = rbind(survey.obj$BBn$shf.dat$w.yst/survey.obj$BBn$shf.dat$n.yst,rep(NA,40)),year = c(surv.years,2020)) -->
+<!-- N.per.bin <- data.frame(N.per.bin = rbind(survey.obj$BBn$shf.dat$n.yst,rep(NA,40)),year = c(surv.years,2020)) -->
+<!-- #reorder them -->
+<!-- mw.per.bin <- mw.per.bin[order(mw.per.bin$year),] -->
+<!-- N.per.bin <- N.per.bin[order(N.per.bin$year),] -->
+<!-- # Get the right bins for the FRs -->
+<!-- max.bin <- length(sizes) -->
+<!-- bin.frs.plus <- which(sizes == 1.025):max.bin -->
+<!-- bin.90.plus <- which(sizes == 0.925):max.bin -->
+<!-- bin.rec <- which(sizes == 0.775):min((bin.90.plus-1)) -->
+<!-- bin.frs.minus <- min(bin.90.plus):(min(bin.90.plus)+1) -->
+
+<!-- # and the right bins for the recruits -->
+
+<!-- # Now make a new object -->
+<!-- g.proper <- data.frame(year = mw.per.bin$year) -->
+<!-- g.proper$total.abun.90 <- rowSums(N.per.bin[,bin.90.plus]) -->
+<!-- g.proper$total.abun.frs <- rowSums(N.per.bin[,bin.frs.plus]) -->
+<!-- g.proper$total.rec.abun <- rowSums(N.per.bin[,bin.rec]) -->
+<!-- g.proper$total.frs.minus <- rowSums(N.per.bin[,bin.frs.minus]) -->
+<!-- # Propotions in each bin, FRs and -->
+<!-- N.prop.per.bin.90 <- N.per.bin[,bin.90.plus]/g.proper$total.abun.90 -->
+<!-- N.prop.per.bin.frs <- N.per.bin[,bin.frs.plus]/g.proper$total.abun.frs -->
+<!-- # Recs -->
+<!-- N.prop.per.bin.rec       <- N.per.bin[,bin.rec]/g.proper$total.rec.abun -->
+<!-- N.prop.per.bin.frs.minus <- N.per.bin[,bin.frs.minus]/g.proper$total.frs.minus -->
+
+<!-- # And the average mw in each of the bins of interest, first for the FRs -->
+<!-- g.proper$mw.frs.plus <-  rowSums(mw.per.bin[,bin.frs.plus] * N.prop.per.bin.frs,na.rm=T) -->
+<!-- g.proper$mw.90.plus <-   rowSums(mw.per.bin[,bin.90.plus] * N.prop.per.bin.90,na.rm=T) -->
+<!-- # and for the rec -->
+<!-- g.proper$mw.recs <-      rowSums(mw.per.bin[,bin.rec] * N.prop.per.bin.rec,na.rm=T) -->
+<!-- g.proper$mw.frs.minus <- rowSums(mw.per.bin[,bin.frs.minus] * N.prop.per.bin.frs.minus,na.rm=T) -->
+
+<!-- g.proper$g.proper <- c(g.proper$mw.frs.plus[2:length(g.proper$mw.frs.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA) -->
+<!-- g.proper$gR.proper<- c(g.proper$mw.frs.minus[2:length(g.proper$mw.frs.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA) -->
+
+
+<!-- g.proper[g.proper$year %in% c(1991,2020),-1] <- NA -->
+<!-- g.proper[g.proper$year %in% c(2019),which(names(g.proper) %in% c("g.proper","gR.proper"))] <- NA -->
+
+<!-- # Fill in the mean for the missing years -->
+<!-- g.proper$g.proper[g.proper$year %in% c(1991,2019,2020,2022)] <- median(g.proper$g.proper,na.rm=T) -->
+<!-- g.proper$gR.proper[g.proper$year %in% c(1991,2019,2020,2022)] <- median(g.proper$gR.proper,na.rm=T) -->
+
+
+<!-- g.proper.bbn <- data.frame(g.proper,bank = "SFA 26A") -->
+
+
+<!-- surv.years <- unique(surv.dat$Sab$year) -->
+<!-- # But not 2020... -->
+<!-- #surv.years <- surv.years[surv.years != 2020] -->
+<!-- # The w.yst object is exactly proportional to mod.dat$I, there is an offset, but given I need proportions I think this object is perfectly fine to use. -->
+<!-- # SO this mw.per.bin is taking the stratified abundance and dividing it by the stratified numbers in each bin, which gives us the MW in that bin. -->
+<!-- # There is probably a MW object out there somewhere with this in it, but it should just be the same thing as this. -->
+<!-- mw.per.bin <- data.frame(mw.per.bin = rbind(survey.obj$Sab$shf.dat$w.yst/survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020)) -->
+<!-- N.per.bin <- data.frame(N.per.bin = rbind(survey.obj$Sab$shf.dat$n.yst,rep(NA,40),rep(NA,40)),year = c(surv.years,2015,2020)) -->
+<!-- #reorder them -->
+<!-- mw.per.bin <- mw.per.bin[order(mw.per.bin$year),] -->
+<!-- N.per.bin <- N.per.bin[order(N.per.bin$year),] -->
+<!-- # Get the right bins for the FRs -->
+<!-- max.bin <- length(sizes) -->
+<!-- bin.frs.plus <- which(sizes == 1.025):max.bin -->
+<!-- bin.90.plus <- which(sizes == 0.925):max.bin -->
+<!-- bin.rec <- which(sizes == 0.775):min((bin.90.plus-1)) -->
+<!-- bin.frs.minus <- min(bin.90.plus):(min(bin.90.plus)+1) -->
+
+<!-- # and the right bins for the recruits -->
+
+<!-- # Now make a new object -->
+<!-- g.proper <- data.frame(year = mw.per.bin$year) -->
+<!-- g.proper$total.abun.90 <- rowSums(N.per.bin[,bin.90.plus]) -->
+<!-- g.proper$total.abun.frs <- rowSums(N.per.bin[,bin.frs.plus]) -->
+<!-- g.proper$total.rec.abun <- rowSums(N.per.bin[,bin.rec]) -->
+<!-- g.proper$total.frs.minus <- rowSums(N.per.bin[,bin.frs.minus]) -->
+<!-- # Propotions in each bin, FRs and -->
+<!-- N.prop.per.bin.90 <- N.per.bin[,bin.90.plus]/g.proper$total.abun.90 -->
+<!-- N.prop.per.bin.frs <- N.per.bin[,bin.frs.plus]/g.proper$total.abun.frs -->
+<!-- # Recs -->
+<!-- N.prop.per.bin.rec       <- N.per.bin[,bin.rec]/g.proper$total.rec.abun -->
+<!-- N.prop.per.bin.frs.minus <- N.per.bin[,bin.frs.minus]/g.proper$total.frs.minus -->
+
+<!-- # And the average mw in each of the bins of interest, first for the FRs -->
+<!-- g.proper$mw.frs.plus <-  rowSums(mw.per.bin[,bin.frs.plus] * N.prop.per.bin.frs,na.rm=T) -->
+<!-- g.proper$mw.90.plus <-   rowSums(mw.per.bin[,bin.90.plus] * N.prop.per.bin.90,na.rm=T) -->
+<!-- # and for the rec -->
+<!-- g.proper$mw.recs <-      rowSums(mw.per.bin[,bin.rec] * N.prop.per.bin.rec,na.rm=T) -->
+<!-- g.proper$mw.frs.minus <- rowSums(mw.per.bin[,bin.frs.minus] * N.prop.per.bin.frs.minus,na.rm=T) -->
+
+<!-- g.proper$g.proper <- c(g.proper$mw.frs.plus[2:length(g.proper$mw.frs.plus)]/g.proper$mw.90.plus[1:(length(g.proper$mw.90.plus)-1)],NA) -->
+<!-- g.proper$gR.proper<- c(g.proper$mw.frs.minus[2:length(g.proper$mw.frs.minus)]/g.proper$mw.recs[1:(length(g.proper$mw.recs)-1)],NA) -->
+
+
+<!-- g.proper[g.proper$year %in% c(1991,2015,2020),-1] <- NA -->
+<!-- g.proper[g.proper$year %in% c(2014,2019),which(names(g.proper) %in% c("g.proper","gR.proper"))] <- NA -->
+
+<!-- # Fill in the mean for the missing years -->
+<!-- g.proper$g.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] <- median(g.proper$g.proper,na.rm=T) -->
+<!-- g.proper$gR.proper[g.proper$year %in% c(1991,2014,2015,2019,2020,2022)] <- median(g.proper$gR.proper,na.rm=T) -->
+
+
+<!-- g.proper.sab <- data.frame(g.proper,bank = "SFA 25A") -->
+
+<!-- g.proper <- rbind(g.proper.sab,g.proper.bbn) -->
+
+<!-- saveRDS(g.proper,file = "D:/Framework/SFA_25_26_2024/Model/Data/revised_growth_data.Rds") -->
+
+<!-- ``` -->
+
+\newpage
+
+```{r g-plt,echo=F,fig.cap="Growth rate of fully recruited (yellow circles) and recruit scallop (blue squares) in SFA 25A (top panel) and SFA 26A (bottom panel)",warning=F,fig.dim=c(8,10)}
+
+g.proper <- readRDS(file = "revised_growth_data.Rds")
+
+ggplot(g.proper) + geom_point(aes(x=year,y=g.proper),color="#FFD500",shape =21,size=3,fill="#FFD500") + 
+                   geom_line(aes(x=year,y=g.proper),color="#FFD500",linewidth=2) + 
+                   geom_point(aes(x=year,y=gR.proper),color="#005BBB",shape =22,fill= "#005BBB",size=3) + 
+                   geom_line(aes(x=year,y=gR.proper),color="#005BBB",linewidth=2) + 
+                   facet_wrap(~bank,nrow=2,) + ylim(c(0,NA)) +
+                   theme_few(base_size = 16) + ylab("Growth rate")
+```
 

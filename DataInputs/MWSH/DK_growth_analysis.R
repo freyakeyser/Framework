@@ -124,7 +124,7 @@ write.csv(mwsh.samples, "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInp
 
 # Start analysis
 
-banker <- "Mid"
+banker <- "GBb"
 dat <- mw.dat.all[[banker]]
 dat$year <- as.numeric(dat$year)
 # with depth across all years (random effect is ID)
@@ -433,7 +433,7 @@ resid_summary <- resid[resid$sh>140,] %>%
   dplyr::group_by(year) %>%
   dplyr::summarize(bank=banker,`med.resid.140+`=median(residuals, na.rm=T))
 
-rs_range <- read.csv("W:/Offshore/Assessment/Data/Size_categories_by_bank_75-90.csv")
+rs_range <- read.csv("Y:/Offshore/Assessment/Data/Size_categories_by_bank_75-90.csv")
 minFR <- rs_range$CS[rs_range$Bank==banker] + 5 # column in n.yst for FRs
 if(200 %in% names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst)) & "years" %in% names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst))){
   colnum <- which(names(as.data.frame(survey.obj[[banker]]$shf.dat$n.yst))==minFR)
@@ -919,7 +919,7 @@ for(bnk in banks) {
   overall.prop <- rbind(overall.prop, prop)
 }
 
-overall.prop[overall.prop$med.resid.140. < -0.05,]
+overall.prop[overall.prop$med.resid.140. < -0.05 & overall.prop$bank=="Ger",]
 
 by.bank <- overall.prop |> collapse::fsubset(abs(med.resid.140.) > 0.1) |>collapse::fgroup_by(bank) |> collapse::fsummarise(med = median(prop))
 by.bank

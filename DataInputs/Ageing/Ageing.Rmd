@@ -349,7 +349,7 @@ print(lvb.par)
 #which bank?
 ```{r}
 bank <- "Sab"
-boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
+boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T, direct_fns="C:/Users/keyserf/Documents/Github/Assessment_fns/")
 
 ```
 
@@ -458,7 +458,7 @@ if(bank=="BBn") {# Fresh ages from TPD
   # get locations
   #tpd_long
   locs <- dplyr::left_join(tpd_long, all.surv.dat[all.surv.dat$bank=="BBn" & all.surv.dat$state=="live",]) %>%
-    dplyr::select("year", "bank", "tow", "lon", "lat") %>%
+    dplyr::select("year", "bank", "tow", "lon", "lat","depth") %>%
     dplyr::distinct()
   locs <- sf::st_as_sf(locs, coords=c("lon", "lat"), crs=4326)
   
@@ -468,13 +468,17 @@ if(bank=="BBn") {# Fresh ages from TPD
   
   locs <- left_join(locs, shells)
   
+  summary(locs$depth)
+  summary(all.surv.dat[all.surv.dat$bank=="BBn",]$depth)
+  
   png(paste0(plotsGo, "/", bank, "/age_map.png"),width=8, height=8, units = "in", res=420)
-  ggplot() + 
+  bbn_map <- ggplot() + 
     geom_sf(data=boundaries[boundaries$ID=="BBn",])+
     geom_sf(data=locs, aes(shape=as.factor(year), size=n_samples)) +
     scale_shape_manual(values=c(1,16), name="Year")+
     scale_size_continuous(name="Number of shells") +
     theme_bw()
+  print(bbn_map)
   dev.off()
   
 }
@@ -562,17 +566,20 @@ if(bank=="Sab") {
   
   # get locations
   #tpd_long
-  locs <- unique(all.surv.dat[all.surv.dat$bank==tpd_long$bank & 
-                 all.surv.dat$year==tpd_long$year &
-                 all.surv.dat$tow %in% tpd_long$tow, c("year", "bank", "tow", "lon", "lat")])
+  locs <- unique(all.surv.dat[all.surv.dat$bank==unique(tpd_long$bank) & 
+                 all.surv.dat$year %in% unique(tpd_long$year) &
+                 all.surv.dat$tow %in% tpd_long$tow, c("year", "bank", "tow", "lon", "lat", "depth")])
   locs <- sf::st_as_sf(locs, coords=c("lon", "lat"), crs=4326)
-  
+  summary(locs$depth)
   shells <- tpd_long %>% 
     dplyr::group_by(cruise, year, tow, bank) %>%
     dplyr::summarize(n_samples = length(unique(Scall.no)))
   
   locs <- dplyr::left_join(locs, shells)
   
+  summary(locs$depth)
+  summary(all.surv.dat[all.surv.dat$bank==unique(tpd_long$bank),]$depth)
+
   png(paste0(plotsGo, "/", bank, "/age_map.png"),width=8, height=8, units = "in", res=420)
   ggplot() + geom_sf(data=boundaries[boundaries$ID=="Sab",])+
     geom_sf(data=locs, aes(size=n_samples)) + 

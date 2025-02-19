@@ -796,7 +796,7 @@ for(sfa in sfa){
 
 # Spatial distribution of tows
 ```{r}
-boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
+boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T, direct_fns="C:/users/keyserf/Documents/Github/Assessment_fns/")
 
 #From Dave/Jessica
 library(sf)
@@ -958,103 +958,23 @@ dev.off()
 ```
 
 # Growth
-
 ```{r growth, echo=F, include=F}
 # from dave
 library(tidyverse)
-# repo.loc <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/Model/" #VERY SLOW!!
-# num.knots <- 20 
-# init.m <- 0.2 
-# qR <- 0.33
-# g.mod <- 'g_original'
-# vary.q <- T
-# R.size <- "75"
-# FR.size <- "90"
-# years <- 1994:2022
-# mod.select <- "SEAM"
-# 
-# scenario.10 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",10,"_knots_",'g_original')
-# scenario.20 <- paste0(min(years),"_",max(years),"_vary_m_m0_",init.m,"_qR_",qR,"_",20,"_knots_",'g_original')
-# 
-# # SEAM results
-# sab.10 <- readRDS(paste0(repo.loc,"Results/Sab/R_",R.size,"_FR_",FR.size,"/Sab_",mod.select,"_model_output_",scenario.10,".Rds"))
-# bbn.20 <- readRDS(paste0(repo.loc,"Results/BBn/R_",R.size,"_FR_",FR.size,"/BBn_",mod.select,"_model_output_",scenario.20,"_vary_q=TRUE.Rds"))
-bbn.20 <- read.csv("C:/Users/keyserf/Documents/temp_data/BBn_input_data_for_freya 2.csv")
-bbn.20 <- bbn.20[bbn.20$year %in% years,]
+library(ggplot2)
+library(collapse)
+library(ggthemes)
+g.proper <- readRDS(file = "revised_growth_data.Rds")
 
-sab.10 <- read.csv("C:/Users/keyserf/Documents/temp_data/Sab_mod_input_for_freya 2.csv")
-sab.10 <- sab.10[sab.10$year %in% years,]
-
-# Extract growth
-
-# sab.gs <- data.frame(g = c(sab.10$obj$env$data$gI[-length(sab.10$obj$env$data$gI)]),
-#                      gR = c(sab.10$obj$env$data$gR[-length(sab.10$obj$env$data$gR)]),
-#                      year = years) %>%
-#   pivot_longer(cols=c("g", "gR"))
-sab.gs <- data.frame(g = c(sab.10$g),
-                     gR = c(sab.10$gR),
-                     year = years) %>%
-  pivot_longer(cols=c("g", "gR"))
-
-sab.gs$name <- gsub(x=sab.gs$name, pattern="gR", replacement="Recruit")
-sab.gs$name <- gsub(x=sab.gs$name, pattern="g", replacement="Fully recruited")
-sab.gs$name <- factor(sab.gs$name, levels=c("Recruit", "Fully recruited"))
-
-# bbn.gs <- data.frame(g = c(bbn.20$obj$env$data$gI[-length(bbn.20$obj$env$data$gI)]),
-#                      gR = c(bbn.20$obj$env$data$gR[-length(bbn.20$obj$env$data$gR)]),
-#                      year = years,
-#                      version = "new")
-bbn.gs <- data.frame(g = c(bbn.20$g),
-                     gR = c(bbn.20$gR),
-                     year = years,
-                     version = "new")
-
-
-# old way for bbn
-load("Y:/Offshore/Assessment/Data/Model/2023/BBn/Model_input.RData")
-growth <- data.frame(bank="BBn", year=mod.dat$BBn$year, g=mod.dat$BBn$g, gR = mod.dat$BBn$gR, version="previous")
-
-growth <- full_join(bbn.gs, growth) %>%
-  pivot_longer(cols = c("g", "gR"))
-
-growth$name <- gsub(x=growth$name, pattern="gR", replacement="Recruit")
-growth$name <- gsub(x=growth$name, pattern="g", replacement="Fully recruited")
-growth$name <- factor(growth$name, levels=c("Recruit", "Fully recruited"))
-
-if(french==T){
-  growth$version <- gsub(x=growth$version, pattern="previous", replacement="ancien")
-  growth$version <- gsub(x=growth$version, pattern="new", replacement="nouveau")
-  #growth$version <- gsub(x=growth$version, pattern="vonB only", replacement="vonB seulement")
-}
-
-# remove missing data years
-growth[growth$year %in% 2019:2020,]$value <- NA
-sab.gs[sab.gs$year %in% 2014:2015,]$value <- NA
-
-png(filename=paste0(plotsGo, "/Survey/", nickname, "/growth_BBn.png"),width=6.5, height=4, units = "in", res=420)
-ggplot() + 
-  geom_line(data=growth, aes(year, value, colour=version)) +
-  geom_point(data=growth, aes(year, value, colour=version, shape=version)) +
-  theme_bw() + 
-  scale_colour_manual(values=c("black", "darkorange"), name=NULL) +
-  scale_shape_discrete(name=NULL) +
-  ylab(en2fr("Growth", translate=french, custom_terms=rosetta_terms)) +
-  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
-  facet_wrap(~en2fr(name, translate=french, custom_terms=rosetta_terms), scales="free_y")
+gp <- ggplot(g.proper[!is.na(g.proper$g.proper),]) + geom_point(aes(x=year,y=g.proper),color="#FFD500",shape =21,size=3,fill="#FFD500") + 
+                   geom_line(aes(x=year,y=g.proper),color="#FFD500",linewidth=2) + 
+                   geom_point(aes(x=year,y=gR.proper),color="#005BBB",shape =22,fill= "#005BBB",size=3) + 
+                   geom_line(aes(x=year,y=gR.proper),color="#005BBB",linewidth=2) + 
+                   facet_wrap(~bank,nrow=2,) + ylim(c(0,NA)) +
+                   theme_few(base_size = 16) + ylab("Growth rate") + xlab("Year")
+png(paste(plotsGo,"/growth_new.png",sep=""),width=10,height=8,res=920,units="in")
+print(gp)
 dev.off()
-
-png(filename=paste0(plotsGo, "/Survey/", nickname, "/growth_Sab.png"),width=6.5, height=4, units = "in", res=420)
-ggplot() + 
-  geom_line(data=sab.gs, aes(year, value)) +
-  geom_point(data=sab.gs, aes(year, value)) +
-  theme_bw() + 
-  scale_colour_manual(values=c("black"), name=NULL) +
-  scale_shape_discrete(name=NULL) +
-  ylab(en2fr("Growth", translate=french, custom_terms=rosetta_terms)) +
-  xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms)) +
-  facet_wrap(~en2fr(name, translate=french, custom_terms=rosetta_terms), scales="free_y")
-dev.off()
-
 ```
 
 
@@ -1753,6 +1673,9 @@ tac2$subarea[tac2$bank=="GBb"] <- "27B"
 tac2$subarea <- factor(x = tac2$subarea, levels=c("25", "25A", "25B", "26AB", "26A", "26B", "26C", "27B" ))
 fishery2$subarea <- factor(x = fishery2$subarea, levels=c("25", "25A", "25B", "26AB", "26A", "26B", "26C", "27B" ))
 
+tacwrite <- tac2[, c("Year", "sfa", "bank", "TAC")] %>% arrange(Year, sfa, bank)
+write.csv(file = paste0(plotsGo, "/fishery/tac.csv"), x=tacwrite)
+
 tac25 <- ggplot() + 
   geom_bar(data=tac2[tac2$sfa==25,], aes(Year, Landings), stat="identity", fill="grey", width=1) + 
   geom_bar(data=fishery2[fishery2$sfa==25,], aes(year, Landings/1000), stat="identity", fill="grey", width=1) + 
@@ -1806,37 +1729,29 @@ dev.off()
 png(filename=paste0(plotsGo, "/Fishery/tac", fr, "_27.png"),width=4, height= 3, units = "in", res=420)
 print(tac27)
 dev.off()
+
 # exploitation rates (relative, not modelled)
 # using survey year, so June to May
+fish_sf2 <- fish_sf 
+fish_sf2$sfa[grep(x=fish_sf2$sfa, "25")] <- 25
+fish_sf2$sfa[grep(x=fish_sf2$sfa, "26")] <- 26
+fish_sf2$sfa[grep(x=fish_sf2$sfa, "27")] <- 27
+fish_sf2$sfa[fish_sf2$bank %in% c("Ban", "Sab","Mid")] <- 25
+fish_sf2$sfa[fish_sf2$bank %in% c("BBn", "BBs", "Ger")] <- 26
+fish_sf2$sfa[fish_sf2$bank %in% c("GBb")] <- 27
 
-
-load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
-
-fish.dat <- fish.dat[!is.na(fish.dat$lon),]
-fish.dat <- fish.dat[!is.na(fish.dat$lat),]
-fish.dat <- fish.dat[!fish.dat$lon==0,]
-fish.dat <- fish.dat[!fish.dat$lat==0,]
-# bbn.fish_dk$month <- lubridate::month(bbn.fish_dk$date)
-fish.dat$month <- lubridate::month(lubridate::ymd(fish.dat$date))
-fish.dat$sfa[grep(x=fish.dat$sfa, "25")] <- 25
-fish.dat$sfa[grep(x=fish.dat$sfa, "26")] <- 26
-fish.dat$sfa[grep(x=fish.dat$sfa, "27")] <- 27
-fish.dat$sfa[fish.dat$bank %in% c("Ban", "Sab","Mid")] <- 25
-fish.dat$sfa[fish.dat$bank %in% c("BBn", "BBs", "Ger")] <- 26
-fish.dat$sfa[fish.dat$bank %in% c("GBb")] <- 27
-
-fish.dat$surv.year <- fish.dat$year 
-fish.dat$surv.year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26]-1
-fish.dat$surv.year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27]-1
+fish_sf2$surv.year <- fish_sf2$year 
+fish_sf2$surv.year[fish_sf2$month %in% 1:5 & fish_sf2$sfa %in% 25:26 ] <- fish_sf2$year[fish_sf2$month %in% 1:5 & fish_sf2$sfa %in% 25:26]-1
+fish_sf2$surv.year[fish_sf2$month %in% 1:8 & fish_sf2$sfa %in% 27] <- fish_sf2$year[fish_sf2$month %in% 1:8 & fish_sf2$sfa %in% 27]-1
 
 strata <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
-fish_sf2 <- st_as_sf(fish.dat, coords=c("lon", "lat"), remove=F, crs=4326) %>% st_transform(32619)
+fish_sf2 <- fish_sf2 %>% st_transform(32619)
 fish_sf2 <- st_intersection(fish_sf2, st_transform(strata, 32619))
 fish.dat2 <- fish.dat #safekeeping
 fish.dat <- fish_sf2
 #st_geometry(fish.dat) <- NULL
 
-by.sy <- fish.dat %>% data.frame() %>%  group_by(bank, surv.year)%>%   summarize(sum = sum(pro.repwt/1000))
+by.sy <- fish.dat %>% data.frame() %>%  group_by(bank, surv.year)%>%  dplyr::summarize(sum = sum(pro.repwt/1000))
 
 by.sy[by.sy$bank=="BBn" & by.sy$surv.year>1990,]
 
@@ -1846,12 +1761,12 @@ by.sy[by.sy$bank=="BBn" & by.sy$surv.year>1990,]
 #tail(fish.dat[, c("fished", "month", "year", "surv.year")], 50)
 survey.yr <- fish.dat %>%
   group_by(surv.year, bank, sfa) %>%
-  summarize(mt = sum(pro.repwt)/1000) %>%
-  mutate(year=surv.year)
+  dplyr::summarize(mt = sum(pro.repwt)/1000) %>%
+  dplyr::mutate(year=surv.year)
 
 fishing.yr <- fish.dat %>%
   group_by(year, bank, sfa) %>%
-  summarize(mt = sum(pro.repwt)/1000) 
+  dplyr::summarize(mt = sum(pro.repwt)/1000) 
   
 
 banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")

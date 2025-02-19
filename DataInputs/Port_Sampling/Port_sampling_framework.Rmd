@@ -16,8 +16,30 @@ require(viridis)
 
 direct <- "Y:/Offshore/Assessment/"
 
+funs <- c("https://raw.githubusercontent.com/Mar-scal/Assessment_fns/master/Fishery/logs_and_fishery_data.r")
+# Now run through a quick loop to load each one, just be sure that your working directory is read/write!
+for(fun in funs) 
+{
+  download.file(fun,destfile = basename(fun))
+  source(paste0(getwd(),"/",basename(fun)))
+  file.remove(paste0(getwd(),"/",basename(fun)))
+}
 # Bring in the port sampling data, which contains meat weights and meat counts for sampled fishing trips
-load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.rData"))
+#load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.rData"))
+#load(paste0("C:/Users/keyserf/Documents/temp_data/Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2024.RData"))
+load("./Port_sampling/portdat_2006-2022.RData")
+logs_and_fish(loc = "offshore", year = 2006:2022, get.local = T, get.marfis = F, direct=direct)
+fish.dat<-merge(new.log.dat,old.log.dat,all=T)
+port.dat$year <- year(ymd(port.dat$fished))
+port.dat$ps.date <- port.dat$date
+port.dat$ps.date <- ymd(port.dat$ps.date)
+port.dat$ps.fished <- ymd(port.dat$fished)
+port.dat$meat_weight <- port.dat$value
+port.dat$meat_weight <- port.dat$meat_weight/100
+port.dat <- dplyr::select(port.dat, -date, -value)
+port.dat$date <- port.dat$ps.fished
+port.sampling <- port.dat
+port.sampling$month <- month(port.sampling$date)
 # for port.sampling object, which becomes "bbn.dat" (even for sable)
 
 # survey data 
@@ -25,7 +47,8 @@ load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_n
 # for mw[[bnk]] object containing all survey and hydration mw data. 
 
 # plot destination
-plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/"
+#plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/new_wbit/"
+plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit2/"
 
 french <- F # set to T for french
 if(french==T) {fr <- "_fr"}
@@ -106,12 +129,14 @@ if(french==T) ylabel <- "Masse de la chair (g)"
 
 port.sampling$ID <- 1:nrow(port.sampling)
 port.sampling$meat_weight <- port.sampling$meat_weight*1.0989011 # add the bit
+port.sampling$month <- month(ymd(port.sampling$fished))
 
 medians <- port.sampling %>%
   group_by(bank, month, year) %>%
   dplyr::summarize(monthly_med=median(meat_weight),
             monthly_mean=mean(meat_weight),
-            monthly_sd=sd(meat_weight),
+            monthly_lqr=quantile(meat_weight, c(0.05, 0.5, 0.95, 1))[1],
+            monthly_uqr=quantile(meat_weight, c(0.05, 0.5, 0.95, 1))[3],
             nsamples = length(ID))
 
 medians2 <- port.sampling %>%
@@ -152,34 +177,46 @@ medians2$monthnum <- as.numeric(medians2$monthyr - min(medians$monthyr))
 labs <- unique(medians2[,c("monthnum", "monthyr")])
 labs$monthnum <- -labs$monthnum
 
+medians2 <- medians2[!is.na(medians2$bank),]
+medians <- medians[!is.na(medians$bank),]
 
 sfa <- c(25, 26, 27)
 for(i in sfa){
   margin <- margin(0,0,0,0, "cm")
   if(i %in% c(27)) margin <- margin(0,3,0,3, "cm")
-  if(i ==26) yn=-20
-  if(i == 25) yn=-60
-  if(i==27) yn=-10
+  if(i ==26) yn=-10
+  if(i == 25) yn=-30
+  if(i==27) yn=0
+  plot1 <-  ggplot() +
+    # geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
+    geom_segment(data=medians2[medians2$sfa==i,],mapping=aes(x=-monthnum, xend=-monthnum-365, y=annual_med, yend=annual_med), colour="blue", linewidth=1) +
+    geom_errorbar(data=medians[medians$sfa==i,], aes(x=-monthnum, ymin=monthly_lqr, ymax=monthly_uqr), width=0)+
+    geom_point(data=medians[medians$sfa==i,], aes(-monthnum, monthly_med)) +
+    geom_text(data=medians2[medians2$sfa==i,], aes(-monthnum - (365/2), yn, label=nsamples_yr), vjust=0.5, hjust=0, colour="blue")+
+    #geom_line(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med), group=1, size=1) +
+    facet_wrap(~bank, ncol=3) +
+    ylab(ylabel) +
+    xlab("Date")+
+    theme_bw() +
+    scale_x_continuous(breaks=labs$monthnum, labels=strftime(labs$monthyr, "%m/%Y"))+#, date_labels = "%m/%Y") +
+    coord_flip() +
+    theme(plot.margin=margin)
+  
+  brks <- ggplot_build(plot1)$layout$panel_params[[1]]$x$get_labels()
+  labs2 <- brks
+  labs2[labs2<0] <- ""
   png(paste0(plotsGo, "medians_long_vert", fr, "_", i, ".png"), width=6, height=7, units = "in", res=420)
   print(
-    ggplot() +
-      # geom_bar(data=medians2[medians2$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med, width=ndaysyr), stat="identity", fill="grey", just = 0) +
-      geom_segment(data=medians2[medians2$sfa==i,],mapping=aes(x=-monthnum, xend=-monthnum-365, y=annual_med, yend=annual_med), colour="blue", linewidth=1) +
-      geom_errorbar(data=medians[medians$sfa==i,], aes(x=-monthnum, ymin=monthly_med-(1.96*monthly_sd), ymax=monthly_med+(1.96*monthly_sd)), width=0)+
-      geom_point(data=medians[medians$sfa==i,], aes(-monthnum, monthly_med)) +
-      geom_text(data=medians2[medians2$sfa==i,], aes(-monthnum - (365/2), yn, label=nsamples_yr), vjust=0.5, hjust=0, colour="blue")+
-      #geom_line(data=medians[medians$bank %in% c("BBn", "Sab"),], aes(monthyr, annual_med), group=1, size=1) +
-      facet_wrap(~bank, ncol=3) +
-      ylab(ylabel) +
-      xlab("Date")+
-      theme_bw() +
-      scale_x_continuous(breaks=labs$monthnum, labels=strftime(labs$monthyr, "%m/%Y"))+#, date_labels = "%m/%Y") + 
-      #scale_y_continuous(expand=c(0.25,10)) +
-      coord_flip() +
-      theme(plot.margin=margin)
+    plot1 + scale_y_continuous(labels=labs2)
   )
   dev.off()
 }
+
+#CSVs
+# medians
+write.csv(dplyr::arrange(dplyr::select(medians, bank, year, month, nsamples), bank, year, month), file=paste0(plotsGo, "/medians.csv"))
+# medians2
+write.csv(dplyr::arrange(dplyr::select(medians2, bank, year, nsamples_yr), bank, year), file=paste0(plotsGo, "/medians2.csv"))
 
 # anomaly (seasonal)
 
@@ -225,7 +262,7 @@ ps_tab$main[ps_tab$bank %in% c("Sab", "BBn")] <- "*"
 
 #1:12 %in% unique(port.sampling[port.sampling$bank=="Sab",]$month)
 # Sable is missing data from Jan and Feb
-write.csv(ps_tab, paste0(plotsGo, "/ps_tab.csv"))
+write.csv(ps_tab, paste0(plotsGo, "ps_tab.csv"))
 
 ps_tab$ltm_mc <- 500/ps_tab$ltm_mw
 mc.reg <- read.csv("Y:/Offshore/Assessment/Data/Fishery_regulations_by_bank.csv")
@@ -233,7 +270,7 @@ mc.reg <- unique(dplyr::select(mc.reg, Bank, MC_reg))
 mc.reg$bank <- mc.reg$Bank
 mc.reg <- dplyr::select(mc.reg, -Bank)
 ps_tab3 <- left_join(ps_tab, mc.reg)
-write.csv(ps_tab3, paste0(plotsGo, "/ps_tab_w_MC.csv"))
+write.csv(ps_tab3, paste0(plotsGo, "ps_tab_w_MC.csv"))
 
 # more summaries for meeting
 ps_tab2 <- port.sampling %>% 
@@ -244,15 +281,15 @@ ps_tab2 <- port.sampling %>%
   dplyr::ungroup()
 
 png(paste0(plotsGo, "ps_summary_vessels.png"), width=18, height=9, units = "in", res=420)
-ggplot() + geom_point(data=ps_tab2, aes(year, month, size=vessels)) +
-  geom_text(data=ps_tab2, aes(year, month, label=vessels), size=3, nudge_x = 0.2) + 
+ggplot() + geom_point(data=ps_tab2, aes(year, month, size=`number of port sampled vessels`)) +
+  geom_text(data=ps_tab2, aes(year, month, label=`number of port sampled vessels`), size=3, nudge_x = 0.2) + 
   facet_grid(sfa+bank~., drop=T,scales="free") +
   scale_size_continuous(name="Number of\nvessels sampled")
 dev.off()
 
 png(paste0(plotsGo, "ps_summary_samples.png"), width=18, height=9, units = "in", res=420)
-ggplot() + geom_point(data=ps_tab2, aes(year, month, size=total)) +
-  geom_text(data=ps_tab2, aes(year, month, label=total), size=3, nudge_x = 0.15, hjust=0) + 
+ggplot() + geom_point(data=ps_tab2, aes(year, month, size=`number of port samples`)) +
+  geom_text(data=ps_tab2, aes(year, month, label=`number of port samples`), size=3, nudge_x = 0.15, hjust=0) + 
   facet_grid(sfa+bank~., drop=T,scales="free") +
   scale_size_continuous(name="Number of samples")
 dev.off()
@@ -261,7 +298,8 @@ fishing <- fish.dat %>%
   dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
   dplyr::mutate(month=month(ymd(date)))%>%
   dplyr::group_by(bank, year, month) %>%
-  dplyr::summarize(`number of fishing trips` = length(unique(trip.id))) %>%
+  dplyr::summarize(`number of fishing trips` = length(unique(trip.id)),
+                   landings=sum(pro.repwt)) %>%
   dplyr::ungroup()
 
 ps_tab2$sfa <- as.character(ps_tab2$sfa)
@@ -269,44 +307,40 @@ ps_tab2 <- left_join(fishing, ps_tab2)
 
 write.csv(ps_tab2, paste0(plotsGo, "/ps_tab2.csv"))
 
+fishloc <- fish.dat %>% dplyr::group_by(trip.id, fished) %>%
+  dplyr::summarize(lat=mean(lat),
+                   lon=mean(lon))
 
 simplified <- port.sampling
+simplified$fished <- ymd(simplified$fished)
+simplified <- left_join(simplified, fishloc)
 simplified$lon <- round(simplified$lon,2)
 simplified$lat <- round(simplified$lat,2)
 simplified <- unique(simplified[, c("lon", "lat", "year", "boat", "bank", "sfa")])
 
 png(paste0(plotsGo, "ps_summary_spatial_25.png"), width=18, height=9, units = "in", res=420)
-ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==25,], aes(lon, lat)) + 
+ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==25 & !is.na(simplified$lon),], aes(lon, lat)) + 
   facet_wrap(~year, scales="free")
 dev.off()
 
 png(paste0(plotsGo, "ps_summary_spatial_26.png"), width=18, height=9, units = "in", res=420)
-ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==26,], aes(lon, lat)) + 
-  facet_wrap(~year, scales="free")
-
-png(paste0(plotsGo, "ps_summary_spatial_27.png"), width=18, height=9, units = "in", res=420)
-ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==27,], aes(lon, lat)) + 
+ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==26 & !is.na(simplified$lon),], aes(lon, lat)) + 
   facet_wrap(~year, scales="free")
 dev.off()
 
-# what proportion of landings from april to august?
-total <- fish.dat %>%
-  dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
-  dplyr::mutate(month=month(ymd(date)))%>%
-  dplyr::group_by(bank, year) %>%
-  dplyr::summarize(total=sum(pro.repwt))
+png(paste0(plotsGo, "ps_summary_spatial_27.png"), width=18, height=9, units = "in", res=420)
+ggplot() + geom_point(data=simplified[!simplified$bank %in% c("GBa", "SPB") & !simplified$lon ==0 & simplified$sfa==27 & !is.na(simplified$lon),], aes(lon, lat)) + 
+  facet_wrap(~year, scales="free")
+dev.off()
+ 
+months <- fishing %>% group_by(bank, year) %>%
+  dplyr::summarize(total=sum(landings, na.rm=T))
 
-months <- fish.dat %>%
-  dplyr::filter(!bank %in% c("GBa", "SPB")) %>%
-  dplyr::mutate(month=month(ymd(date)))%>%
-  dplyr::group_by(bank, year, month) %>%
-  dplyr::summarize(kg=sum(pro.repwt)) %>%
-  dplyr::filter(month %in% 4:8) %>%
-  dplyr::ungroup() %>%
-  dplyr::group_by(bank, year) %>%
-  dplyr::summarize(springsummer = sum(kg)) %>%
-  dplyr::left_join(total) %>%
-  dplyr::mutate(prop = springsummer/total)
+months <- fishing %>% filter(month %in% 4:8) %>%
+  group_by(bank, year) %>%
+  dplyr::summarize(atoa=sum(landings)) %>%
+  left_join(months) %>%
+  mutate(prop=atoa/total)
 
 png(paste0(plotsGo, "april_to_august.png"), width=6, height=5, units = "in", res=420)
 ggplot() + geom_boxplot(data=months, aes(bank, prop)) + 
@@ -317,9 +351,9 @@ dev.off()
 
 # Single bank results
 ```{r}
-bank <- "Ger"
+bank <- "Ban"
 
-bbn.dat <- port.sampling[port.sampling$bank == bank,]
+bbn.dat <- port.sampling[port.sampling$bank == bank & !is.na(port.sampling$bank),]
 
 # For the models to come let's center on the day we believe the ASM's arrive on the scence (May 24, 2010 according to Ginette)
 # The day here represents 100 days. FK changed ps.date to ps.fished
@@ -426,7 +460,6 @@ print(sh.plt)
 #                                bandwidth=5 # you may wish to adjust this
 #                                ) +
 
-
 scale_fac <- length(unique(bbn.dat$surv.year[!is.na(bbn.dat$sh)]))/length(unique(bbn.dat$surv.year))
 
 png(paste0(plotsGo, bank, "/shf_ps", fr, "_new.png"), width=6.5, height=8, units = "in", res=420)
@@ -440,7 +473,10 @@ ggplot() +
   scale_y_discrete(expand=c(0,0.9), limits=rev)
 dev.off()  
 
-
+# summary values from above plot (ranges insufficient):
+ps_shf_tab <- data.frame(bank=bank, lqr75 = quantile(bbn.dat$sh, probs = c(0, 0.125, 0.875, 1), na.rm=T)[2], 
+           uqr75 = quantile(bbn.dat$sh, probs = c(0, 0.125, 0.875, 1), na.rm=T)[3],row.names = NULL)
+write.csv(ps_shf_tab, file=paste0(plotsGo, bank, "/shf_ps", fr, "_tab.csv"))
 # combine with survey SHF
 shf <- SHF.summary[[bank]]
 names(shf)[1] <- "years"
@@ -651,7 +687,7 @@ shf <- shf %>%
   dplyr::select(-shf) %>%
   dplyr::distinct() %>%
   dplyr::group_by(years, name) %>%
-  mutate(cumsum_d = cumsum(value))
+  dplyr::mutate(cumsum_d = cumsum(value))
 
 RS <- unique(survey.obj[[bank]]$model.dat$RS[survey.obj[[bank]]$model.dat$year>2020])
 CS <- unique(survey.obj[[bank]]$model.dat$CS[survey.obj[[bank]]$model.dat$year>2020])
@@ -744,7 +780,7 @@ if(!bank=="Ger") {
 }
 
 # for text:
-yearround <- overall %>% group_by(lim) %>% summarize(median(prop))
+yearround <- overall %>% dplyr::group_by(lim) %>% dplyr::summarize(median(prop))
 
 
 
@@ -829,7 +865,7 @@ ggplot() +
 dev.off()
 
 # for text:
-ss <- overall %>% group_by(lim) %>% summarize(median(prop))
+ss <- overall %>% dplyr::group_by(lim) %>% dplyr::summarize(median(prop))
 yearround$type <- "yearround"
 ss$type <- "ss"
 overall <- full_join(yearround, ss)
@@ -867,40 +903,59 @@ unique(fish.dat[fish.dat$bank=="BBs" & fish.dat$year==2022,]$tripnum)
 unique(fish.dat[fish.dat$bank=="BBs" & fish.dat$year==2013,]$tripnum)
 ```
 
-#comparing bit to no bit
+#comparing bit to no bit and sensitivity testing the other joining methods
 ```{r}
+# In some cases, we have MORE samples than Ginette. This was due to double-counting samples collected on days where a vessel fished on both banks (split trips). 
+# I couldn't resolve this fully, but I can compare the results of multiple methods...
+
 no_bit <- NULL
 with_bit <- NULL
+mod_bit <- NULL
+new_bit <- NULL
+mod_bit2 <- NULL
 for(bank in c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")){
-  no <- read.csv(paste0(plotsGo, bank, "/no bit/boxplot_vals.csv"))
+  print(bank)
+  no <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/", bank,"/no bit/boxplot_vals.csv"))
   no$bank <- bank
   no_bit <- rbind(no_bit, no)
-  
-  with <- read.csv(paste0(plotsGo, bank, "/boxplot_vals.csv"))
+
+  with <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/", bank,"/w_bit/boxplot_vals.csv"))
   with$bank <- bank
   with_bit <- rbind(with_bit, with)
+
+  mod <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/", bank,"/boxplot_vals.csv"))
+  mod$bank <- bank
+  mod_bit <- rbind(mod_bit, mod)
+  
+    mod2 <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit2/", bank,"/boxplot_vals.csv"))
+  mod2$bank <- bank
+  mod_bit2 <- rbind(mod_bit2, mod2)
+  
+  new <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/new_wbit/", bank,"/boxplot_vals.csv"))
+  new$bank <- bank
+  new_bit <- rbind(new_bit, new)
 }
 
 no_bit$bit <- "no"
 with_bit$bit <- "yes"
-bit <- rbind(no_bit, with_bit)
+mod_bit$bit <-"mod"
+mod_bit2$bit <-"mod2"
+new_bit$bit <- "new"
+bit <- rbind(no_bit, with_bit, mod_bit, mod_bit2, new_bit)
 
 bit$lim <- gsub(bit$lim, pattern = "<", replacement="")
 bit$lim <-as.numeric(bit$lim)
 png(filename=paste0(plotsGo, "bit_comparison.png"), height=6, width=10, units="in", res=420)
-ggplot() + geom_point(data=bit, aes(lim, median.prop., shape=bit)) + 
+ggplot() + geom_point(data=bit, aes(lim, median.prop., shape=bit), position=position_dodge(width=0.5)) + 
   facet_grid(type~bank) + theme_bw() +
-  scale_shape_manual(values=c(1,16)) +
+  scale_shape_manual(values=c(1,2,4,5,6))+
   xlab("Minimum fully recruited size (mm)") +
   ylab("Proportion of meats below fully recruited size")
 dev.off()
-```
 
-# comparing to GR numbers of samples per year by bank
-```{r}
-# In some cases, we have MORE samples than Ginette. This was due to double-counting samples collected on days where a vessel fished on both banks (split trips). 
+bit[bit$bank=="GBb" & bit$lim ==95,]
 
+ps_tab_compare <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/ps_tab_compare.csv")
 
-
-
+ggplot() + geom_point(data=ps_tab_compare, aes(type, total)) + facet_wrap(~bank, scales="free")
 ```

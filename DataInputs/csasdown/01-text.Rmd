@@ -10,11 +10,18 @@ editor_options:
 ```{r}
 banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")
 ps.prop <- NULL
+shf_quan <- NULL
 for(i in banks){
-  ps.props <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/", i, "/boxplot_vals.csv"))
+  ps.props <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/", i, "/boxplot_vals.csv"))
   ps.props$bank <- i
   ps.props$median.prop. <- round(ps.props$median.prop., 3)
   ps.prop <- rbind(ps.prop, ps.props)
+  
+  shf_quans <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/", i, "/shf_ps_tab.csv"))
+  shf_quans$bank <- i
+  shf_quans$lqr75 <- round(shf_quans$lqr75/5) *5
+  shf_quans$uqr75 <- round(shf_quans$uqr75/5) *5
+  shf_quan <- rbind(shf_quan, shf_quans)
 }
 
 # ps.prop <- pivot_wider(ps.prop, id_cols = c(bank, lim), names_from = type, values_from=median.prop.) %>%
@@ -246,11 +253,11 @@ For the two stocks for which models are being developed as part of this Framewor
 
 The first step in this analysis is to estimate the shell heights of scallop targeted by the fishery. The Port Sampling data provide a sample of the scallop meat weights landed by the fishery.  These meat weights can be converted to shell heights using the MWSH models developed for each stock. Given the known seasonal variability in scallop meat weight [@hennen_shell_2012; @sarro_spatial_2009], this analysis used port sampling data from two time periods: year-round, and from April to August (inclusive). This shorter period of time corresponds to the period in which most fishing activity occurs, is similar to the timing of the annual surveys (mid-late May and August), and is prior to the fall spawning period when meat weights typically decline and after the meat weight increase peaks in the spring [@hennen_shell_2012; @sarro_spatial_2009].
 
-The shell heights of meats landed in SFA 25A-Sab were estimated to range between 65 and 195 mm (Figure \@ref(fig:sh-ps-sab)) and over 98% of landings were of scallops greater than 90 mm in shell height (Figures \@ref(fig:prop-ps-sab) and \@ref(fig:propss-ps-sab)). The shell heights of meats landed in SFA 25A-Mid were estimated to range between 70 and 160 mm (Figure \@ref(fig:sh-ps-mid)) and over 86% of landings were of scallops greater than 90 mm in shell height (Figures \@ref(fig:prop-ps-mid) and \@ref(fig:propss-ps-mid)). The shell heights of meats landed in SFA 25B were estimated to range between 80 and 175 mm (Figure \@ref(fig:sh-ps-ban)) and over 97% of landings were of scallops greater than 90 mm in shell height (Figures \@ref(fig:prop-ps-ban) and \@ref(fig:propss-ps-ban)). 
+Approximately 75% of meats landed in SFA 25A-Sab had estimated shell heights of `r shf_quan$lqr75[shf_quan$bank=="Sab"]` to `r shf_quan$uqr75[shf_quan$bank=="Sab"]` mm (Figure \@ref(fig:sh-ps-sab)) and over 98% of landings were of scallops greater than 90 mm in shell height (Figures \@ref(fig:prop-ps-sab) and \@ref(fig:propss-ps-sab)). Approximately 75% of meats landed in SFA 25A-Mid had estimated shell heights of `r shf_quan$lqr75[shf_quan$bank=="Mid"]` to `r shf_quan$uqr75[shf_quan$bank=="Mid"]` mm (Figure \@ref(fig:sh-ps-mid)) and over 86% of landings were of scallops greater than 90 mm in shell height (Figures \@ref(fig:prop-ps-mid) and \@ref(fig:propss-ps-mid)). Approximately 75% of meats landed in SFA 25B had estimated shell heights of `r shf_quan$lqr75[shf_quan$bank=="Ban"]` to `r shf_quan$uqr75[shf_quan$bank=="Ban"]` mm (Figure \@ref(fig:sh-ps-ban)) and over 97% of landings were of scallops greater than 90 mm in shell height (Figures \@ref(fig:prop-ps-ban) and \@ref(fig:propss-ps-ban)). 
 
-The shell heights of meats landed in SFA 26A were estimated to range between 65 and 200 mm (Figure \@ref(fig:sh-ps-bbn)) and over 95% of landings were of scallops greater than 95 mm in shell height (Figures \@ref(fig:prop-ps-bbn) and \@ref(fig:propss-ps-bbn)). The shell heights of meats landed in SFA 26B were estimated to range between 75 and 190 mm (Figure \@ref(fig:sh-ps-bbs)) and over 98% of landings were of scallops greater than 95 mm in shell height (Figures \@ref(fig:prop-ps-bbs) and \@ref(fig:propss-ps-bbs)). The shell heights of meats landed in SFA 26C were estimated to range between 70 and 195 mm (Figure \@ref(fig:sh-ps-ger)) and over 95% of landings were of scallops greater than 105 mm in shell height (Figures \@ref(fig:prop-ps-ger) and \@ref(fig:propss-ps-ger)).
+Approximately 75% of meats landed in SFA 26A had estimated shell heights of `r shf_quan$lqr75[shf_quan$bank=="BBn"]` to `r shf_quan$uqr75[shf_quan$bank=="BBn"]` mm (Figure \@ref(fig:sh-ps-bbn)) and over 95% of landings were of scallops greater than 95 mm in shell height (Figures \@ref(fig:prop-ps-bbn) and \@ref(fig:propss-ps-bbn)). Approximately 75% of meats landed in SFA 26B had estimated shell heights of `r shf_quan$lqr75[shf_quan$bank=="BBs"]` to `r shf_quan$uqr75[shf_quan$bank=="BBs"]` mm (Figure \@ref(fig:sh-ps-bbs)) and over 98% of landings were of scallops greater than 95 mm in shell height (Figures \@ref(fig:prop-ps-bbs) and \@ref(fig:propss-ps-bbs)). Approximately 75% of meats landed in SFA 26C had estimated shell heights of `r shf_quan$lqr75[shf_quan$bank=="Ger"]` to `r shf_quan$uqr75[shf_quan$bank=="Ger"]` mm (Figure \@ref(fig:sh-ps-ger)) and over 95% of landings were of scallops greater than 105 mm in shell height (Figures \@ref(fig:prop-ps-ger) and \@ref(fig:propss-ps-ger)).
 
-The shell heights of meats landed in SFA 27B were estimated to range between 65 and 175 mm (Figure \@ref(fig:sh-ps-gbb)) and over 97% of landings were of scallops greater than 95 mm in shell height (Figures \@ref(fig:prop-ps-gbb) and \@ref(fig:propss-ps-gbb)).
+Approximately 75% of meats landed in SFA 27B had estimated shell heights of `r shf_quan$lqr75[shf_quan$bank=="GBb"]` to `r shf_quan$uqr75[shf_quan$bank=="GBb"]` mm (Figure \@ref(fig:sh-ps-gbb)) and over 97% of landings were of scallops greater than 95 mm in shell height (Figures \@ref(fig:prop-ps-gbb) and \@ref(fig:propss-ps-gbb)).
 
 The next step in the process is to explore the size-selectivity of the fishery by comparing the estimated shell height distribution in the fishery (using data from April to August) with the shell height distribution in the survey for each year that both data types are available. This is undertaken to determine whether the fishery is targeting a range of scallop shell heights that differs from the shell height distribution of the scallop population. Here an assumption is made that the shell height distribution observed using the survey gear is representative of the actual shell height of the scallop population. 
 
@@ -297,14 +304,34 @@ In SFA 27B the extremely large recruitment event in 2014 makes interpretation of
 
 ## Growth
 
-Annual observed growth rates are calculated for recruit and fully-recruited size classes following @hubley_georges_2014. The calculation involves vonB growth parameters, so growth can only be calculated for SFA 25A-Sab and SFA 26A. The growth rates of fully-recruited ($g_{fr,t-1}$) and recruit ($g_{r,t-1}$) scallops are calculated as the ratios between the expected average meat weight (see page 4 in Hubley et al. 2014) of fully-recruited ($\bar{w}_{fr,t}$) or recruit sized scallops ($\bar{w}_{r,t}$) in the current year's survey ($t$) and the observed average meat weight of fully-recruited or recruit sized scallops in the previous year $(t-1)$:
+Annual observed growth rates for recruit and fully-recruited size classes are calculated using a combination of the estimated meat weights in each shell height bin (i.e., each 5 mm shell height bin) and the expected growth of the scallop using the vonB relationship. The shell height bins are used to summarize the number of scallop in 5 mm bins. For the below calculations, the scallop in each shell height bin are assumed to be at the mid-point of each shell height bin (e.g., for scallop in the [85-90) mm shell height category, the scallop are assumed to be 87.5 mm in height). For the recruit sized scallops [75-90 mm), the meat weight ($MW_{[75-90),t}$) was estimated using the weighted average of the meat weight in each shell height bin in year $t$, (recruits are in the [75-80), [80-85), and [85-90) shell height bins).  
 
-<!-- \begin{align}  -->
-$$g_{fr,t-1} = \frac{\bar{w}_{fr,t}}{\bar{w}_{fr,t-1}}$$
-$$g_{r,t-1} = \frac{\bar{w}_{r,t}}{\bar{w}_{r,t-1}}$$
-<!-- \end{align} -->
+$$ MW_{[75:90),t} = \sum_{i=[75:80)}^{[85:90)}{MW_{i,t} \frac{N_{i,t}}{N_{[75:90),t}}}$$
 
-The growth rates can vary substantially from year to year, but no temporal trends in growth are evident for either stock (Figures \@ref(fig:growth-25) and \@ref(fig:growth-26)). Growth rates for SFA 26A using the new MWSH model and new vonB growth parameters presented in this document are higher than growth rates calculated using the previous MWSH model and vonB parameters from @hubley_georges_2014, but the variability between years is similar (Figure \@ref(fig:growth-26)). 
+Here, $MW_{i,t}$ is the meat weight in the $i^{th}$ shell height bin in year $t$, $N_{i,t}$ is the estimated abundance in this shell height bin, and $N_{[75:90),t}$ is the total estimated abundance of recruit scallop in year $t$. 
+
+Based on the vonB relationship, the majority of recruit sized scallop will have a shell height between 90 and 100 mm after one year.  Given this, we calculated the average MW of scallop observed in the survey in the following year in the [90-100) mm size classes
+
+$$ MW_{[90-100),t+1} = \sum_{i={[90:95)}}^{[95:100)}{MW_{i,t+1} \frac{N_{i,t+1}}{N_{[90-100),t+1}}}$$  
+
+The ratio of these values provides the growth estimate for the recruit sized scallop in year $t$.
+
+$$ g_{rec,t} = \frac{MW_{[90-100),t+1}}{MW_{[75:90),t}} $$
+
+Fully-recruited growth is calculated in a similar manner.  First, the average meat weight of the fully-recruited scallop ($MW_{[90-95)+,t}$) in year $t$ is calculated:
+
+$$ MW_{[90-95)+,t} = \sum_{i=[90:95)}^{SH_{max}}{MW_{i,t} \frac{N_{i,t}}{N_{[90-95)+,t}}}$$
+
+$SH_{max}$ is the maximum observed shell height in year $t$. In the following year, the average meat weight of these scallop are again calculated.  Given a 90 mm scallop is expected to grow into the 100-105 mm scallop shell height bin, only scallop in the shell height bins of [100-105) mm and above are used for the MW calculation for year $t+1$.
+
+$$ MW_{[100-105)+,t+1} = \sum_{i=[100:105)}^{SH_{max}}{MW_{i,t+1} \frac{ N_{i,t+1}}{N_{[100-105)+,t+1}}}$$
+
+The ratio of these values provides the growth estimate for fully-recruited scallop in year $t$.
+
+$$ g_{fr,t} = \frac{MW_{[100-105)+,t+1}}{MW_{[90-95)+,t}} $$
+When used in the model, estimates for the terminal year and years in which data for this calculation are unavailable are required, the median growth rate is assumed for these situations. Given this method requires two years of information, in years a survey does not occur results in two years that use the median growth rate is used for the models. In areas in which survey's do not occur annually, this method would not be a feasible means of estimating growth.
+
+The growth rates can vary substantially from year to year, but no temporal trends in growth are evident for either stock (Figures \@ref(fig:g-plt). Growth rates for SFA 26A using the new MWSH model and new vonB growth parameters presented in this document are higher than growth rates calculated using the previous MWSH model and vonB parameters from @hubley_georges_2014.
 
 ## Natural Mortality
 

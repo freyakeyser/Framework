@@ -159,7 +159,7 @@ port.dat$day <- day(port.dat$ps.fished)
 # There are some types in the fished entries for the year, so this is simple fix for those key punch mistakes...
 port.dat$ps.fished <- ymd(paste(port.dat$year,port.dat$month,port.dat$day))
 
-save.image(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_raw_data_2022.RData"))
+save.image(paste0("C:/Users/keyserf/Documents/temp_data/Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_raw_data_2024.RData"))
 #load(paste0("C:/Users/keyserf/Documents/temp_data/Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_raw_data_2022.RData"))
 
 ############  Section 2 - Add in teh fishery data to the port sampling...
@@ -285,7 +285,8 @@ port.sampling <- port.sampling[-which(is.na(port.sampling$bank)),]
 ASMs <- off.fleet[!is.na(off.fleet$ASM_date),]
 for(i in 1:nrow(ASMs)) port.sampling$fleet[port.sampling$boat == ASMs$ID_alt_Port_Sampling[i] & port.sampling$date >= ASMs$ASM_date[i]] <- "ASM"
 
-save.image(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.RData"))
+#save.image(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.RData"))
+save.image(paste0("C:/Users/keyserf/Documents/temp_data/Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2024.RData"))
 
 
 ################  End Section 1, processing the port sampling meat weight information  --  End Section 1 ##############################################

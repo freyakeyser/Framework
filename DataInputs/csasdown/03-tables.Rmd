@@ -35,7 +35,7 @@ strata$`Area (km^2^)`[is.na(strata$`Area (km^2^)`)] <- "NA"
 # strata <- kableExtra::kbl(strata, align = "l", valign = "t") %>%
 #   kableExtra::collapse_rows(columns = 1:4, valign = "top")
 
-ps_tab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/ps_tab.csv")
+ps_tab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/ps_tab.csv")
 ps_tab <- dplyr::select(ps_tab, -X, -main)
 names(ps_tab) <- c("SFA", "Stock", "Number of samples", "Number of years with PS data", "Most recent year with PS data", "Number of months with PS data, all years combined (to a maximum of 12)", "Long term median MW (g)", "Standard deviation MW (g)", "Minimum MW (g)", "Maximum MW (g)")
 
