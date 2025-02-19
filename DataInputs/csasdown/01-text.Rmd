@@ -12,12 +12,12 @@ banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")
 ps.prop <- NULL
 shf_quan <- NULL
 for(i in banks){
-  ps.props <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/", i, "/boxplot_vals.csv"))
+  ps.props <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit2/", i, "/boxplot_vals.csv"))
   ps.props$bank <- i
   ps.props$median.prop. <- round(ps.props$median.prop., 3)
   ps.prop <- rbind(ps.prop, ps.props)
   
-  shf_quans <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit/", i, "/shf_ps_tab.csv"))
+  shf_quans <- read.csv(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit2/", i, "/shf_ps_tab.csv"))
   shf_quans$bank <- i
   shf_quans$lqr75 <- round(shf_quans$lqr75/5) *5
   shf_quans$uqr75 <- round(shf_quans$uqr75/5) *5
@@ -78,6 +78,13 @@ Since approximately 2010, the Offshore Scallop fleet has gradually shifted towar
 ## Fishery data
 
 Commercial fishery data are collected from mandatory logbooks submitted by fishers at the end of each trip. Landings are subject to dockside monitoring and a port sampling program to independently verify landed weights and compliance with meat count regulations. Logbook data are subjected to a quality control process to validate information used for Science purposes related to location, date, gear, tow duration and number, and landings. Prior to 2009, fishing log data were recorded on a 24 hour basis; from 2009 on, log data were recorded every 6 hours. For fishing that occurred prior to 2009, only records that passed historical quality control protocols (historically deemed "class 1", meaning that effort data for the records were available and reliable) were used for catch rate calculations; these catch rates were then used to estimate effort for records that were unreliable. For data in 2009 and later, all records were corrected through the quality control process, which resulted in 100% of the records being usable for catch rate, effort, and landings calculations. Logbook and port sampling data up to and including 2022 are used in this document.
+
+The port sampling data have been summarized and reported on a biweekly basis since 2006. Over the years, the analysis and organization methods for these data have evolved. For this retrospective analysis of all port sampling data, all available records were retrieved and subjected to a consistent validation and archiving approach. As such, there were some discrepancies between current port sampling data and previous biweekly summaries. These have been addressed as follows:
+
+ * When possible, erroneous data (e.g. typos) have been corrected, such that there is a high degree of confidence in the accuracy of the PS data used in this analysis.
+ * When discrepancies could not be resolved, PS data were excluded. These discrepancies were typically due to files no longer being available, or issues that could not be automatically corrected with confidence. While discrepancies were more common in the early years of the PS program, these exclusions are non-systematic in nature and do not suggest any bias in PS results.
+
+In summary, 98.6% of fishing trips were matched to port sampling data, and 99.9% of port samples were matched to fishing trips.
 
 In SFA 25, scallop landings have been below 100 tonnes (t) annually in recent years (Figure \@ref(fig:fts-25)). Within SFA 25, landings have traditionally been highest from SFA 25A-Sab. Fishing has occurred over much of SFA 25A since 1980, with landings highest in the western portion of SFA 25A-Sab, and the southeastern portion of SFA 25A-Mid (Figure \@ref(fig:fts-25) and \@ref(fig:foot-25)). Fishing in SFA 25B tends to target small areas, and this bank has been fished relatively infrequently over time (Figure \@ref(fig:foot-25)). Fishing effort has been below 50,000 hour-metres (hm) annually in all SFA 25 management units since 2000, with catch rates (kilograms per hour-metre; kg/hm) below 10 kg/hm in most years (Figure \@ref(fig:fts-25)). Meat weights have varied within and between stocks in SFA 25 (Table \@ref(tab:ps-tab), Figure \@ref(fig:mw-annual-25)). The long term median meat weights for SFA 25A-Sab, SFA 25A-Mid, and SFA 25B were 17.7 grams (g), 23.3 g, and 19.8 g, respectively (Table \@ref(tab:ps-tab)).
 
@@ -310,7 +317,7 @@ $$ MW_{[75:90),t} = \sum_{i=[75:80)}^{[85:90)}{MW_{i,t} \frac{N_{i,t}}{N_{[75:90
 
 Here, $MW_{i,t}$ is the meat weight in the $i^{th}$ shell height bin in year $t$, $N_{i,t}$ is the estimated abundance in this shell height bin, and $N_{[75:90),t}$ is the total estimated abundance of recruit scallop in year $t$. 
 
-Based on the vonB relationship, the majority of recruit sized scallop will have a shell height between 90 and 100 mm after one year.  Given this, we calculated the average MW of scallop observed in the survey in the following year in the [90-100) mm size classes
+Based on the vonB relationship, the majority of recruit sized scallop will have a shell height between 90 and 100 mm after one year.  Given this, we calculated the average MW of scallop observed in the survey in the following year in the [90-100) mm size classes.
 
 $$ MW_{[90-100),t+1} = \sum_{i={[90:95)}}^{[95:100)}{MW_{i,t+1} \frac{N_{i,t+1}}{N_{[90-100),t+1}}}$$  
 

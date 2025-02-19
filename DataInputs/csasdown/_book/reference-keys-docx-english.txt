@@ -102,8 +102,7 @@ fig:shf-bbn
 fig:shf-bbs
 fig:shf-ger
 fig:shf-gbb
-fig:growth-25
-fig:growth-26
+fig:g-plt
 fig:cts-25
 fig:cts-26
 fig:cts-27
