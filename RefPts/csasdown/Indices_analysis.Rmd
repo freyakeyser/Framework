@@ -46,10 +46,19 @@ LRP.max.2.26a <- round(0.2*max.three.26a,digits = 0)
 USR.med.8.26a <- round(0.8*gmean.26a,digits = 0)
 USR.max.4.26a <- round(0.4*max.three.26a,digits = 0)
 
-
+# I should be using the "merged.survey.obj here....
 # SFA 26C
-surv.26c <- lined.survey.obj$model.dat # Has NA's for missing 2020 so good to use as is
-surv.26c <- surv.26c |> collapse::fsubset(year >=1994)
+#surv.26c <- lined.survey.obj$model.dat # Has NA's for missing 2020 so good to use as is
+#surv.26c <- surv.26c |> collapse::fsubset(year >=1994)
+surv.26c <- merged.survey.obj # Need to add in 2020 missing...
+surv.26c[nrow(surv.26c)+1,] <- NA
+surv.26c$year[nrow(surv.26c)] <- 2020
+# and reorder
+surv.26c <- surv.26c[order(surv.26c$year),]
+# Now the units of german are....? If it is grams/tow... this puts us in total tonnes
+surv.26c$I <- surv.26c$I /atow*ger.area.km2/1e6
+surv.26c$IR <- surv.26c$IR/atow*ger.area.km2/1e6
+
 # Q correct
 surv.26c$I <- surv.26c$I/q.index
 surv.26c$IR <- surv.26c$IR/q.index
@@ -109,7 +118,7 @@ fish.dat$sfa[grep(x=fish.dat$sfa, "27")] <- 27
 fish.dat$sfa[fish.dat$bank %in% c("Ban", "Sab","Mid")] <- 25
 fish.dat$sfa[fish.dat$bank %in% c("BBn", "BBs", "Ger")] <- 26
 fish.dat$sfa[fish.dat$bank %in% c("GBb")] <- 27
-
+fish.dat <- fish.dat[fish.dat$year < 2023,]
 fish.dat$surv.year <- fish.dat$year 
 fish.dat$surv.year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26 ] <- fish.dat$year[fish.dat$month %in% 1:5 & fish.dat$sfa %in% 25:26]-1
 fish.dat$surv.year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27] <- fish.dat$year[fish.dat$month %in% 1:8 & fish.dat$sfa %in% 27]-1
@@ -160,7 +169,8 @@ for(b in banks) {
     if(b=="Ger") compare <- full_join(merged.survey.obj[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
     if(!b=="Ger") compare <- full_join(survey.obj[[b]]$model.dat[, c("year", "I")], survey.yr[survey.yr$bank==b &!is.na(survey.yr$bank),c("year", "bank", "mt")])
  # }
-  compare$relative.F <- compare$mt / (compare$I /q.index) # survey catchability
+  compare$I <- compare$I / q.index # survey catchability
+  compare$relative.F <- compare$mt / (compare$I ) 
   relative.F <- rbind(relative.F, compare)
 }
 relFyrs <- expand.grid(year=min(relative.F$year, na.rm=T):max(relative.F$year, na.rm=T), bank=banks)
@@ -404,6 +414,35 @@ plt.bmi.gem <- add_sub(plt.bmi.gem, "Change in survey biomass Index (%)",angle=9
 #plt.bmi.ts <- ggdraw(plt.bmi.ts)
 save_plot(plt.bmi.gem,file =paste0(plot.index.loc,"GEM_BM_Indices.png"),base_height = 8,base_width = 11)
 
+# For the SAR we want the BM time series figure for just 26C and 27B with the 30% BMSY value
+# Now german
+plt.dat.26c <- data.frame(year =2020:2022,cur.bm = bm.last.3.26c,
+                          lrp.2 = LRP.max.2.26c,lrp.3 = LRP.med.3.26c,lrp.4 = LRP.med.4.26c,
+                          usr.4 = USR.max.4.26c,usr.8 = USR.med.8.26c)
+                          
+plt.26c.bmi.lrp <- ggplot(surv.26c) + geom_line(aes(x=year,y=I)) + 
+                              geom_line(data= plt.dat.26c,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.26c$lrp.3[1],color='firebrick2',linetype = 'dotted') +
+                              scale_x_continuous(name = '',breaks = seq(1995,2025,by=5),limits = c(1994,2022)) +
+                              scale_y_continuous(name = "",limits=c(0,6000))
+
+# Now GGb
+plt.dat.27b <- data.frame(year =2020:2022,cur.bm = bm.last.3.27b,
+                          lrp.2 = LRP.max.2.27b,lrp.3 = LRP.med.3.27b,lrp.4 = LRP.med.4.27b,
+                          usr.4 = USR.max.4.27b,usr.8 = USR.med.8.27b)
+                          
+plt.27b.bmi.lrp <- ggplot(surv.27b) + geom_line(aes(x=year,y=I)) + #geom_point(aes(x=year,y=I),size=3) +
+                              geom_line(data= plt.dat.27b,aes(x=year,y=cur.bm),color=u.colors[1],size=1.5) +
+                              geom_hline(yintercept = plt.dat.27b$lrp.3[1],color='firebrick2',linetype = 'dotted') +
+                              scale_x_continuous(name = '',breaks = seq(1995,2025,by=5),limits = c(1994,2022)) +
+                              scale_y_continuous(name = "",limits=c(0,6000))
+
+# We can make these a nice 2 x 1 plot now...
+plt.bmi.lrp <- plot_grid(plt.26c.bmi.lrp,plt.27b.bmi.lrp,ncol=2,labels = c("SFA 26C","SFA 27B"),label_size=14,label_y=0.95,label_x=0.15) + theme(plot.margin = margin(0, 0, -275, 0))
+
+plt.bmi.lrp <- add_sub(plt.bmi.lrp, "Survey Biomass Index (tonnes)",angle=90,y=2.25,x=0.01,size=18)
+plt.bmi.lrp <- ggdraw(plt.bmi.lrp)
+save_plot(plt.bmi.lrp,file =paste0(plot.index.loc,"LRPs_BM_Indices_26C_27B.png"),base_height = 8.5,base_width = 16)
 
 
 

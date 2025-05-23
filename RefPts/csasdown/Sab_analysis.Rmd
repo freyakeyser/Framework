@@ -198,7 +198,7 @@ sab.cor.q.bm <- signif(cor(mod.index.bm$mod.bm , mod.index.bm$index.bm,use= 'com
 p.sab.mod.ind.bm <-ggplot(mod.index.bm) + geom_text(aes(x=index.bm,y=mod.bm,label = substr(year,3,4))) +
                                           scale_x_continuous(name="Survey Biomass Index (tonnes)") +
                                           scale_y_continuous(name="Model Biomass (tonnes)") +
-                                          geom_abline(slope=1/mod.out$BUGSoutput$median$q,intercept=0)
+                                          geom_abline(slope=1,intercept=0)
 save_plot(paste0(sab.plot.loc,"Model_vs_index_biomass.png"),p.sab.mod.ind.bm,base_height =6,base_width = 10)   
 
 
@@ -279,10 +279,10 @@ sab.trp.b0 <- 0.8 * sab.b0
 
 
 sab.res.at.rr.last.yrs <- sab.Exp.res[sab.Exp.res$F.scenario==sab.rr & sab.Exp.res$year > (n_y-last.yrs),]
-# We can estimate the proportion of the time the stocks are in the critical, cautious, and healthy zones in the last 25 years of the simulations
-sab.prop.yrs.critical <- round(100*length(which(sab.res.at.rr.last.yrs$B < sab.lrp.b0))/n_sims/last.yrs,digits=1)
-sab.prop.yrs.cautious <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.lrp.b0 & sab.res.at.rr.last.yrs$B < sab.usr.b0))/n_sims/last.yrs,digits=1)
-sab.prop.yrs.healthy <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.usr.b0))/n_sims/last.yrs,digits=1)
+# We can estimate the proportion of the time the stocks are in the critical, cautious, and healthy zones in the last 100 years of the simulations
+sab.prop.yrs.critical <- round(100*length(which(sab.res.at.rr.last.yrs$B < sab.lrp.4.bmsy))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.cautious <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.lrp.4.bmsy & sab.res.at.rr.last.yrs$B < sab.usr.bmsy))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.healthy <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.usr.bmsy))/n_sims/last.yrs,digits=1)
 
 # How long does it take to 'rebuild'
 
@@ -303,23 +303,23 @@ if(any(B.now$med.B >= sab.bmsy))
   tmp[trues] <- T
   time.to$T.msy[time.to$years == i] <- tmp
 }
-if(any(B.now$med.B >= sab.usr.b0))
+if(any(B.now$med.B >= sab.usr.bmsy))
 {
-   trues <- which(B.now$med.B >= sab.usr.b0)
+   trues <- which(B.now$med.B >= sab.usr.bmsy)
   tmp <- time.to$T.usr[time.to$years == i]
   tmp[trues] <- T
   time.to$T.usr[time.to$years == i] <- tmp
 }
-if(any(B.now$med.B >= sab.lrp.b0))
+if(any(B.now$med.B >= sab.lrp.4.bmsy))
 {
-  trues <- which(B.now$med.B >= sab.lrp.b0)
+  trues <- which(B.now$med.B >= sab.lrp.4.bmsy)
   tmp <- time.to$T.lrp[time.to$years == i]
   tmp[trues] <- T
   time.to$T.lrp[time.to$years == i] <- tmp
 }
-if(any(B.now$med.B >= sab.trp.b0))
+if(any(B.now$med.B >= sab.trp.bmsy))
 {
-  trues <- which(B.now$med.B >= sab.trp.b0)
+  trues <- which(B.now$med.B >= sab.trp.bmsy)
   tmp <- time.to$T.trp[time.to$years == i]
   tmp[trues] <- T
   time.to$T.trp[time.to$years == i] <- tmp
@@ -513,11 +513,11 @@ sab.med.B.4.plt <- sab.res.4.plts |> collapse::fgroup_by(year) |> collapse::fsum
 
 sab.mod.real.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
                        geom_line(data = sab.med.B.4.plt,aes(x=year,y=B.med/1000),color='black',size=1.25) + 
-                       geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
+                       #geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
                        #geom_hline(yintercept = sab.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
-                       #geom_hline(yintercept = sab.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
-                       geom_hline(yintercept = sab.usr.b0/1000,color=u.colors[2],linetype = 'solid',size=1.5) +
-                       #geom_hline(yintercept = sab.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
+                       geom_hline(yintercept = sab.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
+                       #geom_hline(yintercept = sab.usr.b0/1000,color=u.colors[2],linetype = 'solid',size=1.5) +
+                       geom_hline(yintercept = sab.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
                        #geom_hline(yintercept = sab.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
                        scale_x_continuous('') +
                        scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') +
@@ -539,8 +539,8 @@ sab.exp.sd <- 0.1
 
 
 hcr.strat <-list(TRP = sab.trp.bmsy,TRP.exp = sab.trp.exp,
-                 USR = sab.usr.b0, USR.exp = sab.usr.exp, 
-                 LRP = sab.lrp.b0, LRP.exp = sab.lrp.exp,exp.sd = sab.exp.sd)
+                 USR = sab.usr.bmsy, USR.exp = sab.usr.exp, 
+                 LRP = sab.lrp.4.bmsy, LRP.exp = sab.lrp.exp,exp.sd = sab.exp.sd)
 # The g/m/r.strat are in the productivity section...
 # For elsewhere, this is the HCR figure plot directory
 sab.HCR <- paste0("T_",hcr.strat$TRP,"_",hcr.strat$TRP.exp,"_U_",hcr.strat$USR,"_",hcr.strat$USR.exp,"_L_",hcr.strat$LRP,"_",hcr.strat$LRP.exp)
@@ -571,13 +571,13 @@ sab.hcr.last.yrs <- sab.hcr[sab.hcr$year > (n_y-last.yrs),]
 sab.mn.catch.hcr <- round(mean(sab.hcr.last.yrs$Catch,na.rm=T),digits=0)
 sab.med.catch.hcr <- round(median(sab.hcr.last.yrs$Catch,na.rm=T),digits=0)
 sab.med.bm.hcr <- round(median(sab.hcr.last.yrs$B),digits=0)
-sab.prop.yrs.bl.lrp.hcr <- round(100*length(which(sab.hcr.last.yrs$B  < sab.lrp.b0))/n_sims/last.yrs,digits=2)
-sab.prop.yrs.cautious.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.lrp.b0 & sab.hcr.last.yrs$B < sab.usr.b0))/n_sims/last.yrs,digits=1)
-sab.prop.yrs.healthy.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.usr.b0 & sab.hcr.last.yrs$B < sab.trp.bmsy))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.bl.lrp.hcr <- round(100*length(which(sab.hcr.last.yrs$B  < sab.lrp.4.bmsy))/n_sims/last.yrs,digits=2)
+sab.prop.yrs.cautious.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.lrp.4.bmsy & sab.hcr.last.yrs$B < sab.usr.bmsy))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.healthy.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.usr.bmsy & sab.hcr.last.yrs$B < sab.trp.bmsy))/n_sims/last.yrs,digits=1)
 sab.prop.yrs.above.trp.hcr <- round(100*length(which(sab.hcr.last.yrs$B > sab.trp.bmsy))/n_sims/last.yrs,digits=1)
 
-sab.min.healthy.zone.catch.hcr <- sab.usr.b0*0.025
-sab.max.healthy.zone.catch.hcr <- sab.trp.bmsy*0.025
+sab.min.healthy.zone.catch.hcr <- sab.usr.bmsy*sab.usr.exp
+sab.max.healthy.zone.catch.hcr <- sab.trp.bmsy*sab.usr.exp
 sab.min.trp.catch.hcr <- sab.trp.bmsy*sab.trp.exp
 sab.catch.quants.hcr <- quantile(sab.hcr$Catch,na.rm=T,probs = seq(0,1,by=0.01))
 

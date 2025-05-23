@@ -1,5 +1,5 @@
 ---
-title: "Shoulder Bank Reference Points"
+title: "STOCK ASSESSMENT FRAMEWORK FOR SCALLOP FISHING AREAS 25, 26, and 27B. Reference Points"
 french_title: "En francais"
 author: "DK"
 author_list: "Keith, D., Keyser, F., McDonald R, Pearo Drew, T., Sameoto, J.A.  "
@@ -14,7 +14,7 @@ french_address: |
      Une autre galaxie
 month: "Month"
 french_month: "Mois"
-year: 2023
+year: 2025
 report_number: nnn
 region: "Maritimes Region"
 isbn: ""
@@ -22,7 +22,7 @@ cat_no: ""
 french_region: "Région des Maritimes"
 citation_other_language: "Keith, D., Keyser, F., McDonald, R., et Pearo Drew, T.  L'évaluation de petoncles dans les zones de pêche"
 abstract: |
-  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). The survey biomass indices and relative exploitation rates used for the development of the index based reference points were approved during the first of two Canadian Science Advisory Secretariat Regional Peer Review meetings which focused on the data inputs (each of these SFAs) and model development (SFA 25A and SFA 26A). The stock assessment models and the productivity scenarios used for the maximum sustainable yield (MSY) simulations in SFA 25A and SFA 26A were also approved during this initial meeting. Survey biomass index based limit reference points (LRPs) are proposed for each of these SFA's. In addition to the survey index based LRPs, guidance on relative target ($RR_{tar}$) and limit ($RR_{lim}$) removal reference and upper stock reference points (USR) is provided for all the areas based on the survey biomass index and relative exploitation rates. In the two areas with approved stock assessment models (SFA 25A and SFA 26A), MSY simulations are used to obtain model based LRPs. Guidance on target removal reference ($RR_{tar}$) and upper stock reference (USR) points are also provided using the MSY simulations for these two areas. In addition, for the two modelled areas, harvest decision rule (HDR) simulations are developed and their potential use demonstrated using the following example: 1) maintain the stock near the TRP, 2) increase the long term average removals from the fishery above the removals estimated using the optimal MSY simulation, and 3) reduce the proportion of time the stock is below the LRP when compared to the optimal MSY simulation. The HDR simulations are able to identify a scenario in which all three of these management objectives were met, with notable increases in the long-term median removals for both areas and declines in the proportion of the time the stocks are below the LRP. The HDR simulations represent a methodology by which the impact of various management objectives could be explored; this could include the development of limit removal reference ($RR_{lim}$) and target reference points (TRP).
+  This research document focuses on the development of reference points for Scallop Fishing Area (SFA) 25A (Sable Bank), SFA 26A (Browns Bank North), SFA 26C (German Bank), and SFA 27B (Georges Bank 'b'). The survey biomass indices and relative exploitation rates used for the development of the index based reference points were approved during the first of two Canadian Science Advisory Secretariat Regional Peer Review meetings which focused on the data inputs (each of these SFAs) and model development (SFA 25A and SFA 26A). The stock assessment models and the productivity scenarios used for the maximum sustainable yield (MSY) simulations in SFA 25A and SFA 26A were also approved during this initial meeting. Survey biomass index based limit reference points (LRPs) are proposed for each of these SFA's. In addition to the survey index based LRPs, guidance on relative target (RR~tar~) and limit (RR~lim~) removal reference and upper stock reference points (USR) is provided for all the areas based on the survey biomass index and relative exploitation rates. In the two areas with approved stock assessment models (SFA 25A and SFA 26A), MSY simulations are used to obtain model based LRPs. Guidance on target removal reference (RR~tar~) and upper stock reference (USR) points are also provided using the MSY simulations for these two areas. In addition, for the two modelled areas, harvest decision rule (HDR) simulations are developed and their potential use demonstrated using the following example: 1) maintain the stock near the TRP, 2) increase the long term average removals from the fishery above the removals estimated using the optimal MSY simulation, and 3) reduce the proportion of time the stock is below the LRP when compared to the optimal MSY simulation. The HDR simulations are able to identify a scenario in which all three of these management objectives were met, with notable increases in the long-term median removals for both areas and declines in the proportion of the time the stocks are below the LRP. The HDR simulations represent a methodology by which the impact of various management objectives could be explored; this could include the development of limit removal reference (RR~lim~) and target reference points (TRP). In areas in which model based reference points are avaialble (SFAs 25A and 26A), these are preferred, and an LRP of 40% of the fully-recruited biomass at MSY is recommended. In areas with only index based reference points (SFAs 26C and 27B), an LRP of 30% of the fully-recruited biomass index is recommended.
   
 french_abstract: |
   NULL
@@ -54,7 +54,8 @@ output:
    line_nums_mod: 1
    lot_lof: false
    draft_watermark: false
-   include_section_nums: true
+   include_section_nums: false
+   global_numbering: true
    # highlight is the theme to use for code output. Must be one of the list given by:
    # which are:
    # the csasdown library 'themes' directory, this directory on your machine:
@@ -71,6 +72,7 @@ header-includes:
  - \usepackage{amssymb}
  - \usepackage{accents}
 ---
+
 
 ```{r setup, echo=FALSE, cache=FALSE, message=FALSE, results='hide', warning=FALSE}
 library(knitr)
@@ -106,8 +108,9 @@ opts_chunk$set(
   dev = fig_out_type,
   dpi = fig_dpi,
   fig.align = fig_align,
-  fig.pos = fig_pos
-  
+  fig.pos = fig_pos,
+  fig.cap.sep = ". ",
+  tab.cap.sep = ". "
 
 )
 ```
@@ -160,6 +163,13 @@ for(fun in funs)
   file.remove(paste0(getwd(),"/",basename(fun)))
 }
 
+# I need the German area of the survey design
+ger.shape <- st_read("D:/Github/GIS_layers/other_boundaries/WGS_84_German.shp") %>% st_make_valid() %>% st_transform(32619)
+# Bring in the survey data
+ger.area.km2 <- st_area(ger.shape)/1e6
+units(ger.area.km2) <- NULL
+ger.area.round <- round(ger.area.km2,digits=0)
+
 
 params <- NULL
 params$bank <- c("Sab", "BBn")
@@ -201,7 +211,7 @@ res.bbn.rp.mod.loc <- paste0(rp.loc,"Results/BBn/")
 load(paste0(rp.loc,"Data/testing_results_framework_75-90RSCS_newMWSH_GBb.Rdata"))
 
 # Load in the fishery data, might wanna tweak where this lives, but does need to be not anywhere public
-load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2022/OSAC_tidy_logs.RData")
+load("Y:/Offshore/Assessment/Data/Fishery_data/Summary/2023/OSAC_tidy_logs.RData")
 
 # Model run parameters
 years <- 1994:2022
@@ -217,7 +227,7 @@ qR <- 0.33#
 # For the simulations
 n_y <- 200
 last.yrs <- n_y/2 # Using the second half of the data.
-n_sims <- 10000 # When we are going for the final model run I'm going to use 5000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
+n_sims <- 1e4 # When we are going for the final model run I'm going to use 10000 sims, which takes a loong time! (5000 * 200 * n_exploit scenarios + 5000 (HCR), all times 2)
 # Run the simulations or load existing results
 run.sims <- F
 # How far back into the time series do you want to use for summarizing RP and HCR. Using 25 would take the last 25 years of the simulations to do this.
