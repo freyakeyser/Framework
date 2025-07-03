@@ -4,13 +4,13 @@ direct <- "Y:/Offshore/Assessment/"
 direct_fns <- "C:/Users/keyserf/Documents/Github/"
 # Grab the years of port sampling data.  Note that Ginette says the Port Sampling data goes all the way back to 1996
 # I haven't a clue where that data is, but would certainly be interesting to compare the last 20 years of data!!
-years <- 2006:2022
+years <- 2006:2024
 options(stringsAsFactors = F) # Don't make anything a Factor as it screws up random crap.
 
 # Load in librarys we may need...
 library(ggplot2)
 require(readxl)
-require(xlsx)
+require(openxlsx)
 library(reshape2)
 library(dplyr)
 library(plyr)
@@ -68,9 +68,10 @@ for(i in 1:length(years))
     index <- index + 1
     #if(index==204) browser()
     #This will pull the data from the Port Sampling file.
+    files[j] <- gsub(pattern = "XLSX", x= files[j], replacement="xlsx")
     if(years[i] < 2006) dat[[index]] <- read.csv(paste0(direct,"Data/Archive/PortSampling/", years[i], "/", files[j]), sep = "\t", header = F)
     if(years[i] < 2018 & years[i]>2005 & str_sub(string = direct, start=1, end=1)=="C") dat[[index]] <- read_excel(path=paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/",years[i],"/", files[j]), sheet = 1)
-    if(years[i] < 2018 & years[i]>2005 & !str_sub(string = direct, start=1, end=1)=="C") dat[[index]] <- read.xlsx(file = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/",years[i],"/", files[j]), sheetIndex = 1)
+    if(years[i] < 2018 & years[i]>2005 & !str_sub(string = direct, start=1, end=1)=="C") dat[[index]] <- read.xlsx(xlsxFile = paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/",years[i],"/", files[j]), sheet = 1)
     if(years[i] > 2017) dat[[index]] <- read.csv(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/",years[i],"/", files[j]))
     # # Make all the variable names lower case as the rest of this works...
     names(dat[[index]]) <- tolower(names(dat[[index]]))
@@ -114,7 +115,6 @@ for(i in 1:length(years))
     # if(any(!year(ymd(dat[[index]]$date)) == year(ymd(dat[[index]]$fished)))){
     #   if(index==731) dat[[index]]$fished <- gsub(x=as.character(ymd(dat[[index]]$fished) + years(2)), "-", "")
     # }
-#browser()
     # compare to logs to assign bank
     # Get the vessel of interest
     vessel <- na.omit(off.fleet[off.fleet$ID_alt_Port_Sampling == unique(dat[[index]]$boat), c("Pre_2008_ID","VMS_old_ID","ID")])
@@ -155,6 +155,7 @@ for(i in 1:length(years))
         test2 <- test %>% dplyr::group_by(fished) %>%
           dplyr::summarize(banks = length(unique(bank)))
         split_days[[index]] <- unique(dplyr::select(test[test$fished %in% test2$fished[test2$banks>1],], -bank))
+        split_days[[index]]$banks <- paste(bank, collapse=" ")
         split_days[[index]]$file <- files[j]
         test <- test[test$fished %in% test2$fished[test2$banks<2],]
         dat[[index]] <- test
@@ -181,8 +182,8 @@ for(i in 1:length(years))
 port.dat <- do.call("rbind",dat)
 split_days <- do.call("rbind",split_days)
 
-save(port.dat, file = "C:/Users/keyserf/Documents/temp_data/portdat_2006-2022.RData")
-save(split_days, file = "C:/Users/keyserf/Documents/temp_data/splitdays_2006-2022.RData")
+save(port.dat, file = "C:/Users/keyserf/Documents/temp_data/portdat_2006-2024.RData")
+save(split_days, file = "C:/Users/keyserf/Documents/temp_data/splitdays_2006-2024.RData")
 load("./Port_sampling/portdat_new.RData")
 port.dat.new <- port.dat
 port.dat.new$year <- year(ymd(port.dat.new$fished))

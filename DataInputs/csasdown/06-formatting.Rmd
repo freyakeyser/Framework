@@ -16,5 +16,6 @@
 - delete extra space above Appendix section
 - equation citations (add #(N) to get number)
 - make references hanging
+- add to bib: Smith, S.J. 1980. Comparison of Two Methods of Estimating the Variance of the Estimate of Catch Per Unit Effort. Canadian Journal of Fisheries and Aquatic Sciences 37(12): 2346–2351. 
 
 

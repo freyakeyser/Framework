@@ -69,6 +69,7 @@ ps_tab$`Long term median MW (g)` <- round(ps_tab$`Long term median MW (g)`, 1)
 ps_tab$`Standard deviation MW (g)` <- round(ps_tab$`Standard deviation MW (g)`, 1)
 ps_tab$`Minimum MW (g)` <- round(ps_tab$`Minimum MW (g)`, 1)
 ps_tab$`Maximum MW (g)` <- round(ps_tab$`Maximum MW (g)`, 1)
+ps_tab <- ps_tab[!is.na(ps_tab$SFA),]
 
 mwsh_bbn <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/AICtable.csv")
 mwsh_sab <- read.csv("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/AICtable.csv")
@@ -229,7 +230,7 @@ csas_table(ps_tab, caption ="Summary of port sampling (PS) data for SFAs 25, 26,
 #   )
 # )
 
-csas_table(strata, caption ="Current survey design and allocation information for SFAs 25, 26, and 27B. Stratum areas are provided in square kilometres (km^2^), and Universal Transverse Mercator zones are in the northern hemisphere. Catch rates used for stratification are reported in kilograms per hour-metre (kg/hm). Some columns are not applicable (NA) for certain Stocks.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(strata, caption ="Current survey design and allocation information for SFAs 25, 26, and 27B. Stratum areas are provided in square kilometres (km^2^), and Universal Transverse Mercator (UTM) zones are in the northern (N) hemisphere. Catch rates used for stratification are reported in kilograms per hour-metre (kg/hm). Some columns are not applicable (NA) for certain Stocks.") %>% kableExtra::row_spec(0,bold=TRUE)
 #qflextable(strata)
 
 #<!---BLOCK_LANDSCAPE_START--->
@@ -299,7 +300,7 @@ csas_table(age_summary, caption ="Tow, shell, and increment counts associated wi
 #     type="continuous"
 #   )
 # )
-csas_table(inc, caption ="Summary of age assignments and measurements for SFA 25A Sable Bank and SFA 26A Browns Bank North. Median increment height is measured in millimetres (mm). Standard deviation (SD) in increment height is provided in parentheses.") %>% kableExtra::row_spec(0,bold=TRUE)
+csas_table(inc, caption ="Summary of age assignments and measurements for SFA 25A Sable Bank (Sab) and SFA 26A Browns Bank North (BBn). Median increment height is measured in millimetres (mm). Standard deviation (SD) in increment height is provided in parentheses.") %>% kableExtra::row_spec(0,bold=TRUE)
 
 #qflextable(strata)
 

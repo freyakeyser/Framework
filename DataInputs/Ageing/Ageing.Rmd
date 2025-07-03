@@ -348,8 +348,10 @@ print(lvb.par)
 
 #which bank?
 ```{r}
-bank <- "Sab"
+bank <- "BBn"
 boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T, direct_fns="C:/Users/keyserf/Documents/Github/Assessment_fns/")
+
+boundaries$ID <- gsub(x=boundaries$ID, pattern=".shp", replacement="", fixed=T)
 
 ```
 

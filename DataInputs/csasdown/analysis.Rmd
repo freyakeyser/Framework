@@ -797,6 +797,7 @@ for(sfa in sfa){
 # Spatial distribution of tows
 ```{r}
 boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T, direct_fns="C:/users/keyserf/Documents/Github/Assessment_fns/")
+boundaries$ID <- gsub(x=boundaries$ID, pattern=".shp", replacement="", fixed=T)
 
 #From Dave/Jessica
 library(sf)
@@ -1053,7 +1054,7 @@ for(b in c("BBn", "BBs", "Sab", "GBb")){
     #manual adjustment to scalebar text size
     p$layers[[5]]$geom_params$text_cex <- 1.5
   }  
-  png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"), width=6.5*2, height=4*2, units = "in", res=420)
+  #png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"), width=6.5*2, height=4*2, units = "in", res=420)
   print(
     p + 
       geom_sf(data=shpf, aes(fill=Strt_ID), colour=NA, alpha=0.7) +
@@ -1067,7 +1068,7 @@ for(b in c("BBn", "BBs", "Sab", "GBb")){
       theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent")) +
       annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
   )
-  dev.off()
+  #dev.off()
 }
   
 for(b in c("Mid", "Ban", "Ger")){
@@ -1114,7 +1115,7 @@ for(b in c("Mid", "Ban", "Ger")){
   
   
   if(b %in% c("Ban", "Mid")){
-    png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+    #png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
     print(
       p + 
         #geom_sf(data=shpf, colour=NA, alpha=0.7) +
@@ -1126,11 +1127,11 @@ for(b in c("Mid", "Ban", "Ger")){
         theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
         annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
     )
-    dev.off()
+    #dev.off()
   }
   tows <- dplyr::arrange(tows, random)
   if(b %in% c("Ger")){
-    png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+    #png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
     print(
       p + 
         geom_sf(data=shpf, colour=NA, alpha=0.7) +
@@ -1142,7 +1143,7 @@ for(b in c("Mid", "Ban", "Ger")){
         theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
         annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
     )
-    dev.off()
+   # dev.off()
   }
   
 }
@@ -1219,7 +1220,7 @@ for(sfa in 25:27){
   if(sfa==27) bp$layers[[4]]$geom_params$text_cex <- 1.5
   if(sfa %in% c(25:26)) bp$layers[[5]]$geom_params$text_cex <- 1.5
 
-  png(filename=paste0(plotsGo, "/Survey/", nickname, "/survey_footprint_", sfa, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+  #png(filename=paste0(plotsGo, "/Survey/", nickname, "/survey_footprint_", sfa, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
   print(bp +
           geom_sf(data=sfoot[!is.na(sfoot$n),], aes(fill=n), colour=NA, show.legend=T) +
           theme(legend.position=c(0.25,0.85), legend.background=element_blank()) +
@@ -1233,7 +1234,7 @@ for(sfa in 25:27){
           #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
           # )
   )
-  dev.off()
+ #dev.off()
 } 
 
 ```
@@ -1787,7 +1788,25 @@ for(b in banks) {
   # }
 
   #if(!b=="Sab/Mid"){
-    if(b=="Ger") compare <- full_join(merged.survey.obj[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
+    if(b=="Ger") {
+      atow<-800*2.4384/10^6 # area of standard tow in km2
+      ger.shape <- st_read("C:/Users/keyserf/Documents/Github/GIS_layers/other_boundaries/WGS_84_German.shp") %>% st_make_valid() %>% st_transform(32619)
+      #ger.shape <- ger.shape %>% st_transform(crs = 32619) # BBn is right on the 19/20 border so think they are basically equivalent options here
+      # Bring in the survey data
+      ger.area.km2 <- st_area(ger.shape)/1e6
+      units(ger.area.km2) <- NULL
+      # Bring in the survey data
+
+      surv.26c <- merged.survey.obj # Need to add in 2020 missing...
+      surv.26c[nrow(surv.26c)+1,] <- NA
+      surv.26c$year[nrow(surv.26c)] <- 2020
+      # and reorder
+      surv.26c <- surv.26c[order(surv.26c$year),]
+      # Now the units of german are....? If it is grams/tow... this puts us in total tonnes,  must confirm the units coming out of merged survey object.
+      surv.26c$I <- surv.26c$I /atow*ger.area.km2/1e6
+      
+      compare <- full_join(surv.26c[, c("year", "I")], survey.yr[survey.yr$bank==b,c("year", "bank", "mt")])
+    }
     if(!b=="Ger") compare <- full_join(survey.obj[[b]]$model.dat[, c("year", "I")], survey.yr[survey.yr$bank==b &!is.na(survey.yr$bank),c("year", "bank", "mt")])
  # }
   compare$relative.F <- compare$mt / (compare$I) #/0.35) # survey catchability? don't use this

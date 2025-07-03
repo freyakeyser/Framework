@@ -6,7 +6,7 @@ author: |
   Tricia Pearo Drew,
   Amy Glass, and
   David Keith
-author_list: "Keyser, F., Glass, A., Keith, D., McDonald, R., Pearo Drew, T., Sameoto, J."
+author_list: "Keyser, F., Glass, A., Keith, D., McDonald, R.R., Pearo Drew, T., Sameoto, J.A."
 address: |
   Bedford Institute of Oceanography\
      Fisheries and Oceans Canada, 1 Challenger Drive\
@@ -24,9 +24,9 @@ region: "Maritimes Region"
 isbn: "978-0-660-43102-4"
 cat_no: "Fs70-5/2022-006E-PDF"
 french_region: "Région des Maritimes"
-citation_other_language: "Keyser, F., Pearo Drew, T., Glass, A., et Keith, D. L'évaluation de petoncles dans les zones de pêche"
+citation_other_language: "Keyser, F., Glass, A., Keith, D., McDonald, R.R., Pearo Drew, T., Sameoto, J.A. L'évaluation de petoncles dans les zones de pêche 25, 26 et 27B: les données d'entrée
 abstract: |
-  This document summarizes the data used for the provision of stock assessment advice in Scallop Fishing Areas 25, 26, and 27B, as well as the history of the Offshore Scallop fishery in DFO Maritimes Region, and the DFO Maritimes Offshore Scallop Survey. A new meat weight-to-shell height model was developed for use in SFAs 25, 26, and 27B, and was used to calculate biomass and condition of stocks in these management units. New shell height-at-age data were available for SFA 25A-Sab (Sable Bank) and SFA 26A (Browns Bank North), and were used to develop new growth curves for these two stocks. Port sampling and survey data were used to estimate the size classes of scallop targeted by the fishery, resulting in changes to the recruit and fully-recruited sizes for SFA 25A-Sab and SFA 26A. Stock indicators (abundance, biomass and condition) were provided for each of the stocks. For the stocks with survey data collected annually, the survey is able to track the growth of scallop from pre-recruits over 40 mm in shell height to fully-recruited scallop and the indicators presented here can be used to provide science advice.
+  This document summarizes the data used for the provision of stock assessment advice for the sea scallop (_Placopecten magellanicus_) in Scallop Fishing Areas 25, 26, and 27B, as well as the history of the Offshore Scallop fishery in DFO Maritimes Region and the DFO Maritimes Offshore Scallop Survey. A new meat weight-to-shell height model was developed for use in SFAs 25, 26, and 27B, and was used to calculate biomass and condition of stocks in these management units. New shell height-at-age data were available for SFA 25A-Sab (Sable Bank) and SFA 26A (Browns Bank North), and were used to develop new growth curves for these two stocks. Port sampling and survey data were used to estimate the size classes of scallop targeted by the fishery, resulting in changes to the recruit and fully-recruited sizes for SFA 25A-Sab and SFA 26A. Stock indicators (abundance, biomass and condition) were provided for each stock area. For the stocks where survey data are collected annually, the survey is able to track the growth of the scallop population over 40 mm in shell height. The indicators presented here can be used to provide science advice.
 french_abstract: |
   Voici le texte du résumé. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
   
