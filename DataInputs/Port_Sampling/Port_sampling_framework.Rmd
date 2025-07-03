@@ -26,11 +26,12 @@ for(fun in funs)
 }
 # Bring in the port sampling data, which contains meat weights and meat counts for sampled fishing trips
 #load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.rData"))
-#load(paste0("C:/Users/keyserf/Documents/temp_data/Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2024.RData"))
-load("./Port_sampling/portdat_2006-2022.RData")
+#load(paste0("C:/Users/keyserf/Documents/temp_data/portdat_2006-2024_july.RData"))
+#load("./Port_sampling/portdat_2006-2024_july.RData")
 logs_and_fish(loc = "offshore", year = 2006:2022, get.local = T, get.marfis = F, direct=direct)
 fish.dat<-merge(new.log.dat,old.log.dat,all=T)
 port.dat$year <- year(ymd(port.dat$fished))
+port.dat <- port.dat[port.dat$year<2023,]
 port.dat$ps.date <- port.dat$date
 port.dat$ps.date <- ymd(port.dat$ps.date)
 port.dat$ps.fished <- ymd(port.dat$fished)
@@ -351,7 +352,7 @@ dev.off()
 
 # Single bank results
 ```{r}
-bank <- "Ban"
+bank <- "GBb"
 
 bbn.dat <- port.sampling[port.sampling$bank == bank & !is.na(port.sampling$bank),]
 
