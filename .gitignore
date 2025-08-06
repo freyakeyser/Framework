@@ -11,6 +11,8 @@
 *.Rdata
 *.rds
 *.RDS
+*.rdb
+*.rdx
 
 # Example code in package build process
 *-Ex.R

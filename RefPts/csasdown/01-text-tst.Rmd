@@ -1,0 +1,25 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+
+\newpage
+# Introduction
+
+This is the third and final research document stemming from a Framework process focused on Scallop Fishing Areas (SFAs) 25, 26, and 27B. The first research document  focused on data inputs [@keyserFrameworkDevelopmentScallop2020] while the second document developed new assessment models for SFAs 25A and 26A [@keithFrameworkDevelopmentScallop2020].  The SFA 26 management unit also includes 26B (Browns Bank South) and 26C (German Bank), whereas SFA 27 includes both 27A (Georges Bank 'a') and 27B (Georges Bank 'b'), and SFA 25, known as the Eastern Scotian Shelf is split into SFA 25A, which includes 25A-Sab (Sable Bank), 25A-Mid (Middle Bank)), and 25B [Banquereau Bank, see Table 1 in @keyserFrameworkDevelopmentScallop2020].
+
+A history of the survey and fisheries in SFAs 25, 26, and 27B can be found in @keyserFrameworkDevelopmentScallop2020. The primary fishing area within SFA 26 is SFA 26A (Browns Bank North). In SFA 25, SFA 25A-Sab (Sable Bank; referred to SFA 25A hereafter as SFA 25A-Mid is not included in the analyses in this document) has been the most consistently fished area [@keyserFrameworkDevelopmentScallop2020]. A Bayesian State-Space Delay difference model (BSSM) has been adopted for SFA 25A, while a new Spatially Explicit Stock Assessment Model (SEAM) has been adopted for SFA 26A [@keithFrameworkDevelopmentScallop2020]. In addition, to minimize prediction bias, the parameters used to project biomass into future years differed between these two areas, however in both areas the projections used the same non-spatial version of the delay difference model [@keithFrameworkDevelopmentScallop2020]. In SFA 25A, for one-year ahead projections the previous year natural mortality, recruitment, and recruit growth are used and the fully-recruited growth term is set to one (i.e., the projections assume no full-recruited growth). In SFA 26A, for one-year ahead projections, the previous year natural mortality, recruitment, recruit growth, and fully-recruited growth are used (Natural mortality and Recruitment) the annual area-wide estimates are used [@keithFrameworkDevelopmentScallop2020].
+
+This research document focuses on the development of limit reference points (LRPs) for SFAs 25A, 26A, 26C, and 27B. Options for the LRPs are developed based on the survey biomass indices, while for the two areas with approved assessment models (SFA 25A and SFA 26A), additional model based LRPs are also developed. In addition to the LRPs, guidance on candidate limit ($RR_{lim}$) and target ($RR_{tar}$) removal references, upper stock reference points (USRs), target reference points (TRPs), and harvest decision rules (HDRs) are provided. This document discusses the concepts of $RR_{lim}$ and $RR_{tar}$. Herein, a $RR_{lim}$ refers to an exploitation rate that should not be exceeded for the stock, whereas a $RR_{tar}$ refers to an exploitation rate that the fishery can maintain, on average, over the long-term. The $RR_{lim}$  should always be $\geq$ the $RR_{tar}$.
+
+In summary, the objectives of this document are:
+
+- To propose and adopt limit reference points for SFAs 25A, 26A, 26C, and 27B; and,
+- To provide guidance on upper stock reference points, target reference points, removal reference points, and harvest decision rules.
+
+# Methods
+
+### Reference Points
+
+The LRPs used throughout this document follow the convention of being derived from estimates of the unfished biomass ($B_0$) or the biomass as maximum sustainable yield [$B_{MSY}$, @marentetteCrossJurisdictionalReviewInternational2020; @dfoScienceAdvicePrecautionary2021; @dfoScienceAdviceGuidance2023]. LPRs typically use 20% of the estimated $B_0$ ($LRP_{20}$), 30% of $B_{MSY}$ ($LRP_{30}$), or 40% of $B_{MSY}$ [$LRP_{40}$, @dfoFisheryDecisionmakingFramework2009; @dfoScienceAdvicePrecautionary2021; @dfoScienceAdviceGuidance2023]. For the USR a similar convention is used, herein two USRs are provided for guidance, 40% of $B_0$ ($USR_{40}$) or 80% of $B_{MSY}$ [$USR_{80}$, @dfoFisheryDecisionmakingFramework2009; @marentetteCrossJurisdictionalReviewInternational2020]. In addition to the biomass reference points, guidance on candidate limit ($RR_{lim}$) and target ($RR_{tar}$) removal references are provided, for the index based reference points, these are relative indices.

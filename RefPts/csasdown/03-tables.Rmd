@@ -1,0 +1,50 @@
+---
+output:
+  word_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+\clearpage
+\newpage
+
+# Tables {-}
+
+```{r rp-table,include=F, echo=F}
+
+index.rp.tab.dat <- data.frame(lrp30 = c(LRP.med.3.25a,LRP.med.3.26a,LRP.med.3.26c,LRP.med.3.27b),
+                               lrp40 = c(LRP.med.4.25a,LRP.med.4.26a,LRP.med.4.26c,LRP.med.4.27b),
+                               lrp20 = c(LRP.max.2.25a,LRP.max.2.26a,LRP.max.2.26c,LRP.max.2.27b),
+                               usr80 = c(USR.med.8.25a,USR.med.8.26a,USR.med.8.26c,USR.med.8.27b),
+                               usr40 = c(USR.max.4.25a,USR.max.4.26a,USR.max.4.26c,USR.max.4.27b),
+                               lim.rr= c(NA,rr.rf.26a,NA,NA),
+                               tar.rr= c(target.rr.25a.index,target.rr.26a.index,target.rr.26c.index,target.rr.27b.index))
+rownames(index.rp.tab.dat)  <- c("SFA 25A","SFA 26A","SFA 26C","SFA 27B")            
+
+names(index.rp.tab.dat) <- c("B~MSY(30)~", "B~MSY(40)~","B~0(20)~",
+                             "B~MSY(80)~","B~0(40)~",
+                             "RR~lim~","RR~tar~")
+
+      
+model.rp.tab.dat <-  data.frame(lrp30 = c(sab.lrp.3.bmsy,bbn.lrp.3.bmsy),
+                                lrp40 = c(sab.lrp.4.bmsy,bbn.lrp.4.bmsy),
+                                lrp20 = c(sab.lrp.b0,bbn.lrp.b0),
+                                usr80 = c(sab.usr.bmsy,bbn.usr.bmsy),
+                                usr40 = c(sab.usr.b0,bbn.usr.b0),
+                                tar.rr= c(sab.rr,bbn.rr))
+rownames(model.rp.tab.dat)  <- c("SFA 25A","SFA 26A")            
+
+names(model.rp.tab.dat) <- c("B~MSY(30)~", "B~MSY(40)~","B~0(20)~",
+                             "B~MSY(80)~","B~0(40)~","RR~tar~")
+
+```
+
+```{r survey-index-rp-table,include=T,echo=F}
+csas_table(index.rp.tab.dat,caption="A summary of the reference points for each area calculated using the survey index based methods.  The LRPs include,  30\\% of the median survey biomass index (B~MSY(30)~), 40\\% of the median survey biomass index (B~MSY(40)~), and 20\\% of the maximum survey biomass index (B~0(20)~). The USRs include, 80\\% of the median survey biomass index (B~MSY(80)~) and 40\\% of the maximum survey biomass index (B~0(40)~). The limit removal reference (RR~lim~) was calculated using the GEM method, while the target removal reference (RR~tar~) was the median removals during the five-year period of time in which the survey biomass index had the least variability. The survey biomass indices were catchability corrected using a ")
+```
+
+```{r model-rp-table,include=T,echo=F}
+csas_table(model.rp.tab.dat,caption="A summary of the reference points for SFA 25A and SFA 26A calculated using the MSY simulations.  The LRPs include, 30\\% of the median biomass at the simulation estimate of maximum sustatainable yield (B~MSY(30)~), 40\\% of the median biomass at the simulation estimate of maximum sustatainable yield (B~MSY(40)~), and  20\\% of the median biomass using simulations with no fishing (B~0(20)~). The USRs include, 80\\% of the median biomass at the simulation estimate of maximum sustatainable yield (B~MSY(80)~) and 40\\% of the median biomass using simulations with no fishing (B~0(40)~). The target removal reference (RR~tar~) was calculated as the exploitation rate which resulted in the maximum sustainable yield.")
+```
+
+

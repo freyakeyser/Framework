@@ -1,0 +1,15 @@
+book_filename: "resdoc"
+rmd_files: ["index.Rmd",
+            "analysis.Rmd",
+            "01-text.Rmd",
+            "02-references.Rmd",
+            "03-tables.Rmd",
+            "04-figures.Rmd",
+            #"05-appendix.Rmd",
+            "06-formatting.Rmd"
+            ]
+delete_merged_file: true
+
+language:
+  label:
+    fig: !expr function(x) sprintf("Figure %s. ", x)
