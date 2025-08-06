@@ -34,7 +34,7 @@ save_plot(paste0(sab.plot.loc,"RPS_ts.png"),p.rps.ts,base_height =6,base_width =
 sab.rps.bp1 <- 4300
 sab.rps.bp2 <- 7000
 p.rps.ssb <- ggplot(sab.prod.dat,aes(y=RPS4,x=SSB)) + geom_text(aes(label = substr(Year,3,4)),size=3) + 
-                                                  xlab("Adult Biomass (tonnes)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
+                                                  xlab("SSB (tonnes)") + ylab("Recruits per Spawner (kg\u00B9\u22C5kg\u207B\u00B9)") +
                                                   geom_smooth(method = 'lm') +
                                                   scale_y_log10() + 
                                                   geom_vline(xintercept = c(sab.rps.bp2),size=0.5,color='firebrick2',linetype='dashed')  + 
@@ -79,13 +79,13 @@ save_plot(paste0(sab.plot.loc,"Rec_vs_SSB.png"),p.rec.ssb,base_height =6,base_wi
 
 # No relationship between g and SSB.
 p.g.ssb <- ggplot(sab.prod.dat,aes(y=g,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
-                                             xlab("") + ylab("Growth (Fully Recruited)") +
+                                             xlab("SSB (tonnes)") + ylab("Growth (Fully Recruited)") +
                                              geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
                                              #geom_vline(xintercept = 9000,size=0.5,color='firebrick2',linetype='dashed')  + 
                                              scale_x_continuous(breaks = c(seq(1000,20000,by=1000),labels = NA))
 
 p.gR.ssb <- ggplot(sab.prod.dat,aes(y=gR,x=SSB)) + geom_text(aes(label = substr(Year,3,4))) +
-                                             xlab("Adult Biomass (tonnes)") + ylab("Growth (Recruits)") +
+                                             xlab("SSB (tonnes)") + ylab("Growth (Recruits)") +
                                              geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
                                              #geom_vline(xintercept = 9000,size=0.5,color='firebrick2',linetype='dashed')  + 
                                              scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
@@ -97,13 +97,13 @@ save_plot(paste0(sab.plot.loc,"Growth_vs_SSB.png"),p.gs.ssb,base_height =12,base
 # Naturnal mortality and SSB, not really anything IMHO.
 sab.m.bp <- 0
 p.m.ssb <- ggplot(sab.prod.dat,aes(y=m,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))+ 
-                                             xlab("") + ylab("FR Natural Mortality (instantaneous)") +
+                                             xlab("SSB (tonnes)") + ylab("FR Natural Mortality (instantaneous)") +
                                              geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
                                              #geom_vline(xintercept = 10000,size=0.5,color='firebrick2',linetype='dashed')  + 
                                              scale_x_continuous(breaks = c(seq(1000,20000,by=1000)),labels=NULL)
 
 p.mr.ssb <- ggplot(sab.prod.dat,aes(y=mr,x=SSB)) + geom_text(aes(label = substr(Year,3,4)))+ 
-                                             xlab("Adult Biomass (tonnes)") + ylab("Recruit Natural Mortality (instantaneous)") +
+                                             xlab("SSB (tonnes)") + ylab("Recruit Natural Mortality (instantaneous)") +
                                              geom_smooth(method = 'gam',formula = y ~ s(x, bs = "cs", k = 3)) +
                                              #geom_vline(xintercept = 10000,size=0.5,color='firebrick2',linetype='dashed')  + 
                                              scale_x_continuous(breaks = c(seq(1000,20000,by=1000)))
@@ -198,7 +198,7 @@ sab.cor.q.bm <- signif(cor(mod.index.bm$mod.bm , mod.index.bm$index.bm,use= 'com
 p.sab.mod.ind.bm <-ggplot(mod.index.bm) + geom_text(aes(x=index.bm,y=mod.bm,label = substr(year,3,4))) +
                                           scale_x_continuous(name="Survey Biomass Index (tonnes)") +
                                           scale_y_continuous(name="Model Biomass (tonnes)") +
-                                          geom_abline(slope=1/mod.out$BUGSoutput$median$q,intercept=0)
+                                          geom_abline(slope=1,intercept=0)
 save_plot(paste0(sab.plot.loc,"Model_vs_index_biomass.png"),p.sab.mod.ind.bm,base_height =6,base_width = 10)   
 
 
@@ -254,8 +254,10 @@ if(run.sims == F) sab.res <- readRDS(paste0(res.sab.rp.mod.loc,"full_bmsy_sims_"
 
 sab.Exp.res <- sab.res$Exp.res
 
-sab.RPs <- sab.Exp.res %>% dplyr::filter(year >= n_y-25) %>% dplyr::group_by(F.scenario) %>% dplyr::summarise(med.B = median(B,na.rm=T),
-                                                                                                       med.C = median(Catch,na.rm=T))  
+sab.RPs <- sab.Exp.res %>% dplyr::filter(year >= n_y-last.yrs) %>% dplyr::group_by(F.scenario) %>% dplyr::summarise(med.B = median(B,na.rm=T),
+                                                                                                       mn.B = median(B,na.rm=T),
+                                                                                                       med.C = median(Catch,na.rm=T),
+                                                                                                       mn.C = mean(Catch,na.rm=T))  
 
 sab.c.at.msy <- max(sab.RPs$med.C)
 sab.rr <- sab.RPs$F.scenario[sab.RPs$med.C == sab.c.at.msy] # 
@@ -277,10 +279,10 @@ sab.trp.b0 <- 0.8 * sab.b0
 
 
 sab.res.at.rr.last.yrs <- sab.Exp.res[sab.Exp.res$F.scenario==sab.rr & sab.Exp.res$year > (n_y-last.yrs),]
-# We can estimate the proportion of the time the stocks are in the critical, cautious, and healthy zones in the last 25 years of the simulations
-sab.prop.yrs.critical <- round(100*length(which(sab.res.at.rr.last.yrs$B < sab.lrp.b0))/n_sims/last.yrs,digits=1)
-sab.prop.yrs.cautious <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.lrp.b0 & sab.res.at.rr.last.yrs$B < sab.usr.b0))/n_sims/last.yrs,digits=1)
-sab.prop.yrs.healthy <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.usr.b0))/n_sims/last.yrs,digits=1)
+# We can estimate the proportion of the time the stocks are in the critical, cautious, and healthy zones in the last 100 years of the simulations
+sab.prop.yrs.critical <- round(100*length(which(sab.res.at.rr.last.yrs$B < sab.lrp.4.bmsy))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.cautious <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.lrp.4.bmsy & sab.res.at.rr.last.yrs$B < sab.usr.bmsy))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.healthy <- round(100*length(which(sab.res.at.rr.last.yrs$B >= sab.usr.bmsy))/n_sims/last.yrs,digits=1)
 
 # How long does it take to 'rebuild'
 
@@ -301,23 +303,23 @@ if(any(B.now$med.B >= sab.bmsy))
   tmp[trues] <- T
   time.to$T.msy[time.to$years == i] <- tmp
 }
-if(any(B.now$med.B >= sab.usr.b0))
+if(any(B.now$med.B >= sab.usr.bmsy))
 {
-   trues <- which(B.now$med.B >= sab.usr.b0)
+   trues <- which(B.now$med.B >= sab.usr.bmsy)
   tmp <- time.to$T.usr[time.to$years == i]
   tmp[trues] <- T
   time.to$T.usr[time.to$years == i] <- tmp
 }
-if(any(B.now$med.B >= sab.lrp.b0))
+if(any(B.now$med.B >= sab.lrp.4.bmsy))
 {
-  trues <- which(B.now$med.B >= sab.lrp.b0)
+  trues <- which(B.now$med.B >= sab.lrp.4.bmsy)
   tmp <- time.to$T.lrp[time.to$years == i]
   tmp[trues] <- T
   time.to$T.lrp[time.to$years == i] <- tmp
 }
-if(any(B.now$med.B >= sab.trp.b0))
+if(any(B.now$med.B >= sab.trp.bmsy))
 {
-  trues <- which(B.now$med.B >= sab.trp.b0)
+  trues <- which(B.now$med.B >= sab.trp.bmsy)
   tmp <- time.to$T.trp[time.to$years == i]
   tmp[trues] <- T
   time.to$T.trp[time.to$years == i] <- tmp
@@ -488,7 +490,7 @@ sab.rps.sim.comp.plt <- ggplot(sab.res.4.plts) + geom_point(aes(x=SSB/1000,y=rps
 
 
 sab.sim.comps.plt <- plot_grid(sab.m.sim.comp.plt,sab.mr.sim.comp.plt,sab.rps.sim.comp.plt,sab.gr.sim.comp.plt)
-sab.sim.comps.plt2 <- add_sub(sab.sim.comps.plt, "Adult Biomass (tonnes x 1000)",angle=0,y=1.4,x=0.55,size=24)
+sab.sim.comps.plt2 <- add_sub(sab.sim.comps.plt, "SSB (tonnes x 1000)",angle=0,y=1.4,x=0.55,size=24)
 
 save_plot(sab.sim.comps.plt2,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_paramter_DD.png"),base_height = 11,base_width=8.5)
 
@@ -501,7 +503,7 @@ sab.mod.rp.plt <- ggplot(sab.prod.dat) + geom_line(aes(x=Year,y=B/1000)) +
                        geom_hline(yintercept = sab.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
                        geom_hline(yintercept = sab.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
                        scale_x_continuous('',breaks=seq(1990,2030,by=3)) +
-                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') 
+                       scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)',limits = c(0,NA)) 
 
 save_plot(sab.mod.rp.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-",max(sab.model.yrs),"/Sim_RPs.png"),base_height = 8.5,base_width=8.5)
 
@@ -510,12 +512,12 @@ save_plot(sab.mod.rp.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),"-
 sab.med.B.4.plt <- sab.res.4.plts |> collapse::fgroup_by(year) |> collapse::fsummarise(B.med = median(B,na.rm=T))
 
 sab.mod.real.plt <- ggplot(sab.res.4.plts) + geom_line(aes(x=year,y=B/1000,group=Sim),alpha=alphs) + 
-                       geom_line(data = sab.med.B.4.plt,aes(x=year,y=B.med/1000),color='orange',size=1.25) + 
-                       geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
+                       geom_line(data = sab.med.B.4.plt,aes(x=year,y=B.med/1000),color='black',size=1.25) + 
+                       #geom_hline(yintercept = sab.lrp.b0/1000,color='firebrick2',linetype='solid',size=1.5) +
                        #geom_hline(yintercept = sab.lrp.3.bmsy/1000,color='firebrick2',linetype = 'dotted') +
-                       #geom_hline(yintercept = sab.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
-                       geom_hline(yintercept = sab.usr.b0/1000,color=u.colors[2],linetype = 'solid',size=1.5) +
-                       #geom_hline(yintercept = sab.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
+                       geom_hline(yintercept = sab.lrp.4.bmsy/1000,color='firebrick2',linetype='dashed') +
+                       #geom_hline(yintercept = sab.usr.b0/1000,color=u.colors[2],linetype = 'solid',size=1.5) +
+                       geom_hline(yintercept = sab.usr.bmsy/1000,color=u.colors[2],linetype='dashed') +
                        #geom_hline(yintercept = sab.bmsy/1000,color=u.colors[1],linetype='solid',size=1.5) +
                        scale_x_continuous('') +
                        scale_y_continuous('Fully-recruited Biomass (tonnes x 1000)') +
@@ -531,14 +533,14 @@ save_plot(sab.mod.real.plt,file = paste0(plot.sab.rp.mod.loc,min(sab.model.yrs),
 # HCR specific settings
 set.seed(4)
 sab.trp.exp <- 0.05
-sab.usr.exp <- 0.01
+sab.usr.exp <- 0.02
 sab.lrp.exp <- 0
 sab.exp.sd <- 0.1 
 
 
 hcr.strat <-list(TRP = sab.trp.bmsy,TRP.exp = sab.trp.exp,
-                 USR = sab.usr.b0, USR.exp = sab.usr.exp, 
-                 LRP = sab.lrp.b0, LRP.exp = sab.lrp.exp,exp.sd = sab.exp.sd)
+                 USR = sab.usr.bmsy, USR.exp = sab.usr.exp, 
+                 LRP = sab.lrp.4.bmsy, LRP.exp = sab.lrp.exp,exp.sd = sab.exp.sd)
 # The g/m/r.strat are in the productivity section...
 # For elsewhere, this is the HCR figure plot directory
 sab.HCR <- paste0("T_",hcr.strat$TRP,"_",hcr.strat$TRP.exp,"_U_",hcr.strat$USR,"_",hcr.strat$USR.exp,"_L_",hcr.strat$LRP,"_",hcr.strat$LRP.exp)
@@ -560,23 +562,22 @@ sab.hcr <- proj.mod(mods = list(bssm.mod = sab.mod),n_sim=n_sims,n_y = n_y,model
                                 ar1=m.strat$ar1,ar2=m.strat$ar2),
                 HCR.sim = list(TRP = hcr.strat$TRP,TRP.exp = hcr.strat$TRP.exp, USR = hcr.strat$USR, USR.exp = hcr.strat$USR.exp,
                                LRP = hcr.strat$LRP, LRP.exp = hcr.strat$LRP.exp,exp.sd = hcr.strat$exp.sd))
-sab.hcr <- sab.hcr$Exp.res
+sab.hcr <- sab.hcr$Exp.res 
 }
 if(run.sims == F) sab.hcr <- readRDS(sab.hcr.res.loc)
   
-sab.mn.catch.hcr <- round(mean(sab.hcr$Catch,na.rm=T),digits=0)
-sab.med.catch.hcr <- round(median(sab.hcr$Catch,na.rm=T),digits=0)
-sab.med.bm.hcr <- round(median(sab.hcr$B),digits=0)
-
 # For this I need to use the summarized object
 sab.hcr.last.yrs <- sab.hcr[sab.hcr$year > (n_y-last.yrs),]
-sab.prop.yrs.bl.lrp.hcr <- round(100*length(which(sab.hcr.last.yrs$B  < sab.lrp.b0))/n_sims/last.yrs,digits=2)
-sab.prop.yrs.cautious.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.lrp.b0 & sab.hcr.last.yrs$B < sab.usr.b0))/n_sims/last.yrs,digits=1)
-sab.prop.yrs.healthy.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.usr.b0 & sab.hcr.last.yrs$B < sab.trp.bmsy))/n_sims/last.yrs,digits=1)
+sab.mn.catch.hcr <- round(mean(sab.hcr.last.yrs$Catch,na.rm=T),digits=0)
+sab.med.catch.hcr <- round(median(sab.hcr.last.yrs$Catch,na.rm=T),digits=0)
+sab.med.bm.hcr <- round(median(sab.hcr.last.yrs$B),digits=0)
+sab.prop.yrs.bl.lrp.hcr <- round(100*length(which(sab.hcr.last.yrs$B  < sab.lrp.4.bmsy))/n_sims/last.yrs,digits=2)
+sab.prop.yrs.cautious.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.lrp.4.bmsy & sab.hcr.last.yrs$B < sab.usr.bmsy))/n_sims/last.yrs,digits=1)
+sab.prop.yrs.healthy.hcr <- round(100*length(which(sab.hcr.last.yrs$B >= sab.usr.bmsy & sab.hcr.last.yrs$B < sab.trp.bmsy))/n_sims/last.yrs,digits=1)
 sab.prop.yrs.above.trp.hcr <- round(100*length(which(sab.hcr.last.yrs$B > sab.trp.bmsy))/n_sims/last.yrs,digits=1)
 
-sab.min.healthy.zone.catch.hcr <- sab.usr.b0*0.025
-sab.max.healthy.zone.catch.hcr <- sab.trp.bmsy*0.025
+sab.min.healthy.zone.catch.hcr <- sab.usr.bmsy*sab.usr.exp
+sab.max.healthy.zone.catch.hcr <- sab.trp.bmsy*sab.usr.exp
 sab.min.trp.catch.hcr <- sab.trp.bmsy*sab.trp.exp
 sab.catch.quants.hcr <- quantile(sab.hcr$Catch,na.rm=T,probs = seq(0,1,by=0.01))
 

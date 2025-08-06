@@ -420,7 +420,11 @@ if(model == "BSSM") mod.fit <- mods$bssm.mod
                                                                             #max.B = max.SSB,mn.at.max = rec.mod$mn.at.max,sd.at.max = rec.mod$sd.at.max)
             # To avoid huge outlier problem, if the recruitment estimate is higher than ever has been observed we instead run a sample
             # using the largest value and a nice normal distribution to avoid silliness
-            if(Rec[j,nn,i] > max.rec.obs) Rec[j,nn,i] <- rnorm(1,max.rec.obs,0.1*max.rec.obs) # The max ends up about 50% above maximum ever seen, so reasonble.
+
+            if(Rec[j,nn,i] > max.rec.obs) 
+            {
+              Rec[j,nn,i] <- rnorm(1,max.rec.obs,0.1*max.rec.obs) # The max ends up about 50% above maximum ever seen, so reasonble.
+            }
             if(Rec[j,nn,i] < 0) Rec[j,nn,i] <- max.rec.obs # Just in case that trips and lands in negative land, very unlikely with our data (like < 1 in a billion)... but still...
           } # end if(run != 'model_error')     
           
@@ -458,6 +462,11 @@ if(model == "BSSM") mod.fit <- mods$bssm.mod
              {
                if(rec.mod$cen.tend == 'median') rps.val <- median(prod.dat$RPS[prod.dat$SSB >= rec.mod$bp],na.rm=T)
                if(rec.mod$cen.tend == 'mean')  rps.val <- mean(prod.dat$RPS[prod.dat$SSB >= rec.mod$bp],na.rm=T)
+               # Test for Dvora way
+               #tster <- 186 # Mean for BBn...
+               #Rec[j,nn,i] <- tster 
+               
+               # Original way
                Rec[j,nn,i] <- SSB.for.rec* rlnorm(1,log(rps.val), sd(prod.dat$RPS[prod.dat$SSB >= rec.mod$bp],na.rm=T))
              }
            } # end if(length(rec.mod$bp) == 1)
@@ -470,7 +479,7 @@ if(model == "BSSM") mod.fit <- mods$bssm.mod
              {
                if(rec.mod$cen.tend == 'median') rps.val <- median(prod.dat$RPS[prod.dat$SSB < min(rec.mod$bp)],na.rm=T)
                if(rec.mod$cen.tend == 'mean')  rps.val <- mean(prod.dat$RPS[prod.dat$SSB < min(rec.mod$bp)],na.rm=T)
-               Rec[j,nn,i] <-SSB.for.rec* rlnorm(1,log(rps.val),
+               Rec[j,nn,i] <- SSB.for.rec* rlnorm(1,log(rps.val),
                                                    sd(prod.dat$RPS[prod.dat$SSB < min(rec.mod$bp)],na.rm=T))
              } # end if(SSB.for.rec < min(rec.mod$bp)) 
              
@@ -490,15 +499,17 @@ if(model == "BSSM") mod.fit <- mods$bssm.mod
         
         if(rec.mod$type == 'sv') Rec[j,nn,i] <- rec.mod$set.value
         
+        # This was a bad idea as this was lagged a year and was causing problems, just setting growth to one is enough of a constraint with 
+        # the already low RPS from the breakpoint analysis.
         # Whenever the SSB is above the maximum observed we can trigger a clause to constrain recruitment
-        if(SSB.init > max.SSB & !is.null(rec.mod$mn.at.max)) 
-        {
-         Rec[j,nn,i] <- SSB.for.rec* rlnorm(1,log(rec.mod$mn.at.max),rec.mod$sd.at.max) 
-        }
+        # if(SSB.init > max.SSB & !is.null(rec.mod$mn.at.max)) 
+        # {
+        #  Rec[j,nn,i] <- SSB.for.rec* rlnorm(1,log(rec.mod$mn.at.max),rec.mod$sd.at.max) 
+        # }
         
          # I'd like too be able to look at the rps time series too...
          rps[j,nn,i] <- Rec[j,nn,i]/SSB.for.rec
-        
+         
         ############################### End recruitment Section #######################################
 
        
@@ -643,7 +654,7 @@ if(save.results == T)
   if(is.null(HCR.sim))
   {
     # This is summarizing the final half of the years in the simulations.
-    MSY.summarized <- Exp.res %>% dplyr::filter(year >= n_y/2) %>% dplyr::group_by(F.scenario,year) %>% 
+    MSY.summarized <- Exp.res %>% dplyr::group_by(F.scenario,year) %>% 
                                    dplyr::summarise(B.mn = median(B,na.rm=T),          B.U90 = quantile(B,probs=0.95,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
                                                                                      B.L90 = quantile(B,probs=0.05,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
                                                     Rec.mn = median(Rec,na.rm=T),      Rec.U90 = quantile(Rec,probs=0.95,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),
@@ -849,7 +860,7 @@ if(save.results == T)
     # Summarize the data to make a nice time series plot.
     # Note that I want the mean catch here, because that's really what people are interested in for this...
     # This is summarizing the final 100 years of the simulations
-    HCR.summarized <- Exp.res %>% dplyr::filter(year >= n_y/2) %>% dplyr::group_by(year) %>% 
+    HCR.summarized <- Exp.res %>% dplyr::group_by(year) %>% 
                                   dplyr::summarise(B.mn = median(B,na.rm=T),         B.U90 = quantile(B,probs=0.95,na.rm=T),           B.U50 = quantile(B,probs=0.75,na.rm=T),
                                                                                    B.L90 = quantile(B,probs=0.05,na.rm=T),           B.L50 = quantile(B,probs=0.25,na.rm=T),
                                                   Rec.mn = median(Rec,na.rm=T),      Rec.U90 = quantile(Rec,probs=0.95,na.rm=T),       Rec.U50 = quantile(Rec,probs=0.75,na.rm=T),
@@ -865,17 +876,18 @@ if(save.results == T)
     
     
     # Biomass realizations          
-    B.real <- ggplot(Exp.res,aes(x=year,y=B/1000,group = Sim)) + geom_line(alpha = alphs) + #facet_wrap(~F.scenario) +
-                                                                      ylab("Predicted Biomass (metric tonnes x 1000)") + xlab("") + 
+    B.real <- ggplot(Exp.res,aes(x=year,y=B/1000,group = Sim)) + geom_point(alpha = 1/100,shape=19,size=0.1)+
+                                                                      xlab("") + 
                                                                       geom_hline(yintercept = c(HCR.sim$LRP/1000,HCR.sim$USR/1000,HCR.sim$TRP/1000),
                                                                                  color=c('firebrick2',u.colors[2],u.colors[1]),linewidth = 1.5) +
+                                                                      scale_y_continuous(name = "Biomass (metric tonnes x 1000)", limits = c(0,NA)) +
                                                                       #scale_color_viridis_b(alpha=0.4,end = 0.75) +
                                                                        theme(legend.position = 'none')
     
     ggsave(paste0(plot_sims,"B_reals.png"),plot=B.real,height=15,width=15)               
     
     # Catch realizations          
-    C.real <- ggplot(Exp.res,aes(x=year,y=Catch,group = Sim)) + geom_line(alpha = alphs) + #facet_wrap(~F.scenario) +
+    C.real <- ggplot(Exp.res,aes(x=year,y=Catch,group = Sim)) + geom_point(alpha = 1/100,shape=19,size=0.1)+
                                                                           ylab("Predicted Catch (metric tonnes)") + xlab("") + 
                                                                           #geom_hline(yintercept = c(HCR.sim$LRP/1000,HCR.sim$USR/1000,HCR.sim$TRP/1000),color=c('firebrick2','green','blue')) +
                                                                           #scale_color_viridis_b(alpha=0.4,end = 0.75) +
@@ -890,7 +902,8 @@ if(save.results == T)
                                                         geom_ribbon(aes(x=year,ymax = B.U50/1000,ymin=B.L50/1000),fill='blue',alpha = sum.fig.alpha) + 
                                                         geom_hline(yintercept = c(HCR.sim$LRP/1000,HCR.sim$USR/1000,HCR.sim$TRP/1000),
                                                                    color=c('firebrick2',u.colors[2],u.colors[1]),linewidth = 1.5) +
-                                                         xlab("") + ylab("Biomass (metric tonnes x 1000)") 
+                                                         scale_y_continuous(name = "Biomass (metric tonnes x 1000)", limits = c(0,NA)) +
+                                                         xlab("") 
     ggsave(paste0(plot_sims,"B_mn_ts.png"),plot=B.ts,height=15,width=15)
     
     

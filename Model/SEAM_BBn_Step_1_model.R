@@ -44,7 +44,16 @@ source("D:/Github/SEBDAM/R/data_setup.R")
 
 bbn.shape <- st_read("D:/Github/GIS_layers/survey_boundaries/BBn.shp", quiet=T)
 bbn.shape <- bbn.shape %>% st_transform(crs = 32619) # BBn is right on the 19/20 border so think they are basically equivalent options here
+# I may also need the german shape file here
+ger.shape <- st_read("D:/Github/GIS_layers/other_boundaries/WGS_84_German.shp") %>% st_make_valid() %>% st_transform(32619)
+#ger.shape <- ger.shape %>% st_transform(crs = 32619) # BBn is right on the 19/20 border so think they are basically equivalent options here
 # Bring in the survey data
+ger.area.km2 <- st_area(ger.shape)/1e6
+units(ger.area.km2) <- NULL
+# Bring in the survey data
+
+
+
 #load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90.Rdata")
 load("Y:/Offshore/Assessment/Data/Survey_data/2022/Survey_summary_output/testing_results_framework_75-90RSCS_newMWSH_GBb.RData")
 #load("D:/Framework/SFA_25_26_2024/Model/Data/testing_results_framework3.Rdata")
@@ -825,7 +834,7 @@ pred.proc$log_processes <- pred.proc$log_processes %>% dplyr::filter(year < 2023
 #  mu[2017] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) 
 # TLM and SEAM don't calculate mu, so we do it manually here, to be analogous...
 # SEAM/TLM mu(t) <- C(t-1) / (B(t) + C(t-1)) because our model is B(t) <- B(t-1) - C(t-1) and C(2016) is now June 2016-Aug 2017.
-# mu[2017] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) 
+# mu[2016] <- C[June 2016-Aug 2017]/(B[2017]+C[June 2016-Aug 2017]) 
 
 if(mod.select != "TLM")
 {
