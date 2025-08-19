@@ -71,7 +71,9 @@ for(fun in funs)
 # Abundance and Biomass TS, FR only
 bankpertow_all <- NULL
 # by recruit size bin range
-for (rdata in c("framework1", "framework2", "framework3", "framework4", "framework5", "framework6")){
+for (rdata in c(#"framework1", "framework2", "framework3", "framework4", 
+  "framework5"#, "framework6"
+  )){
   
   # prep data for TS plotting
   bankpertow <- NULL
@@ -123,15 +125,16 @@ for (rdata in c("framework1", "framework2", "framework3", "framework4", "framewo
   # BBn, BBs, GBb
   for(b in c("BBn", "BBs", "GBb")){
     print(dim(get(rdata)$survey.obj[[b]]$bankpertow))
+    filleryears <- expand.grid(year=min(get(rdata)$survey.obj[[b]]$bankpertow$year):max(get(rdata)$survey.obj[[b]]$bankpertow$year), bank=b, liner="lined")
+
       bankpertow <- get(rdata)$survey.obj[[b]]$bankpertow %>%
+        full_join(filleryears)%>%
+        arrange(year)%>%
         dplyr::mutate(bank=b) %>%
         dplyr::select(bank, year, N, NR, NPR, N.se, NR.se, NPR.se, I, IR, IPR, I.se, IR.se, IPR.se) %>%
         dplyr::rename(N.cv=N.se, NR.cv=NR.se, NPR.cv=NPR.se, I.cv=I.se, IR.cv = IR.se, IPR.cv=IPR.se)%>%
         dplyr::mutate(liner="lined") %>%
         full_join(bankpertow)
-
-  
-    bankpertow <- full_join(bankpertow, data.frame(bank=b, year=2020, liner="lined"))
     
     print(dim(bankpertow))
   }
