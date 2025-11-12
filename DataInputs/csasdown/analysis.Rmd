@@ -32,7 +32,7 @@ framework5 <- list(SS.summary=SS.summary, merged.survey.obj=merged.survey.obj, s
 
 
 nickname <- "framework5"
-french <- F # set to T for french
+french <- T # set to T for french
 
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs"
 
@@ -55,7 +55,8 @@ for(fun in funs)
 funs <- c("https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Fishery/jackknife.r",
           "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/create_grid.R",
           "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/pectinid_projector_sf.R",
-          "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/github_spatial_import.R")
+          "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/github_spatial_import.R",
+          "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Fishery/logs_and_fishery_data.r")
 # Now run through a quick loop to load each one, just be sure that your working directory is read/write!
 for(fun in funs) 
 {
@@ -831,6 +832,13 @@ for (i in 1:n.banks){
   if(banks[i] == 'Ger') surv$`Tow type`[!surv$random %in% c(1,3)] <- paste0('exploratory (n = ',length(surv$random[!surv$random %in% c(1,3)]),")")
   if(banks[i] == 'Ger') surv$`Tow type`[surv$random == 3] <- paste0('repeated (n = ',length(surv$random[surv$random==3]),")")
   if(banks[i] == 'GB') surv$`Tow type`[surv$random == 3] <- paste0('regular (n = ',length(surv$random[surv$random==3]),")")
+  
+  if(french==T){
+    surv$`Tow type` <- gsub(x=surv$`Tow type`,pattern="regular", "régulière")
+    surv$`Tow type` <- gsub(x=surv$`Tow type`,pattern="exploratory", "exploratoire")
+    surv$`Tow type` <- gsub(x=surv$`Tow type`,pattern="fixed", "fixe")
+  }
+  
   # Get the shapes for symbols we want, this should do what we want for all cases we've ever experienced...
   if(length(unique(surv$`Tow type`)) ==1) shp <- 21; ptcol <- c("black")
   if(!banks[i] == "Ger" & length(unique(surv$`Tow type`)) ==2) shp <- c(24,21); ptcol <- c("transparent", "black")
@@ -861,7 +869,7 @@ for (i in 1:n.banks){
   print(ggplot() + geom_sf(data=boundary, fill="grey", colour=NA) + 
           geom_sf(data=surv[surv$sampled==0,], aes(shape=`Tow type`, fill=as.factor(sampled))) + 
           geom_sf(data=surv[surv$sampled==1,], aes(shape=`Tow type`, fill=as.factor(sampled))) + 
-          scale_shape_manual(values = shp, guide=guide_legend(order=4)) +
+          scale_shape_manual(values = shp, guide=guide_legend(order=4), name=en2fr("Tow type", translate=french, custom_terms=rosetta_terms)) +
           scale_fill_manual(values=c("transparent", "black"), guide=F) +
           facet_wrap(~year, ncol=ncol) + 
           theme_bw() +
@@ -926,9 +934,9 @@ p <-  pecjector(area = "NL", add_layer = list(land = 'grey',
                                               bathy=c(100, 'c', 200)),
                 c_sys = 4326, quiet=T)
 
-png(paste(plotsGo,"/Offshore_banks.png",sep=""),width=11,height=8,res=920,units="in")
-
 if(french==F) {
+  png(paste(plotsGo,"/Offshore_banks.png",sep=""),width=11,height=8,res=920,units="in")
+  
   p <-  p + geom_sf_text(data = nonGB[!(nonGB$SFA%in% c("SFA10", "SFA11", "SFA12", "SFA26B")),], 
                          aes(label = lab_short), 
                          fun.geometry = sf::st_centroid) +
@@ -955,9 +963,44 @@ if(french==F) {
     #scale_y_continuous(limits=c(40, 48)) + 
     theme_bw() +
     xlab(NULL) + ylab(NULL)
+  
+  print(p)
+  dev.off()
 }
-print(p)
-dev.off()
+
+if(french==T) {
+  png(paste(plotsGo,"/Offshore_banks_fr.png",sep=""),width=11,height=8,res=920,units="in")
+  
+  p <-  p + geom_sf_text(data = nonGB[!(nonGB$SFA%in% c("SFA10", "SFA11", "SFA12", "SFA26B")),], 
+                         aes(label = fr), 
+                         fun.geometry = sf::st_centroid) +
+    # geom_sf_text(data = nonGB[nonGB$SFA=="SFA11",], 
+    #              aes(label = lab_short), 
+    #              fun.geometry = sf::st_centroid, 
+    #              nudge_x=-0.5, nudge_y=-0.5) +
+    geom_sf_text(data = nonGB[nonGB$SFA=="SFA26B",], 
+                 aes(label = fr), 
+                 fun.geometry = sf::st_centroid, 
+                 nudge_y=0.5) +
+    geom_text_repel(data = GBalab, 
+                    aes(x=as.data.frame(st_coordinates(st_centroid(GBalab)))$X,
+                        y=as.data.frame(st_coordinates(st_centroid(GBalab)))$Y,
+                        label = fr), 
+                    nudge_x=-1, nudge_y=-0.5, direction = "x", min.segment.length=0, box.padding = 0) +
+    geom_text_repel(data = GBblab, 
+                    aes(x=as.data.frame(st_coordinates(st_centroid(GBblab)))$X,
+                        y=as.data.frame(st_coordinates(st_centroid(GBblab)))$Y,
+                        label = fr), 
+                    nudge_x=1.25, nudge_y=-0.5, direction = "x", min.segment.length=0, box.padding = 0) +
+    coord_sf(expand=F) +
+    scale_x_continuous(limits=c(-68, -54)) +
+    #scale_y_continuous(limits=c(40, 48)) + 
+    theme_bw() +
+    xlab(NULL) + ylab(NULL)
+  
+  print(p)
+  dev.off()
+}
 
 ```
 
@@ -970,18 +1013,34 @@ library(collapse)
 library(ggthemes)
 g.proper <- readRDS(file = "revised_growth_data.Rds")
 
-gp <- ggplot(g.proper[!is.na(g.proper$g.proper),]) + geom_point(aes(x=year,y=g.proper),color="#FFD500",shape =21,size=3,fill="#FFD500") + 
-                   geom_line(aes(x=year,y=g.proper),color="#FFD500",linewidth=2) + 
-                   geom_point(aes(x=year,y=gR.proper),color="#005BBB",shape =22,fill= "#005BBB",size=3) + 
-                   geom_line(aes(x=year,y=gR.proper),color="#005BBB",linewidth=2) + 
-                   facet_wrap(~bank,nrow=2,) + ylim(c(0,NA)) +
-                   theme_few(base_size = 16) + ylab("Growth rate") + xlab("Year")
-png(paste(plotsGo,"/growth_new.png",sep=""),width=10,height=8,res=920,units="in")
-print(gp)
-dev.off()
+if(french==F){
+  gp <- ggplot(g.proper[!is.na(g.proper$g.proper),]) + geom_point(aes(x=year,y=g.proper),color="#FFD500",shape =21,size=3,fill="#FFD500") + 
+    geom_line(aes(x=year,y=g.proper),color="#FFD500",linewidth=2) + 
+    geom_point(aes(x=year,y=gR.proper),color="#005BBB",shape =22,fill= "#005BBB",size=3) + 
+    geom_line(aes(x=year,y=gR.proper),color="#005BBB",linewidth=2) + 
+    facet_wrap(~bank,nrow=2,) + ylim(c(0,NA)) +
+    theme_few(base_size = 16) + ylab("Growth rate") + xlab("Year")
+  png(paste(plotsGo,"/growth_new.png",sep=""),width=10,height=8,res=920,units="in")
+  print(gp)
+  dev.off()
+}
+
+if(french==T){
+  g.proper$bank <- gsub(x=g.proper$bank, pattern="SFA", replacement="ZPP")
+  gp <- ggplot(g.proper[!is.na(g.proper$g.proper),]) +
+    geom_point(aes(x=year,y=g.proper),color="#FFD500",shape =21,size=3,fill="#FFD500") + 
+    geom_line(aes(x=year,y=g.proper),color="#FFD500",linewidth=2) + 
+    geom_point(aes(x=year,y=gR.proper),color="#005BBB",shape =22,fill= "#005BBB",size=3) + 
+    geom_line(aes(x=year,y=gR.proper),color="#005BBB",linewidth=2) + 
+    facet_wrap(~bank,nrow=2,) + ylim(c(0,NA)) +
+    theme_few(base_size = 16) + ylab(en2fr("Growth rate", translate=french, custom_terms=rosetta_terms)) + xlab(en2fr("Year", translate=french, custom_terms=rosetta_terms))
+  png(paste(plotsGo,"/growth_new_fr.png",sep=""),width=10,height=8,res=920,units="in")
+  print(gp)
+  dev.off()
+}
 ```
 
-
+#### 2025-08-26 HERE!!
 # Maps
 ```{r maps, echo=F, include=F}
 boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
@@ -1024,7 +1083,7 @@ for(b in c("BBn", "BBs", "Sab", "GBb")){
     coord_sf(expand=F)
   
   if(b=="Sab"){
-    shpf$are_km2[shpf$Strt_ID==501] <- surv.info$area_km2[surv.info$Strata_ID==501 & surv.info$label=="Sab" & surv.info$startyear==2018]
+    shpf$are_km2[shpf$Strt_ID==501] <- survey.info$area_km2[survey.info$Strata_ID==501 & survey.info$label=="Sab" & survey.info$startyear==2018]
     stns <- st_as_sf(stns, coords=c("lon", "lat"), crs=4326)# %>% st_transform(32620)
     legend.loc <- c(0.7, 0.15)
     p$layers[[4]]$aes_params$location <- "tr"
@@ -1057,7 +1116,7 @@ for(b in c("BBn", "BBs", "Sab", "GBb")){
     #manual adjustment to scalebar text size
     p$layers[[5]]$geom_params$text_cex <- 1.5
   }  
-  #png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"), width=6.5*2, height=4*2, units = "in", res=420)
+  png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"), width=6.5*2, height=4*2, units = "in", res=420)
   print(
     p + 
       geom_sf(data=shpf, aes(fill=Strt_ID), colour=NA, alpha=0.7) +
@@ -1071,7 +1130,7 @@ for(b in c("BBn", "BBs", "Sab", "GBb")){
       theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent")) +
       annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
   )
-  #dev.off()
+  dev.off()
 }
   
 for(b in c("Mid", "Ban", "Ger")){
@@ -1118,7 +1177,7 @@ for(b in c("Mid", "Ban", "Ger")){
   
   
   if(b %in% c("Ban", "Mid")){
-    #png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+    png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
     print(
       p + 
         #geom_sf(data=shpf, colour=NA, alpha=0.7) +
@@ -1130,11 +1189,11 @@ for(b in c("Mid", "Ban", "Ger")){
         theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
         annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
     )
-    #dev.off()
+    dev.off()
   }
   tows <- dplyr::arrange(tows, random)
   if(b %in% c("Ger")){
-    #png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+    png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
     print(
       p + 
         geom_sf(data=shpf, colour=NA, alpha=0.7) +
@@ -1146,12 +1205,12 @@ for(b in c("Mid", "Ban", "Ger")){
         theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
         annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
     )
-   # dev.off()
+    dev.off()
   }
   
 }
 
-
+boundaries$ID <- gsub(x=boundaries$ID, pattern=".shp", "", fixed=T)
 
 
 for(sfa in 25:27){
@@ -1223,7 +1282,7 @@ for(sfa in 25:27){
   if(sfa==27) bp$layers[[4]]$geom_params$text_cex <- 1.5
   if(sfa %in% c(25:26)) bp$layers[[5]]$geom_params$text_cex <- 1.5
 
-  #png(filename=paste0(plotsGo, "/Survey/", nickname, "/survey_footprint_", sfa, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
+  png(filename=paste0(plotsGo, "/Survey/", nickname, "/survey_footprint_", sfa, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
   print(bp +
           geom_sf(data=sfoot[!is.na(sfoot$n),], aes(fill=n), colour=NA, show.legend=T) +
           theme(legend.position=c(0.25,0.85), legend.background=element_blank()) +
@@ -1237,7 +1296,7 @@ for(sfa in 25:27){
           #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
           # )
   )
- #dev.off()
+ dev.off()
 } 
 
 ```
@@ -1889,7 +1948,7 @@ dev.off()
 # 
 # if(french==F) explab <- "Exploitation rate"; labs <- c("modelled", "relative")
 # if(french==T) explab <- "Taux d'exploitation"; labs <- c("prédit", "relative")
-# 
+ 
 # png(filename=paste0(plotsGo, "/Fishery/exploit_BBn_", nickname, ".png"),width=6.5, height= 4, units = "in", res=420)
 # ggplot() + geom_line(data=relative.F[relative.F$bank=="BBn",], aes(year, mu, colour="relative")) + 
 #   geom_point(data=relative.F[relative.F$bank=="BBn",], aes(year, mu, colour="relative", shape="relative")) +

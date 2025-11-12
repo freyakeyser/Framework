@@ -1,5 +1,5 @@
 # for ginette
-load("./Port_sampling/portdat_2006-2022.RData")
+load("C:/Users/keyserf/Documents/temp_data/portdat_2006-2024_july.RData")
 require(lubridate)
 require(tidyverse)
 port.dat$year <- year(ymd(port.dat$fished))
@@ -21,7 +21,7 @@ test <- test[!is.na(test$value),]
 test$year <- year(ymd(test$fished))
 test %>% dplyr::group_by(year) %>% dplyr::summarize(n())
 require(openxlsx)
-write.xlsx(x = gba_wide, file = "C:/Users/keyserf/Documents/temp_data/PS_GBa_2012_2014.xlsx", na.string=0)
+write.xlsx(x = gba_wide, file = "C:/Users/keyserf/Documents/temp_data/PS_GBa_2012_2014_2.xlsx", na.string=0)
 
 
 
@@ -43,5 +43,5 @@ test <- test[!is.na(test$value),]
 test$year <- year(ymd(test$fished))
 test %>% dplyr::group_by(year) %>% dplyr::summarize(n())
 require(openxlsx)
-write.xlsx(x = mid_wide, file = "C:/Users/keyserf/Documents/temp_data/PS_Mid.xlsx", na.string=0)
+write.xlsx(x = mid_wide, file = "C:/Users/keyserf/Documents/temp_data/PS_Mid_2.xlsx", na.string=0)
 
