@@ -27,7 +27,7 @@ for(fun in funs)
 # Bring in the port sampling data, which contains meat weights and meat counts for sampled fishing trips
 #load(paste0(direct,"Data/PortSampling/PS_data_reorg_4_analysis/Port_sampling_processed_data_2022.rData"))
 #load(paste0("C:/Users/keyserf/Documents/temp_data/portdat_2006-2024_july.RData"))
-#load("./Port_sampling/portdat_2006-2024_july.RData")
+load("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/portdat_2006-2024.RData")
 logs_and_fish(loc = "offshore", year = 2006:2022, get.local = T, get.marfis = F, direct=direct)
 fish.dat<-merge(new.log.dat,old.log.dat,all=T)
 port.dat$year <- year(ymd(port.dat$fished))
@@ -51,7 +51,7 @@ load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_n
 #plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/new_wbit/"
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Port_sampling/mod_wbit2/"
 
-french <- F # set to T for french
+french <- T # set to T for french
 if(french==T) {fr <- "_fr"}
 if(french==F) {fr <- ""}
 
@@ -74,7 +74,7 @@ for(fun in funs)
 # port.sampling$ps.fished[1:10]
 # summary(port.sampling$ps.fished)
 if(french==F) ylabel <- "Meat weight (g)"
-if(french==T) ylabel <- "Masse de la chair (g)"
+if(french==T) ylabel <- "Poids de chair (g)"
 
 # png(paste0(plotsGo, "timeseries_mw", fr, ".png"), width=6.5, height=9, units = "in", res=420)
 # ggplot() +
@@ -153,24 +153,28 @@ medians2$ndaysyr <- as.numeric(strftime(ymd(paste0(medians2$year, "12-31")), "%j
 medians2$xend <- ymd(medians2$monthyr) + years(1)
 
 if(french==F) ylabel <- "Meat weight (g)"
-if(french==T) ylabel <- "Masse de la chair (g)"
+if(french==T) ylabel <- "Poids de chair (g)"
 
 medians2$bank <- gsub(x=medians2$bank, pattern="BBn", replacement = "26A-BBn")
 medians2$bank <- gsub(x=medians2$bank, pattern="BBs", replacement = "26B-BBs")
 medians2$bank <- gsub(x=medians2$bank, pattern="Ger", replacement = "26C-Ger")
 medians2$bank <- gsub(x=medians2$bank, pattern="Sab", replacement = "25A-Sab")
-medians2$bank <- gsub(x=medians2$bank, pattern="Mid", replacement = "25A-Mid")
+if(french==F) medians2$bank <- gsub(x=medians2$bank, pattern="Mid", replacement = "25A-Mid")
+if(french==T) medians2$bank <- gsub(x=medians2$bank, pattern="Mid", replacement = "25A-Mi")
 medians2$bank <- gsub(x=medians2$bank, pattern="Ban", replacement = "25B-Ban")
-medians2$bank <- gsub(x=medians2$bank, pattern="GBb", replacement = "27B-GBb")
+if(french==F) medians2$bank <- gsub(x=medians2$bank, pattern="GBb", replacement = "27B-GBb")
+if(french==T) medians2$bank <- gsub(x=medians2$bank, pattern="GBb", replacement = "27B-BGb")
 medians2$sfa <- substr(x = medians2$bank, start = 1, stop = 2)
 
 medians$bank <- gsub(x=medians$bank, pattern="BBn", replacement = "26A-BBn")
 medians$bank <- gsub(x=medians$bank, pattern="BBs", replacement = "26B-BBs")
 medians$bank <- gsub(x=medians$bank, pattern="Ger", replacement = "26C-Ger")
 medians$bank <- gsub(x=medians$bank, pattern="Sab", replacement = "25A-Sab")
-medians$bank <- gsub(x=medians$bank, pattern="Mid", replacement = "25A-Mid")
+if(french==F) medians$bank <- gsub(x=medians$bank, pattern="Mid", replacement = "25A-Mid")
+if(french==T) medians$bank <- gsub(x=medians$bank, pattern="Mid", replacement = "25A-Mi")
 medians$bank <- gsub(x=medians$bank, pattern="Ban", replacement = "25B-Ban")
-medians$bank <- gsub(x=medians$bank, pattern="GBb", replacement = "27B-GBb")
+if(french==F) medians$bank <- gsub(x=medians$bank, pattern="GBb", replacement = "27B-GBb")
+if(french==T) medians$bank <- gsub(x=medians$bank, pattern="GBb", replacement = "27B-BGb")
 medians$sfa <- substr(x = medians$bank, start = 1, stop = 2)
 
 medians$monthnum <- as.numeric(medians$monthyr - min(medians$monthyr))
@@ -581,13 +585,24 @@ if(height<4) height <- 4
 if(bank=="Ger") shf <- shf[shf$years>2007,]
 if(bank=="GBb") shf <- shf[!shf$years==2020,]
 
+if(french==F) {
+  proplab <- "Proportion of scallops >65 mm"
+  shlab <- "Shell height (5 mm bin)"
+  typelab <- c("Survey", "Fishery")
+}
+if(french==T) {
+  proplab <- "Proportion de pétoncles >65 mm"
+  shlab <- "Hauteur de coquille (tranche de 5 mm)"
+  typelab <- c("Relevé", "Pêche")
+}
+
 png(paste0(plotsGo, bank, "/shf_selectivity", fr, ".png"), width=6, height=height, units = "in", res=420)
 ggplot() + geom_line(data=shf, aes(shf, value, colour=name), linewidth=1) + 
   facet_wrap(~years, ncol=1, strip.position="right") +
   theme_bw() +
-  scale_colour_manual(name=NULL, labels=c("Survey", "Fishery"), values=c("blue", "black")) +
-  xlab("Shell height (5 mm bin)") +
-  ylab("Proportion of scallops >65 mm") +
+  scale_colour_manual(name=NULL, labels=typelab, values=c("blue", "black")) +
+  xlab(shlab) +
+  ylab(proplab) +
   scale_y_continuous(n.breaks = 3)
 dev.off()
 
@@ -701,14 +716,17 @@ if(bank=="GBb") shf <- shf[!shf$years==2020,]
 
 xmax <- max(shf$bin[shf$value>0]) +5
 
+if(french==F) cumulab <- "Cumulative proportion of scallops measured"
+if(french==T) cumulab <- "Proportion cumulative de pétoncles mesurée"
+
 png(paste0(plotsGo, bank, "/shf_selectivity_cumulative", fr, ".png"), width=6, height=height, units = "in", res=420)
 print(ggplot() + 
         geom_line(data=shf, aes(bin, cumsum_d, colour=name), linewidth=1) + 
         facet_wrap(~years, ncol=1, strip.position="right") +
         theme_bw() +
-        scale_colour_manual(name=NULL, labels=c("Survey", "Fishery"), values=c("blue", "black")) +
-        xlab("Shell height (5 mm bin)") +
-        ylab("Cumulative proportion of scallops measured") +
+        scale_colour_manual(name=NULL, labels=typelab, values=c("blue", "black")) +
+        xlab(shlab) +
+        ylab(cumulab) +
         scale_y_continuous(n.breaks = 3, limits=c(0,1)) +
         xlim(0,xmax)+
         geom_vline(data=shf, xintercept=RS, linetype="dashed") +

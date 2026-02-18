@@ -79,8 +79,8 @@ opts_chunk$set(
   # fig.align = fig_align,
   # fig.pos = fig_pos
 )
-nickname <- 'framework5'
-fr <- ""
+nickname <- 'framework5_fr'
+fr <- "_fr"
 
 ```
 
@@ -102,31 +102,31 @@ img.asp.sel <- magick::image_info(img)$height /  magick::image_info(img)$width #
 # APPENDIX {#app:a}
 
 ```{r stations-mid, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 25A-Mid by year. Tows where detailed samples were collected are indicated by filled (black) symbols."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Mid", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Mid.png"))
 ```
 
 ```{r stations-sab, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 25A-Sab by year. Tows where detailed samples were collected are indicated by filled (black) symbols."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Sab", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Sab.png"))
 ```
 
 ```{r stations-ban, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 25B by year. Tows where detailed samples were collected are indicated by filled (black) symbols."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Ban", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Ban.png"))
 ```
 
 ```{r stations-bbn, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 26A by year. Tows where detailed samples were collected are indicated by filled (black) symbols."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_BBn", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_BBn.png"))
 ```
 
 ```{r stations-bbs, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 26B by year. Tows where detailed samples were collected are indicated by filled (black) symbols."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_BBs", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_BBs.png"))
 ```
 
 ```{r stations-ger, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 26C by year. Tows where detailed samples were collected are indicated by filled (black) symbols."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Ger", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_Ger.png"))
 ```
 
 ```{r stations-gbb, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of survey tows on SFA 27B by year. Tows where detailed samples were collected are indicated by filled (black) symbols."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_GBb", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/stations_GBb.png"))
 ```
 
 ```{r age-sab, echo=F, message=F, fig.asp=img.asp.map, fig.width=6, fig.cap="The spatial distribution of shells collected for age analysis on SFA 25A in 2016."}

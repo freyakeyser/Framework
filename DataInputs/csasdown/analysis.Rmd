@@ -10,6 +10,7 @@ require(dplyr)
 require(patchwork)
 require(sf)
 require(ggrepel)
+require(rosettafish)
 
 load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_origRSCS_oldMWSH_GBb.RData")
 #load("Y:/Offshore/Assessment/Data/Survey_data/2023/Survey_summary_output/Survey_all_results.Rdata")
@@ -56,7 +57,8 @@ funs <- c("https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/F
           "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/create_grid.R",
           "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/pectinid_projector_sf.R",
           "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/github_spatial_import.R",
-          "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Fishery/logs_and_fishery_data.r")
+          "https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Fishery/logs_and_fishery_data.r",
+          "https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/French_west_labeller.R")
 # Now run through a quick loop to load each one, just be sure that your working directory is read/write!
 for(fun in funs) 
 {
@@ -72,8 +74,8 @@ for(fun in funs)
 # Abundance and Biomass TS, FR only
 bankpertow_all <- NULL
 # by recruit size bin range
-for (rdata in c(#"framework1", "framework2", "framework3", "framework4", 
-  "framework5"#, "framework6"
+for (rdata in c("framework1", "framework2", "framework3", "framework4", 
+  "framework5", "framework6"
   )){
   
   # prep data for TS plotting
@@ -236,7 +238,8 @@ for (rdata in c(#"framework1", "framework2", "framework3", "framework4",
 #bankpertow_all contains a bankpertow dataframe for each bank and for three different recruit size bins (so it contains nBanks * 3 dataframes)
 bankpertow <- bankpertow_all[bankpertow_all$rdata==gsub(x=nickname, pattern="_fr", replacement=""),]
 
-bankpertow$subarea[bankpertow$bank=="Mid"] <- "25A-Mid"
+if(french==T) bankpertow$subarea[bankpertow$bank=="Mid"] <- "25A-Mi"
+if(french==F) bankpertow$subarea[bankpertow$bank=="Mid"] <- "25A-Mid"
 bankpertow$subarea[bankpertow$bank=="Sab"] <- "25A-Sab"
 bankpertow$subarea[bankpertow$bank=="Ban"] <- "25B"
 bankpertow$subarea[bankpertow$bank=="BBn"] <- "26A"
@@ -333,7 +336,8 @@ if(grepl(x=nickname, pattern="framework2")){
   bankpertow_all <- bankpertow_all[!bankpertow_all$rdata %in% c("framework4", "framework5", "framework6"),]
 }
 
-bankpertow_all$subarea[bankpertow_all$bank=="Mid"] <- "25A-Mid"
+if(french==T) bankpertow_all$subarea[bankpertow_all$bank=="Mid"] <- "25A-Mi"
+if(french==F) bankpertow_all$subarea[bankpertow_all$bank=="Mid"] <- "25A-Mid"
 bankpertow_all$subarea[bankpertow_all$bank=="Sab"] <- "25A-Sab"
 bankpertow_all$subarea[bankpertow_all$bank=="Ban"] <- "25B"
 bankpertow_all$subarea[bankpertow_all$bank=="BBn"] <- "26A"
@@ -516,20 +520,23 @@ if(french==F){
   version <- "Model"
   cfts_old$version <- "old"
   cfts$version<- "new"
+  cols <- c("darkorange", "black")
 }
 
 if(french==T){
   version <- "Modèle"
   cfts_old$version <- "ancien"
   cfts$version<- "nouveau"
+  cols <- c("black","darkorange")
 }
 
 cfts <- full_join(cfts, cfts_old)
 
 if(french==F) cflab <- paste("Condition (g)")
 if(french==T) cflab <- paste("Coefficient de condition (g)")
+if(french==T) cfts$subarea[cfts$bank=="Mid"] <- "25A-Mi"
 
-cfts$subarea[cfts$bank=="Mid"] <- "25A-Mid"
+if(french==F) cfts$subarea[cfts$bank=="Mid"] <- "25A-Mid"
 cfts$subarea[cfts$bank=="Sab"] <- "25A-Sab"
 cfts$subarea[cfts$bank=="Ban"] <- "25B"
 cfts$subarea[cfts$bank=="BBn"] <- "26A"
@@ -545,7 +552,7 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==26,], aes(year, CF, colour=versi
         theme_bw() +
         scale_linetype_discrete(name="", labels=en2fr(c("lined", "unlined"), translate = french, custom_terms=rosetta_terms)) +
         #guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
-        scale_colour_manual(name=version, values=c("darkorange", "black")) +
+        scale_colour_manual(name=version, values=cols) +
         scale_shape_discrete(name=version) +
         facet_wrap(~subarea, ncol=1)
 )
@@ -559,7 +566,7 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==25,], aes(year, CF, colour=versi
         theme_bw() +
         #scale_linetype_discrete(name="", labels=en2fr(c("lined", "unlined"), translate = french, custom_terms=rosetta_terms)) +
         #guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
-        scale_colour_manual(name=version, values=c("darkorange", "black")) +
+        scale_colour_manual(name=version, values=cols) +
         scale_shape_discrete(name=version) +
         facet_wrap(~subarea, ncol=1)
 )
@@ -573,7 +580,7 @@ print(ggplot() + geom_point(data=cfts[cfts$sfa==27,], aes(year, CF, colour=versi
         theme_bw() +
         #scale_linetype_discrete(name="", labels=en2fr(c("lined", "unlined"), translate = french, custom_terms=rosetta_terms)) +
         #guides(linetype = guide_legend(override.aes = list(colour = "blue")))+ 
-        scale_colour_manual(name=version, values=c("darkorange", "black")) +
+        scale_colour_manual(name=version, values=cols) +
         scale_shape_discrete(name=version) +
         facet_wrap(~subarea, ncol=1)
 )
@@ -663,11 +670,12 @@ clappertow$size2 <- factor(clappertow$size2,
 
 if(french==F) man.unit <- "Management unit"
 if(french==T) man.unit <- "Zone de gestion"
+if(french==T) clappertow$subarea[clappertow$bank=="Mid"] <- "25A-Mi"
 
 if(french==T) xlabel <- expression(frac("% claquettes", "trait"))
 if(french==F) xlabel <- expression(frac("% clappers", "tow"))
 
-clappertow$subarea[clappertow$bank=="Mid"] <- "25A-Mid"
+if(french==F) clappertow$subarea[clappertow$bank=="Mid"] <- "25A-Mid"
 clappertow$subarea[clappertow$bank=="Sab"] <- "25A-Sab"
 clappertow$subarea[clappertow$bank=="Ban"] <- "25B"
 clappertow$subarea[clappertow$bank=="BBn"] <- "26A"
@@ -703,7 +711,7 @@ for(sfa in sfa){
 tab_clap <- clappertow %>% group_by(subarea, liner, index) %>%
   summarize(LTM=median(index.val, na.rm=T))
 tab_cf <- cfts %>% 
-  filter(version=="new") %>%
+  filter(version=="new"|version=="nouveau") %>%
   group_by(subarea, type) %>%
   summarize(LTM=median(CF, na.rm=T)) %>%
   mutate(index="CF", liner=type) %>%
@@ -800,7 +808,7 @@ for(sfa in sfa){
 
 # Spatial distribution of tows
 ```{r}
-boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T, direct_fns="C:/users/keyserf/Documents/Github/Assessment_fns/")
+boundaries <- github_spatial_import(subfolder = "survey_boundaries", zipname = "survey_boundaries.zip", quiet=T, direct_fns="C:/Users/keyserf/Documents/Github/Assessment_fns/")
 boundaries$ID <- gsub(x=boundaries$ID, pattern=".shp", replacement="", fixed=T)
 
 #From Dave/Jessica
@@ -815,6 +823,7 @@ st_crs(ger.concave) <- st_crs(german)
 banks <- c("Sab", "Mid", "Ban", "BBn", "BBs", "Ger", "GBb")
 n.banks <- length(banks)
 for (i in 1:n.banks){
+  print(i)
   surv <- st_as_sf(surv.Live[[banks[i]]],coords = c('slon','slat'),crs = 4326,remove=F) %>% 
     dplyr::filter(state == 'live')
 
@@ -837,6 +846,7 @@ for (i in 1:n.banks){
     surv$`Tow type` <- gsub(x=surv$`Tow type`,pattern="regular", "régulière")
     surv$`Tow type` <- gsub(x=surv$`Tow type`,pattern="exploratory", "exploratoire")
     surv$`Tow type` <- gsub(x=surv$`Tow type`,pattern="fixed", "fixe")
+    surv$bank <- gsub(x=surv$bank,pattern="Mid", "Mi")
   }
   
   # Get the shapes for symbols we want, this should do what we want for all cases we've ever experienced...
@@ -876,7 +886,7 @@ for (i in 1:n.banks){
           theme(legend.position = 'bottom',legend.direction = 'horizontal',
                 legend.justification = 'centre',legend.key.size = unit(.5,"line"),
                 legend.key = element_rect(fill = NA)) +
-          scale_x_continuous(breaks = seq(from = -180, to = 180, by = by))
+          scale_x_continuous(breaks = seq(from = -180, to = 180, by = by), labels = french.west)
   )
   dev.off()
 }
@@ -917,11 +927,12 @@ joined <- st_join(offshore, sfa.labels)
 
 joined <- joined[!(joined$bank=="Banquereau" & joined$ID.x=="SFA25A"),]
 joined$fr <- joined$lab_short
-joined$fr <- gsub(x=joined$fr, pattern="Browns South", replacement ="Sud de Brown")
-joined$fr <- gsub(x=joined$fr, pattern="Browns North", replacement ="Nord de Brown")
-joined$fr <- gsub(x=joined$fr, pattern="Georges 'a'", replacement ="Georges \u00ABa\u00BB")
-joined$fr <- gsub(x=joined$fr, pattern="Georges 'b'", replacement ="Georges \u00ABb\u00BB")
-joined$fr <- gsub(x=joined$fr, pattern="Eastern Scotian Shelf", replacement ="Est du plateau n\u00E9o-\u00E9cossais")
+joined$fr <- gsub(x=joined$fr, pattern="Browns South", replacement ="Secteur sud du\nbanc de Browns")
+joined$fr <- gsub(x=joined$fr, pattern="Browns North", replacement ="Secteur nord du\nbanc de Browns")
+joined$fr <- gsub(x=joined$fr, pattern="Georges 'a'", replacement ="Zone \u00ABa\u00BB du\nbanc de Georges")
+joined$fr <- gsub(x=joined$fr, pattern="Georges 'b'", replacement ="Zone \u00ABb\u00BB du\nbanc de Georges")
+joined$fr <- gsub(x=joined$fr, pattern="Eastern Scotian Shelf", replacement ="Est du plateau\nn\u00E9o-\u00E9cossais")
+joined$fr <- gsub(x=joined$fr, pattern="Banquereau", replacement ="Banc\nBanquereau")
 joined$fr <- gsub(x=joined$fr, pattern="SFA", replacement ="ZPP")
 
 nonGB <- joined[!joined$SFA %in% c("SFA27A", "SFA27B"),]
@@ -935,7 +946,7 @@ p <-  pecjector(area = "NL", add_layer = list(land = 'grey',
                 c_sys = 4326, quiet=T)
 
 if(french==F) {
-  png(paste(plotsGo,"/Offshore_banks.png",sep=""),width=11,height=8,res=920,units="in")
+  png(paste(plotsGo,"/Offshore_banks_2.png",sep=""),width=11,height=8,res=920,units="in")
   
   p <-  p + geom_sf_text(data = nonGB[!(nonGB$SFA%in% c("SFA10", "SFA11", "SFA12", "SFA26B")),], 
                          aes(label = lab_short), 
@@ -971,7 +982,7 @@ if(french==F) {
 if(french==T) {
   png(paste(plotsGo,"/Offshore_banks_fr.png",sep=""),width=11,height=8,res=920,units="in")
   
-  p <-  p + geom_sf_text(data = nonGB[!(nonGB$SFA%in% c("SFA10", "SFA11", "SFA12", "SFA26B")),], 
+  p2 <-  p + geom_sf_text(data = nonGB[!(nonGB$SFA%in% c("SFA10", "SFA11", "SFA12", "SFA26B", "SFA26A")),], 
                          aes(label = fr), 
                          fun.geometry = sf::st_centroid) +
     # geom_sf_text(data = nonGB[nonGB$SFA=="SFA11",], 
@@ -982,23 +993,27 @@ if(french==T) {
                  aes(label = fr), 
                  fun.geometry = sf::st_centroid, 
                  nudge_y=0.5) +
+    geom_sf_text(data = nonGB[nonGB$SFA=="SFA26A",], 
+                 aes(label = fr), 
+                 fun.geometry = sf::st_centroid, 
+                 size=3) +
     geom_text_repel(data = GBalab, 
                     aes(x=as.data.frame(st_coordinates(st_centroid(GBalab)))$X,
                         y=as.data.frame(st_coordinates(st_centroid(GBalab)))$Y,
                         label = fr), 
-                    nudge_x=-1, nudge_y=-0.5, direction = "x", min.segment.length=0, box.padding = 0) +
+                    nudge_x=-0.5, nudge_y=-0.75, direction = "x", min.segment.length=0, box.padding = -1) +
     geom_text_repel(data = GBblab, 
                     aes(x=as.data.frame(st_coordinates(st_centroid(GBblab)))$X,
                         y=as.data.frame(st_coordinates(st_centroid(GBblab)))$Y,
                         label = fr), 
-                    nudge_x=1.25, nudge_y=-0.5, direction = "x", min.segment.length=0, box.padding = 0) +
+                    nudge_x=0.75, nudge_y=-0.5, hjust=0, direction = "x", min.segment.length=0, box.padding = -1) +
     coord_sf(expand=F) +
-    scale_x_continuous(limits=c(-68, -54)) +
+    scale_x_continuous(limits=c(-68, -54),name = "", labels = french.west) +
     #scale_y_continuous(limits=c(40, 48)) + 
     theme_bw() +
-    xlab(NULL) + ylab(NULL)
+    xlab(NULL) + ylab(NULL) 
   
-  print(p)
+  print(p2)
   dev.off()
 }
 
@@ -1040,7 +1055,7 @@ if(french==T){
 }
 ```
 
-#### 2025-08-26 HERE!!
+
 # Maps
 ```{r maps, echo=F, include=F}
 boundaries <- github_spatial_import("survey_boundaries", "survey_boundaries.zip", quiet=T)
@@ -1051,18 +1066,19 @@ ger <- github_spatial_import("other_boundaries", "other_boundaries.zip", specifi
 if(french==T) {
   strata.title <- "Description de strate"
   strata$PName <- gsub(x=strata$PName, pattern = "Low", replacement=en2fr("Low", translate=french, custom_terms=rosetta_terms))
-  strata$PName <- gsub(x=strata$PName, pattern = "Very", replacement="Tres")
-  strata$PName <- gsub(x=strata$PName, pattern = "Medium", replacement=en2fr("Medium", translate=french, custom_terms=rosetta_terms))
-  strata$PName <- gsub(x=strata$PName, pattern = "High", replacement=en2fr("High", translate=french, custom_terms=rosetta_terms))
+  strata$PName <- gsub(x=strata$PName, pattern = "Very", replacement="Très")
+  strata$PName <- gsub(x=strata$PName, pattern = "Medium", replacement="Moyenne")
+  strata$PName <- gsub(x=strata$PName, pattern = "High", replacement="Élevée")
   strata$PName <- gsub(x=strata$PName, pattern = "North", replacement=en2fr("North", translate=french, custom_terms=rosetta_terms))
   strata$PName <- gsub(x=strata$PName, pattern = "South", replacement=en2fr("South", translate=french, custom_terms=rosetta_terms))
   strata$PName <- gsub(x=strata$PName, pattern = "scallops/tow", replacement="pétoncles/trait")
-  strata$PName <- gsub(x=strata$PName, pattern = "Gravel Lag with thin sand", replacement="Sédiments marqués par un dépôt de graviers avec du sable fin")
-  strata$PName <- gsub(x=strata$PName, pattern = "Thick sand", replacement="Sable épais")
-  strata$PName <- gsub(x=strata$PName, pattern = "Gravel lag", replacement="Sédiments marqués par un dépôt de graviers")
-  strata$PName <- gsub(x=strata$PName, pattern = "Thin sand over gravel lag", replacement="Sable fin au dessus de sédiments marqués par un dépôt de graviers")
+  strata$PName <- gsub(x=strata$PName, pattern = "Gravel Lag with thin sand", replacement="Dépôt de gravier résiduel avec une mince couche de sable")
+  strata$PName <- gsub(x=strata$PName, pattern = "Thick sand", replacement="Épaisse couche de sable")
+  strata$PName <- gsub(x=strata$PName, pattern = "Gravel lag", replacement="Dépôt de gravier résiduel")
+  strata$PName <- gsub(x=strata$PName, pattern = "Thin sand over gravel lag", replacement="Mince couche de sable sur un dépôt de gravier résiduel")
 }
 if(french==F) strata.title <- "Stratum description"
+if(french==T) strata.title <- "Description de la strate"
 
 for(b in c("BBn", "BBs", "Sab", "GBb")){
   shpf <- strata[strata$label==b,]
@@ -1079,7 +1095,7 @@ for(b in c("BBn", "BBs", "Sab", "GBb")){
   shpf_b <- st_union(shpf)
     
   p <- pecjector(area = b,plot = F,
-                 add_layer = list(eez = 'eez' , sfa = 'offshore',bathy = c(50, 'c'),scale.bar = "br")) +
+                 add_layer = list(eez = 'eez' , sfa = 'offshore',land="grey", bathy = c(50, 'c'),scale.bar = "br")) +
     coord_sf(expand=F)
   
   if(b=="Sab"){
@@ -1116,20 +1132,39 @@ for(b in c("BBn", "BBs", "Sab", "GBb")){
     #manual adjustment to scalebar text size
     p$layers[[5]]$geom_params$text_cex <- 1.5
   }  
+  
   png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"), width=6.5*2, height=4*2, units = "in", res=420)
-  print(
-    p + 
-      geom_sf(data=shpf, aes(fill=Strt_ID), colour=NA, alpha=0.7) +
-      geom_sf(data=shpf_b, fill=NA)+
-      geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
-      scale_fill_manual(values=shpf$col, name=strata.title, labels=shpf$PName) +
-      scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
-                         guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
-      scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
-      coord_sf(expand=F) +
-      theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent")) +
-      annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
-  )
+  if(french==F) {
+    print(
+      p + 
+        geom_sf(data=shpf, aes(fill=Strt_ID), colour=NA, alpha=0.7) +
+        geom_sf(data=shpf_b, fill=NA)+
+        geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+        scale_fill_manual(values=shpf$col, name=strata.title, labels=shpf$PName) +
+        scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                           guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+        scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+        coord_sf(expand=F) +
+        theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent")) +
+        annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
+    )
+  }
+  if(french==T) {
+    print(
+      p + 
+        geom_sf(data=shpf, aes(fill=Strt_ID), colour=NA, alpha=0.7) +
+        geom_sf(data=shpf_b, fill=NA)+
+        geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+        scale_fill_manual(values=shpf$col, name=strata.title, labels=shpf$PName) +
+        scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                           guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+        scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+        coord_sf(expand=F) +
+        theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent")) +
+        annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6) +
+        scale_x_continuous(name = "", labels = french.west) 
+    )
+  }
   dev.off()
 }
   
@@ -1153,7 +1188,7 @@ for(b in c("Mid", "Ban", "Ger")){
   if(b=="Ger") sf_use_s2(TRUE)
     
   p <- pecjector(area = b,plot = F,
-                 add_layer = list(eez = 'eez' , sfa = 'offshore',bathy = c(50, 'c'),scale.bar = "br")) +
+                 add_layer = list(eez = 'eez' , sfa = 'offshore',land="grey", bathy = c(50, 'c'),scale.bar = "br")) +
     coord_sf(expand=F)
   
   if(b=="Ger") {
@@ -1178,33 +1213,65 @@ for(b in c("Mid", "Ban", "Ger")){
   
   if(b %in% c("Ban", "Mid")){
     png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
-    print(
-      p + 
-        #geom_sf(data=shpf, colour=NA, alpha=0.7) +
-        geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
-        scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
-                           guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
-        scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
-        coord_sf(expand=F) +
-        theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
-        annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
-    )
+    if(french==F) {
+      print(
+        p + 
+          #geom_sf(data=shpf, colour=NA, alpha=0.7) +
+          geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+          scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                             guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+          scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+          coord_sf(expand=F) +
+          theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
+          annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
+      )
+    }
+    if(french==T) {
+      print(
+        p + 
+          #geom_sf(data=shpf, colour=NA, alpha=0.7) +
+          geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+          scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                             guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+          scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+          coord_sf(expand=F) +
+          theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
+          annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)+
+          scale_x_continuous(name = "", labels = french.west) 
+      )
+    }
     dev.off()
   }
   tows <- dplyr::arrange(tows, random)
   if(b %in% c("Ger")){
     png(filename=paste0(plotsGo, "/Survey/", nickname, "/surveymap_", b, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
-    print(
-      p + 
-        geom_sf(data=shpf, colour=NA, alpha=0.7) +
-        geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
-        scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
-                           guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
-        scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
-        coord_sf(expand=F) +
-        theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
-        annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
-    )
+    if(french==F){
+      print(
+        p + 
+          geom_sf(data=shpf, colour=NA, alpha=0.7) +
+          geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+          scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                             guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+          scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+          coord_sf(expand=F) +
+          theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
+          annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)
+      )
+    }
+    if(french==T){
+      print(
+        p + 
+          geom_sf(data=shpf, colour=NA, alpha=0.7) +
+          geom_sf(data=stns, aes(shape=as.factor(random)), show.legend=F, size=3)+
+          scale_shape_manual(values=as.numeric(tows$shape[tows$random %in% unique(stns$random)]), 
+                             guide=guide_legend(override.aes = list(fill= as.numeric(tows$col[tows$random %in% unique(stns$random)])), order=2))+
+          scale_colour_manual(values=c("black", shpf$col[2:length(shpf$Strt_ID)])) +
+          coord_sf(expand=F) +
+          theme(legend.position=legend.loc, legend.background=element_rect(fill="transparent"))+
+          annotate(geom="text", x=-Inf, y=Inf, label=unique(stns$year), hjust=-0.5, vjust=1.5, size=6)+
+          scale_x_continuous(name = "", labels = french.west) 
+      )
+    }
     dev.off()
   }
   
@@ -1276,18 +1343,19 @@ for(sfa in 25:27){
   bp <- pecjector(area=list(y = c(lims$ymin[[1]], lims$ymax[[1]]),
                             x =c(lims$xmin[[1]], lims$xmax[[1]]),
                             crs = crs),
-                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), sfa = 'offshore', scale.bar="br"),plot=F, quiet=T)# + 
+                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), land="grey", sfa = 'offshore', scale.bar="br"),plot=F, quiet=T)# + 
   
   #manual adjustment to scalebar text size
   if(sfa==27) bp$layers[[4]]$geom_params$text_cex <- 1.5
   if(sfa %in% c(25:26)) bp$layers[[5]]$geom_params$text_cex <- 1.5
 
   png(filename=paste0(plotsGo, "/Survey/", nickname, "/survey_footprint_", sfa, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
-  print(bp +
-          geom_sf(data=sfoot[!is.na(sfoot$n),], aes(fill=n), colour=NA, show.legend=T) +
-          theme(legend.position=c(0.25,0.85), legend.background=element_blank()) +
-          scale_fill_viridis_c(name=paste0(en2fr(x = "Number of survey tows", translate=french, custom_terms=rosetta_terms), "\n", years), option="G", begin=0.95, end=0)+
-          coord_sf(expand=F)#+
+  if(french==F){
+    print(bp +
+            geom_sf(data=sfoot[!is.na(sfoot$n),], aes(fill=n), colour=NA, show.legend=T) +
+            theme(legend.position=c(0.25,0.85), legend.background=element_blank()) +
+            scale_fill_viridis_c(name=paste0(en2fr(x = "Number of survey tows", translate=french, custom_terms=rosetta_terms), "\n", years), option="G", begin=0.95, end=0)+
+            coord_sf(expand=F)#+
           # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,],
           #              aes(label = final),
           #              size=6,
@@ -1295,12 +1363,28 @@ for(sfa in 25:27){
           #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
           #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
           # )
-  )
+    )
+  }
+  if(french==T){
+    print(bp +
+            geom_sf(data=sfoot[!is.na(sfoot$n),], aes(fill=n), colour=NA, show.legend=T) +
+            theme(legend.position=c(0.25,0.85), legend.background=element_blank()) +
+            scale_fill_viridis_c(name=paste0(en2fr(x = "Number of survey tows", translate=french, custom_terms=rosetta_terms), "\n", years), option="G", begin=0.95, end=0)+
+            coord_sf(expand=F) +
+            scale_x_continuous(name = "", labels = french.west) #+
+          # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,],
+          #              aes(label = final),
+          #              size=6,
+          #              fun.geometry = sf::st_centroid,
+          #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+          #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+          # )
+    )
+  }
  dev.off()
 } 
 
 ```
-
 
 # Fishery
 ```{r fishery-ts, echo=F, include=F}
@@ -1379,11 +1463,12 @@ fishery <- fishery[fishery$sfa %in% 25:27,]
 
 if(french==F) cpuelab <- expression(paste("Catch per unit effort  ",bgroup("(",frac(kg,hm)   ,")")))
 if(french==T) cpuelab <- expression(paste("Captures par unité d’effort  ",bgroup("(",frac(kg,hm)   ,")")))
+if(french==T) fishery$subarea[fishery$bank=="Mid"] <- "25A-Mi"
 
 if(french==F) man.unit <- "Management\nunit"
 if(french==T) man.unit <- "Zone de\ngestion"
 
-fishery$subarea[fishery$bank=="Mid"] <- "25A-Mid"
+if(french==F) fishery$subarea[fishery$bank=="Mid"] <- "25A-Mid"
 fishery$subarea[fishery$bank=="Sab"] <- "25A-Sab"
 fishery$subarea[fishery$bank=="Ban"] <- "25B"
 fishery$subarea[fishery$bank=="BBn"] <- "26A"
@@ -1400,7 +1485,8 @@ for(sfa in 25:27){
     scale_shape_discrete(name=man.unit) +
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
     ylab(paste0(en2fr("Catch", translate=french, custom_terms=rosetta_terms), " (t)"))+
-    guides(colour="none", shape="none")
+    guides(colour="none", shape="none") +
+    theme(axis.title.y = element_text(vjust=0.5))
   
   hm <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=subarea, shape=subarea), size=2) +
     geom_line(data=fishery[fishery$sfa==sfa,], aes(year, effort, colour=subarea)) +
@@ -1408,7 +1494,8 @@ for(sfa in 25:27){
     scale_colour_manual(values=c("black", "darkorange", "blue"), name=man.unit) +
     scale_shape_discrete(name=man.unit) +
     xlab(en2fr("Year", translate = french, custom_terms=rosetta_terms)) +
-    ylab(paste0(en2fr("Effort", translate=french, custom_terms=rosetta_terms), " (", en2fr("hour-metre", translate=french, custom_terms=rosetta_terms), ")"))
+    ylab(paste0(en2fr("Effort", translate=french, custom_terms=rosetta_terms), " (", en2fr("hour-metre", translate=french, custom_terms=rosetta_terms), ")")) +
+    theme(axis.title.y = element_text(vjust=0.5))
   
   cp <- ggplot() + geom_point(data=fishery[fishery$sfa==sfa,], aes(year, cpue, colour=subarea, shape=subarea), size=2) +
     geom_line(data=fishery[fishery$sfa==sfa,], aes(year, cpue, colour=subarea)) +
@@ -1459,11 +1546,12 @@ sf_use_s2(TRUE)
 
 joined <- joined[!(joined$bank=="Banquereau" & joined$ID.x=="SFA25A"),]
 joined$fr <- joined$lab_short
-joined$fr <- gsub(x=joined$fr, pattern="Browns South", replacement ="Sud de Brown")
-joined$fr <- gsub(x=joined$fr, pattern="Browns North", replacement ="Nord de Brown")
-joined$fr <- gsub(x=joined$fr, pattern="Georges 'a'", replacement ="Georges \u00ABa\u00BB")
-joined$fr <- gsub(x=joined$fr, pattern="Georges 'b'", replacement ="Georges \u00ABb\u00BB")
+joined$fr <- gsub(x=joined$fr, pattern="Browns South", replacement ="Secteur sud du banc de Browns")
+joined$fr <- gsub(x=joined$fr, pattern="Browns North", replacement ="Secteur nord du banc de Browns")
+joined$fr <- gsub(x=joined$fr, pattern="Georges 'a'", replacement ="Zone \u00ABa\u00BB du banc de Georges")
+joined$fr <- gsub(x=joined$fr, pattern="Georges 'b'", replacement ="Zone \u00ABb\u00BB du banc de Georges")
 joined$fr <- gsub(x=joined$fr, pattern="Eastern Scotian Shelf", replacement ="Est du plateau n\u00E9o-\u00E9cossais")
+joined$fr <- gsub(x=joined$fr, pattern="Banquereau", replacement ="Banc Banquereau")
 joined$fr <- gsub(x=joined$fr, pattern="SFA", replacement ="ZPP")
 
 nonGB <- joined[!joined$SFA %in% c("SFA27A", "SFA27B"),]
@@ -1488,6 +1576,7 @@ for(sfa in 25:27){
     foot <- st_as_sf(fish_sf[grep(x=fish_sf$sfa, pattern="25"),]) %>%
       st_transform(crs)
     base <- offshore[grep(x=offshore$ID, pattern="25"),] %>% st_transform(crs)
+    base$ID <- gsub(x=base$ID, pattern=".shp", replacement="")
   }
   
   if(sfa==26) {
@@ -1495,6 +1584,7 @@ for(sfa in 25:27){
     foot <- st_as_sf(fish_sf[grep(x=fish_sf$sfa, pattern="26"),]) %>%
       st_transform(crs)
     base <- offshore[grep(x=offshore$ID, pattern="26"),] %>% st_transform(crs)
+    base$ID <- gsub(x=base$ID, pattern=".shp", replacement="")
   }  
   
   if(sfa==27) {
@@ -1502,6 +1592,7 @@ for(sfa in 25:27){
     foot <- st_as_sf(fish_sf[grep(x=fish_sf$sfa, pattern="27B"),]) %>%
       st_transform(crs)
     base <- offshore[grep(x=offshore$ID, pattern="27B"),] %>% st_transform(crs)
+    base$ID <- gsub(x=base$ID, pattern=".shp", replacement="")
   }  
   
   r <- create_grid(gridsize = sqrt(10)*1000, polygon = base)
@@ -1531,26 +1622,44 @@ for(sfa in 25:27){
   bp <- pecjector(area=list(y = c(lims$ymin[[1]], lims$ymax[[1]]),
                             x =c(lims$xmin[[1]], lims$xmax[[1]]),
                             crs = crs),
-                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), sfa = 'offshore', scale.bar="br"),plot=F, quiet=T)# + 
+                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), land="grey", sfa = 'offshore', scale.bar="br"),plot=F, quiet=T)# + 
   
   #manual adjustment to scalebar text size
   bp$layers[[5]]$geom_params$text_cex <- 1.5
 
   png(filename=paste0(plotsGo, "/Fishery/footprint_", sfa, fr, ".png"),width=6.5*2, height=4*2, units = "in", res=420)
-  print(bp +
-          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/1000), colour=NA, show.legend=T) +
-          theme(legend.position="right") +
-          scale_fill_viridis_c(name=paste0(en2fr(x = "Catch", translate=french, custom_terms=rosetta_terms), " (t)"), option="G", begin=0.95, end=0)+
-          coord_sf(expand=F)+
-          geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
-                       aes(label = final), 
-                       size=6,
-                       fun.geometry = sf::st_centroid,
-                       nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
-                       nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
-          )#+
+  if(french==F){
+    print(bp +
+            geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/1000), colour=NA, show.legend=T) +
+            theme(legend.position="right") +
+            scale_fill_viridis_c(name=paste0(en2fr(x = "Catch", translate=french, custom_terms=rosetta_terms), " (t)"), option="G", begin=0.95, end=0)+
+            coord_sf(expand=F)+
+            geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+                         aes(label = final), 
+                         size=6,
+                         fun.geometry = sf::st_centroid,
+                         nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+                         nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+            )#+
           #theme(legend.position="bottom",legend.key.width= unit(2, 'cm'))
-  )
+    )
+  }
+  if(french==T){
+    print(bp +
+            geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/1000), colour=NA, show.legend=T) +
+            theme(legend.position="right") +
+            scale_fill_viridis_c(name=paste0(en2fr(x = "Catch", translate=french, custom_terms=rosetta_terms), " (t)"), option="G", begin=0.95, end=0)+
+            coord_sf(expand=F)+
+            geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+                         aes(label = final), 
+                         size=6,
+                         fun.geometry = sf::st_centroid,
+                         nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+                         nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey)+
+            scale_x_continuous(name = "", labels = french.west) #+
+          #theme(legend.position="bottom",legend.key.width= unit(2, 'cm'))
+    )
+  }
   dev.off()
 }  
 
@@ -1605,61 +1714,118 @@ for(sfa in 25:27){
   bp <- pecjector(area=list(y = c(lims$ymin[[1]], lims$ymax[[1]]),
                             x =c(lims$xmin[[1]], lims$xmax[[1]]),
                             crs = crs),
-                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), sfa = 'offshore'),plot=F, quiet=T)# + 
+                    repo = 'github',c_sys = 32619, add_layer = list(bathy = c(200,'c'), land="grey", sfa = 'offshore'),plot=F, quiet=T)# + 
   
   #manual adjustment to scalebar text size
   #bp$layers[[5]]$geom_params$text_cex <- 1.5
 
   png(filename=paste0(plotsGo, "/Fishery/footprint_year_kg_", sfa, fr, ".png"),width=18, height=9, units = "in", res=420)
-  print(bp +
-          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/1000), colour=NA, show.legend=T) +
-          theme(legend.position="right") +
-          scale_fill_viridis_c(name=paste0(en2fr(x = "Catch", translate=french, custom_terms=rosetta_terms), " (t)"), option="rocket", begin=0.95, end=0)+
-          coord_sf(expand=F)+
-          # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
-          #              aes(label = final), 
-          #              size=6,
-          #              fun.geometry = sf::st_centroid,
-          #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
-          #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
-          # )+
-          facet_wrap(~year, ncol=9)
-  )
+  if(french==F){
+    print(bp +
+            geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/1000), colour=NA, show.legend=T) +
+            theme(legend.position="right") +
+            scale_fill_viridis_c(name=paste0(en2fr(x = "Catch", translate=french, custom_terms=rosetta_terms), " (t)"), option="rocket", begin=0.95, end=0)+
+            coord_sf(expand=F)+
+            # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+            #              aes(label = final), 
+            #              size=6,
+            #              fun.geometry = sf::st_centroid,
+            #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+            #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+            # )+
+            facet_wrap(~year, ncol=9)
+    )
+  }
+    if(french==T){
+    print(bp +
+            geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/1000), colour=NA, show.legend=T) +
+            theme(legend.position="right") +
+            scale_fill_viridis_c(name=paste0(en2fr(x = "Catch", translate=french, custom_terms=rosetta_terms), " (t)"), option="rocket", begin=0.95, end=0)+
+            coord_sf(expand=F)+
+            # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+            #              aes(label = final), 
+            #              size=6,
+            #              fun.geometry = sf::st_centroid,
+            #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+            #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+            # )+
+            facet_wrap(~year, ncol=9)+
+            scale_x_continuous(name = "", labels = french.west) 
+    )
+  }
   dev.off()
   
    png(filename=paste0(plotsGo, "/Fishery/footprint_year_hm_", sfa, fr, ".png"),width=18, height=9, units = "in", res=420)
-  print(bp +
-          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=hm), colour=NA, show.legend=T) +
-          theme(legend.position="right") +
-          scale_fill_viridis_c(name=paste0(en2fr(x = "Effort", translate=french, custom_terms=rosetta_terms), " (hm)"), option="rocket", begin=0.95, end=0)+
-          coord_sf(expand=F)+
-          # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
-          #              aes(label = final), 
-          #              size=6,
-          #              fun.geometry = sf::st_centroid,
-          #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
-          #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
-          # )+
-          facet_wrap(~year, ncol=9)
-  )
-  dev.off()
-  
-     png(filename=paste0(plotsGo, "/Fishery/footprint_year_cpue_", sfa, fr, ".png"),width=18, height=9, units = "in", res=420)
-  print(bp +
-          geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/hm), colour=NA, show.legend=T) +
-          theme(legend.position="right") +
-          scale_fill_viridis_c(name=paste0(en2fr(x = "CPUE", translate=french, custom_terms=rosetta_terms), " (kg/hm)"), option="rocket", begin=0.95, end=0)+
-          coord_sf(expand=F)+
-          # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
-          #              aes(label = final), 
-          #              size=6,
-          #              fun.geometry = sf::st_centroid,
-          #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
-          #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
-          # )+
-          facet_wrap(~year, ncol=9)
-  )
-  dev.off()
+   if(french==F){
+     print(bp +
+             geom_sf(data=foot[!is.na(foot$kg),], aes(fill=hm), colour=NA, show.legend=T) +
+             theme(legend.position="right") +
+             scale_fill_viridis_c(name=paste0(en2fr(x = "Effort", translate=french, custom_terms=rosetta_terms), " (hm)"), option="rocket", begin=0.95, end=0)+
+             coord_sf(expand=F)+
+             # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+             #              aes(label = final), 
+             #              size=6,
+             #              fun.geometry = sf::st_centroid,
+             #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+             #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+             # )+
+             facet_wrap(~year, ncol=9)
+     )
+   }
+   if(french==T){
+     print(bp +
+             geom_sf(data=foot[!is.na(foot$kg),], aes(fill=hm), colour=NA, show.legend=T) +
+             theme(legend.position="right") +
+             scale_fill_viridis_c(name=paste0(en2fr(x = "Effort", translate=french, custom_terms=rosetta_terms), " (hm)"), option="rocket", begin=0.95, end=0)+
+             coord_sf(expand=F)+
+             # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+             #              aes(label = final), 
+             #              size=6,
+             #              fun.geometry = sf::st_centroid,
+             #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+             #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+             # )+
+             facet_wrap(~year, ncol=9)+
+             scale_x_continuous(name = "", labels = french.west) 
+     )
+   }
+   dev.off()
+   
+   png(filename=paste0(plotsGo, "/Fishery/footprint_year_cpue_", sfa, fr, ".png"),width=18, height=9, units = "in", res=420)
+   if(french==F) {
+     print(bp +
+             geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/hm), colour=NA, show.legend=T) +
+             theme(legend.position="right") +
+             scale_fill_viridis_c(name=paste0(en2fr(x = "CPUE", translate=french, custom_terms=rosetta_terms), " (kg/hm)"), option="rocket", begin=0.95, end=0)+
+             coord_sf(expand=F)+
+             # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+             #              aes(label = final), 
+             #              size=6,
+             #              fun.geometry = sf::st_centroid,
+             #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+             #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+             # )+
+             facet_wrap(~year, ncol=9)
+     )
+   }
+   if(french==T) {
+     print(bp +
+             geom_sf(data=foot[!is.na(foot$kg),], aes(fill=kg/hm), colour=NA, show.legend=T) +
+             theme(legend.position="right") +
+             scale_fill_viridis_c(name=paste0(en2fr(x = "CPUE", translate=french, custom_terms=rosetta_terms), " (kg/hm)"), option="rocket", begin=0.95, end=0)+
+             coord_sf(expand=F)+
+             # geom_sf_text(data = nonGB[nonGB$SFA %in% base$ID,], 
+             #              aes(label = final), 
+             #              size=6,
+             #              fun.geometry = sf::st_centroid,
+             #              nudge_x = nonGB[nonGB$SFA %in% base$ID,]$nudgex,
+             #              nudge_y = nonGB[nonGB$SFA %in% base$ID,]$nudgey
+             # )+
+             facet_wrap(~year, ncol=9) +
+             scale_x_continuous(name = "", labels = french.west) 
+     )
+   }
+   dev.off()
 }  
 
 
@@ -1711,7 +1877,7 @@ tac2$bank <- factor(tac2$bank, levels=c("Sab/Mid/Ban", "Ban", "Sab/Mid", "BBn/BB
 
 tac2 <- tac2[tac2$Year<2023,]
 
-if(french==T) t <- "tonnes de chair"
+if(french==T) t <- "chairs, tonnes"
 if(french==F) t <- "meat, tonnes"
 
 
@@ -1882,12 +2048,13 @@ relative.F$sfa[relative.F$bank %in% c("BBn", "BBs", "Ger", "BBn/BBs")] <- as.num
 relative.F$sfa[relative.F$bank %in% c("Ban", "Ban/Sab/Mid", "Sab/Mid", "Sab", "Mid")] <- as.numeric(25)
 relative.F$sfa[relative.F$bank %in% c("GBb")] <- as.numeric(27)
 
-if(french==T) flab <- "Mortalité par pêche, relative"
+if(french==T) flab <- "Mortalité par pêche relative"
 if(french==F) flab <- "Relative fishing mortality"
 
 relative.F$subarea[relative.F$bank=="Ban"] <- "25B"
 relative.F$subarea[relative.F$bank=="Sab"] <- "25A-Sab"
-relative.F$subarea[relative.F$bank=="Mid"] <- "25A-Mid"
+if(french==F) relative.F$subarea[relative.F$bank=="Mid"] <- "25A-Mid"
+if(french==T) relative.F$subarea[relative.F$bank=="Mid"] <- "25A-Mi"
 relative.F$subarea[relative.F$bank=="BBn"] <- "26A"
 relative.F$subarea[relative.F$bank=="BBs"] <- "26B"
 relative.F$subarea[relative.F$bank=="Ger"] <- "26C"

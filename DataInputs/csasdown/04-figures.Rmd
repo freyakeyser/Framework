@@ -106,25 +106,23 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 <!-- ``` -->
 
 ```{r nav-linear, echo=F, message=F, fig.align="center", fig.cap="Tow lengths derived from Olex and Ocean Vision tow tracks, in metres (m). Raw lengths of Olex tracks are shown in black, while lengths following the application of the correction factor are show in orange. Each point corresponds to a specific tow. The solid black and orange lines are linear trendlines for each relationship. The dashed black line represents the 1:1 relationship between Ocean Vision tow lengths and Olex tow lengths."}
-knitr::include_graphics("Y:/Offshore/Assessment/2023/Supporting_tasks/Olex_transition_linear.png")
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/2023/Supporting_tasks/Olex_transition_linear", fr, ".png"))
 ```
 
 ```{r nav-box, echo=F, message=F,  fig.align="center",  fig.cap="Boxplots of tow lengths (in metres, m) derived from two Olex-based tracking methods and the current Ocean Vision method. “Olex (raw)” represents tows tracked using Olex without correction, “Olex (correction applied)” represents tows that had the correction factor applied."}
-knitr::include_graphics("Y:/Offshore/Assessment/2023/Supporting_tasks/Olex_transition_boxplot.png")
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/2023/Supporting_tasks/Olex_transition_boxplot", fr, ".png"))
 ```
 
 ```{r sfoot-25, echo=F, message=F, fig.align="center", fig.cap="The spatial distribution of survey tows in 10 km^2^ cells for SFA 25 from 1984—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_25", fr, ".png"))
-
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr, "/survey_footprint_25", fr, ".png"))
 ```
 
 ```{r sfoot-26, echo=F, message=F, fig.align="center", fig.cap="The spatial distribution of survey tows in 10 km^2^ cells for SFA 26 from 1984—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_26", fr, ".png"))
-
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr, "/survey_footprint_26", fr, ".png"))
 ```
 
 ```{r sfoot-27, echo=F, message=F, fig.align="center", fig.cap="The spatial distribution of survey tows in 10 km^2^ cells for SFA 27B from 1981—2022. The value of the colour is proportional to the number of survey tows conducted in each cell (darker colours indicate more tows). Black lines define SFA management unit boundaries."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/survey_footprint_27", fr, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, fr, "/survey_footprint_27", fr, ".png"))
 ```
 
 ```{r map-bbn, echo=F, message=F, fig.align="center", fig.cap="The survey design for SFA 26A in 2022. Stratification is based on catch rate (kilograms per hour-metre, kg/hm), with the strata (Very Low, Low, Medium, High, and Very High) represented by different shades of yellow and blue. Points represent survey stations allocated within the stratified design. Triangles represent exploratory tows. Bathymetry contours are shown in light blue."}
@@ -254,59 +252,59 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 <!-- ``` -->
 
 ```{r mwsh-sab-rs, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A-Sab from 1992--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_sh_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-sab-rm, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A-Sab from 1992--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Sab/MWSH_resid_mw_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-mid-rs, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A-Mid from 1994--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_sh_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_sh_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-mid-rm, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25A-Mid from 1994--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_mw_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Mid/MWSH_resid_mw_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-ban-rs, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25B from 1999--2019. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_resid_sh_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_resid_sh_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-ban-rm, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 25B from 1999--2019. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_resid_mw_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ban/MWSH_resid_mw_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-bbn-rs, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26A from 1992--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_sh_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-bbn-rm, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26A from 1992--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBn/MWSH_resid_mw_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-bbs-rs, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26B from 2001--2021. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_resid_sh_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_resid_sh_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-bbs-rm, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26B from 2001--2021. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_resid_mw_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/BBs/MWSH_resid_mw_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-ger-rs, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 26C from 1995--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_resid_sh_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_resid_sh_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-ger-rm, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 26C from 1995--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_resid_mw_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/Ger/MWSH_resid_mw_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-gbb-rs, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 27B from 1995--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_resid_sh_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_resid_sh_landscape",  fr,".png"))
 ```
 
 ```{r mwsh-gbb-rm, echo=F, message=F,  fig.align="center",  fig.cap="Raw residuals of meat weight-shell height model predictions (points) by meat weight (grams, g) for SFA 27B from 1995--2022. The dashed blue line represents a residual value of 0. The solid blue line represents the fit of a generalized additive model. Only years with samples from at least two tows are shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_resid_mw_", fr, "landscape.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/MWSH/GBb/MWSH_resid_mw_landscape",  fr,".png"))
 ```
 
 <!-- ```{r mwsh-sab-rs-1, echo=F, message=F,  fig.align="center",  fig.cap="Residuals of meat weight-shell height model predictions (points) by shell height (millimetres, mm) for SFA 25A-Sab from 1992--2001. The dashed blue line represents a residual value of 0, and the yellow curve represents GAM predictions."} -->
@@ -420,15 +418,15 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 ```{r cfts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Time series of scallop condition (meat weight (g) of a 100 mm shell height scallop) for SFA 25 stocks. Condition estimates from the new meat weight-shell height model are shown in orange with points, while condition factor estimates (also standardized for a 100 mm shell height; calculated as described in @hubley_georges_2014) are shown in black with triangles."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/cfts_25.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr,"/cfts_25.png"))
 ```
 
 ```{r cfts-26, echo=FALSE, message=F, fig.align="center", fig.cap="Time series of scallop condition (meat weight (g) of a 100 mm shell height scallop) for SFA 26 stocks. Condition estimates from the new meat weight-shell height model are shown in orange with points, while condition factor estimates (also standardized for a 100 mm shell height; calculated as described in @hubley_georges_2014) are shown in black with triangles."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/cfts_26.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr,"/cfts_26.png"))
 ```
 
 ```{r cfts-27, echo=FALSE, message=F, fig.align="center", fig.cap="Time series of scallop condition (meat weight (g) of a 100 mm shell height scallop) for SFA 27B. Condition estimates from the new meat weight-shell height model are shown in orange with points, while condition factor estimates (also standardized for a 100 mm shell height; calculated as described in @hubley_georges_2014) are shown in black with triangles."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/cfts_27.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr,"/cfts_27.png"))
 ```
 
 ```{r vb-sab, echo=FALSE, message=F,fig.align="center", fig.cap="Ages and shell heights (in millimetres, mm) of scallops collected from SFA 25A-Sab in 2012 (black points), and the von Bertalanffy growth model based on incremental age analysis (black line). Model parameters are shown in text.  Grey shading represents the bootstrapped 95% confidence interval. The dashed red line shows the predicted age for a 90 mm shell height, while the green dashed line shows the predicted shell height (in mm) for scallops one year prior."}
@@ -570,37 +568,37 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 ```
 
 ```{r rec-comp-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 25A-Sab using recruit size ranges of 75--90 millimetres (mm, points), and 80--90 mm (triangles)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_Sab_compare", fr, MWSH, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/timeseries_Sab_compare", fr, MWSH, ".png"))
 ```
 
 ```{r rec-comp-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of recruit scallop per standardized tow and biomass (right) time series represented by grams (g) of recruit scallop per standardized tow for SFA 26A using recruit size ranges of 75--90 millimetres (mm, points), and 85--95 mm (triangles)."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_BBn_compare", fr, MWSH, ".png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/timeseries_BBn_compare", fr, MWSH, ".png"))
 ```
 
 
 ```{r sts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 25 stocks (black points for SFA 25A-Mid, orange triangles for SFA 25A-Sab and blue squares for SFA 25B) by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom). The shell heights associated with each size class for each stock are provided in Table 5."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_25.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/timeseries_25.png"))
 ```
 
 ```{r sts-26, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 26 stocks (black points for SFA 26A, orange triangles for SFA 26B and blue squares for SFA 26C) by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom). The shell heights associated with each size class for each stock are provided in Table 5. For SFA 26C, the unlined gear time series is shown separately using a dashed line."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_26.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/timeseries_26.png"))
 ```
 
 ```{r sts-27, echo=FALSE, message=F, fig.align="center", fig.cap="Abundance (left) time series represented by number (N) of scallop per standardized tow and biomass (right) time series represented by grams (g) of scallop per standardized tow for SFA 27B Georges Bank ‘b’ by size class (pre-recruits at the top, recruits in the middle, and fully-recruited at the bottom).  The shell heights associated with each size class for each stock are provided in Table 5. "}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/timeseries_27.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/timeseries_27.png"))
 ```
 
 
 ```{r shf-sab, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops collected during DFO Maritimes Offshore Scallop Surveys on SFA 25A-Sab in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops. Data were not available for years in which surveys did not occur, thus some years have no data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_Sab.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/shf_survey_Sab.png"))
 ```
 
 ```{r shf-mid, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops collected during DFO Maritimes Offshore Scallop Surveys on SFA 25A-Mid in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops. Data were not available for years in which surveys did not occur, thus some years have no data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_Mid.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/shf_survey_Mid.png"))
 ```
 
 ```{r shf-ban, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops collected during DFO Maritimes Offshore Scallop Surveys on SFA 25B in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops. Data were not available for years in which surveys did not occur, thus some years have no data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_Ban.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/shf_survey_Ban.png"))
 ```
 
 <!-- # ```{r shf-ban-75, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops from 75-200 mm collected during DFO surveys on Banquereau Bank. Black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops."} -->
@@ -613,35 +611,35 @@ knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/
 <!-- ``` -->
 
 ```{r shf-bbn, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops collected during DFO Maritimes Offshore Scallop Surveys on SFA 26A in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops. Data were not available for years in which surveys did not occur, thus some years have no data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_BBn.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/shf_survey_BBn.png"))
 ```
 
 ```{r shf-bbs, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops collected during DFO Maritimes Offshore Scallop Surveys on SFA 26B in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops. Data were not available for years in which surveys did not occur, thus some years have no data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname, "/shf_survey_BBs.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr, "/shf_survey_BBs.png"))
 ```
 
 ```{r shf-ger, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops collected during DFO Maritimes Offshore Scallop Surveys on SFA 26C in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops. Data were not available for years in which surveys did not occur, thus some years have no data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_Ger.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr,"/shf_survey_Ger.png"))
 ```
 
 ```{r shf-gbb, echo=FALSE, message=F, fig.align="center", fig.cap="Shell height frequency (number per tow) of scallops collected during DFO Maritimes Offshore Scallop Surveys on SFA 27B Georges Bank ‘b’ in 5 mm (millimetre) shell height bins by year. Dashed black vertical lines indicate the minimum sizes of recruit and fully-recruited scallops. Data were not available for years in which surveys did not occur, thus some years have no data."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/shf_survey_GBb.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr,"/shf_survey_GBb.png"))
 ```
 
 ```{r g-plt,echo=F, message=F, fig.align="centre", fig.cap="Growth rate of fully recruited (yellow circles) and recruit scallop (blue squares) in SFA 25A (top panel) and SFA 26A (bottom panel)",warning=F}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/growth_new.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/growth_new", fr, ".png"))
 ```
 
 ```{r cts-25, echo=FALSE, message=F, fig.align="center", fig.cap="Index of clappers (empty, paired and hinged scallop shells) as a percentage of total survey catch per standardized tow for SFA 25 stocks by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). The shell heights associated with each size class for each stock are provided in Table 5. SFA 25A-Mid is shown with black points, SFA 25A-Sab is shown with orange triangles, and SFA 25B is shown with blue squares."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/clap_prop_25.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr,"/clap_prop_25.png"))
 ```
 
 ```{r cts-26, echo=FALSE, message=F, fig.align="center", fig.cap="Index of clappers (empty, paired and hinged scallop shells) as a percentage of total survey catch per standardized tow for SFA 26 stocks by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). SFA 26A is shown with black points, SFA 26B is shown with orange triangles, and SFA 26C is shown with blue squares. The shell heights associated with each size class for each stock are provided in Table 5. For SFA 26C, only the lined gear time series (since 2009) is shown."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/clap_prop_26.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr,"/clap_prop_26.png"))
 ```
 
 ```{r cts-27, echo=FALSE, message=F, fig.align="center", fig.cap="Index of clappers (empty, paired and hinged scallop shells) as a percentage of total survey catch per standardized tow for SFA 27B Georges Bank ‘b’ by size class (pre-recruits, top; recruits, middle; and fully-recruited, bottom). The shell heights associated with each size class for each stock are provided in Table 5."}
-knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,"/clap_prop_27.png"))
+knitr::include_graphics(paste0("Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Survey/", nickname,fr,"/clap_prop_27.png"))
 ```
 
 ```{r relf, echo=FALSE, message=F, fig.align="center", fig.cap="Index of relative fishing mortality for SFAs 25 (A) 26 (B) and 27B (C), calculated using survey biomass estimates and landings corresponding to survey year (June to May for SFAs 25 and 26, September to August for SFA 27B)."}

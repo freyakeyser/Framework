@@ -17,7 +17,7 @@ load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_n
 
 plotsGo <- "Y:/Offshore/Assessment/Framework/SFA_25_26_2024/DataInputs/Ageing"
 
-french <- F # set to T for french
+french <- T # set to T for french
 if(french==T) {fr <- "_fr"}
 if(french==F) {fr <- ""}
 
@@ -41,7 +41,8 @@ for(fun in funs)
   file.remove(paste0(getwd(),"/",basename(fun)))
 }
 
-funs <- c("https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/github_spatial_import.R")
+funs <- c("https://raw.githubusercontent.com/freyakeyser/Assessment_fns/master/Maps/github_spatial_import.R",
+          "https://raw.githubusercontent.com/Mar-Scal/Assessment_fns/master/Maps/French_west_labeller.R")
 # Now run through a quick loop to load each one, just be sure that your working directory is read/write!
 for(fun in funs) 
 {
@@ -483,6 +484,17 @@ if(bank=="BBn") {# Fresh ages from TPD
   print(bbn_map)
   dev.off()
   
+  png(paste0(plotsGo, "/", bank, "/age_map_fr.png"),width=8, height=8, units = "in", res=420)
+  bbn_map <- ggplot() + 
+    geom_sf(data=boundaries[boundaries$ID=="BBn",])+
+    geom_sf(data=locs, aes(shape=as.factor(year), size=n_samples)) +
+    scale_shape_manual(values=c(1,16), name="Année")+
+    scale_size_continuous(name="Nombre de coquilles") +
+    theme_bw() +
+    scale_x_continuous(name="", labels=french.west)
+  print(bbn_map)
+  dev.off()
+  
 }
 ```
 
@@ -562,7 +574,7 @@ if(bank=="Sab") {
     theme_minimal()
   
   
-  LVB(tpd_long)
+  lvb.par <- LVB(tpd_long)
   print(lvb.par)
   
   
@@ -588,6 +600,15 @@ if(bank=="Sab") {
     scale_size_continuous(name="Number of shells") +
     theme_bw() +
     theme(legend.position = c(1,0.1), legend.justification = "right", legend.background=element_rect(fill=NA))
+  dev.off()
+  
+  png(paste0(plotsGo, "/", bank, "/age_map_fr.png"),width=8, height=8, units = "in", res=420)
+  ggplot() + geom_sf(data=boundaries[boundaries$ID=="Sab",])+
+    geom_sf(data=locs, aes(size=n_samples)) + 
+    scale_size_continuous(name="Nombre de coquilles") +
+    theme_bw() +
+    theme(legend.position = c(1,0.1), legend.justification = "right", legend.background=element_rect(fill=NA)) +
+    scale_x_continuous(name="", labels=french.west)
   dev.off()
 }
 ```
@@ -1230,11 +1251,13 @@ t_02 <- paste0("t[0] == ", round(vonBpars2$tzero, 1))
 if(french==F) {
   increment <- "Increments"
   shell <- "Shells"
+  increment2 <- "Increment (Year)"
 }
 
 if(french==T) {
-  increment <- "Incréments"
+  increment <- "Accroissements"
   shell <- "Coquilles"
+  increment2 <- "Accroissement (Année)"
 }
 
 # get values for line tracing
@@ -1248,6 +1271,9 @@ xagenext <- log(-((yheightnext/vonBpars$linf) -1))/(-vonBpars$k) + vonBpars$tzer
 xagenext2 <- xagenext + 1
 yheightnext2 <- vonBpars$linf * (1 - exp(-vonBpars$k * (xagenext2 - vonBpars$tzero)))
 yheightnext2 - yheightnext
+
+
+#Accroissements= increments
 
 
 png(paste0(plotsGo, "/", bank, "/fit_vb", fr, "_2.png"),width=6.5, height=5, units = "in", res=420)
@@ -1271,16 +1297,16 @@ ggplot() +
   annotate(geom="text", x=min(preds_long$AGE)*0.75, y=yheight2, label=round(yheight2,2), colour="forestgreen", hjust=-0.5, vjust=-0.1)+
   annotate(geom="text", x=xage2, y=min(preds_long$value)*0.75, label=round(xage2,2), colour="forestgreen", vjust=-1, hjust=-0.1)+
   
-  geom_segment(aes(y=yheightnext2, yend=yheightnext2, x=min(preds_long$AGE)*0.75, xend=xagenext2), colour="forestgreen", linetype="dashed") +
-  geom_segment(aes(y=min(preds_long$value)*0.75, yend=yheightnext2, x=xagenext2, xend=xagenext2), colour="forestgreen", linetype="dashed") +
-  annotate(geom="text", x=min(preds_long$AGE)*0.75, y=yheightnext2, label=round(yheightnext2,2), colour="forestgreen", hjust=-0.5, vjust=-0.1)+
-  annotate(geom="text", x=xagenext2, y=min(preds_long$value)*0.75, label=round(xagenext2,2), colour="forestgreen", vjust=-1, hjust=-0.1)+
-  ggtitle(bank)+
+  # geom_segment(aes(y=yheightnext2, yend=yheightnext2, x=min(preds_long$AGE)*0.75, xend=xagenext2), colour="forestgreen", linetype="dashed") +
+  # geom_segment(aes(y=min(preds_long$value)*0.75, yend=yheightnext2, x=xagenext2, xend=xagenext2), colour="forestgreen", linetype="dashed") +
+  # annotate(geom="text", x=min(preds_long$AGE)*0.75, y=yheightnext2, label=round(yheightnext2,2), colour="forestgreen", hjust=-0.5, vjust=-0.1)+
+  # annotate(geom="text", x=xagenext2, y=min(preds_long$value)*0.75, label=round(xagenext2,2), colour="forestgreen", vjust=-1, hjust=-0.1)+
+  #ggtitle(bank)+
   #ylim(50,170) +
   theme_bw() +
   theme(panel.grid=element_blank())+
   ylab(paste0(en2fr("Shell height", translate=french, custom_terms=rosetta_terms), " (mm)")) +
-  xlab("Increment (Year)") +
+  xlab(increment2) +
   annotate(geom="text", x=7, y=85, label=increment, parse=T, hjust=0) +
   annotate(geom="text", x=7, y=80, label=Linf, parse=T, hjust=0) +
   annotate(geom="text", x=7, y=75, label=K, parse=T, hjust=0) + 

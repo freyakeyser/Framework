@@ -28,7 +28,7 @@ load("C:/Users/keyserf/Documents/temp_data/testing_results_framework_75-90RSCS_n
 
 nickname<-NULL
 
-french <- F # set to T for french
+french <- T # set to T for french
 if(french == T) {
   nickname <- paste0(nickname, "_fr")
 }
@@ -824,7 +824,7 @@ depth.effect$LCI <- depth.effect$effect - 1.96*depth.effect$se
 
 # Plot of the effect of depth.  In most years the slope is negative as would be expected, but it is infrequently significantly negative in any one year.
 # But overall given it's always negative, there is no doubt a general decrease in mw with increasing depth.
-if(french==T) depthlab <- "Effet de profondeur"
+if(french==T) depthlab <- "Effet de la profondeur"
 if(french==F) depthlab <- "Depth effect"
 p.depth <- ggplot(depth.effect,aes(x=year,y=effect)) +
   geom_errorbar(aes(ymin=LCI,ymax=UCI,x=year), width=0.5)+
